@@ -384,6 +384,8 @@ data TraceLocalRootPeers exception =
        -- ^ 'Int' is the configured valency for the local producer groups
      | TraceLocalRootWaiting DomainAddress DiffTime
      | TraceLocalRootResult  DomainAddress [(IPv4, DNS.TTL)]
+     | TraceLocalRootGroups  (Seq (Int, Map Socket.SockAddr PeerAdvertise))
+       -- ^ This traces the results of the local root peer provider
      | TraceLocalRootFailure DomainAddress (DNSorIOError exception)
        --TODO: classify DNS errors, config error vs transitory
   deriving Show
@@ -449,6 +451,7 @@ localRootPeersProvider tracer
                      RelayDomain {}  -> False
                    )
 
+  traceWith tracer (TraceLocalRootGroups rootPeersGroups)
   atomically $
     writeTVar rootPeersGroupsVar rootPeersGroups
 
@@ -516,7 +519,7 @@ localRootPeersProvider tracer
           case reply of
             Left err -> go rrNext (ttlForDnsError err ttl)
             Right results -> do
-              atomically $ do
+              tmpTracer <- atomically $ do
                 rootPeersGroups <- readTVar rootPeersGroupsVar
                 let (target, entry)  = rootPeersGroups `Seq.index` index
                     resultsMap       = Map.fromList (map fst results)
@@ -532,10 +535,14 @@ localRootPeersProvider tracer
                     tmpTracer =
                       contramap (const $ TraceLocalRootGroups rootPeersGroups')
                                 tracer
+
                 -- Only overwrite if it changed:
                 when (entry /= resultsMap) $
                   writeTVar rootPeersGroupsVar rootPeersGroups'
 
+                return tmpTracer
+
+              traceWith tmpTracer ()
               go rrNext (ttlForResults (map snd results))
 
 
