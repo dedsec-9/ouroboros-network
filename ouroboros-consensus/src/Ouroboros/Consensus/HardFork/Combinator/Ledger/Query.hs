@@ -131,7 +131,7 @@ instance All SingleEraBlock xs => QueryLedger (HardForkBlock xs) where
             hardForkState
         QueryHardFork queryHardFork ->
           interpretQueryHardFork
-            lcfg
+            cfg
             queryHardFork
             st
     where
@@ -331,14 +331,14 @@ instance SameDepIndex (QueryHardFork xs) where
 
 interpretQueryHardFork ::
      All SingleEraBlock xs
-  => HardForkLedgerConfig xs
+  => TopLevelConfig (HardForkBlock xs)
   -> QueryHardFork xs result
   -> LedgerState (HardForkBlock xs)
   -> result
 interpretQueryHardFork cfg query st =
     case query of
       GetInterpreter ->
-        History.mkInterpreter $ hardForkSummary cfg st
+        History.mkInterpreter $ hardForkSummary (configLedger cfg) st
       GetCurrentEra  ->
         eraIndexFromNS $ State.tip $ hardForkLedgerStatePerEra st
 
