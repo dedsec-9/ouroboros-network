@@ -1,0 +1,881 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DeriveTraversable #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DerivingVia       #-}</span><span>
+</span><span id="line-3"></span><span>
+</span><span id="line-4"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.Testing.Data.Script</span><span>
+</span><span id="line-5"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Test scripts</span></span><span>
+</span><span id="line-6"></span><span>    </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier">Script</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-7"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">NonEmpty</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-8"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#scriptHead"><span class="hs-identifier">scriptHead</span></a></span><span>
+</span><span id="line-9"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#singletonScript"><span class="hs-identifier">singletonScript</span></a></span><span>
+</span><span id="line-10"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#initScript"><span class="hs-identifier">initScript</span></a></span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#stepScript"><span class="hs-identifier">stepScript</span></a></span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#stepScriptSTM"><span class="hs-identifier">stepScriptSTM</span></a></span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#initScript%27"><span class="hs-identifier">initScript'</span></a></span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#stepScript%27"><span class="hs-identifier">stepScript'</span></a></span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#stepScriptSTM%27"><span class="hs-identifier">stepScriptSTM'</span></a></span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#arbitraryScriptOf"><span class="hs-identifier">arbitraryScriptOf</span></a></span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#prop_shrink_Script"><span class="hs-identifier">prop_shrink_Script</span></a></span><span>
+</span><span id="line-18"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Timed scripts</span></span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#ScriptDelay"><span class="hs-identifier">ScriptDelay</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#TimedScript"><span class="hs-identifier">TimedScript</span></a></span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#playTimedScript"><span class="hs-identifier">playTimedScript</span></a></span><span>
+</span><span id="line-22"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Pick scripts</span></span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#PickScript"><span class="hs-identifier">PickScript</span></a></span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#PickMembers"><span class="hs-identifier">PickMembers</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#arbitraryPickScript"><span class="hs-identifier">arbitraryPickScript</span></a></span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#interpretPickScript"><span class="hs-identifier">interpretPickScript</span></a></span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-28"></span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.List.NonEmpty</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">NonEmpty</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.List.NonEmpty</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">NonEmpty</span></span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Data.Set</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Set</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Data.Set</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Set</span></span><span>
+</span><span id="line-33"></span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier">Control.Monad.Class.MonadAsync</span></a></span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier">Control.Monad.Class.MonadSTM</span></a></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier">Control.Monad.Class.MonadSTM</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">LazySTM</span></span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier">Control.Monad.Class.MonadTimer</span></a></span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Tracer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Tracer</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">traceWith</span></span><span class="hs-special">)</span><span>
+</span><span id="line-39"></span><span>
+</span><span id="line-40"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html"><span class="hs-identifier">Ouroboros.Network.Testing.Utils</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#prop_shrink_nonequal"><span class="hs-identifier">prop_shrink_nonequal</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-41"></span><span>                     </span><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#shrinkVector"><span class="hs-identifier">shrinkVector</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-42"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Test.QuickCheck</span></span><span>
+</span><span id="line-43"></span><span>
+</span><span id="line-44"></span><span class="hs-comment">--</span><span>
+</span><span id="line-45"></span><span class="hs-comment">-- Test script abstraction</span><span>
+</span><span id="line-46"></span><span class="hs-comment">--</span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span class="hs-keyword">newtype</span><span> </span><span id="Script"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-var">Script</span></a></span></span><span> </span><span id="local-6989586621679087999"><span class="annot"><a href="#local-6989586621679087999"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Script"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-var">Script</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">NonEmpty</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087999"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-49"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679087876"><span id="local-6989586621679087878"><span class="annot"><span class="annottext">Script a -&gt; Script a -&gt; Bool
+(Script a -&gt; Script a -&gt; Bool)
+-&gt; (Script a -&gt; Script a -&gt; Bool) -&gt; Eq (Script a)
+forall a. Eq a =&gt; Script a -&gt; Script a -&gt; Bool
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Script a -&gt; Script a -&gt; Bool
+$c/= :: forall a. Eq a =&gt; Script a -&gt; Script a -&gt; Bool
+== :: Script a -&gt; Script a -&gt; Bool
+$c== :: forall a. Eq a =&gt; Script a -&gt; Script a -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679087869"><span id="local-6989586621679087871"><span id="local-6989586621679087873"><span class="annot"><span class="annottext">Int -&gt; Script a -&gt; ShowS
+[Script a] -&gt; ShowS
+Script a -&gt; String
+(Int -&gt; Script a -&gt; ShowS)
+-&gt; (Script a -&gt; String) -&gt; ([Script a] -&gt; ShowS) -&gt; Show (Script a)
+forall a. Show a =&gt; Int -&gt; Script a -&gt; ShowS
+forall a. Show a =&gt; [Script a] -&gt; ShowS
+forall a. Show a =&gt; Script a -&gt; String
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Script a] -&gt; ShowS
+$cshowList :: forall a. Show a =&gt; [Script a] -&gt; ShowS
+show :: Script a -&gt; String
+$cshow :: forall a. Show a =&gt; Script a -&gt; String
+showsPrec :: Int -&gt; Script a -&gt; ShowS
+$cshowsPrec :: forall a. Show a =&gt; Int -&gt; Script a -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679087864"><span id="local-6989586621679087866"><span class="annot"><span class="annottext">a -&gt; Script b -&gt; Script a
+(a -&gt; b) -&gt; Script a -&gt; Script b
+(forall a b. (a -&gt; b) -&gt; Script a -&gt; Script b)
+-&gt; (forall a b. a -&gt; Script b -&gt; Script a) -&gt; Functor Script
+forall a b. a -&gt; Script b -&gt; Script a
+forall a b. (a -&gt; b) -&gt; Script a -&gt; Script b
+forall (f :: * -&gt; *).
+(forall a b. (a -&gt; b) -&gt; f a -&gt; f b)
+-&gt; (forall a b. a -&gt; f b -&gt; f a) -&gt; Functor f
+&lt;$ :: a -&gt; Script b -&gt; Script a
+$c&lt;$ :: forall a b. a -&gt; Script b -&gt; Script a
+fmap :: (a -&gt; b) -&gt; Script a -&gt; Script b
+$cfmap :: forall a b. (a -&gt; b) -&gt; Script a -&gt; Script b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Functor</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679087829"><span id="local-6989586621679087831"><span id="local-6989586621679087833"><span id="local-6989586621679087835"><span id="local-6989586621679087837"><span id="local-6989586621679087839"><span id="local-6989586621679087841"><span id="local-6989586621679087843"><span id="local-6989586621679087845"><span id="local-6989586621679087847"><span id="local-6989586621679087849"><span id="local-6989586621679087851"><span id="local-6989586621679087853"><span id="local-6989586621679087855"><span id="local-6989586621679087857"><span id="local-6989586621679087859"><span id="local-6989586621679087861"><span class="annot"><span class="annottext">Script a -&gt; Bool
+(a -&gt; m) -&gt; Script a -&gt; m
+(a -&gt; b -&gt; b) -&gt; b -&gt; Script a -&gt; b
+(forall m. Monoid m =&gt; Script m -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; Script a -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; Script a -&gt; m)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Script a -&gt; b)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Script a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; Script a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; Script a -&gt; b)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; Script a -&gt; a)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; Script a -&gt; a)
+-&gt; (forall a. Script a -&gt; [a])
+-&gt; (forall a. Script a -&gt; Bool)
+-&gt; (forall a. Script a -&gt; Int)
+-&gt; (forall a. Eq a =&gt; a -&gt; Script a -&gt; Bool)
+-&gt; (forall a. Ord a =&gt; Script a -&gt; a)
+-&gt; (forall a. Ord a =&gt; Script a -&gt; a)
+-&gt; (forall a. Num a =&gt; Script a -&gt; a)
+-&gt; (forall a. Num a =&gt; Script a -&gt; a)
+-&gt; Foldable Script
+forall a. Eq a =&gt; a -&gt; Script a -&gt; Bool
+forall a. Num a =&gt; Script a -&gt; a
+forall a. Ord a =&gt; Script a -&gt; a
+forall m. Monoid m =&gt; Script m -&gt; m
+forall a. Script a -&gt; Bool
+forall a. Script a -&gt; Int
+forall a. Script a -&gt; [a]
+forall a. (a -&gt; a -&gt; a) -&gt; Script a -&gt; a
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; Script a -&gt; m
+forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; Script a -&gt; b
+forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Script a -&gt; b
+forall (t :: * -&gt; *).
+(forall m. Monoid m =&gt; t m -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; t a -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; t a -&gt; m)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; t a -&gt; a)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; t a -&gt; a)
+-&gt; (forall a. t a -&gt; [a])
+-&gt; (forall a. t a -&gt; Bool)
+-&gt; (forall a. t a -&gt; Int)
+-&gt; (forall a. Eq a =&gt; a -&gt; t a -&gt; Bool)
+-&gt; (forall a. Ord a =&gt; t a -&gt; a)
+-&gt; (forall a. Ord a =&gt; t a -&gt; a)
+-&gt; (forall a. Num a =&gt; t a -&gt; a)
+-&gt; (forall a. Num a =&gt; t a -&gt; a)
+-&gt; Foldable t
+product :: Script a -&gt; a
+$cproduct :: forall a. Num a =&gt; Script a -&gt; a
+sum :: Script a -&gt; a
+$csum :: forall a. Num a =&gt; Script a -&gt; a
+minimum :: Script a -&gt; a
+$cminimum :: forall a. Ord a =&gt; Script a -&gt; a
+maximum :: Script a -&gt; a
+$cmaximum :: forall a. Ord a =&gt; Script a -&gt; a
+elem :: a -&gt; Script a -&gt; Bool
+$celem :: forall a. Eq a =&gt; a -&gt; Script a -&gt; Bool
+length :: Script a -&gt; Int
+$clength :: forall a. Script a -&gt; Int
+null :: Script a -&gt; Bool
+$cnull :: forall a. Script a -&gt; Bool
+toList :: Script a -&gt; [a]
+$ctoList :: forall a. Script a -&gt; [a]
+foldl1 :: (a -&gt; a -&gt; a) -&gt; Script a -&gt; a
+$cfoldl1 :: forall a. (a -&gt; a -&gt; a) -&gt; Script a -&gt; a
+foldr1 :: (a -&gt; a -&gt; a) -&gt; Script a -&gt; a
+$cfoldr1 :: forall a. (a -&gt; a -&gt; a) -&gt; Script a -&gt; a
+foldl' :: (b -&gt; a -&gt; b) -&gt; b -&gt; Script a -&gt; b
+$cfoldl' :: forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; Script a -&gt; b
+foldl :: (b -&gt; a -&gt; b) -&gt; b -&gt; Script a -&gt; b
+$cfoldl :: forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; Script a -&gt; b
+foldr' :: (a -&gt; b -&gt; b) -&gt; b -&gt; Script a -&gt; b
+$cfoldr' :: forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Script a -&gt; b
+foldr :: (a -&gt; b -&gt; b) -&gt; b -&gt; Script a -&gt; b
+$cfoldr :: forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Script a -&gt; b
+foldMap' :: (a -&gt; m) -&gt; Script a -&gt; m
+$cfoldMap' :: forall m a. Monoid m =&gt; (a -&gt; m) -&gt; Script a -&gt; m
+foldMap :: (a -&gt; m) -&gt; Script a -&gt; m
+$cfoldMap :: forall m a. Monoid m =&gt; (a -&gt; m) -&gt; Script a -&gt; m
+fold :: Script m -&gt; m
+$cfold :: forall m. Monoid m =&gt; Script m -&gt; m
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Foldable</span></a></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679087818"><span id="local-6989586621679087820"><span id="local-6989586621679087822"><span id="local-6989586621679087824"><span class="annot"><span class="annottext">Functor Script
+Foldable Script
+Functor Script
+-&gt; Foldable Script
+-&gt; (forall (f :: * -&gt; *) a b.
+    Applicative f =&gt;
+    (a -&gt; f b) -&gt; Script a -&gt; f (Script b))
+-&gt; (forall (f :: * -&gt; *) a.
+    Applicative f =&gt;
+    Script (f a) -&gt; f (Script a))
+-&gt; (forall (m :: * -&gt; *) a b.
+    Monad m =&gt;
+    (a -&gt; m b) -&gt; Script a -&gt; m (Script b))
+-&gt; (forall (m :: * -&gt; *) a.
+    Monad m =&gt;
+    Script (m a) -&gt; m (Script a))
+-&gt; Traversable Script
+(a -&gt; f b) -&gt; Script a -&gt; f (Script b)
+forall (t :: * -&gt; *).
+Functor t
+-&gt; Foldable t
+-&gt; (forall (f :: * -&gt; *) a b.
+    Applicative f =&gt;
+    (a -&gt; f b) -&gt; t a -&gt; f (t b))
+-&gt; (forall (f :: * -&gt; *) a. Applicative f =&gt; t (f a) -&gt; f (t a))
+-&gt; (forall (m :: * -&gt; *) a b.
+    Monad m =&gt;
+    (a -&gt; m b) -&gt; t a -&gt; m (t b))
+-&gt; (forall (m :: * -&gt; *) a. Monad m =&gt; t (m a) -&gt; m (t a))
+-&gt; Traversable t
+forall (m :: * -&gt; *) a. Monad m =&gt; Script (m a) -&gt; m (Script a)
+forall (f :: * -&gt; *) a.
+Applicative f =&gt;
+Script (f a) -&gt; f (Script a)
+forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+(a -&gt; m b) -&gt; Script a -&gt; m (Script b)
+forall (f :: * -&gt; *) a b.
+Applicative f =&gt;
+(a -&gt; f b) -&gt; Script a -&gt; f (Script b)
+sequence :: Script (m a) -&gt; m (Script a)
+$csequence :: forall (m :: * -&gt; *) a. Monad m =&gt; Script (m a) -&gt; m (Script a)
+mapM :: (a -&gt; m b) -&gt; Script a -&gt; m (Script b)
+$cmapM :: forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+(a -&gt; m b) -&gt; Script a -&gt; m (Script b)
+sequenceA :: Script (f a) -&gt; f (Script a)
+$csequenceA :: forall (f :: * -&gt; *) a.
+Applicative f =&gt;
+Script (f a) -&gt; f (Script a)
+traverse :: (a -&gt; f b) -&gt; Script a -&gt; f (Script b)
+$ctraverse :: forall (f :: * -&gt; *) a b.
+Applicative f =&gt;
+(a -&gt; f b) -&gt; Script a -&gt; f (Script b)
+$cp2Traversable :: Foldable Script
+$cp1Traversable :: Functor Script
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Traversable</span></a></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-50"></span><span>
+</span><span id="line-51"></span><span id="local-6989586621679087816"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#singletonScript"><span class="hs-identifier hs-type">singletonScript</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679087816"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087816"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-52"></span><span id="singletonScript"><span class="annot"><span class="annottext">singletonScript :: a -&gt; Script a
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#singletonScript"><span class="hs-identifier hs-var hs-var">singletonScript</span></a></span></span><span> </span><span id="local-6989586621679087815"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087815"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NonEmpty a -&gt; Script a
+forall a. NonEmpty a -&gt; Script a
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-var">Script</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087815"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; [a] -&gt; NonEmpty a
+forall a. a -&gt; [a] -&gt; NonEmpty a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">:|</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">)</span><span>
+</span><span id="line-53"></span><span>
+</span><span id="line-54"></span><span id="local-6989586621679087813"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#scriptHead"><span class="hs-identifier hs-type">scriptHead</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087813"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679087813"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-55"></span><span id="scriptHead"><span class="annot"><span class="annottext">scriptHead :: Script a -&gt; a
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#scriptHead"><span class="hs-identifier hs-var hs-var">scriptHead</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679087812"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087812"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-type">:|</span></a></span><span> </span><span class="annot"><span class="annottext">[a]
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087812"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-56"></span><span>
+</span><span id="line-57"></span><span id="local-6989586621679087949"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#arbitraryScriptOf"><span class="hs-identifier hs-type">arbitraryScriptOf</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="annot"><a href="#local-6989586621679087949"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087949"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-58"></span><span id="arbitraryScriptOf"><span class="annot"><span class="annottext">arbitraryScriptOf :: Int -&gt; Gen a -&gt; Gen (Script a)
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#arbitraryScriptOf"><span class="hs-identifier hs-var hs-var">arbitraryScriptOf</span></a></span></span><span> </span><span id="local-6989586621679087811"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087811"><span class="hs-identifier hs-var">maxSz</span></a></span></span><span> </span><span id="local-6989586621679087810"><span class="annot"><span class="annottext">Gen a
+</span><a href="#local-6989586621679087810"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-59"></span><span>    </span><span class="annot"><span class="annottext">(Int -&gt; Gen (Script a)) -&gt; Gen (Script a)
+forall a. (Int -&gt; Gen a) -&gt; Gen a
+</span><span class="hs-identifier hs-var">sized</span></span><span> </span><span class="annot"><span class="annottext">((Int -&gt; Gen (Script a)) -&gt; Gen (Script a))
+-&gt; (Int -&gt; Gen (Script a)) -&gt; Gen (Script a)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679087808"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087808"><span class="hs-identifier hs-var">sz</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-60"></span><span>      </span><span id="local-6989586621679087807"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087807"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Int, Int) -&gt; Gen Int
+forall a. Random a =&gt; (a, a) -&gt; Gen a
+</span><span class="hs-identifier hs-var">choose</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Ord a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">max</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Ord a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">min</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087811"><span class="hs-identifier hs-var">maxSz</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087808"><span class="hs-identifier hs-var">sz</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-61"></span><span>      </span><span class="annot"><span class="annottext">NonEmpty a -&gt; Script a
+forall a. NonEmpty a -&gt; Script a
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-var">Script</span></a></span><span> </span><span class="annot"><span class="annottext">(NonEmpty a -&gt; Script a) -&gt; ([a] -&gt; NonEmpty a) -&gt; [a] -&gt; Script a
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">[a] -&gt; NonEmpty a
+forall a. [a] -&gt; NonEmpty a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">NonEmpty.fromList</span></a></span><span> </span><span class="annot"><span class="annottext">([a] -&gt; Script a) -&gt; Gen [a] -&gt; Gen (Script a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Gen a -&gt; Gen [a]
+forall a. Int -&gt; Gen a -&gt; Gen [a]
+</span><span class="hs-identifier hs-var">vectorOf</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087807"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Gen a
+</span><a href="#local-6989586621679087810"><span class="hs-identifier hs-var">a</span></a></span><span>
+</span><span id="line-62"></span><span>
+</span><span id="line-63"></span><span id="local-6989586621679087798"><span id="local-6989586621679087799"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#initScript"><span class="hs-identifier hs-type">initScript</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">MonadSTM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087799"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-64"></span><span>            </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087798"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-65"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">STM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087799"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">TVar</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087799"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087798"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-66"></span><span id="initScript"><span class="annot"><span class="annottext">initScript :: Script a -&gt; STM m (TVar m (Script a))
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#initScript"><span class="hs-identifier hs-var hs-var">initScript</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Script a -&gt; STM m (TVar m (Script a))
+forall (m :: * -&gt; *) a. MonadSTM m =&gt; a -&gt; STM m (TVar m a)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">LazySTM.newTVar</span></a></span><span>
+</span><span id="line-67"></span><span>
+</span><span id="line-68"></span><span id="local-6989586621679087795"><span id="local-6989586621679087796"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#stepScript"><span class="hs-identifier hs-type">stepScript</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">MonadSTM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087796"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">TVar</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087796"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087795"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679087796"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087795"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-69"></span><span id="stepScript"><span class="annot"><span class="annottext">stepScript :: TVar m (Script a) -&gt; m a
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#stepScript"><span class="hs-identifier hs-var hs-var">stepScript</span></a></span></span><span> </span><span id="local-6989586621679087794"><span class="annot"><span class="annottext">TVar m (Script a)
+</span><a href="#local-6989586621679087794"><span class="hs-identifier hs-var">scriptVar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">STM m a -&gt; m a
+forall (m :: * -&gt; *) a.
+(MonadSTM m, HasCallStack) =&gt;
+STM m a -&gt; m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">atomically</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TVar m (Script a) -&gt; STM m a
+forall (m :: * -&gt; *) a. MonadSTM m =&gt; TVar m (Script a) -&gt; STM m a
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#stepScriptSTM"><span class="hs-identifier hs-var">stepScriptSTM</span></a></span><span> </span><span class="annot"><span class="annottext">TVar m (Script a)
+</span><a href="#local-6989586621679087794"><span class="hs-identifier hs-var">scriptVar</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-70"></span><span>
+</span><span id="line-71"></span><span id="local-6989586621679087966"><span id="local-6989586621679087967"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#stepScriptSTM"><span class="hs-identifier hs-type">stepScriptSTM</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">MonadSTM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087967"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">TVar</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087967"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087966"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">STM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087967"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087966"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-72"></span><span id="stepScriptSTM"><span class="annot"><span class="annottext">stepScriptSTM :: TVar m (Script a) -&gt; STM m a
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#stepScriptSTM"><span class="hs-identifier hs-var hs-var">stepScriptSTM</span></a></span></span><span> </span><span id="local-6989586621679087792"><span class="annot"><span class="annottext">TVar m (Script a)
+</span><a href="#local-6989586621679087792"><span class="hs-identifier hs-var">scriptVar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-73"></span><span>    </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679087791"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087791"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-type">:|</span></a></span><span> </span><span id="local-6989586621679087790"><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679087790"><span class="hs-identifier hs-var">xs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">TVar m (Script a) -&gt; STM m (Script a)
+forall (m :: * -&gt; *) a. MonadSTM m =&gt; TVar m a -&gt; STM m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">LazySTM.readTVar</span></a></span><span> </span><span class="annot"><span class="annottext">TVar m (Script a)
+</span><a href="#local-6989586621679087792"><span class="hs-identifier hs-var">scriptVar</span></a></span><span>
+</span><span id="line-74"></span><span>    </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679087790"><span class="hs-identifier hs-var">xs</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-75"></span><span>      </span><span class="hs-special">[</span><span class="hs-special">]</span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">() -&gt; STM m ()
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-76"></span><span>      </span><span id="local-6989586621679087788"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087788"><span class="hs-identifier hs-var">x'</span></a></span></span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">:</span></a></span><span id="local-6989586621679087787"><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679087787"><span class="hs-identifier hs-var">xs'</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">TVar m (Script a) -&gt; Script a -&gt; STM m ()
+forall (m :: * -&gt; *) a. MonadSTM m =&gt; TVar m a -&gt; a -&gt; STM m ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">LazySTM.writeTVar</span></a></span><span> </span><span class="annot"><span class="annottext">TVar m (Script a)
+</span><a href="#local-6989586621679087792"><span class="hs-identifier hs-var">scriptVar</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NonEmpty a -&gt; Script a
+forall a. NonEmpty a -&gt; Script a
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-var">Script</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087788"><span class="hs-identifier hs-var">x'</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; [a] -&gt; NonEmpty a
+forall a. a -&gt; [a] -&gt; NonEmpty a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">:|</span></a></span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679087787"><span class="hs-identifier hs-var">xs'</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-77"></span><span>    </span><span class="annot"><span class="annottext">a -&gt; STM m a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087791"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-78"></span><span>
+</span><span id="line-79"></span><span id="local-6989586621679087784"><span id="local-6989586621679087785"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#initScript%27"><span class="hs-identifier hs-type">initScript'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">MonadSTM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087785"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087784"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679087785"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">TVar</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087785"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087784"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-80"></span><span id="initScript%27"><span class="annot"><span class="annottext">initScript' :: Script a -&gt; m (TVar m (Script a))
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#initScript%27"><span class="hs-identifier hs-var hs-var">initScript'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Script a -&gt; m (TVar m (Script a))
+forall (m :: * -&gt; *) a. MonadSTM m =&gt; a -&gt; m (TVar m a)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">newTVarIO</span></a></span><span>
+</span><span id="line-81"></span><span>
+</span><span id="line-82"></span><span id="local-6989586621679087781"><span id="local-6989586621679087782"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#stepScript%27"><span class="hs-identifier hs-type">stepScript'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">MonadSTM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087782"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">TVar</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087782"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087781"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679087782"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087781"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-83"></span><span id="stepScript%27"><span class="annot"><span class="annottext">stepScript' :: TVar m (Script a) -&gt; m a
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#stepScript%27"><span class="hs-identifier hs-var hs-var">stepScript'</span></a></span></span><span> </span><span id="local-6989586621679087780"><span class="annot"><span class="annottext">TVar m (Script a)
+</span><a href="#local-6989586621679087780"><span class="hs-identifier hs-var">scriptVar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">STM m a -&gt; m a
+forall (m :: * -&gt; *) a.
+(MonadSTM m, HasCallStack) =&gt;
+STM m a -&gt; m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">atomically</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TVar m (Script a) -&gt; STM m a
+forall (m :: * -&gt; *) a. MonadSTM m =&gt; TVar m (Script a) -&gt; STM m a
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#stepScriptSTM"><span class="hs-identifier hs-var">stepScriptSTM</span></a></span><span> </span><span class="annot"><span class="annottext">TVar m (Script a)
+</span><a href="#local-6989586621679087780"><span class="hs-identifier hs-var">scriptVar</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-84"></span><span>
+</span><span id="line-85"></span><span id="local-6989586621679087778"><span id="local-6989586621679087779"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#stepScriptSTM%27"><span class="hs-identifier hs-type">stepScriptSTM'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">MonadSTM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087779"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">TVar</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087779"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087778"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">STM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087779"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087778"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-86"></span><span id="stepScriptSTM%27"><span class="annot"><span class="annottext">stepScriptSTM' :: TVar m (Script a) -&gt; STM m a
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#stepScriptSTM%27"><span class="hs-identifier hs-var hs-var">stepScriptSTM'</span></a></span></span><span> </span><span id="local-6989586621679087777"><span class="annot"><span class="annottext">TVar m (Script a)
+</span><a href="#local-6989586621679087777"><span class="hs-identifier hs-var">scriptVar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-87"></span><span>    </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679087776"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087776"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-type">:|</span></a></span><span> </span><span id="local-6989586621679087775"><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679087775"><span class="hs-identifier hs-var">xs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">TVar m (Script a) -&gt; STM m (Script a)
+forall (m :: * -&gt; *) a. MonadSTM m =&gt; TVar m a -&gt; STM m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">readTVar</span></a></span><span> </span><span class="annot"><span class="annottext">TVar m (Script a)
+</span><a href="#local-6989586621679087777"><span class="hs-identifier hs-var">scriptVar</span></a></span><span>
+</span><span id="line-88"></span><span>    </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679087775"><span class="hs-identifier hs-var">xs</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-89"></span><span>      </span><span class="hs-special">[</span><span class="hs-special">]</span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">() -&gt; STM m ()
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-90"></span><span>      </span><span id="local-6989586621679087774"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087774"><span class="hs-identifier hs-var">x'</span></a></span></span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">:</span></a></span><span id="local-6989586621679087773"><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679087773"><span class="hs-identifier hs-var">xs'</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">TVar m (Script a) -&gt; Script a -&gt; STM m ()
+forall (m :: * -&gt; *) a. MonadSTM m =&gt; TVar m a -&gt; a -&gt; STM m ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">writeTVar</span></a></span><span> </span><span class="annot"><span class="annottext">TVar m (Script a)
+</span><a href="#local-6989586621679087777"><span class="hs-identifier hs-var">scriptVar</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NonEmpty a -&gt; Script a
+forall a. NonEmpty a -&gt; Script a
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-var">Script</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087774"><span class="hs-identifier hs-var">x'</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; [a] -&gt; NonEmpty a
+forall a. a -&gt; [a] -&gt; NonEmpty a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">:|</span></a></span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679087773"><span class="hs-identifier hs-var">xs'</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-91"></span><span>    </span><span class="annot"><span class="annottext">a -&gt; STM m a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087776"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-92"></span><span>
+</span><span id="line-93"></span><span id="local-6989586621679087772"><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="#local-6989586621679087772"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087772"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-94"></span><span>    </span><span id="local-6989586621679087768"><span class="annot"><span class="annottext">arbitrary :: Gen (Script a)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Gen (Script a)) -&gt; Gen (Script a)
+forall a. (Int -&gt; Gen a) -&gt; Gen a
+</span><span class="hs-identifier hs-var">sized</span></span><span> </span><span class="annot"><span class="annottext">((Int -&gt; Gen (Script a)) -&gt; Gen (Script a))
+-&gt; (Int -&gt; Gen (Script a)) -&gt; Gen (Script a)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679087766"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087766"><span class="hs-identifier hs-var">sz</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Gen a -&gt; Gen (Script a)
+forall a. Int -&gt; Gen a -&gt; Gen (Script a)
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#arbitraryScriptOf"><span class="hs-identifier hs-var">arbitraryScriptOf</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087766"><span class="hs-identifier hs-var">sz</span></a></span><span> </span><span class="annot"><span class="annottext">Gen a
+forall a. Arbitrary a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrary</span></span><span>
+</span><span id="line-95"></span><span>
+</span><span id="line-96"></span><span>    </span><span id="local-6989586621679087765"><span class="annot"><span class="annottext">shrink :: Script a -&gt; [Script a]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679087763"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087763"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-type">:|</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">NonEmpty a -&gt; Script a
+forall a. NonEmpty a -&gt; Script a
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-var">Script</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087762"><span class="hs-identifier hs-var">x'</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; [a] -&gt; NonEmpty a
+forall a. a -&gt; [a] -&gt; NonEmpty a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">:|</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679087762"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087762"><span class="hs-identifier hs-var">x'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">a -&gt; [a]
+forall a. Arbitrary a =&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087763"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-97"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679087761"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087761"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-type">:|</span></a></span><span> </span><span id="local-6989586621679087760"><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679087760"><span class="hs-identifier hs-var">xs</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-98"></span><span>        </span><span class="annot"><span class="annottext">NonEmpty a -&gt; Script a
+forall a. NonEmpty a -&gt; Script a
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-var">Script</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087761"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; [a] -&gt; NonEmpty a
+forall a. a -&gt; [a] -&gt; NonEmpty a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">:|</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">)</span><span>                          </span><span class="hs-comment">-- drop whole tail</span><span>
+</span><span id="line-99"></span><span>      </span><span class="annot"><span class="annottext">Script a -&gt; [Script a] -&gt; [Script a]
+forall a. a -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-var">:</span></a></span><span> </span><span class="annot"><span class="annottext">NonEmpty a -&gt; Script a
+forall a. NonEmpty a -&gt; Script a
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-var">Script</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087761"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; [a] -&gt; NonEmpty a
+forall a. a -&gt; [a] -&gt; NonEmpty a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">:|</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; [a] -&gt; [a]
+forall a. Int -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">take</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[a] -&gt; Int
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">length</span></a></span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679087760"><span class="hs-identifier hs-var">xs</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Integral a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">`div`</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679087760"><span class="hs-identifier hs-var">xs</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-comment">-- drop half the tail</span><span>
+</span><span id="line-100"></span><span>      </span><span class="annot"><span class="annottext">Script a -&gt; [Script a] -&gt; [Script a]
+forall a. a -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-var">:</span></a></span><span> </span><span class="annot"><span class="annottext">NonEmpty a -&gt; Script a
+forall a. NonEmpty a -&gt; Script a
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-var">Script</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087761"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; [a] -&gt; NonEmpty a
+forall a. a -&gt; [a] -&gt; NonEmpty a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">:|</span></a></span><span> </span><span class="annot"><span class="annottext">[a] -&gt; [a]
+forall a. [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">init</span></a></span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679087760"><span class="hs-identifier hs-var">xs</span></a></span><span class="hs-special">)</span><span>                     </span><span class="hs-comment">-- drop only last</span><span>
+</span><span id="line-101"></span><span>
+</span><span id="line-102"></span><span>        </span><span class="hs-comment">-- drop none, shrink only elements</span><span>
+</span><span id="line-103"></span><span>      </span><span class="annot"><span class="annottext">Script a -&gt; [Script a] -&gt; [Script a]
+forall a. a -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-var">:</span></a></span><span> </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">NonEmpty a -&gt; Script a
+forall a. NonEmpty a -&gt; Script a
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-var">Script</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087755"><span class="hs-identifier hs-var">x'</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; [a] -&gt; NonEmpty a
+forall a. a -&gt; [a] -&gt; NonEmpty a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">:|</span></a></span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679087760"><span class="hs-identifier hs-var">xs</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679087755"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087755"><span class="hs-identifier hs-var">x'</span></a></span></span><span>  </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">a -&gt; [a]
+forall a. Arbitrary a =&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087761"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-104"></span><span>     </span><span class="annot"><span class="annottext">[Script a] -&gt; [Script a] -&gt; [Script a]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">++</span></a></span><span> </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">NonEmpty a -&gt; Script a
+forall a. NonEmpty a -&gt; Script a
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-var">Script</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087761"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; [a] -&gt; NonEmpty a
+forall a. a -&gt; [a] -&gt; NonEmpty a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">:|</span></a></span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679087754"><span class="hs-identifier hs-var">xs'</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679087754"><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679087754"><span class="hs-identifier hs-var">xs'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(a -&gt; [a]) -&gt; [a] -&gt; [[a]]
+forall a. (a -&gt; [a]) -&gt; [a] -&gt; [[a]]
+</span><a href="Ouroboros.Network.Testing.Utils.html#shrinkVector"><span class="hs-identifier hs-var">shrinkVector</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; [a]
+forall a. Arbitrary a =&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679087760"><span class="hs-identifier hs-var">xs</span></a></span><span> </span><span class="hs-special">]</span></span><span>
+</span><span id="line-105"></span><span>
+</span><span id="line-106"></span><span>
+</span><span id="line-107"></span><span class="hs-comment">--</span><span>
+</span><span id="line-108"></span><span class="hs-comment">-- Timed scripts</span><span>
+</span><span id="line-109"></span><span class="hs-comment">--</span><span>
+</span><span id="line-110"></span><span>
+</span><span id="line-111"></span><span class="hs-keyword">type</span><span> </span><span id="TimedScript"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#TimedScript"><span class="hs-identifier hs-var">TimedScript</span></a></span></span><span> </span><span id="local-6989586621679087753"><span class="annot"><a href="#local-6989586621679087753"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679087753"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#ScriptDelay"><span class="hs-identifier hs-type">ScriptDelay</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-112"></span><span>
+</span><span id="line-113"></span><span class="hs-keyword">data</span><span> </span><span id="ScriptDelay"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#ScriptDelay"><span class="hs-identifier hs-var">ScriptDelay</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="NoDelay"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#NoDelay"><span class="hs-identifier hs-var">NoDelay</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="ShortDelay"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#ShortDelay"><span class="hs-identifier hs-var">ShortDelay</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="LongDelay"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#LongDelay"><span class="hs-identifier hs-var">LongDelay</span></a></span></span><span>
+</span><span id="line-114"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679087746"><span id="local-6989586621679087748"><span class="annot"><span class="annottext">ScriptDelay -&gt; ScriptDelay -&gt; Bool
+(ScriptDelay -&gt; ScriptDelay -&gt; Bool)
+-&gt; (ScriptDelay -&gt; ScriptDelay -&gt; Bool) -&gt; Eq ScriptDelay
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: ScriptDelay -&gt; ScriptDelay -&gt; Bool
+$c/= :: ScriptDelay -&gt; ScriptDelay -&gt; Bool
+== :: ScriptDelay -&gt; ScriptDelay -&gt; Bool
+$c== :: ScriptDelay -&gt; ScriptDelay -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679087740"><span id="local-6989586621679087742"><span id="local-6989586621679087744"><span class="annot"><span class="annottext">Int -&gt; ScriptDelay -&gt; ShowS
+[ScriptDelay] -&gt; ShowS
+ScriptDelay -&gt; String
+(Int -&gt; ScriptDelay -&gt; ShowS)
+-&gt; (ScriptDelay -&gt; String)
+-&gt; ([ScriptDelay] -&gt; ShowS)
+-&gt; Show ScriptDelay
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [ScriptDelay] -&gt; ShowS
+$cshowList :: [ScriptDelay] -&gt; ShowS
+show :: ScriptDelay -&gt; String
+$cshow :: ScriptDelay -&gt; String
+showsPrec :: Int -&gt; ScriptDelay -&gt; ShowS
+$cshowsPrec :: Int -&gt; ScriptDelay -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-115"></span><span>
+</span><span id="line-116"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#ScriptDelay"><span class="hs-identifier hs-type">ScriptDelay</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-117"></span><span>  </span><span id="local-6989586621679087737"><span class="annot"><span class="annottext">arbitrary :: Gen ScriptDelay
+</span><a href="#local-6989586621679087737"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(Int, Gen ScriptDelay)] -&gt; Gen ScriptDelay
+forall a. [(Int, Gen a)] -&gt; Gen a
+</span><span class="hs-identifier hs-var">frequency</span></span><span> </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ScriptDelay -&gt; Gen ScriptDelay
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">ScriptDelay
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#NoDelay"><span class="hs-identifier hs-var">NoDelay</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-118"></span><span>                        </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ScriptDelay -&gt; Gen ScriptDelay
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">ScriptDelay
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#ShortDelay"><span class="hs-identifier hs-var">ShortDelay</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-119"></span><span>                        </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">4</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ScriptDelay -&gt; Gen ScriptDelay
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">ScriptDelay
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#LongDelay"><span class="hs-identifier hs-var">LongDelay</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-120"></span><span>
+</span><span id="line-121"></span><span>  </span><span id="local-6989586621679087735"><span class="annot"><span class="annottext">shrink :: ScriptDelay -&gt; [ScriptDelay]
+</span><a href="#local-6989586621679087735"><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></a></span></span><span> </span><span class="annot"><span class="annottext">ScriptDelay
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#LongDelay"><span class="hs-identifier hs-var">LongDelay</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">ScriptDelay
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#NoDelay"><span class="hs-identifier hs-var">NoDelay</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ScriptDelay
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#ShortDelay"><span class="hs-identifier hs-var">ShortDelay</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-122"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="annot"><span class="annottext">ScriptDelay
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#ShortDelay"><span class="hs-identifier hs-var">ShortDelay</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">ScriptDelay
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#NoDelay"><span class="hs-identifier hs-var">NoDelay</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-123"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="annot"><span class="annottext">ScriptDelay
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#NoDelay"><span class="hs-identifier hs-var">NoDelay</span></a></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-124"></span><span>
+</span><span id="line-125"></span><span id="local-6989586621679087733"><span id="local-6989586621679087734"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#playTimedScript"><span class="hs-identifier hs-type">playTimedScript</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">MonadAsync</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087734"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">MonadTimer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087734"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-126"></span><span>                </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Tracer</span></span><span> </span><span class="annot"><a href="#local-6989586621679087734"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087733"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#TimedScript"><span class="hs-identifier hs-type">TimedScript</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087733"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679087734"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">TVar</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087734"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087733"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-127"></span><span id="playTimedScript"><span class="annot"><span class="annottext">playTimedScript :: Tracer m a -&gt; TimedScript a -&gt; m (TVar m a)
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#playTimedScript"><span class="hs-identifier hs-var hs-var">playTimedScript</span></a></span></span><span> </span><span id="local-6989586621679087731"><span class="annot"><span class="annottext">Tracer m a
+</span><a href="#local-6989586621679087731"><span class="hs-identifier hs-var">tracer</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span id="local-6989586621679087730"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087730"><span class="hs-identifier hs-var">x0</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679087729"><span class="annot"><span class="annottext">ScriptDelay
+</span><a href="#local-6989586621679087729"><span class="hs-identifier hs-var">d0</span></a></span></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-type">:|</span></a></span><span> </span><span id="local-6989586621679087728"><span class="annot"><span class="annottext">[(a, ScriptDelay)]
+</span><a href="#local-6989586621679087728"><span class="hs-identifier hs-var">script</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-128"></span><span>    </span><span id="local-6989586621679087727"><span class="annot"><span class="annottext">TVar m a
+</span><a href="#local-6989586621679087727"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">a -&gt; m (TVar m a)
+forall (m :: * -&gt; *) a. MonadSTM m =&gt; a -&gt; m (TVar m a)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">newTVarIO</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087730"><span class="hs-identifier hs-var">x0</span></a></span><span>
+</span><span id="line-129"></span><span>    </span><span class="annot"><span class="annottext">Tracer m a -&gt; a -&gt; m ()
+forall (m :: * -&gt; *) a. Tracer m a -&gt; a -&gt; m ()
+</span><span class="hs-identifier hs-var">traceWith</span></span><span> </span><span class="annot"><span class="annottext">Tracer m a
+</span><a href="#local-6989586621679087731"><span class="hs-identifier hs-var">tracer</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087730"><span class="hs-identifier hs-var">x0</span></a></span><span>
+</span><span id="line-130"></span><span>    </span><span class="annot"><span class="annottext">Async m ()
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">m () -&gt; m (Async m ())
+forall (m :: * -&gt; *) a. MonadAsync m =&gt; m a -&gt; m (Async m a)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">async</span></a></span><span> </span><span class="annot"><span class="annottext">(m () -&gt; m (Async m ())) -&gt; m () -&gt; m (Async m ())
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-131"></span><span>           </span><span class="annot"><span class="annottext">DiffTime -&gt; m ()
+forall (m :: * -&gt; *). MonadDelay m =&gt; DiffTime -&gt; m ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">threadDelay</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ScriptDelay -&gt; DiffTime
+forall p. Num p =&gt; ScriptDelay -&gt; p
+</span><a href="#local-6989586621679087724"><span class="hs-identifier hs-var">interpretScriptDelay</span></a></span><span> </span><span class="annot"><span class="annottext">ScriptDelay
+</span><a href="#local-6989586621679087729"><span class="hs-identifier hs-var">d0</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-132"></span><span>           </span><span class="annot"><span class="annottext">[m ()] -&gt; m ()
+forall (t :: * -&gt; *) (m :: * -&gt; *) a.
+(Foldable t, Monad m) =&gt;
+t (m a) -&gt; m ()
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">sequence_</span></a></span><span> </span><span class="hs-special">[</span><span> </span><span class="hs-keyword">do</span><span> </span><span class="annot"><span class="annottext">STM m () -&gt; m ()
+forall (m :: * -&gt; *) a.
+(MonadSTM m, HasCallStack) =&gt;
+STM m a -&gt; m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">atomically</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TVar m a -&gt; a -&gt; STM m ()
+forall (m :: * -&gt; *) a. MonadSTM m =&gt; TVar m a -&gt; a -&gt; STM m ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">writeTVar</span></a></span><span> </span><span class="annot"><span class="annottext">TVar m a
+</span><a href="#local-6989586621679087727"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087722"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-133"></span><span>                          </span><span class="annot"><span class="annottext">Tracer m a -&gt; a -&gt; m ()
+forall (m :: * -&gt; *) a. Tracer m a -&gt; a -&gt; m ()
+</span><span class="hs-identifier hs-var">traceWith</span></span><span> </span><span class="annot"><span class="annottext">Tracer m a
+</span><a href="#local-6989586621679087731"><span class="hs-identifier hs-var">tracer</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087722"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-134"></span><span>                          </span><span class="annot"><span class="annottext">DiffTime -&gt; m ()
+forall (m :: * -&gt; *). MonadDelay m =&gt; DiffTime -&gt; m ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">threadDelay</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ScriptDelay -&gt; DiffTime
+forall p. Num p =&gt; ScriptDelay -&gt; p
+</span><a href="#local-6989586621679087724"><span class="hs-identifier hs-var">interpretScriptDelay</span></a></span><span> </span><span class="annot"><span class="annottext">ScriptDelay
+</span><a href="#local-6989586621679087721"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-135"></span><span>                     </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679087722"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087722"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679087721"><span class="annot"><span class="annottext">ScriptDelay
+</span><a href="#local-6989586621679087721"><span class="hs-identifier hs-var">d</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[(a, ScriptDelay)]
+</span><a href="#local-6989586621679087728"><span class="hs-identifier hs-var">script</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-136"></span><span>    </span><span class="annot"><span class="annottext">TVar m a -&gt; m (TVar m a)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">TVar m a
+</span><a href="#local-6989586621679087727"><span class="hs-identifier hs-var">v</span></a></span><span>
+</span><span id="line-137"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-138"></span><span>    </span><span id="local-6989586621679087724"><span class="annot"><span class="annottext">interpretScriptDelay :: ScriptDelay -&gt; p
+</span><a href="#local-6989586621679087724"><span class="hs-identifier hs-var hs-var">interpretScriptDelay</span></a></span></span><span> </span><span class="annot"><span class="annottext">ScriptDelay
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#NoDelay"><span class="hs-identifier hs-var">NoDelay</span></a></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">p
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-139"></span><span>    </span><span class="annot"><a href="#local-6989586621679087724"><span class="hs-identifier hs-var">interpretScriptDelay</span></a></span><span> </span><span class="annot"><span class="annottext">ScriptDelay
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#ShortDelay"><span class="hs-identifier hs-var">ShortDelay</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">p
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-140"></span><span>    </span><span class="annot"><a href="#local-6989586621679087724"><span class="hs-identifier hs-var">interpretScriptDelay</span></a></span><span> </span><span class="annot"><span class="annottext">ScriptDelay
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#LongDelay"><span class="hs-identifier hs-var">LongDelay</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">p
+</span><span class="hs-number">3600</span></span><span>
+</span><span id="line-141"></span><span>
+</span><span id="line-142"></span><span>
+</span><span id="line-143"></span><span class="hs-comment">--</span><span>
+</span><span id="line-144"></span><span class="hs-comment">-- Pick scripts</span><span>
+</span><span id="line-145"></span><span class="hs-comment">--</span><span>
+</span><span id="line-146"></span><span>
+</span><span id="line-147"></span><span class="hs-comment">-- | A pick script is used to interpret the 'policyPickKnownPeersForGossip' and</span><span>
+</span><span id="line-148"></span><span class="hs-comment">-- the 'policyPickColdPeersToForget'. It selects elements from the given</span><span>
+</span><span id="line-149"></span><span class="hs-comment">-- choices by their index (modulo the number of choices). This representation</span><span>
+</span><span id="line-150"></span><span class="hs-comment">-- was chosen because it allows easy shrinking.</span><span>
+</span><span id="line-151"></span><span class="hs-comment">--</span><span>
+</span><span id="line-152"></span><span class="hs-keyword">type</span><span> </span><span id="PickScript"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#PickScript"><span class="hs-identifier hs-var">PickScript</span></a></span></span><span> </span><span id="local-6989586621679087720"><span class="annot"><a href="#local-6989586621679087720"><span class="hs-identifier hs-type">peeraddr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#PickMembers"><span class="hs-identifier hs-type">PickMembers</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087720"><span class="hs-identifier hs-type">peeraddr</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-153"></span><span>
+</span><span id="line-154"></span><span class="hs-keyword">data</span><span> </span><span id="PickMembers"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#PickMembers"><span class="hs-identifier hs-var">PickMembers</span></a></span></span><span> </span><span id="local-6989586621679087914"><span class="annot"><a href="#local-6989586621679087914"><span class="hs-identifier hs-type">peeraddr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="PickFirst"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#PickFirst"><span class="hs-identifier hs-var">PickFirst</span></a></span></span><span>
+</span><span id="line-155"></span><span>                          </span><span class="hs-glyph">|</span><span> </span><span id="PickAll"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#PickAll"><span class="hs-identifier hs-var">PickAll</span></a></span></span><span>
+</span><span id="line-156"></span><span>                          </span><span class="hs-glyph">|</span><span> </span><span id="PickSome"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#PickSome"><span class="hs-identifier hs-var">PickSome</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-type">Set</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087914"><span class="hs-identifier hs-type">peeraddr</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-157"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679087713"><span id="local-6989586621679087715"><span class="annot"><span class="annottext">PickMembers peeraddr -&gt; PickMembers peeraddr -&gt; Bool
+(PickMembers peeraddr -&gt; PickMembers peeraddr -&gt; Bool)
+-&gt; (PickMembers peeraddr -&gt; PickMembers peeraddr -&gt; Bool)
+-&gt; Eq (PickMembers peeraddr)
+forall peeraddr.
+Eq peeraddr =&gt;
+PickMembers peeraddr -&gt; PickMembers peeraddr -&gt; Bool
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: PickMembers peeraddr -&gt; PickMembers peeraddr -&gt; Bool
+$c/= :: forall peeraddr.
+Eq peeraddr =&gt;
+PickMembers peeraddr -&gt; PickMembers peeraddr -&gt; Bool
+== :: PickMembers peeraddr -&gt; PickMembers peeraddr -&gt; Bool
+$c== :: forall peeraddr.
+Eq peeraddr =&gt;
+PickMembers peeraddr -&gt; PickMembers peeraddr -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679087707"><span id="local-6989586621679087709"><span id="local-6989586621679087711"><span class="annot"><span class="annottext">Int -&gt; PickMembers peeraddr -&gt; ShowS
+[PickMembers peeraddr] -&gt; ShowS
+PickMembers peeraddr -&gt; String
+(Int -&gt; PickMembers peeraddr -&gt; ShowS)
+-&gt; (PickMembers peeraddr -&gt; String)
+-&gt; ([PickMembers peeraddr] -&gt; ShowS)
+-&gt; Show (PickMembers peeraddr)
+forall peeraddr.
+Show peeraddr =&gt;
+Int -&gt; PickMembers peeraddr -&gt; ShowS
+forall peeraddr. Show peeraddr =&gt; [PickMembers peeraddr] -&gt; ShowS
+forall peeraddr. Show peeraddr =&gt; PickMembers peeraddr -&gt; String
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [PickMembers peeraddr] -&gt; ShowS
+$cshowList :: forall peeraddr. Show peeraddr =&gt; [PickMembers peeraddr] -&gt; ShowS
+show :: PickMembers peeraddr -&gt; String
+$cshow :: forall peeraddr. Show peeraddr =&gt; PickMembers peeraddr -&gt; String
+showsPrec :: Int -&gt; PickMembers peeraddr -&gt; ShowS
+$cshowsPrec :: forall peeraddr.
+Show peeraddr =&gt;
+Int -&gt; PickMembers peeraddr -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-158"></span><span>
+</span><span id="line-159"></span><span id="local-6989586621679087706"><span class="hs-keyword">instance</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="#local-6989586621679087706"><span class="hs-identifier hs-type">peeraddr</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Ord</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087706"><span class="hs-identifier hs-type">peeraddr</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-160"></span><span>         </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#PickMembers"><span class="hs-identifier hs-type">PickMembers</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087706"><span class="hs-identifier hs-type">peeraddr</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-161"></span><span>    </span><span id="local-6989586621679087703"><span class="annot"><span class="annottext">arbitrary :: Gen (PickMembers peeraddr)
+</span><a href="#local-6989586621679087703"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen (Set peeraddr) -&gt; Gen (PickMembers peeraddr)
+forall peeraddr. Gen (Set peeraddr) -&gt; Gen (PickMembers peeraddr)
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#arbitraryPickMembers"><span class="hs-identifier hs-var">arbitraryPickMembers</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[peeraddr] -&gt; Set peeraddr
+forall a. Ord a =&gt; [a] -&gt; Set a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.fromList</span></a></span><span> </span><span class="annot"><span class="annottext">([peeraddr] -&gt; Set peeraddr)
+-&gt; Gen [peeraddr] -&gt; Gen (Set peeraddr)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Gen peeraddr -&gt; Gen [peeraddr]
+forall a. Gen a -&gt; Gen [a]
+</span><span class="hs-identifier hs-var">listOf1</span></span><span> </span><span class="annot"><span class="annottext">Gen peeraddr
+forall a. Arbitrary a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrary</span></span><span class="hs-special">)</span><span>
+</span><span id="line-162"></span><span>
+</span><span id="line-163"></span><span>    </span><span id="local-6989586621679087699"><span class="annot"><span class="annottext">shrink :: PickMembers peeraddr -&gt; [PickMembers peeraddr]
+</span><a href="#local-6989586621679087699"><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#PickSome"><span class="hs-identifier hs-type">PickSome</span></a></span><span> </span><span id="local-6989586621679087698"><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679087698"><span class="hs-identifier hs-var">ixs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PickMembers peeraddr
+forall peeraddr. PickMembers peeraddr
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#PickFirst"><span class="hs-identifier hs-var">PickFirst</span></a></span><span>
+</span><span id="line-164"></span><span>                          </span><span class="annot"><span class="annottext">PickMembers peeraddr
+-&gt; [PickMembers peeraddr] -&gt; [PickMembers peeraddr]
+forall a. a -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-var">:</span></a></span><span> </span><span class="annot"><span class="annottext">PickMembers peeraddr
+forall peeraddr. PickMembers peeraddr
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#PickAll"><span class="hs-identifier hs-var">PickAll</span></a></span><span>
+</span><span id="line-165"></span><span>                          </span><span class="annot"><span class="annottext">PickMembers peeraddr
+-&gt; [PickMembers peeraddr] -&gt; [PickMembers peeraddr]
+forall a. a -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-var">:</span></a></span><span> </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">Set peeraddr -&gt; PickMembers peeraddr
+forall peeraddr. Set peeraddr -&gt; PickMembers peeraddr
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#PickSome"><span class="hs-identifier hs-var">PickSome</span></a></span><span> </span><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679087697"><span class="hs-identifier hs-var">ixs'</span></a></span><span>
+</span><span id="line-166"></span><span>                            </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679087697"><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679087697"><span class="hs-identifier hs-var">ixs'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Set peeraddr -&gt; [Set peeraddr]
+forall a. Arbitrary a =&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679087698"><span class="hs-identifier hs-var">ixs</span></a></span><span>
+</span><span id="line-167"></span><span>                            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">not</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set peeraddr -&gt; Bool
+forall a. Set a -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.null</span></a></span><span> </span><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679087697"><span class="hs-identifier hs-var">ixs'</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-168"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="annot"><span class="annottext">PickMembers peeraddr
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#PickAll"><span class="hs-identifier hs-var">PickAll</span></a></span><span>        </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">PickMembers peeraddr
+forall peeraddr. PickMembers peeraddr
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#PickFirst"><span class="hs-identifier hs-var">PickFirst</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-169"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="annot"><span class="annottext">PickMembers peeraddr
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#PickFirst"><span class="hs-identifier hs-var">PickFirst</span></a></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span></span><span>
+</span><span id="line-170"></span><span>
+</span><span id="line-171"></span><span id="local-6989586621679087917"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#arbitraryPickMembers"><span class="hs-identifier hs-type">arbitraryPickMembers</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-type">Set</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087917"><span class="hs-identifier hs-type">peeraddr</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#PickMembers"><span class="hs-identifier hs-type">PickMembers</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087917"><span class="hs-identifier hs-type">peeraddr</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-172"></span><span id="arbitraryPickMembers"><span class="annot"><span class="annottext">arbitraryPickMembers :: Gen (Set peeraddr) -&gt; Gen (PickMembers peeraddr)
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#arbitraryPickMembers"><span class="hs-identifier hs-var hs-var">arbitraryPickMembers</span></a></span></span><span> </span><span id="local-6989586621679087694"><span class="annot"><span class="annottext">Gen (Set peeraddr)
+</span><a href="#local-6989586621679087694"><span class="hs-identifier hs-var">pickSome</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-173"></span><span>    </span><span class="annot"><span class="annottext">[(Int, Gen (PickMembers peeraddr))] -&gt; Gen (PickMembers peeraddr)
+forall a. [(Int, Gen a)] -&gt; Gen a
+</span><span class="hs-identifier hs-var">frequency</span></span><span> </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">PickMembers peeraddr -&gt; Gen (PickMembers peeraddr)
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">PickMembers peeraddr
+forall peeraddr. PickMembers peeraddr
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#PickFirst"><span class="hs-identifier hs-var">PickFirst</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-174"></span><span>              </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">PickMembers peeraddr -&gt; Gen (PickMembers peeraddr)
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">PickMembers peeraddr
+forall peeraddr. PickMembers peeraddr
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#PickAll"><span class="hs-identifier hs-var">PickAll</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-175"></span><span>              </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Set peeraddr -&gt; PickMembers peeraddr
+forall peeraddr. Set peeraddr -&gt; PickMembers peeraddr
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#PickSome"><span class="hs-identifier hs-var">PickSome</span></a></span><span> </span><span class="annot"><span class="annottext">(Set peeraddr -&gt; PickMembers peeraddr)
+-&gt; Gen (Set peeraddr) -&gt; Gen (PickMembers peeraddr)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Gen (Set peeraddr)
+</span><a href="#local-6989586621679087694"><span class="hs-identifier hs-var">pickSome</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-176"></span><span>              </span><span class="hs-special">]</span><span>
+</span><span id="line-177"></span><span>
+</span><span id="line-178"></span><span id="local-6989586621679087693"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#arbitraryPickScript"><span class="hs-identifier hs-type">arbitraryPickScript</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-type">Set</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087693"><span class="hs-identifier hs-type">peeraddr</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#PickScript"><span class="hs-identifier hs-type">PickScript</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087693"><span class="hs-identifier hs-type">peeraddr</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-179"></span><span id="arbitraryPickScript"><span class="annot"><span class="annottext">arbitraryPickScript :: Gen (Set peeraddr) -&gt; Gen (PickScript peeraddr)
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#arbitraryPickScript"><span class="hs-identifier hs-var hs-var">arbitraryPickScript</span></a></span></span><span> </span><span id="local-6989586621679087692"><span class="annot"><span class="annottext">Gen (Set peeraddr)
+</span><a href="#local-6989586621679087692"><span class="hs-identifier hs-var">pickSome</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-180"></span><span>    </span><span class="annot"><span class="annottext">(Int -&gt; Gen (PickScript peeraddr)) -&gt; Gen (PickScript peeraddr)
+forall a. (Int -&gt; Gen a) -&gt; Gen a
+</span><span class="hs-identifier hs-var">sized</span></span><span> </span><span class="annot"><span class="annottext">((Int -&gt; Gen (PickScript peeraddr)) -&gt; Gen (PickScript peeraddr))
+-&gt; (Int -&gt; Gen (PickScript peeraddr)) -&gt; Gen (PickScript peeraddr)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679087691"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087691"><span class="hs-identifier hs-var">sz</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-181"></span><span>      </span><span class="annot"><span class="annottext">Int -&gt; Gen (PickMembers peeraddr) -&gt; Gen (PickScript peeraddr)
+forall a. Int -&gt; Gen a -&gt; Gen (Script a)
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#arbitraryScriptOf"><span class="hs-identifier hs-var">arbitraryScriptOf</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087691"><span class="hs-identifier hs-var">sz</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Gen (Set peeraddr) -&gt; Gen (PickMembers peeraddr)
+forall peeraddr. Gen (Set peeraddr) -&gt; Gen (PickMembers peeraddr)
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#arbitraryPickMembers"><span class="hs-identifier hs-var">arbitraryPickMembers</span></a></span><span> </span><span class="annot"><span class="annottext">Gen (Set peeraddr)
+</span><a href="#local-6989586621679087692"><span class="hs-identifier hs-var">pickSome</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-182"></span><span>
+</span><span id="line-183"></span><span id="local-6989586621679087689"><span id="local-6989586621679087690"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#interpretPickScript"><span class="hs-identifier hs-type">interpretPickScript</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">MonadSTM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087690"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Ord</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087689"><span class="hs-identifier hs-type">peeraddr</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-184"></span><span>                    </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">TVar</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087690"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#PickScript"><span class="hs-identifier hs-type">PickScript</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087689"><span class="hs-identifier hs-type">peeraddr</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-185"></span><span>                    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-type">Set</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087689"><span class="hs-identifier hs-type">peeraddr</span></a></span><span>
+</span><span id="line-186"></span><span>                    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span>
+</span><span id="line-187"></span><span>                    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">STM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087690"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-type">Set</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087689"><span class="hs-identifier hs-type">peeraddr</span></a></span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-188"></span><span id="interpretPickScript"><span class="annot"><span class="annottext">interpretPickScript :: TVar m (PickScript peeraddr)
+-&gt; Set peeraddr -&gt; Int -&gt; STM m (Set peeraddr)
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#interpretPickScript"><span class="hs-identifier hs-var hs-var">interpretPickScript</span></a></span></span><span> </span><span id="local-6989586621679087688"><span class="annot"><span class="annottext">TVar m (PickScript peeraddr)
+</span><a href="#local-6989586621679087688"><span class="hs-identifier hs-var">scriptVar</span></a></span></span><span> </span><span id="local-6989586621679087687"><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679087687"><span class="hs-identifier hs-var">available</span></a></span></span><span> </span><span id="local-6989586621679087686"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087686"><span class="hs-identifier hs-var">pickNum</span></a></span></span><span>
+</span><span id="line-189"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Set peeraddr -&gt; Bool
+forall a. Set a -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.null</span></a></span><span> </span><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679087687"><span class="hs-identifier hs-var">available</span></a></span><span>
+</span><span id="line-190"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; STM m (Set peeraddr)
+forall a. HasCallStack =&gt; String -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">error</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;interpretPickScript: given empty map to pick from&quot;</span></span><span>
+</span><span id="line-191"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087686"><span class="hs-identifier hs-var">pickNum</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&lt;=</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-192"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; STM m (Set peeraddr)
+forall a. HasCallStack =&gt; String -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">error</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;interpretPickScript: given invalid pickNum&quot;</span></span><span>
+</span><span id="line-193"></span><span>
+</span><span id="line-194"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>
+</span><span id="line-195"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span> </span><span id="local-6989586621679087683"><span class="annot"><span class="annottext">PickMembers peeraddr
+</span><a href="#local-6989586621679087683"><span class="hs-identifier hs-var">pickmembers</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">TVar m (PickScript peeraddr) -&gt; STM m (PickMembers peeraddr)
+forall (m :: * -&gt; *) a. MonadSTM m =&gt; TVar m (Script a) -&gt; STM m a
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#stepScriptSTM"><span class="hs-identifier hs-var">stepScriptSTM</span></a></span><span> </span><span class="annot"><span class="annottext">TVar m (PickScript peeraddr)
+</span><a href="#local-6989586621679087688"><span class="hs-identifier hs-var">scriptVar</span></a></span><span>
+</span><span id="line-196"></span><span>       </span><span class="annot"><span class="annottext">Set peeraddr -&gt; STM m (Set peeraddr)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PickMembers peeraddr -&gt; Set peeraddr -&gt; Int -&gt; Set peeraddr
+forall peeraddr.
+Ord peeraddr =&gt;
+PickMembers peeraddr -&gt; Set peeraddr -&gt; Int -&gt; Set peeraddr
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#interpretPickMembers"><span class="hs-identifier hs-var">interpretPickMembers</span></a></span><span> </span><span class="annot"><span class="annottext">PickMembers peeraddr
+</span><a href="#local-6989586621679087683"><span class="hs-identifier hs-var">pickmembers</span></a></span><span> </span><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679087687"><span class="hs-identifier hs-var">available</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087686"><span class="hs-identifier hs-var">pickNum</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-197"></span><span>
+</span><span id="line-198"></span><span id="local-6989586621679087905"><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#interpretPickMembers"><span class="hs-identifier hs-type">interpretPickMembers</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Ord</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087905"><span class="hs-identifier hs-type">peeraddr</span></a></span><span>
+</span><span id="line-199"></span><span>                     </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#PickMembers"><span class="hs-identifier hs-type">PickMembers</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087905"><span class="hs-identifier hs-type">peeraddr</span></a></span><span>
+</span><span id="line-200"></span><span>                     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-type">Set</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087905"><span class="hs-identifier hs-type">peeraddr</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-type">Set</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087905"><span class="hs-identifier hs-type">peeraddr</span></a></span></span><span>
+</span><span id="line-201"></span><span id="interpretPickMembers"><span class="annot"><span class="annottext">interpretPickMembers :: PickMembers peeraddr -&gt; Set peeraddr -&gt; Int -&gt; Set peeraddr
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#interpretPickMembers"><span class="hs-identifier hs-var hs-var">interpretPickMembers</span></a></span></span><span> </span><span class="annot"><span class="annottext">PickMembers peeraddr
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#PickFirst"><span class="hs-identifier hs-var">PickFirst</span></a></span><span>     </span><span id="local-6989586621679087681"><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679087681"><span class="hs-identifier hs-var">ps</span></a></span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">peeraddr -&gt; Set peeraddr
+forall a. a -&gt; Set a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.singleton</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Set peeraddr -&gt; peeraddr
+forall a. Int -&gt; Set a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.elemAt</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679087681"><span class="hs-identifier hs-var">ps</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-202"></span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#interpretPickMembers"><span class="hs-identifier hs-var">interpretPickMembers</span></a></span><span> </span><span class="annot"><span class="annottext">PickMembers peeraddr
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#PickAll"><span class="hs-identifier hs-var">PickAll</span></a></span><span>       </span><span id="local-6989586621679087678"><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679087678"><span class="hs-identifier hs-var">ps</span></a></span></span><span> </span><span id="local-6989586621679087677"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087677"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Set peeraddr -&gt; Set peeraddr
+forall a. Int -&gt; Set a -&gt; Set a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.take</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087677"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679087678"><span class="hs-identifier hs-var">ps</span></a></span><span>
+</span><span id="line-203"></span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#interpretPickMembers"><span class="hs-identifier hs-var">interpretPickMembers</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#PickSome"><span class="hs-identifier hs-type">PickSome</span></a></span><span> </span><span id="local-6989586621679087675"><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679087675"><span class="hs-keyword hs-var">as</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679087674"><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679087674"><span class="hs-identifier hs-var">ps</span></a></span></span><span> </span><span id="local-6989586621679087673"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087673"><span class="hs-identifier hs-var">n</span></a></span></span><span>
+</span><span id="line-204"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Set peeraddr -&gt; Bool
+forall a. Set a -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.null</span></a></span><span> </span><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679087672"><span class="hs-identifier hs-var">ps'</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">peeraddr -&gt; Set peeraddr
+forall a. a -&gt; Set a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.singleton</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Set peeraddr -&gt; peeraddr
+forall a. Int -&gt; Set a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.elemAt</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679087674"><span class="hs-identifier hs-var">ps</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-205"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Set peeraddr -&gt; Set peeraddr
+forall a. Int -&gt; Set a -&gt; Set a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.take</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087673"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679087672"><span class="hs-identifier hs-var">ps'</span></a></span><span>
+</span><span id="line-206"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-207"></span><span>    </span><span id="local-6989586621679087672"><span class="annot"><span class="annottext">ps' :: Set peeraddr
+</span><a href="#local-6989586621679087672"><span class="hs-identifier hs-var hs-var">ps'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set peeraddr -&gt; Set peeraddr -&gt; Set peeraddr
+forall a. Ord a =&gt; Set a -&gt; Set a -&gt; Set a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.intersection</span></a></span><span> </span><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679087674"><span class="hs-identifier hs-var">ps</span></a></span><span> </span><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679087675"><span class="hs-keyword hs-var">as</span></a></span><span>
+</span><span id="line-208"></span><span>
+</span><span id="line-209"></span><span>
+</span><span id="line-210"></span><span class="hs-comment">--</span><span>
+</span><span id="line-211"></span><span class="hs-comment">-- Tests for the QC Arbitrary instances</span><span>
+</span><span id="line-212"></span><span class="hs-comment">--</span><span>
+</span><span id="line-213"></span><span>
+</span><span id="line-214"></span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#prop_shrink_Script"><span class="hs-identifier hs-type">prop_shrink_Script</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Fixed</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Property</span></span><span>
+</span><span id="line-215"></span><span id="prop_shrink_Script"><span class="annot"><span class="annottext">prop_shrink_Script :: Fixed (Script Int) -&gt; Property
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#prop_shrink_Script"><span class="hs-identifier hs-var hs-var">prop_shrink_Script</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Fixed (Script Int) -&gt; Property
+forall a. (Arbitrary a, Eq a) =&gt; Fixed a -&gt; Property
+</span><a href="Ouroboros.Network.Testing.Utils.html#prop_shrink_nonequal"><span class="hs-identifier hs-var">prop_shrink_nonequal</span></a></span><span>
+</span><span id="line-216"></span><span>
+</span><span id="line-217"></span></pre></body></html>

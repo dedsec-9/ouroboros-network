@@ -1,48 +1,54 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DataKinds           #-}</span><span>
-</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE FlexibleInstances   #-}</span><span>
-</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables #-}</span><span>
-</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE TypeFamilies        #-}</span><span>
-</span><span id="line-5"></span><span class="hs-pragma">{-# OPTIONS_GHC -Wno-orphans #-}</span><span>
-</span><span id="line-6"></span><span>
-</span><span id="line-7"></span><span class="hs-comment">-- TODO where to put this?</span><span>
-</span><span id="line-8"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Consensus.Shelley.Ledger.TPraos</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DataKinds            #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE FlexibleInstances    #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables  #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE TypeFamilies         #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE FlexibleContexts     #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE UndecidableInstances #-}</span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span class="hs-pragma">{-# OPTIONS_GHC -Wno-orphans #-}</span><span>
 </span><span id="line-9"></span><span>
-</span><span id="line-10"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Map.Strict</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Map</span></span><span class="hs-special">)</span><span>
-</span><span id="line-11"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map.Strict</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Map</span></span><span>
-</span><span id="line-12"></span><span>
-</span><span id="line-13"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Crypto.VRF</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">certifiedOutput</span></span><span class="hs-special">)</span><span>
+</span><span id="line-10"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Consensus.Shelley.Ledger.TPraos</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-11"></span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Data.Map.Strict</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Map</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-13"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Data.Map.Strict</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Map</span></span><span>
 </span><span id="line-14"></span><span>
-</span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Block</span></a></span><span>
-</span><span id="line-16"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Protocol.Signed</span></a></span><span>
-</span><span id="line-17"></span><span>
-</span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Shelley.Spec.Ledger.API</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Crypto.VRF</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">certifiedOutput</span></span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Block</span></a></span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Protocol.Signed</span></a></span><span>
 </span><span id="line-19"></span><span>
-</span><span id="line-20"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html"><span class="hs-identifier">Ouroboros.Consensus.Shelley.Eras</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier">EraCrypto</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html"><span class="hs-identifier">Ouroboros.Consensus.Shelley.Ledger.Block</span></a></span><span>
-</span><span id="line-22"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html"><span class="hs-identifier">Ouroboros.Consensus.Shelley.Ledger.Config</span></a></span><span>
-</span><span id="line-23"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Protocol.html"><span class="hs-identifier">Ouroboros.Consensus.Shelley.Protocol</span></a></span><span>
-</span><span id="line-24"></span><span>
-</span><span id="line-25"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Shelley.API</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Protocol.TPraos.BHeader</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Protocol.TPraos.OCert</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Protocol.TPraos.API</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-protocol-0.1.0.0/noopt/doc/html/ouroboros-consensus-protocol/src"><span class="hs-identifier">Ouroboros.Consensus.Protocol.TPraos</span></a></span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html"><span class="hs-identifier">Ouroboros.Consensus.Shelley.Eras</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier">EraCrypto</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html"><span class="hs-identifier">Ouroboros.Consensus.Shelley.Ledger.Block</span></a></span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html"><span class="hs-identifier">Ouroboros.Consensus.Shelley.Ledger.Config</span></a></span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span class="hs-comment">{-------------------------------------------------------------------------------
   Support for Transitional Praos consensus algorithm
 -------------------------------------------------------------------------------}</span><span>
-</span><span id="line-28"></span><span>
-</span><span id="line-29"></span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="BlockProtocol"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">BlockProtocol</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyBlock"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span id="local-6989586621679580083"><span class="annot"><a href="#local-6989586621679580083"><span class="hs-identifier hs-type hs-type">era</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Protocol.html#TPraos"><span class="hs-identifier hs-type">TPraos</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier hs-type">EraCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679580083"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-30"></span><span>
-</span><span id="line-31"></span><span id="local-6989586621679580081"><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679580081"><span class="hs-identifier hs-type">era</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">BlockSupportsProtocol</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyBlock"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679580081"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-32"></span><span>  </span><span id="local-6989586621679580070"><span class="annot"><span class="annottext">validateView :: BlockConfig (ShelleyBlock era)
+</span><span id="line-33"></span><span>
+</span><span id="line-34"></span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="BlockProtocol"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">BlockProtocol</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyBlock"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span id="local-6989586621679728181"><span class="annot"><a href="#local-6989586621679728181"><span class="hs-identifier hs-type hs-type">era</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-protocol-0.1.0.0/noopt/doc/html/ouroboros-consensus-protocol/src"><span class="hs-identifier hs-type">TPraos</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier hs-type">EraCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679728181"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span id="local-6989586621679728179"><span class="hs-keyword">instance</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.PraosCrypto</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier hs-type">EraCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679728179"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679728179"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">BlockSupportsProtocol</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyBlock"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679728179"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-38"></span><span>  </span><span id="local-6989586621679728168"><span class="annot"><span class="annottext">validateView :: BlockConfig (ShelleyBlock era)
 -&gt; Header (ShelleyBlock era)
 -&gt; ValidateView (BlockProtocol (ShelleyBlock era))
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">validateView</span></a></span></span><span> </span><span id="local-6989586621679580068"><span class="annot"><span class="annottext">BlockConfig (ShelleyBlock era)
-</span><a href="#local-6989586621679580068"><span class="hs-identifier hs-var">_cfg</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyHeader"><span class="hs-identifier hs-type">ShelleyHeader</span></a></span><span> </span><span id="local-6989586621679580066"><span class="annot"><a href="#local-6989586621679580066"><span class="hs-identifier hs-var">hdr</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ValidateView (BlockProtocol (ShelleyBlock era))
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">validateView</span></a></span></span><span> </span><span id="local-6989586621679728166"><span class="annot"><span class="annottext">BlockConfig (ShelleyBlock era)
+</span><a href="#local-6989586621679728166"><span class="hs-identifier hs-var">_cfg</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyHeader"><span class="hs-identifier hs-type">ShelleyHeader</span></a></span><span> </span><span id="local-6989586621679728164"><span class="annot"><a href="#local-6989586621679728164"><span class="hs-identifier hs-var">hdr</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ValidateView (BlockProtocol (ShelleyBlock era))
 BHeader (EraCrypto era)
-</span><a href="#local-6989586621679580066"><span class="hs-identifier hs-var">hdr</span></a></span><span>
-</span><span id="line-33"></span><span>
-</span><span id="line-34"></span><span>  </span><span id="local-6989586621679580065"><span class="annot"><span class="annottext">selectView :: BlockConfig (ShelleyBlock era)
+</span><a href="#local-6989586621679728164"><span class="hs-identifier hs-var">hdr</span></a></span><span>
+</span><span id="line-39"></span><span>
+</span><span id="line-40"></span><span>  </span><span id="local-6989586621679728163"><span class="annot"><span class="annottext">selectView :: BlockConfig (ShelleyBlock era)
 -&gt; Header (ShelleyBlock era)
 -&gt; SelectView (BlockProtocol (ShelleyBlock era))
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">selectView</span></a></span></span><span> </span><span id="local-6989586621679580063"><span class="annot"><span class="annottext">BlockConfig (ShelleyBlock era)
-</span><a href="#local-6989586621679580063"><span class="hs-identifier hs-var">cfg</span></a></span></span><span> </span><span id="local-6989586621679580062"><span class="annot"><span class="annottext">hdr :: Header (ShelleyBlock era)
-</span><a href="#local-6989586621679580062"><span class="hs-identifier hs-var">hdr</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyHeader"><span class="hs-identifier hs-type">ShelleyHeader</span></a></span><span> </span><span id="local-6989586621679580061"><span class="annot"><a href="#local-6989586621679580061"><span class="hs-identifier hs-var">shdr</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TPraosChainSelectView :: forall c.
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">selectView</span></a></span></span><span> </span><span id="local-6989586621679728161"><span class="annot"><span class="annottext">BlockConfig (ShelleyBlock era)
+</span><a href="#local-6989586621679728161"><span class="hs-identifier hs-var">cfg</span></a></span></span><span> </span><span id="local-6989586621679728160"><span class="annot"><span class="annottext">hdr :: Header (ShelleyBlock era)
+</span><a href="#local-6989586621679728160"><span class="hs-identifier hs-var">hdr</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyHeader"><span class="hs-identifier hs-type">ShelleyHeader</span></a></span><span> </span><span id="local-6989586621679728159"><span class="annot"><a href="#local-6989586621679728159"><span class="hs-identifier hs-var">shdr</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TPraosChainSelectView :: forall c.
 BlockNo
 -&gt; SlotNo
 -&gt; SelfIssued
@@ -50,42 +56,42 @@ BlockNo
 -&gt; Word64
 -&gt; OutputVRF (VRF c)
 -&gt; TPraosChainSelectView c
-</span><a href="Ouroboros.Consensus.Shelley.Protocol.html#TPraosChainSelectView"><span class="hs-identifier hs-type">TPraosChainSelectView</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-35"></span><span>        </span><span class="annot"><span class="annottext">csvChainLength :: BlockNo
-</span><a href="#local-6989586621679580059"><span class="hs-identifier hs-var">csvChainLength</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Header (ShelleyBlock era) -&gt; BlockNo
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-protocol-0.1.0.0/noopt/doc/html/ouroboros-consensus-protocol/src"><span class="hs-identifier hs-type">TPraosChainSelectView</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-41"></span><span>        </span><span class="annot"><span class="annottext">csvChainLength :: BlockNo
+</span><a href="#local-6989586621679728157"><span class="hs-identifier hs-var">csvChainLength</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Header (ShelleyBlock era) -&gt; BlockNo
 forall b. HasHeader b =&gt; b -&gt; BlockNo
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">blockNo</span></a></span><span> </span><span class="annot"><span class="annottext">Header (ShelleyBlock era)
-</span><a href="#local-6989586621679580062"><span class="hs-identifier hs-var">hdr</span></a></span><span>
-</span><span id="line-36"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">csvSlotNo :: SlotNo
-</span><a href="#local-6989586621679580057"><span class="hs-identifier hs-var">csvSlotNo</span></a></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Header (ShelleyBlock era) -&gt; SlotNo
+</span><a href="#local-6989586621679728160"><span class="hs-identifier hs-var">hdr</span></a></span><span>
+</span><span id="line-42"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">csvSlotNo :: SlotNo
+</span><a href="#local-6989586621679728155"><span class="hs-identifier hs-var">csvSlotNo</span></a></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Header (ShelleyBlock era) -&gt; SlotNo
 forall b. HasHeader b =&gt; b -&gt; SlotNo
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">blockSlot</span></a></span><span> </span><span class="annot"><span class="annottext">Header (ShelleyBlock era)
-</span><a href="#local-6989586621679580062"><span class="hs-identifier hs-var">hdr</span></a></span><span>
-</span><span id="line-37"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">csvSelfIssued :: SelfIssued
-</span><a href="#local-6989586621679580055"><span class="hs-identifier hs-var">csvSelfIssued</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SelfIssued
-</span><a href="#local-6989586621679580054"><span class="hs-identifier hs-var">selfIssued</span></a></span><span>
-</span><span id="line-38"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">csvIssuer :: VKey 'BlockIssuer (EraCrypto era)
-</span><a href="#local-6989586621679580053"><span class="hs-identifier hs-var">csvIssuer</span></a></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BHBody (EraCrypto era) -&gt; VKey 'BlockIssuer (EraCrypto era)
+</span><a href="#local-6989586621679728160"><span class="hs-identifier hs-var">hdr</span></a></span><span>
+</span><span id="line-43"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">csvSelfIssued :: SelfIssued
+</span><a href="#local-6989586621679728153"><span class="hs-identifier hs-var">csvSelfIssued</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SelfIssued
+</span><a href="#local-6989586621679728152"><span class="hs-identifier hs-var">selfIssued</span></a></span><span>
+</span><span id="line-44"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">csvIssuer :: VKey 'BlockIssuer (EraCrypto era)
+</span><a href="#local-6989586621679728151"><span class="hs-identifier hs-var">csvIssuer</span></a></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BHBody (EraCrypto era) -&gt; VKey 'BlockIssuer (EraCrypto era)
 forall crypto. BHBody crypto -&gt; VKey 'BlockIssuer crypto
 </span><span class="hs-identifier hs-var hs-var">SL.bheaderVk</span></span><span> </span><span class="annot"><span class="annottext">BHBody (EraCrypto era)
-</span><a href="#local-6989586621679580051"><span class="hs-identifier hs-var">hdrBody</span></a></span><span>
-</span><span id="line-39"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">csvIssueNo :: Word64
-</span><a href="#local-6989586621679580050"><span class="hs-identifier hs-var">csvIssueNo</span></a></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">OCert (EraCrypto era) -&gt; Word64
+</span><a href="#local-6989586621679728149"><span class="hs-identifier hs-var">hdrBody</span></a></span><span>
+</span><span id="line-45"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">csvIssueNo :: Word64
+</span><a href="#local-6989586621679728148"><span class="hs-identifier hs-var">csvIssueNo</span></a></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">OCert (EraCrypto era) -&gt; Word64
 forall crypto. OCert crypto -&gt; Word64
 </span><span class="hs-identifier hs-var hs-var">SL.ocertN</span></span><span> </span><span class="annot"><span class="annottext">(OCert (EraCrypto era) -&gt; Word64)
 -&gt; (BHBody (EraCrypto era) -&gt; OCert (EraCrypto era))
 -&gt; BHBody (EraCrypto era)
 -&gt; Word64
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">BHBody (EraCrypto era) -&gt; OCert (EraCrypto era)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">BHBody (EraCrypto era) -&gt; OCert (EraCrypto era)
 forall crypto. BHBody crypto -&gt; OCert crypto
 </span><span class="hs-identifier hs-var hs-var">SL.bheaderOCert</span></span><span> </span><span class="annot"><span class="annottext">(BHBody (EraCrypto era) -&gt; Word64)
 -&gt; BHBody (EraCrypto era) -&gt; Word64
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">BHBody (EraCrypto era)
-</span><a href="#local-6989586621679580051"><span class="hs-identifier hs-var">hdrBody</span></a></span><span>
-</span><span id="line-40"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">csvLeaderVRF :: OutputVRF (VRF (EraCrypto era))
-</span><a href="#local-6989586621679580046"><span class="hs-identifier hs-var">csvLeaderVRF</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">CertifiedVRF (VRF (EraCrypto era)) Natural
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">BHBody (EraCrypto era)
+</span><a href="#local-6989586621679728149"><span class="hs-identifier hs-var">hdrBody</span></a></span><span>
+</span><span id="line-46"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">csvLeaderVRF :: OutputVRF (VRF (EraCrypto era))
+</span><a href="#local-6989586621679728144"><span class="hs-identifier hs-var">csvLeaderVRF</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">CertifiedVRF (VRF (EraCrypto era)) Natural
 -&gt; OutputVRF (VRF (EraCrypto era))
 forall v a. CertifiedVRF v a -&gt; OutputVRF v
 </span><span class="hs-identifier hs-var hs-var">certifiedOutput</span></span><span> </span><span class="annot"><span class="annottext">(CertifiedVRF (VRF (EraCrypto era)) Natural
@@ -95,29 +101,29 @@ forall v a. CertifiedVRF v a -&gt; OutputVRF v
 -&gt; BHBody (EraCrypto era)
 -&gt; OutputVRF (VRF (EraCrypto era))
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">BHBody (EraCrypto era)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">BHBody (EraCrypto era)
 -&gt; CertifiedVRF (VRF (EraCrypto era)) Natural
 forall crypto. BHBody crypto -&gt; CertifiedVRF crypto Natural
 </span><span class="hs-identifier hs-var hs-var">SL.bheaderL</span></span><span> </span><span class="annot"><span class="annottext">(BHBody (EraCrypto era) -&gt; OutputVRF (VRF (EraCrypto era)))
 -&gt; BHBody (EraCrypto era) -&gt; OutputVRF (VRF (EraCrypto era))
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">BHBody (EraCrypto era)
-</span><a href="#local-6989586621679580051"><span class="hs-identifier hs-var">hdrBody</span></a></span><span>
-</span><span id="line-41"></span><span>      </span><span class="hs-special">}</span><span>
-</span><span id="line-42"></span><span>    </span><span class="hs-keyword">where</span><span>
-</span><span id="line-43"></span><span>      </span><span class="annot"><a href="#local-6989586621679580051"><span class="hs-identifier hs-type">hdrBody</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.BHBody</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier hs-type">EraCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679580081"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-44"></span><span>      </span><span id="local-6989586621679580051"><span class="annot"><span class="annottext">hdrBody :: BHBody (EraCrypto era)
-</span><a href="#local-6989586621679580051"><span class="hs-identifier hs-var hs-var">hdrBody</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BHeader (EraCrypto era) -&gt; BHBody (EraCrypto era)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">BHBody (EraCrypto era)
+</span><a href="#local-6989586621679728149"><span class="hs-identifier hs-var">hdrBody</span></a></span><span>
+</span><span id="line-47"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-48"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-49"></span><span>      </span><span class="annot"><a href="#local-6989586621679728149"><span class="hs-identifier hs-type">hdrBody</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.BHBody</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier hs-type">EraCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679728179"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-50"></span><span>      </span><span id="local-6989586621679728149"><span class="annot"><span class="annottext">hdrBody :: BHBody (EraCrypto era)
+</span><a href="#local-6989586621679728149"><span class="hs-identifier hs-var hs-var">hdrBody</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BHeader (EraCrypto era) -&gt; BHBody (EraCrypto era)
 forall crypto. Crypto crypto =&gt; BHeader crypto -&gt; BHBody crypto
 </span><span class="hs-identifier hs-var">SL.bhbody</span></span><span> </span><span class="annot"><span class="annottext">BHeader (EraCrypto era)
-</span><a href="#local-6989586621679580061"><span class="hs-identifier hs-var">shdr</span></a></span><span>
-</span><span id="line-45"></span><span>
-</span><span id="line-46"></span><span>      </span><span class="annot"><a href="#local-6989586621679580043"><span class="hs-identifier hs-type">issuerVKeys</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.KeyHash</span></span><span> </span><span class="hs-special">'</span><span class="annot"><span class="hs-identifier hs-type">SL.BlockIssuer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier hs-type">EraCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679580081"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-47"></span><span>                         </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.VKey</span></span><span> </span><span class="hs-special">'</span><span class="annot"><span class="hs-identifier hs-type">SL.BlockIssuer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier hs-type">EraCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679580081"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-48"></span><span>      </span><span id="local-6989586621679580043"><span class="annot"><span class="annottext">issuerVKeys :: Map
+</span><a href="#local-6989586621679728159"><span class="hs-identifier hs-var">shdr</span></a></span><span>
+</span><span id="line-51"></span><span>
+</span><span id="line-52"></span><span>      </span><span class="annot"><a href="#local-6989586621679728141"><span class="hs-identifier hs-type">issuerVKeys</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-type">Map</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.KeyHash</span></span><span> </span><span class="hs-special">'</span><span class="annot"><span class="hs-identifier hs-type">SL.BlockIssuer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier hs-type">EraCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679728179"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-53"></span><span>                         </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.VKey</span></span><span> </span><span class="hs-special">'</span><span class="annot"><span class="hs-identifier hs-type">SL.BlockIssuer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier hs-type">EraCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679728179"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-54"></span><span>      </span><span id="local-6989586621679728141"><span class="annot"><span class="annottext">issuerVKeys :: Map
   (KeyHash 'BlockIssuer (EraCrypto era))
   (VKey 'BlockIssuer (EraCrypto era))
-</span><a href="#local-6989586621679580043"><span class="hs-identifier hs-var hs-var">issuerVKeys</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BlockConfig (ShelleyBlock era)
+</span><a href="#local-6989586621679728141"><span class="hs-identifier hs-var hs-var">issuerVKeys</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BlockConfig (ShelleyBlock era)
 -&gt; Map
      (KeyHash 'BlockIssuer (EraCrypto era))
      (VKey 'BlockIssuer (EraCrypto era))
@@ -127,68 +133,68 @@ BlockConfig (ShelleyBlock era)
      (KeyHash 'BlockIssuer (EraCrypto era))
      (VKey 'BlockIssuer (EraCrypto era))
 </span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#shelleyBlockIssuerVKeys"><span class="hs-identifier hs-var hs-var">shelleyBlockIssuerVKeys</span></a></span><span> </span><span class="annot"><span class="annottext">BlockConfig (ShelleyBlock era)
-</span><a href="#local-6989586621679580063"><span class="hs-identifier hs-var">cfg</span></a></span><span>
-</span><span id="line-49"></span><span>
-</span><span id="line-50"></span><span>      </span><span class="hs-comment">-- | Premature optimisation: we assume everywhere that 'selectView' is</span><span>
-</span><span id="line-51"></span><span>      </span><span class="hs-comment">-- cheap, so micro-optimise checking whether the issuer vkey is one of our</span><span>
-</span><span id="line-52"></span><span>      </span><span class="hs-comment">-- own vkeys.</span><span>
-</span><span id="line-53"></span><span>      </span><span class="hs-comment">--</span><span>
-</span><span id="line-54"></span><span>      </span><span class="hs-comment">-- * Equality of vkeys takes roughly 40ns</span><span>
-</span><span id="line-55"></span><span>      </span><span class="hs-comment">-- * Hashing a vkey takes roughly 850ns</span><span>
-</span><span id="line-56"></span><span>      </span><span class="hs-comment">-- * Equality of hashes takes roughly 10ns</span><span>
-</span><span id="line-57"></span><span>      </span><span class="hs-comment">--</span><span>
-</span><span id="line-58"></span><span>      </span><span class="hs-comment">-- We want to avoid the hashing of a vkey as it is more expensive than</span><span>
-</span><span id="line-59"></span><span>      </span><span class="hs-comment">-- simply doing a linear search, comparing vkeys for equality. Only when</span><span>
-</span><span id="line-60"></span><span>      </span><span class="hs-comment">-- we have to do a linear search across a large number of vkeys does it</span><span>
-</span><span id="line-61"></span><span>      </span><span class="hs-comment">-- become more efficient to first hash the vkey and look up its hash in</span><span>
-</span><span id="line-62"></span><span>      </span><span class="hs-comment">-- the map.</span><span>
+</span><a href="#local-6989586621679728161"><span class="hs-identifier hs-var">cfg</span></a></span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span>      </span><span class="hs-comment">-- | Premature optimisation: we assume everywhere that 'selectView' is</span><span>
+</span><span id="line-57"></span><span>      </span><span class="hs-comment">-- cheap, so micro-optimise checking whether the issuer vkey is one of our</span><span>
+</span><span id="line-58"></span><span>      </span><span class="hs-comment">-- own vkeys.</span><span>
+</span><span id="line-59"></span><span>      </span><span class="hs-comment">--</span><span>
+</span><span id="line-60"></span><span>      </span><span class="hs-comment">-- * Equality of vkeys takes roughly 40ns</span><span>
+</span><span id="line-61"></span><span>      </span><span class="hs-comment">-- * Hashing a vkey takes roughly 850ns</span><span>
+</span><span id="line-62"></span><span>      </span><span class="hs-comment">-- * Equality of hashes takes roughly 10ns</span><span>
 </span><span id="line-63"></span><span>      </span><span class="hs-comment">--</span><span>
-</span><span id="line-64"></span><span>      </span><span class="hs-comment">-- We could try to be clever and estimate the number of keys after which</span><span>
-</span><span id="line-65"></span><span>      </span><span class="hs-comment">-- we switch from a linear search to hashing + a O(log n) map lookup, but</span><span>
-</span><span id="line-66"></span><span>      </span><span class="hs-comment">-- we keep it (relatively) simple and optimise for the common case: 0 or 1</span><span>
-</span><span id="line-67"></span><span>      </span><span class="hs-comment">-- key.</span><span>
-</span><span id="line-68"></span><span>      </span><span class="annot"><a href="#local-6989586621679580054"><span class="hs-identifier hs-type">selfIssued</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Protocol.html#SelfIssued"><span class="hs-identifier hs-type">SelfIssued</span></a></span><span>
-</span><span id="line-69"></span><span>      </span><span id="local-6989586621679580054"><span class="annot"><span class="annottext">selfIssued :: SelfIssued
-</span><a href="#local-6989586621679580054"><span class="hs-identifier hs-var hs-var">selfIssued</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Map
+</span><span id="line-64"></span><span>      </span><span class="hs-comment">-- We want to avoid the hashing of a vkey as it is more expensive than</span><span>
+</span><span id="line-65"></span><span>      </span><span class="hs-comment">-- simply doing a linear search, comparing vkeys for equality. Only when</span><span>
+</span><span id="line-66"></span><span>      </span><span class="hs-comment">-- we have to do a linear search across a large number of vkeys does it</span><span>
+</span><span id="line-67"></span><span>      </span><span class="hs-comment">-- become more efficient to first hash the vkey and look up its hash in</span><span>
+</span><span id="line-68"></span><span>      </span><span class="hs-comment">-- the map.</span><span>
+</span><span id="line-69"></span><span>      </span><span class="hs-comment">--</span><span>
+</span><span id="line-70"></span><span>      </span><span class="hs-comment">-- We could try to be clever and estimate the number of keys after which</span><span>
+</span><span id="line-71"></span><span>      </span><span class="hs-comment">-- we switch from a linear search to hashing + a O(log n) map lookup, but</span><span>
+</span><span id="line-72"></span><span>      </span><span class="hs-comment">-- we keep it (relatively) simple and optimise for the common case: 0 or 1</span><span>
+</span><span id="line-73"></span><span>      </span><span class="hs-comment">-- key.</span><span>
+</span><span id="line-74"></span><span>      </span><span class="annot"><a href="#local-6989586621679728152"><span class="hs-identifier hs-type">selfIssued</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-protocol-0.1.0.0/noopt/doc/html/ouroboros-consensus-protocol/src"><span class="hs-identifier hs-type">SelfIssued</span></a></span><span>
+</span><span id="line-75"></span><span>      </span><span id="local-6989586621679728152"><span class="annot"><span class="annottext">selfIssued :: SelfIssued
+</span><a href="#local-6989586621679728152"><span class="hs-identifier hs-var hs-var">selfIssued</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Map
   (KeyHash 'BlockIssuer (EraCrypto era))
   (VKey 'BlockIssuer (EraCrypto era))
 -&gt; Int
 forall k a. Map k a -&gt; Int
-</span><span class="hs-identifier hs-var">Map.size</span></span><span> </span><span class="annot"><span class="annottext">Map
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.size</span></a></span><span> </span><span class="annot"><span class="annottext">Map
   (KeyHash 'BlockIssuer (EraCrypto era))
   (VKey 'BlockIssuer (EraCrypto era))
-</span><a href="#local-6989586621679580043"><span class="hs-identifier hs-var">issuerVKeys</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-70"></span><span>          </span><span class="hs-comment">-- The most common case: a non-block producing node</span><span>
-</span><span id="line-71"></span><span>          </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679728141"><span class="hs-identifier hs-var">issuerVKeys</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-76"></span><span>          </span><span class="hs-comment">-- The most common case: a non-block producing node</span><span>
+</span><span id="line-77"></span><span>          </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SelfIssued
-</span><a href="Ouroboros.Consensus.Shelley.Protocol.html#NotSelfIssued"><span class="hs-identifier hs-var">NotSelfIssued</span></a></span><span>
-</span><span id="line-72"></span><span>          </span><span class="hs-comment">-- A block producing node with a single set of credentials: just do an</span><span>
-</span><span id="line-73"></span><span>          </span><span class="hs-comment">-- equality check of the single VKey, skipping the more expensive</span><span>
-</span><span id="line-74"></span><span>          </span><span class="hs-comment">-- computation of the hash.</span><span>
-</span><span id="line-75"></span><span>          </span><span class="annot"><span class="annottext">Int
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-protocol-0.1.0.0/noopt/doc/html/ouroboros-consensus-protocol/src"><span class="hs-identifier hs-var">NotSelfIssued</span></a></span><span>
+</span><span id="line-78"></span><span>          </span><span class="hs-comment">-- A block producing node with a single set of credentials: just do an</span><span>
+</span><span id="line-79"></span><span>          </span><span class="hs-comment">-- equality check of the single VKey, skipping the more expensive</span><span>
+</span><span id="line-80"></span><span>          </span><span class="hs-comment">-- computation of the hash.</span><span>
+</span><span id="line-81"></span><span>          </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">1</span></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">BHBody (EraCrypto era) -&gt; VKey 'BlockIssuer (EraCrypto era)
 forall crypto. BHBody crypto -&gt; VKey 'BlockIssuer crypto
 </span><span class="hs-identifier hs-var hs-var">SL.bheaderVk</span></span><span> </span><span class="annot"><span class="annottext">BHBody (EraCrypto era)
-</span><a href="#local-6989586621679580051"><span class="hs-identifier hs-var">hdrBody</span></a></span><span> </span><span class="annot"><span class="annottext">VKey 'BlockIssuer (EraCrypto era)
+</span><a href="#local-6989586621679728149"><span class="hs-identifier hs-var">hdrBody</span></a></span><span> </span><span class="annot"><span class="annottext">VKey 'BlockIssuer (EraCrypto era)
 -&gt; Map
      (KeyHash 'BlockIssuer (EraCrypto era))
      (VKey 'BlockIssuer (EraCrypto era))
 -&gt; Bool
 forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
-</span><span class="hs-operator hs-var">`elem`</span></span><span> </span><span class="annot"><span class="annottext">Map
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">`elem`</span></a></span><span> </span><span class="annot"><span class="annottext">Map
   (KeyHash 'BlockIssuer (EraCrypto era))
   (VKey 'BlockIssuer (EraCrypto era))
-</span><a href="#local-6989586621679580043"><span class="hs-identifier hs-var">issuerVKeys</span></a></span><span>
-</span><span id="line-76"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SelfIssued
-</span><a href="Ouroboros.Consensus.Shelley.Protocol.html#SelfIssued"><span class="hs-identifier hs-var">SelfIssued</span></a></span><span>
-</span><span id="line-77"></span><span>            </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><span class="hs-identifier hs-var">otherwise</span></span><span>
-</span><span id="line-78"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SelfIssued
-</span><a href="Ouroboros.Consensus.Shelley.Protocol.html#NotSelfIssued"><span class="hs-identifier hs-var">NotSelfIssued</span></a></span><span>
-</span><span id="line-79"></span><span>          </span><span class="hs-comment">-- When we are running with multiple sets of credentials, which should</span><span>
-</span><span id="line-80"></span><span>          </span><span class="hs-comment">-- only happen when benchmarking, do a hash lookup, as the number of</span><span>
-</span><span id="line-81"></span><span>          </span><span class="hs-comment">-- keys can grow to 100-250.</span><span>
-</span><span id="line-82"></span><span>          </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679728141"><span class="hs-identifier hs-var">issuerVKeys</span></a></span><span>
+</span><span id="line-82"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SelfIssued
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-protocol-0.1.0.0/noopt/doc/html/ouroboros-consensus-protocol/src"><span class="hs-identifier hs-var">SelfIssued</span></a></span><span>
+</span><span id="line-83"></span><span>            </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>
+</span><span id="line-84"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SelfIssued
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-protocol-0.1.0.0/noopt/doc/html/ouroboros-consensus-protocol/src"><span class="hs-identifier hs-var">NotSelfIssued</span></a></span><span>
+</span><span id="line-85"></span><span>          </span><span class="hs-comment">-- When we are running with multiple sets of credentials, which should</span><span>
+</span><span id="line-86"></span><span>          </span><span class="hs-comment">-- only happen when benchmarking, do a hash lookup, as the number of</span><span>
+</span><span id="line-87"></span><span>          </span><span class="hs-comment">-- keys can grow to 100-250.</span><span>
+</span><span id="line-88"></span><span>          </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">VKey 'BlockIssuer (EraCrypto era)
 -&gt; KeyHash 'BlockIssuer (EraCrypto era)
 forall crypto (kd :: KeyRole).
@@ -197,28 +203,28 @@ VKey kd crypto -&gt; KeyHash kd crypto
 </span><span class="hs-identifier hs-var">SL.hashKey</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">BHBody (EraCrypto era) -&gt; VKey 'BlockIssuer (EraCrypto era)
 forall crypto. BHBody crypto -&gt; VKey 'BlockIssuer crypto
 </span><span class="hs-identifier hs-var hs-var">SL.bheaderVk</span></span><span> </span><span class="annot"><span class="annottext">BHBody (EraCrypto era)
-</span><a href="#local-6989586621679580051"><span class="hs-identifier hs-var">hdrBody</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">KeyHash 'BlockIssuer (EraCrypto era)
+</span><a href="#local-6989586621679728149"><span class="hs-identifier hs-var">hdrBody</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">KeyHash 'BlockIssuer (EraCrypto era)
 -&gt; Map
      (KeyHash 'BlockIssuer (EraCrypto era))
      (VKey 'BlockIssuer (EraCrypto era))
 -&gt; Bool
 forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Bool
-</span><span class="hs-operator hs-var">`Map.member`</span></span><span> </span><span class="annot"><span class="annottext">Map
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-operator hs-var">`Map.member`</span></a></span><span> </span><span class="annot"><span class="annottext">Map
   (KeyHash 'BlockIssuer (EraCrypto era))
   (VKey 'BlockIssuer (EraCrypto era))
-</span><a href="#local-6989586621679580043"><span class="hs-identifier hs-var">issuerVKeys</span></a></span><span>
-</span><span id="line-83"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SelfIssued
-</span><a href="Ouroboros.Consensus.Shelley.Protocol.html#SelfIssued"><span class="hs-identifier hs-var">SelfIssued</span></a></span><span>
-</span><span id="line-84"></span><span>            </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><span class="hs-identifier hs-var">otherwise</span></span><span>
-</span><span id="line-85"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SelfIssued
-</span><a href="Ouroboros.Consensus.Shelley.Protocol.html#NotSelfIssued"><span class="hs-identifier hs-var">NotSelfIssued</span></a></span></span><span>
-</span><span id="line-86"></span><span>
-</span><span id="line-87"></span><span class="hs-comment">-- TODO correct place for these two?</span><span>
-</span><span id="line-88"></span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="Signed"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">Signed</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Header</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyBlock"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span id="local-6989586621679580035"><span class="annot"><a href="#local-6989586621679580035"><span class="hs-identifier hs-type hs-type">era</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.BHBody</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier hs-type">EraCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679580035"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-89"></span><span>
-</span><span id="line-90"></span><span id="local-6989586621679580034"><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679580034"><span class="hs-identifier hs-type">era</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">SignedHeader</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Header</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyBlock"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679580034"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-91"></span><span>  </span><span id="local-6989586621679580031"><span class="annot"><span class="annottext">headerSigned :: Header (ShelleyBlock era) -&gt; Signed (Header (ShelleyBlock era))
+</span><a href="#local-6989586621679728141"><span class="hs-identifier hs-var">issuerVKeys</span></a></span><span>
+</span><span id="line-89"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SelfIssued
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-protocol-0.1.0.0/noopt/doc/html/ouroboros-consensus-protocol/src"><span class="hs-identifier hs-var">SelfIssued</span></a></span><span>
+</span><span id="line-90"></span><span>            </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>
+</span><span id="line-91"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SelfIssued
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-protocol-0.1.0.0/noopt/doc/html/ouroboros-consensus-protocol/src"><span class="hs-identifier hs-var">NotSelfIssued</span></a></span></span><span>
+</span><span id="line-92"></span><span>
+</span><span id="line-93"></span><span class="hs-comment">-- TODO correct place for these two?</span><span>
+</span><span id="line-94"></span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="Signed"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">Signed</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Header</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyBlock"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span id="local-6989586621679728133"><span class="annot"><a href="#local-6989586621679728133"><span class="hs-identifier hs-type hs-type">era</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.BHBody</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier hs-type">EraCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679728133"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-95"></span><span>
+</span><span id="line-96"></span><span id="local-6989586621679728132"><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679728132"><span class="hs-identifier hs-type">era</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">SignedHeader</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Header</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyBlock"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679728132"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-97"></span><span>  </span><span id="local-6989586621679728129"><span class="annot"><span class="annottext">headerSigned :: Header (ShelleyBlock era) -&gt; Signed (Header (ShelleyBlock era))
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">headerSigned</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BHeader (Crypto era) -&gt; BHBody (Crypto era)
 forall crypto. Crypto crypto =&gt; BHeader crypto -&gt; BHBody crypto
 </span><span class="hs-identifier hs-var">SL.bhbody</span></span><span> </span><span class="annot"><span class="annottext">(BHeader (Crypto era) -&gt; BHBody (Crypto era))
@@ -226,7 +232,7 @@ forall crypto. Crypto crypto =&gt; BHeader crypto -&gt; BHBody crypto
 -&gt; Header (ShelleyBlock era)
 -&gt; BHBody (Crypto era)
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Header (ShelleyBlock era) -&gt; BHeader (Crypto era)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Header (ShelleyBlock era) -&gt; BHeader (Crypto era)
 forall era. Header (ShelleyBlock era) -&gt; BHeader (EraCrypto era)
 </span><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#shelleyHeaderRaw"><span class="hs-identifier hs-var hs-var">shelleyHeaderRaw</span></a></span></span><span>
-</span><span id="line-92"></span></pre></body></html>
+</span><span id="line-98"></span></pre></body></html>

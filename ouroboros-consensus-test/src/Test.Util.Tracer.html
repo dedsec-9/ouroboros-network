@@ -3,7 +3,7 @@
 </span><span id="line-3"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Test.Util.Tracer.html#recordingTracerTVar"><span class="hs-identifier">recordingTracerTVar</span></a></span><span>
 </span><span id="line-4"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-5"></span><span>
-</span><span id="line-6"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.IORef</span></span><span>
+</span><span id="line-6"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.IORef</span></a></span><span>
 </span><span id="line-7"></span><span>
 </span><span id="line-8"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Tracer</span></span><span>
 </span><span id="line-9"></span><span>
@@ -12,48 +12,48 @@
 </span><span id="line-12"></span><span class="hs-comment">-- | Create a 'Tracer' that stores all events in an 'IORef' that is atomically</span><span>
 </span><span id="line-13"></span><span class="hs-comment">-- updated. The second return value lets you obtain the events recorded so far</span><span>
 </span><span id="line-14"></span><span class="hs-comment">-- (from oldest to newest). Obtaining the events does not erase them.</span><span>
-</span><span id="line-15"></span><span id="local-6989586621679261620"><span class="annot"><a href="Test.Util.Tracer.html#recordingTracerIORef"><span class="hs-identifier hs-type">recordingTracerIORef</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Tracer</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><a href="#local-6989586621679261620"><span class="hs-identifier hs-type">ev</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679261620"><span class="hs-identifier hs-type">ev</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span></span><span>
+</span><span id="line-15"></span><span id="local-6989586621679265602"><span class="annot"><a href="Test.Util.Tracer.html#recordingTracerIORef"><span class="hs-identifier hs-type">recordingTracerIORef</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Tracer</span></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265602"><span class="hs-identifier hs-type">ev</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679265602"><span class="hs-identifier hs-type">ev</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span></span><span>
 </span><span id="line-16"></span><span id="recordingTracerIORef"><span class="annot"><span class="annottext">recordingTracerIORef :: IO (Tracer IO ev, IO [ev])
 </span><a href="Test.Util.Tracer.html#recordingTracerIORef"><span class="hs-identifier hs-var hs-var">recordingTracerIORef</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[ev] -&gt; IO (IORef [ev])
 forall a. a -&gt; IO (IORef a)
-</span><span class="hs-identifier hs-var">newIORef</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">IO (IORef [ev])
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">newIORef</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">IO (IORef [ev])
 -&gt; (IORef [ev] -&gt; IO (Tracer IO ev, IO [ev]))
 -&gt; IO (Tracer IO ev, IO [ev])
 forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
-</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679261618"><span class="annot"><span class="annottext">IORef [ev]
-</span><a href="#local-6989586621679261618"><span class="hs-identifier hs-var">ref</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Tracer IO ev, IO [ev]) -&gt; IO (Tracer IO ev, IO [ev])
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&gt;&gt;=</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679265600"><span class="annot"><span class="annottext">IORef [ev]
+</span><a href="#local-6989586621679265600"><span class="hs-identifier hs-var">ref</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Tracer IO ev, IO [ev]) -&gt; IO (Tracer IO ev, IO [ev])
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
-</span><span class="hs-identifier hs-var">return</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span>
 </span><span id="line-17"></span><span>    </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">(ev -&gt; IO ()) -&gt; Tracer IO ev
 forall (m :: * -&gt; *) a. (a -&gt; m ()) -&gt; Tracer m a
 </span><span class="hs-identifier hs-var">Tracer</span></span><span> </span><span class="annot"><span class="annottext">((ev -&gt; IO ()) -&gt; Tracer IO ev) -&gt; (ev -&gt; IO ()) -&gt; Tracer IO ev
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679261616"><span class="annot"><span class="annottext">ev
-</span><a href="#local-6989586621679261616"><span class="hs-identifier hs-var">ev</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">IORef [ev] -&gt; ([ev] -&gt; ([ev], ())) -&gt; IO ()
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679265598"><span class="annot"><span class="annottext">ev
+</span><a href="#local-6989586621679265598"><span class="hs-identifier hs-var">ev</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">IORef [ev] -&gt; ([ev] -&gt; ([ev], ())) -&gt; IO ()
 forall a b. IORef a -&gt; (a -&gt; (a, b)) -&gt; IO b
-</span><span class="hs-identifier hs-var">atomicModifyIORef'</span></span><span> </span><span class="annot"><span class="annottext">IORef [ev]
-</span><a href="#local-6989586621679261618"><span class="hs-identifier hs-var">ref</span></a></span><span> </span><span class="annot"><span class="annottext">(([ev] -&gt; ([ev], ())) -&gt; IO ()) -&gt; ([ev] -&gt; ([ev], ())) -&gt; IO ()
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">atomicModifyIORef'</span></a></span><span> </span><span class="annot"><span class="annottext">IORef [ev]
+</span><a href="#local-6989586621679265600"><span class="hs-identifier hs-var">ref</span></a></span><span> </span><span class="annot"><span class="annottext">(([ev] -&gt; ([ev], ())) -&gt; IO ()) -&gt; ([ev] -&gt; ([ev], ())) -&gt; IO ()
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679261614"><span class="annot"><span class="annottext">[ev]
-</span><a href="#local-6989586621679261614"><span class="hs-identifier hs-var">evs</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ev
-</span><a href="#local-6989586621679261616"><span class="hs-identifier hs-var">ev</span></a></span><span class="annot"><span class="annottext">ev -&gt; [ev] -&gt; [ev]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679265596"><span class="annot"><span class="annottext">[ev]
+</span><a href="#local-6989586621679265596"><span class="hs-identifier hs-var">evs</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ev
+</span><a href="#local-6989586621679265598"><span class="hs-identifier hs-var">ev</span></a></span><span class="annot"><span class="annottext">ev -&gt; [ev] -&gt; [ev]
 forall a. a -&gt; [a] -&gt; [a]
-</span><span class="hs-glyph hs-var">:</span></span><span class="annot"><span class="annottext">[ev]
-</span><a href="#local-6989586621679261614"><span class="hs-identifier hs-var">evs</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-var">:</span></a></span><span class="annot"><span class="annottext">[ev]
+</span><a href="#local-6989586621679265596"><span class="hs-identifier hs-var">evs</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-18"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">[ev] -&gt; [ev]
 forall a. [a] -&gt; [a]
-</span><span class="hs-identifier hs-var">reverse</span></span><span> </span><span class="annot"><span class="annottext">([ev] -&gt; [ev]) -&gt; IO [ev] -&gt; IO [ev]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">reverse</span></a></span><span> </span><span class="annot"><span class="annottext">([ev] -&gt; [ev]) -&gt; IO [ev] -&gt; IO [ev]
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">IORef [ev] -&gt; IO [ev]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">IORef [ev] -&gt; IO [ev]
 forall a. IORef a -&gt; IO a
-</span><span class="hs-identifier hs-var">readIORef</span></span><span> </span><span class="annot"><span class="annottext">IORef [ev]
-</span><a href="#local-6989586621679261618"><span class="hs-identifier hs-var">ref</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">readIORef</span></a></span><span> </span><span class="annot"><span class="annottext">IORef [ev]
+</span><a href="#local-6989586621679265600"><span class="hs-identifier hs-var">ref</span></a></span><span>
 </span><span id="line-19"></span><span>    </span><span class="hs-special">)</span><span>
 </span><span id="line-20"></span><span>
 </span><span id="line-21"></span><span class="hs-comment">-- | Create a 'Tracer' that stores all events in a 'TVar' that is atomically</span><span>
 </span><span id="line-22"></span><span class="hs-comment">-- updated. The second return value lets you obtain the events recorded so far</span><span>
 </span><span id="line-23"></span><span class="hs-comment">-- (from oldest to newest). Obtaining the events does not erase them.</span><span>
-</span><span id="line-24"></span><span id="local-6989586621679261609"><span id="local-6989586621679261610"><span class="annot"><a href="Test.Util.Tracer.html#recordingTracerTVar"><span class="hs-identifier hs-type">recordingTracerTVar</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier hs-type">MonadSTM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679261610"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679261610"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Tracer</span></span><span> </span><span class="annot"><a href="#local-6989586621679261610"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679261609"><span class="hs-identifier hs-type">ev</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679261610"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679261609"><span class="hs-identifier hs-type">ev</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-24"></span><span id="local-6989586621679265591"><span id="local-6989586621679265592"><span class="annot"><a href="Test.Util.Tracer.html#recordingTracerTVar"><span class="hs-identifier hs-type">recordingTracerTVar</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">MonadSTM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265592"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679265592"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Tracer</span></span><span> </span><span class="annot"><a href="#local-6989586621679265592"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265591"><span class="hs-identifier hs-type">ev</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679265592"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679265591"><span class="hs-identifier hs-type">ev</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span></span></span><span>
 </span><span id="line-25"></span><span id="recordingTracerTVar"><span class="annot"><span class="annottext">recordingTracerTVar :: m (Tracer m ev, m [ev])
 </span><a href="Test.Util.Tracer.html#recordingTracerTVar"><span class="hs-identifier hs-var hs-var">recordingTracerTVar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[ev] -&gt; m (StrictTVar m [ev])
 forall (m :: * -&gt; *) a. MonadSTM m =&gt; a -&gt; m (StrictTVar m a)
@@ -61,43 +61,43 @@ forall (m :: * -&gt; *) a. MonadSTM m =&gt; a -&gt; m (StrictTVar m a)
 -&gt; (StrictTVar m [ev] -&gt; m (Tracer m ev, m [ev]))
 -&gt; m (Tracer m ev, m [ev])
 forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
-</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679261607"><span class="annot"><span class="annottext">StrictTVar m [ev]
-</span><a href="#local-6989586621679261607"><span class="hs-identifier hs-var">ref</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Tracer m ev, m [ev]) -&gt; m (Tracer m ev, m [ev])
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&gt;&gt;=</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679265589"><span class="annot"><span class="annottext">StrictTVar m [ev]
+</span><a href="#local-6989586621679265589"><span class="hs-identifier hs-var">ref</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Tracer m ev, m [ev]) -&gt; m (Tracer m ev, m [ev])
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
-</span><span class="hs-identifier hs-var">return</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span>
 </span><span id="line-26"></span><span>    </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">(ev -&gt; m ()) -&gt; Tracer m ev
 forall (m :: * -&gt; *) a. (a -&gt; m ()) -&gt; Tracer m a
 </span><span class="hs-identifier hs-var">Tracer</span></span><span> </span><span class="annot"><span class="annottext">((ev -&gt; m ()) -&gt; Tracer m ev) -&gt; (ev -&gt; m ()) -&gt; Tracer m ev
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679261606"><span class="annot"><span class="annottext">ev
-</span><a href="#local-6989586621679261606"><span class="hs-identifier hs-var">ev</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">STM m () -&gt; m ()
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679265588"><span class="annot"><span class="annottext">ev
+</span><a href="#local-6989586621679265588"><span class="hs-identifier hs-var">ev</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">STM m () -&gt; m ()
 forall (m :: * -&gt; *) a.
 (MonadSTM m, HasCallStack) =&gt;
 STM m a -&gt; m a
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier hs-var">atomically</span></a></span><span> </span><span class="annot"><span class="annottext">(STM m () -&gt; m ()) -&gt; STM m () -&gt; m ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">atomically</span></a></span><span> </span><span class="annot"><span class="annottext">(STM m () -&gt; m ()) -&gt; STM m () -&gt; m ()
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">StrictTVar m [ev] -&gt; ([ev] -&gt; [ev]) -&gt; STM m ()
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">StrictTVar m [ev] -&gt; ([ev] -&gt; [ev]) -&gt; STM m ()
 forall (m :: * -&gt; *) a.
 MonadSTM m =&gt;
 StrictTVar m a -&gt; (a -&gt; a) -&gt; STM m ()
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier hs-var">modifyTVar</span></a></span><span> </span><span class="annot"><span class="annottext">StrictTVar m [ev]
-</span><a href="#local-6989586621679261607"><span class="hs-identifier hs-var">ref</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ev
-</span><a href="#local-6989586621679261606"><span class="hs-identifier hs-var">ev</span></a></span><span class="annot"><span class="annottext">ev -&gt; [ev] -&gt; [ev]
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/strict-stm-0.1.0.0/noopt/doc/html/strict-stm/src"><span class="hs-identifier hs-var">modifyTVar</span></a></span><span> </span><span class="annot"><span class="annottext">StrictTVar m [ev]
+</span><a href="#local-6989586621679265589"><span class="hs-identifier hs-var">ref</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ev
+</span><a href="#local-6989586621679265588"><span class="hs-identifier hs-var">ev</span></a></span><span class="annot"><span class="annottext">ev -&gt; [ev] -&gt; [ev]
 forall a. a -&gt; [a] -&gt; [a]
-</span><span class="hs-glyph hs-var">:</span></span><span class="hs-special">)</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-var">:</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-27"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">STM m [ev] -&gt; m [ev]
 forall (m :: * -&gt; *) a.
 (MonadSTM m, HasCallStack) =&gt;
 STM m a -&gt; m a
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier hs-var">atomically</span></a></span><span> </span><span class="annot"><span class="annottext">(STM m [ev] -&gt; m [ev]) -&gt; STM m [ev] -&gt; m [ev]
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">atomically</span></a></span><span> </span><span class="annot"><span class="annottext">(STM m [ev] -&gt; m [ev]) -&gt; STM m [ev] -&gt; m [ev]
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[ev] -&gt; [ev]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">[ev] -&gt; [ev]
 forall a. [a] -&gt; [a]
-</span><span class="hs-identifier hs-var">reverse</span></span><span> </span><span class="annot"><span class="annottext">([ev] -&gt; [ev]) -&gt; STM m [ev] -&gt; STM m [ev]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">reverse</span></a></span><span> </span><span class="annot"><span class="annottext">([ev] -&gt; [ev]) -&gt; STM m [ev] -&gt; STM m [ev]
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">StrictTVar m [ev] -&gt; STM m [ev]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">StrictTVar m [ev] -&gt; STM m [ev]
 forall (m :: * -&gt; *) a. MonadSTM m =&gt; StrictTVar m a -&gt; STM m a
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier hs-var">readTVar</span></a></span><span> </span><span class="annot"><span class="annottext">StrictTVar m [ev]
-</span><a href="#local-6989586621679261607"><span class="hs-identifier hs-var">ref</span></a></span><span>
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/strict-stm-0.1.0.0/noopt/doc/html/strict-stm/src"><span class="hs-identifier hs-var">readTVar</span></a></span><span> </span><span class="annot"><span class="annottext">StrictTVar m [ev]
+</span><a href="#local-6989586621679265589"><span class="hs-identifier hs-var">ref</span></a></span><span>
 </span><span id="line-28"></span><span>    </span><span class="hs-special">)</span><span>
 </span><span id="line-29"></span></pre></body></html>

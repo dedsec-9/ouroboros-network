@@ -1,0 +1,721 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE KindSignatures      #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE LambdaCase          #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE NamedFieldPuns      #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE PatternSynonyms     #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE RankNTypes          #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables #-}</span><span>
+</span><span id="line-7"></span><span class="hs-pragma">{-# LANGUAGE ViewPatterns        #-}</span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Inbound protocol governor state.</span><span>
+</span><span id="line-10"></span><span class="hs-comment">--</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.InboundGovernor.State</span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorObservableState"><span class="hs-identifier">InboundGovernorObservableState</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#newObservableStateVar"><span class="hs-identifier">newObservableStateVar</span></a></span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#newObservableStateVarIO"><span class="hs-identifier">newObservableStateVarIO</span></a></span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#newObservableStateVarFromSeed"><span class="hs-identifier">newObservableStateVarFromSeed</span></a></span><span>
+</span><span id="line-16"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Internals</span></span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorState"><span class="hs-identifier">InboundGovernorState</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#ConnectionState"><span class="hs-identifier">ConnectionState</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorCounters"><span class="hs-identifier">InboundGovernorCounters</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#inboundGovernorCounters"><span class="hs-identifier">inboundGovernorCounters</span></a></span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#unregisterConnection"><span class="hs-identifier">unregisterConnection</span></a></span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#updateMiniProtocol"><span class="hs-identifier">updateMiniProtocol</span></a></span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteState"><span class="hs-identifier">RemoteState</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteEstablished"><span class="hs-identifier">RemoteEstablished</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#updateRemoteState"><span class="hs-identifier">updateRemoteState</span></a></span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#mapRemoteState"><span class="hs-identifier">mapRemoteState</span></a></span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#MiniProtocolData"><span class="hs-identifier">MiniProtocolData</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-28"></span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Control.Exception</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">assert</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/strict-stm-0.1.0.0/noopt/doc/html/strict-stm/src"><span class="hs-identifier">Control.Monad.Class.MonadSTM.Strict</span></a></span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier">Control.Monad.Class.MonadThrow</span></a></span><span> </span><span class="hs-keyword">hiding</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier">handle</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier">Data.ByteString.Lazy</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier">ByteString</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Data.Cache.html"><span class="hs-identifier">Data.Cache</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Cache.html#Cache"><span class="hs-identifier">Cache</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Data.Map.Strict</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Map</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Data.Map.Strict</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Map</span></span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">System.Random</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">StdGen</span></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">System.Random</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Rnd</span></span><span>
+</span><span id="line-39"></span><span>
+</span><span id="line-40"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier">Network.Mux</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Mux</span></span><span>
+</span><span id="line-41"></span><span>
+</span><span id="line-42"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.ConnectionId.html"><span class="hs-identifier">Ouroboros.Network.ConnectionId</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.ConnectionId.html#ConnectionId"><span class="hs-identifier">ConnectionId</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.ConnectionManager.Types.html"><span class="hs-identifier">Ouroboros.Network.ConnectionManager.Types</span></a></span><span>
+</span><span id="line-44"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.Mux.html"><span class="hs-identifier">Ouroboros.Network.Mux</span></a></span><span> </span><span class="hs-keyword">hiding</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Mux.html#ControlMessage"><span class="hs-identifier">ControlMessage</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-45"></span><span>
+</span><span id="line-46"></span><span>
+</span><span id="line-47"></span><span class="hs-comment">-- | Currently only 'StdGen', but in the future this will be extended to</span><span>
+</span><span id="line-48"></span><span class="hs-comment">-- a record which contains some useful statistics about peers to support more</span><span>
+</span><span id="line-49"></span><span class="hs-comment">-- advances prune strategies (see. 'PruneStrategy').</span><span>
+</span><span id="line-50"></span><span class="hs-comment">--</span><span>
+</span><span id="line-51"></span><span class="hs-keyword">newtype</span><span> </span><span id="InboundGovernorObservableState"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorObservableState"><span class="hs-identifier hs-var">InboundGovernorObservableState</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="InboundGovernorObservableState"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorObservableState"><span class="hs-identifier hs-var">InboundGovernorObservableState</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-52"></span><span>      </span><span id="igosPrng"><span class="annot"><span class="annottext">InboundGovernorObservableState -&gt; StdGen
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#igosPrng"><span class="hs-identifier hs-var hs-var">igosPrng</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StdGen</span></span><span>
+</span><span id="line-53"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-54"></span><span>
+</span><span id="line-55"></span><span class="hs-comment">-- | Create new observable state 'StrictTVar'.</span><span>
+</span><span id="line-56"></span><span class="hs-comment">--</span><span>
+</span><span id="line-57"></span><span id="local-6989586621679177025"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#newObservableStateVar"><span class="hs-identifier hs-type">newObservableStateVar</span></a></span><span>
+</span><span id="line-58"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">MonadLabelledSTM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679177025"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-59"></span><span>    </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StdGen</span></span><span>
+</span><span id="line-60"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679177025"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/strict-stm-0.1.0.0/noopt/doc/html/strict-stm/src"><span class="hs-identifier hs-type">StrictTVar</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679177025"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorObservableState"><span class="hs-identifier hs-type">InboundGovernorObservableState</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-61"></span><span id="newObservableStateVar"><span class="annot"><span class="annottext">newObservableStateVar :: StdGen -&gt; m (StrictTVar m InboundGovernorObservableState)
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#newObservableStateVar"><span class="hs-identifier hs-var hs-var">newObservableStateVar</span></a></span></span><span> </span><span id="local-6989586621679176877"><span class="annot"><span class="annottext">StdGen
+</span><a href="#local-6989586621679176877"><span class="hs-identifier hs-var">prng</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-62"></span><span>    </span><span id="local-6989586621679176876"><span class="annot"><span class="annottext">StrictTVar m InboundGovernorObservableState
+</span><a href="#local-6989586621679176876"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">InboundGovernorObservableState
+-&gt; m (StrictTVar m InboundGovernorObservableState)
+forall (m :: * -&gt; *) a. MonadSTM m =&gt; a -&gt; m (StrictTVar m a)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/strict-stm-0.1.0.0/noopt/doc/html/strict-stm/src"><span class="hs-identifier hs-var">newTVarIO</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">StdGen -&gt; InboundGovernorObservableState
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorObservableState"><span class="hs-identifier hs-var">InboundGovernorObservableState</span></a></span><span> </span><span class="annot"><span class="annottext">StdGen
+</span><a href="#local-6989586621679176877"><span class="hs-identifier hs-var">prng</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-63"></span><span>    </span><span class="annot"><span class="annottext">StrictTVar m InboundGovernorObservableState -&gt; String -&gt; m ()
+forall (m :: * -&gt; *) a.
+MonadLabelledSTM m =&gt;
+StrictTVar m a -&gt; String -&gt; m ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/strict-stm-0.1.0.0/noopt/doc/html/strict-stm/src"><span class="hs-identifier hs-var">labelTVarIO</span></a></span><span> </span><span class="annot"><span class="annottext">StrictTVar m InboundGovernorObservableState
+</span><a href="#local-6989586621679176876"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;observable-state-var&quot;</span></span><span>
+</span><span id="line-64"></span><span>    </span><span class="annot"><span class="annottext">StrictTVar m InboundGovernorObservableState
+-&gt; m (StrictTVar m InboundGovernorObservableState)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">StrictTVar m InboundGovernorObservableState
+</span><a href="#local-6989586621679176876"><span class="hs-identifier hs-var">v</span></a></span><span>
+</span><span id="line-65"></span><span>
+</span><span id="line-66"></span><span>
+</span><span id="line-67"></span><span class="hs-comment">-- | Using the global 'StdGen'.</span><span>
+</span><span id="line-68"></span><span class="hs-comment">--</span><span>
+</span><span id="line-69"></span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#newObservableStateVarIO"><span class="hs-identifier hs-type">newObservableStateVarIO</span></a></span><span>
+</span><span id="line-70"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/strict-stm-0.1.0.0/noopt/doc/html/strict-stm/src"><span class="hs-identifier hs-type">StrictTVar</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorObservableState"><span class="hs-identifier hs-type">InboundGovernorObservableState</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-71"></span><span id="newObservableStateVarIO"><span class="annot"><span class="annottext">newObservableStateVarIO :: IO (StrictTVar IO InboundGovernorObservableState)
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#newObservableStateVarIO"><span class="hs-identifier hs-var hs-var">newObservableStateVarIO</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-72"></span><span>    </span><span id="local-6989586621679176873"><span class="annot"><span class="annottext">StdGen
+</span><a href="#local-6989586621679176873"><span class="hs-identifier hs-var">g</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">IO StdGen
+forall (m :: * -&gt; *). MonadIO m =&gt; m StdGen
+</span><span class="hs-identifier hs-var">Rnd.getStdGen</span></span><span>
+</span><span id="line-73"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679176871"><span class="annot"><span class="annottext">StdGen
+</span><a href="#local-6989586621679176871"><span class="hs-identifier hs-var">g'</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679176870"><span class="annot"><span class="annottext">StdGen
+</span><a href="#local-6989586621679176870"><span class="hs-identifier hs-var">igsPrng</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StdGen -&gt; (StdGen, StdGen)
+forall g. RandomGen g =&gt; g -&gt; (g, g)
+</span><span class="hs-identifier hs-var">Rnd.split</span></span><span> </span><span class="annot"><span class="annottext">StdGen
+</span><a href="#local-6989586621679176873"><span class="hs-identifier hs-var">g</span></a></span><span>
+</span><span id="line-74"></span><span>    </span><span class="annot"><span class="annottext">StdGen -&gt; IO ()
+forall (m :: * -&gt; *). MonadIO m =&gt; StdGen -&gt; m ()
+</span><span class="hs-identifier hs-var">Rnd.setStdGen</span></span><span> </span><span class="annot"><span class="annottext">StdGen
+</span><a href="#local-6989586621679176871"><span class="hs-identifier hs-var">g'</span></a></span><span>
+</span><span id="line-75"></span><span>    </span><span class="annot"><span class="annottext">StdGen -&gt; IO (StrictTVar IO InboundGovernorObservableState)
+forall (m :: * -&gt; *).
+MonadLabelledSTM m =&gt;
+StdGen -&gt; m (StrictTVar m InboundGovernorObservableState)
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#newObservableStateVar"><span class="hs-identifier hs-var">newObservableStateVar</span></a></span><span> </span><span class="annot"><span class="annottext">StdGen
+</span><a href="#local-6989586621679176870"><span class="hs-identifier hs-var">igsPrng</span></a></span><span>
+</span><span id="line-76"></span><span>
+</span><span id="line-77"></span><span>
+</span><span id="line-78"></span><span class="hs-comment">-- | Useful for testing, it is using 'Rnd.mkStdGen'.</span><span>
+</span><span id="line-79"></span><span class="hs-comment">--</span><span>
+</span><span id="line-80"></span><span id="local-6989586621679176867"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#newObservableStateVarFromSeed"><span class="hs-identifier hs-type">newObservableStateVarFromSeed</span></a></span><span>
+</span><span id="line-81"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">MonadLabelledSTM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176867"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-82"></span><span>    </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span>
+</span><span id="line-83"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679176867"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/strict-stm-0.1.0.0/noopt/doc/html/strict-stm/src"><span class="hs-identifier hs-type">StrictTVar</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176867"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorObservableState"><span class="hs-identifier hs-type">InboundGovernorObservableState</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-84"></span><span id="newObservableStateVarFromSeed"><span class="annot"><span class="annottext">newObservableStateVarFromSeed :: Int -&gt; m (StrictTVar m InboundGovernorObservableState)
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#newObservableStateVarFromSeed"><span class="hs-identifier hs-var hs-var">newObservableStateVarFromSeed</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StdGen -&gt; m (StrictTVar m InboundGovernorObservableState)
+forall (m :: * -&gt; *).
+MonadLabelledSTM m =&gt;
+StdGen -&gt; m (StrictTVar m InboundGovernorObservableState)
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#newObservableStateVar"><span class="hs-identifier hs-var">newObservableStateVar</span></a></span><span> </span><span class="annot"><span class="annottext">(StdGen -&gt; m (StrictTVar m InboundGovernorObservableState))
+-&gt; (Int -&gt; StdGen)
+-&gt; Int
+-&gt; m (StrictTVar m InboundGovernorObservableState)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; StdGen
+</span><span class="hs-identifier hs-var">Rnd.mkStdGen</span></span><span>
+</span><span id="line-85"></span><span>
+</span><span id="line-86"></span><span>
+</span><span id="line-87"></span><span class="hs-comment">-- | 'InboundGovernorState', which consist of pure part, and a mutable part.</span><span>
+</span><span id="line-88"></span><span class="hs-comment">-- The mutable part can be observable from outside.  Future version could</span><span>
+</span><span id="line-89"></span><span class="hs-comment">-- contain additional statistics on the peers.</span><span>
+</span><span id="line-90"></span><span class="hs-comment">--</span><span>
+</span><span id="line-91"></span><span class="hs-keyword">data</span><span> </span><span id="InboundGovernorState"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorState"><span class="hs-identifier hs-var">InboundGovernorState</span></a></span></span><span> </span><span id="local-6989586621679176983"><span class="annot"><a href="#local-6989586621679176983"><span class="hs-identifier hs-type">muxMode</span></a></span></span><span> </span><span id="local-6989586621679176982"><span class="annot"><a href="#local-6989586621679176982"><span class="hs-identifier hs-type">peerAddr</span></a></span></span><span> </span><span id="local-6989586621679176981"><span class="annot"><a href="#local-6989586621679176981"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679176980"><span class="annot"><a href="#local-6989586621679176980"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span id="local-6989586621679176979"><span class="annot"><a href="#local-6989586621679176979"><span class="hs-identifier hs-type">b</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-92"></span><span>    </span><span id="InboundGovernorState"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorState"><span class="hs-identifier hs-var">InboundGovernorState</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-93"></span><span>        </span><span class="hs-comment">-- | Map of connections state.  Modifying 'igsConnections' outside of</span><span>
+</span><span id="line-94"></span><span>        </span><span class="hs-comment">-- 'inboundGovernorLoop' is not safe.</span><span>
+</span><span id="line-95"></span><span>        </span><span class="hs-comment">--</span><span>
+</span><span id="line-96"></span><span>        </span><span id="igsConnections"><span class="annot"><span class="annottext">InboundGovernorState muxMode peerAddr m a b
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#igsConnections"><span class="hs-identifier hs-var hs-var">igsConnections</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-type">Map</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.ConnectionId.html#ConnectionId"><span class="hs-identifier hs-type">ConnectionId</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176982"><span class="hs-identifier hs-type">peerAddr</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-97"></span><span>                                  </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#ConnectionState"><span class="hs-identifier hs-type">ConnectionState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176983"><span class="hs-identifier hs-type">muxMode</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176982"><span class="hs-identifier hs-type">peerAddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176981"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176980"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176979"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-98"></span><span>
+</span><span id="line-99"></span><span>        </span><span class="hs-comment">-- | PRNG available to 'PrunePolicy'.</span><span>
+</span><span id="line-100"></span><span>        </span><span class="hs-comment">--</span><span>
+</span><span id="line-101"></span><span>        </span><span id="igsObservableVar"><span class="annot"><span class="annottext">InboundGovernorState muxMode peerAddr m a b
+-&gt; StrictTVar m InboundGovernorObservableState
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#igsObservableVar"><span class="hs-identifier hs-var hs-var">igsObservableVar</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/strict-stm-0.1.0.0/noopt/doc/html/strict-stm/src"><span class="hs-identifier hs-type">StrictTVar</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176981"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorObservableState"><span class="hs-identifier hs-type">InboundGovernorObservableState</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-102"></span><span>
+</span><span id="line-103"></span><span>        </span><span class="hs-comment">-- | 'InboundGovernorCounters' counters cache. Allows to only trace</span><span>
+</span><span id="line-104"></span><span>        </span><span class="hs-comment">-- values when necessary.</span><span>
+</span><span id="line-105"></span><span>        </span><span id="igsCountersCache"><span class="annot"><span class="annottext">InboundGovernorState muxMode peerAddr m a b
+-&gt; Cache InboundGovernorCounters
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#igsCountersCache"><span class="hs-identifier hs-var hs-var">igsCountersCache</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="Data.Cache.html#Cache"><span class="hs-identifier hs-type">Cache</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorCounters"><span class="hs-identifier hs-type">InboundGovernorCounters</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-106"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-107"></span><span>
+</span><span id="line-108"></span><span class="hs-comment">-- | Counters for tracing and analysis purposes</span><span>
+</span><span id="line-109"></span><span class="hs-comment">--</span><span>
+</span><span id="line-110"></span><span class="hs-keyword">data</span><span> </span><span id="InboundGovernorCounters"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorCounters"><span class="hs-identifier hs-var">InboundGovernorCounters</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="InboundGovernorCounters"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorCounters"><span class="hs-identifier hs-var">InboundGovernorCounters</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-111"></span><span>      </span><span id="coldPeersRemote"><span class="annot"><span class="annottext">InboundGovernorCounters -&gt; Int
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#coldPeersRemote"><span class="hs-identifier hs-var hs-var">coldPeersRemote</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-112"></span><span>      </span><span class="hs-comment">-- ^ the number of remote peers which are in 'RemoteCold' state</span><span>
+</span><span id="line-113"></span><span>      </span><span id="idlePeersRemote"><span class="annot"><span class="annottext">InboundGovernorCounters -&gt; Int
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#idlePeersRemote"><span class="hs-identifier hs-var hs-var">idlePeersRemote</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-114"></span><span>      </span><span class="hs-comment">-- ^ the number of remote peers which are in 'RemoteIdle' state</span><span>
+</span><span id="line-115"></span><span>      </span><span id="warmPeersRemote"><span class="annot"><span class="annottext">InboundGovernorCounters -&gt; Int
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#warmPeersRemote"><span class="hs-identifier hs-var hs-var">warmPeersRemote</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-116"></span><span>      </span><span class="hs-comment">-- ^ the number of remote peers which are in 'RemoteWarm' state (a close</span><span>
+</span><span id="line-117"></span><span>      </span><span class="hs-comment">-- approximation of peers that have the node as a warm peer)</span><span>
+</span><span id="line-118"></span><span>      </span><span id="hotPeersRemote"><span class="annot"><span class="annottext">InboundGovernorCounters -&gt; Int
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#hotPeersRemote"><span class="hs-identifier hs-var hs-var">hotPeersRemote</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span>
+</span><span id="line-119"></span><span>      </span><span class="hs-comment">-- ^ the number of remote peers which are in 'RemoteHot' state (a close</span><span>
+</span><span id="line-120"></span><span>      </span><span class="hs-comment">-- approximation of peers that have the node as a hot peer)</span><span>
+</span><span id="line-121"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-122"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679176852"><span id="local-6989586621679176854"><span class="annot"><span class="annottext">InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Bool
+(InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Bool)
+-&gt; (InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Bool)
+-&gt; Eq InboundGovernorCounters
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Bool
+$c/= :: InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Bool
+== :: InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Bool
+$c== :: InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679176836"><span id="local-6989586621679176838"><span id="local-6989586621679176840"><span id="local-6989586621679176842"><span id="local-6989586621679176844"><span id="local-6989586621679176846"><span id="local-6989586621679176848"><span class="annot"><span class="annottext">Eq InboundGovernorCounters
+Eq InboundGovernorCounters
+-&gt; (InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Ordering)
+-&gt; (InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Bool)
+-&gt; (InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Bool)
+-&gt; (InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Bool)
+-&gt; (InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Bool)
+-&gt; (InboundGovernorCounters
+    -&gt; InboundGovernorCounters -&gt; InboundGovernorCounters)
+-&gt; (InboundGovernorCounters
+    -&gt; InboundGovernorCounters -&gt; InboundGovernorCounters)
+-&gt; Ord InboundGovernorCounters
+InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Bool
+InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Ordering
+InboundGovernorCounters
+-&gt; InboundGovernorCounters -&gt; InboundGovernorCounters
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: InboundGovernorCounters
+-&gt; InboundGovernorCounters -&gt; InboundGovernorCounters
+$cmin :: InboundGovernorCounters
+-&gt; InboundGovernorCounters -&gt; InboundGovernorCounters
+max :: InboundGovernorCounters
+-&gt; InboundGovernorCounters -&gt; InboundGovernorCounters
+$cmax :: InboundGovernorCounters
+-&gt; InboundGovernorCounters -&gt; InboundGovernorCounters
+&gt;= :: InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Bool
+$c&gt;= :: InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Bool
+&gt; :: InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Bool
+$c&gt; :: InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Bool
+&lt;= :: InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Bool
+$c&lt;= :: InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Bool
+&lt; :: InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Bool
+$c&lt; :: InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Bool
+compare :: InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Ordering
+$ccompare :: InboundGovernorCounters -&gt; InboundGovernorCounters -&gt; Ordering
+$cp1Ord :: Eq InboundGovernorCounters
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></a></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679176829"><span id="local-6989586621679176831"><span id="local-6989586621679176833"><span class="annot"><span class="annottext">Int -&gt; InboundGovernorCounters -&gt; ShowS
+[InboundGovernorCounters] -&gt; ShowS
+InboundGovernorCounters -&gt; String
+(Int -&gt; InboundGovernorCounters -&gt; ShowS)
+-&gt; (InboundGovernorCounters -&gt; String)
+-&gt; ([InboundGovernorCounters] -&gt; ShowS)
+-&gt; Show InboundGovernorCounters
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [InboundGovernorCounters] -&gt; ShowS
+$cshowList :: [InboundGovernorCounters] -&gt; ShowS
+show :: InboundGovernorCounters -&gt; String
+$cshow :: InboundGovernorCounters -&gt; String
+showsPrec :: Int -&gt; InboundGovernorCounters -&gt; ShowS
+$cshowsPrec :: Int -&gt; InboundGovernorCounters -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-123"></span><span>
+</span><span id="line-124"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679176823"><span id="local-6989586621679176825"><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Semigroup</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorCounters"><span class="hs-identifier hs-type">InboundGovernorCounters</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-125"></span><span>    </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorCounters"><span class="hs-identifier hs-type">InboundGovernorCounters</span></a></span><span> </span><span id="local-6989586621679176821"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679176821"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span id="local-6989586621679176820"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679176820"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span id="local-6989586621679176819"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679176819"><span class="hs-identifier hs-var">w</span></a></span></span><span> </span><span id="local-6989586621679176818"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679176818"><span class="hs-identifier hs-var">h</span></a></span></span><span> </span><span id="local-6989586621679176817"><span class="annot"><span class="annottext">&lt;&gt; :: InboundGovernorCounters
+-&gt; InboundGovernorCounters -&gt; InboundGovernorCounters
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var hs-var hs-var hs-var">&lt;&gt;</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorCounters"><span class="hs-identifier hs-type">InboundGovernorCounters</span></a></span><span> </span><span id="local-6989586621679176816"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679176816"><span class="hs-identifier hs-var">c'</span></a></span></span><span> </span><span id="local-6989586621679176815"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679176815"><span class="hs-identifier hs-var">i'</span></a></span></span><span> </span><span id="local-6989586621679176814"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679176814"><span class="hs-identifier hs-var">w'</span></a></span></span><span> </span><span id="local-6989586621679176813"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679176813"><span class="hs-identifier hs-var">h'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-126"></span><span>      </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int -&gt; Int -&gt; InboundGovernorCounters
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorCounters"><span class="hs-identifier hs-var">InboundGovernorCounters</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679176821"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679176816"><span class="hs-identifier hs-var">c'</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679176820"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679176815"><span class="hs-identifier hs-var">i'</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679176819"><span class="hs-identifier hs-var">w</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679176814"><span class="hs-identifier hs-var">w'</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679176818"><span class="hs-identifier hs-var">h</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679176813"><span class="hs-identifier hs-var">h'</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-127"></span><span>
+</span><span id="line-128"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679176806"><span id="local-6989586621679176808"><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Monoid</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorCounters"><span class="hs-identifier hs-type">InboundGovernorCounters</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-129"></span><span>    </span><span id="local-6989586621679176804"><span class="annot"><span class="annottext">mempty :: InboundGovernorCounters
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">mempty</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int -&gt; Int -&gt; InboundGovernorCounters
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorCounters"><span class="hs-identifier hs-var">InboundGovernorCounters</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-130"></span><span>
+</span><span id="line-131"></span><span>
+</span><span id="line-132"></span><span id="local-6989586621679176799"><span id="local-6989586621679176800"><span id="local-6989586621679176801"><span id="local-6989586621679176802"><span id="local-6989586621679176803"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#inboundGovernorCounters"><span class="hs-identifier hs-type">inboundGovernorCounters</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorState"><span class="hs-identifier hs-type">InboundGovernorState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176803"><span class="hs-identifier hs-type">muxMode</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176802"><span class="hs-identifier hs-type">peerAddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176801"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176800"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176799"><span class="hs-identifier hs-type">b</span></a></span><span>
+</span><span id="line-133"></span><span>                        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorCounters"><span class="hs-identifier hs-type">InboundGovernorCounters</span></a></span></span></span></span></span></span><span>
+</span><span id="line-134"></span><span id="inboundGovernorCounters"><span class="annot"><span class="annottext">inboundGovernorCounters :: InboundGovernorState muxMode peerAddr m a b
+-&gt; InboundGovernorCounters
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#inboundGovernorCounters"><span class="hs-identifier hs-var hs-var">inboundGovernorCounters</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorState"><span class="hs-identifier hs-type">InboundGovernorState</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679176798"><span class="annot"><span class="annottext">Map
+  (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+igsConnections :: Map
+  (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+igsConnections :: forall (muxMode :: MuxMode) peerAddr (m :: * -&gt; *) a b.
+InboundGovernorState muxMode peerAddr m a b
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+</span><a href="#local-6989586621679176798"><span class="hs-identifier hs-var hs-var">igsConnections</span></a></span></span><span> </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-135"></span><span>    </span><span class="annot"><span class="annottext">(ConnectionState muxMode peerAddr m a b -&gt; InboundGovernorCounters)
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+-&gt; InboundGovernorCounters
+forall (t :: * -&gt; *) m a.
+(Foldable t, Monoid m) =&gt;
+(a -&gt; m) -&gt; t a -&gt; m
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">foldMap</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#ConnectionState"><span class="hs-identifier hs-type">ConnectionState</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679176795"><span class="annot"><span class="annottext">RemoteState m
+csRemoteState :: forall (muxMode :: MuxMode) peerAddr (m :: * -&gt; *) a b.
+ConnectionState muxMode peerAddr m a b -&gt; RemoteState m
+csRemoteState :: RemoteState m
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#csRemoteState"><span class="hs-identifier hs-var hs-var">csRemoteState</span></a></span></span><span> </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-136"></span><span>              </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">RemoteState m
+</span><a href="#local-6989586621679176795"><span class="hs-identifier hs-var">csRemoteState</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-137"></span><span>                </span><span class="annot"><span class="annottext">RemoteState m
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteCold"><span class="hs-identifier hs-var">RemoteCold</span></a></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int -&gt; Int -&gt; InboundGovernorCounters
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorCounters"><span class="hs-identifier hs-var">InboundGovernorCounters</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-138"></span><span>                </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteIdle"><span class="hs-identifier hs-type">RemoteIdle</span></a></span><span> </span><span class="hs-special">{</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int -&gt; Int -&gt; InboundGovernorCounters
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorCounters"><span class="hs-identifier hs-var">InboundGovernorCounters</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-139"></span><span>                </span><span class="annot"><span class="annottext">RemoteState m
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteWarm"><span class="hs-identifier hs-var">RemoteWarm</span></a></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int -&gt; Int -&gt; InboundGovernorCounters
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorCounters"><span class="hs-identifier hs-var">InboundGovernorCounters</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-140"></span><span>                </span><span class="annot"><span class="annottext">RemoteState m
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteHot"><span class="hs-identifier hs-var">RemoteHot</span></a></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int -&gt; Int -&gt; InboundGovernorCounters
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorCounters"><span class="hs-identifier hs-var">InboundGovernorCounters</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-141"></span><span>            </span><span class="hs-special">)</span><span>
+</span><span id="line-142"></span><span>            </span><span class="annot"><span class="annottext">Map
+  (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+</span><a href="#local-6989586621679176798"><span class="hs-identifier hs-var">igsConnections</span></a></span><span>
+</span><span id="line-143"></span><span>
+</span><span id="line-144"></span><span>
+</span><span id="line-145"></span><span class="hs-keyword">data</span><span> </span><span id="MiniProtocolData"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#MiniProtocolData"><span class="hs-identifier hs-var">MiniProtocolData</span></a></span></span><span> </span><span id="local-6989586621679176789"><span class="annot"><a href="#local-6989586621679176789"><span class="hs-identifier hs-type">muxMode</span></a></span></span><span> </span><span id="local-6989586621679176788"><span class="annot"><a href="#local-6989586621679176788"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679176787"><span class="annot"><a href="#local-6989586621679176787"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span id="local-6989586621679176786"><span class="annot"><a href="#local-6989586621679176786"><span class="hs-identifier hs-type">b</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="MiniProtocolData"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#MiniProtocolData"><span class="hs-identifier hs-var">MiniProtocolData</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-146"></span><span>    </span><span class="hs-comment">-- | Static 'MiniProtocol' description.</span><span>
+</span><span id="line-147"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-148"></span><span>    </span><span id="mpdMiniProtocol"><span class="annot"><span class="annottext">MiniProtocolData muxMode m a b
+-&gt; MiniProtocol muxMode ByteString m a b
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#mpdMiniProtocol"><span class="hs-identifier hs-var hs-var">mpdMiniProtocol</span></a></span></span><span>     </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Mux.html#MiniProtocol"><span class="hs-identifier hs-type">MiniProtocol</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176789"><span class="hs-identifier hs-type">muxMode</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-type">ByteString</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176788"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176787"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176786"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-149"></span><span>
+</span><span id="line-150"></span><span>    </span><span class="hs-comment">-- | Static mini-protocol temperature.</span><span>
+</span><span id="line-151"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-152"></span><span>    </span><span id="mpdMiniProtocolTemp"><span class="annot"><span class="annottext">MiniProtocolData muxMode m a b -&gt; ProtocolTemperature
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#mpdMiniProtocolTemp"><span class="hs-identifier hs-var hs-var">mpdMiniProtocolTemp</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="Ouroboros.Network.Mux.html#ProtocolTemperature"><span class="hs-identifier hs-type">ProtocolTemperature</span></a></span><span>
+</span><span id="line-153"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-154"></span><span>
+</span><span id="line-155"></span><span>
+</span><span id="line-156"></span><span class="hs-comment">-- | Per connection state tracked by /inbound protocol governor/.</span><span>
+</span><span id="line-157"></span><span class="hs-comment">--</span><span>
+</span><span id="line-158"></span><span class="hs-keyword">data</span><span> </span><span id="ConnectionState"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#ConnectionState"><span class="hs-identifier hs-var">ConnectionState</span></a></span></span><span> </span><span id="local-6989586621679176974"><span class="annot"><a href="#local-6989586621679176974"><span class="hs-identifier hs-type">muxMode</span></a></span></span><span> </span><span id="local-6989586621679176973"><span class="annot"><a href="#local-6989586621679176973"><span class="hs-identifier hs-type">peerAddr</span></a></span></span><span> </span><span id="local-6989586621679176972"><span class="annot"><a href="#local-6989586621679176972"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679176971"><span class="annot"><a href="#local-6989586621679176971"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span id="local-6989586621679176970"><span class="annot"><a href="#local-6989586621679176970"><span class="hs-identifier hs-type">b</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ConnectionState"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#ConnectionState"><span class="hs-identifier hs-var">ConnectionState</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-159"></span><span>      </span><span class="hs-comment">-- | Mux interface.</span><span>
+</span><span id="line-160"></span><span>      </span><span class="hs-comment">--</span><span>
+</span><span id="line-161"></span><span>      </span><span id="csMux"><span class="annot"><span class="annottext">ConnectionState muxMode peerAddr m a b -&gt; Mux muxMode m
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#csMux"><span class="hs-identifier hs-var hs-var">csMux</span></a></span></span><span>             </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-type">Mux.Mux</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176974"><span class="hs-identifier hs-type">muxMode</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176972"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-162"></span><span>
+</span><span id="line-163"></span><span>      </span><span class="hs-comment">-- | Connection data flow.</span><span>
+</span><span id="line-164"></span><span>      </span><span class="hs-comment">--</span><span>
+</span><span id="line-165"></span><span>      </span><span id="csDataFlow"><span class="annot"><span class="annottext">ConnectionState muxMode peerAddr m a b -&gt; DataFlow
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#csDataFlow"><span class="hs-identifier hs-var hs-var">csDataFlow</span></a></span></span><span>        </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="Ouroboros.Network.ConnectionManager.Types.html#DataFlow"><span class="hs-identifier hs-type">DataFlow</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-166"></span><span>
+</span><span id="line-167"></span><span>      </span><span class="hs-comment">-- | All supported mini-protocols and respective</span><span>
+</span><span id="line-168"></span><span>      </span><span class="hs-comment">-- 'ProtocolTemperature'</span><span>
+</span><span id="line-169"></span><span>      </span><span class="hs-comment">--</span><span>
+</span><span id="line-170"></span><span>      </span><span id="csMiniProtocolMap"><span class="annot"><span class="annottext">ConnectionState muxMode peerAddr m a b
+-&gt; Map MiniProtocolNum (MiniProtocolData muxMode m a b)
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#csMiniProtocolMap"><span class="hs-identifier hs-var hs-var">csMiniProtocolMap</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-type">Map</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-type">MiniProtocolNum</span></a></span><span>
+</span><span id="line-171"></span><span>                                 </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#MiniProtocolData"><span class="hs-identifier hs-type">MiniProtocolData</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176974"><span class="hs-identifier hs-type">muxMode</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176972"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176971"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176970"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-172"></span><span>
+</span><span id="line-173"></span><span>      </span><span class="hs-comment">-- | Map of all running mini-protocol completion STM actions.</span><span>
+</span><span id="line-174"></span><span>      </span><span class="hs-comment">--</span><span>
+</span><span id="line-175"></span><span>      </span><span id="csCompletionMap"><span class="annot"><span class="annottext">ConnectionState muxMode peerAddr m a b
+-&gt; Map MiniProtocolNum (STM m (Either SomeException b))
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#csCompletionMap"><span class="hs-identifier hs-var hs-var">csCompletionMap</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-type">Map</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-type">MiniProtocolNum</span></a></span><span>
+</span><span id="line-176"></span><span>                                 </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">STM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176972"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Either</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">SomeException</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176970"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-177"></span><span>
+</span><span id="line-178"></span><span>      </span><span class="hs-comment">-- | State of the connection.</span><span>
+</span><span id="line-179"></span><span>      </span><span class="hs-comment">--</span><span>
+</span><span id="line-180"></span><span>      </span><span id="csRemoteState"><span class="annot"><span class="annottext">ConnectionState muxMode peerAddr m a b -&gt; RemoteState m
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#csRemoteState"><span class="hs-identifier hs-var hs-var">csRemoteState</span></a></span></span><span>     </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteState"><span class="hs-identifier hs-type">RemoteState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176972"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-181"></span><span>
+</span><span id="line-182"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-183"></span><span>
+</span><span id="line-184"></span><span>
+</span><span id="line-185"></span><span class="hs-comment">--</span><span>
+</span><span id="line-186"></span><span class="hs-comment">-- State management functions</span><span>
+</span><span id="line-187"></span><span class="hs-comment">--</span><span>
+</span><span id="line-188"></span><span>
+</span><span id="line-189"></span><span>
+</span><span id="line-190"></span><span class="hs-comment">-- | Remove connection from 'InboundGovernorState'.</span><span>
+</span><span id="line-191"></span><span class="hs-comment">--</span><span>
+</span><span id="line-192"></span><span id="local-6989586621679176774"><span id="local-6989586621679176775"><span id="local-6989586621679176776"><span id="local-6989586621679176777"><span id="local-6989586621679176778"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#unregisterConnection"><span class="hs-identifier hs-type">unregisterConnection</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Ord</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176778"><span class="hs-identifier hs-type">peerAddr</span></a></span><span>
+</span><span id="line-193"></span><span>                     </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.ConnectionId.html#ConnectionId"><span class="hs-identifier hs-type">ConnectionId</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176778"><span class="hs-identifier hs-type">peerAddr</span></a></span><span>
+</span><span id="line-194"></span><span>                     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorState"><span class="hs-identifier hs-type">InboundGovernorState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176777"><span class="hs-identifier hs-type">muxMode</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176778"><span class="hs-identifier hs-type">peerAddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176776"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176775"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176774"><span class="hs-identifier hs-type">b</span></a></span><span>
+</span><span id="line-195"></span><span>                     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorState"><span class="hs-identifier hs-type">InboundGovernorState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176777"><span class="hs-identifier hs-type">muxMode</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176778"><span class="hs-identifier hs-type">peerAddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176776"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176775"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176774"><span class="hs-identifier hs-type">b</span></a></span></span></span></span></span></span><span>
+</span><span id="line-196"></span><span id="unregisterConnection"><span class="annot"><span class="annottext">unregisterConnection :: ConnectionId peerAddr
+-&gt; InboundGovernorState muxMode peerAddr m a b
+-&gt; InboundGovernorState muxMode peerAddr m a b
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#unregisterConnection"><span class="hs-identifier hs-var hs-var">unregisterConnection</span></a></span></span><span> </span><span id="local-6989586621679176773"><span class="annot"><span class="annottext">ConnectionId peerAddr
+</span><a href="#local-6989586621679176773"><span class="hs-identifier hs-var">connId</span></a></span></span><span> </span><span id="local-6989586621679176772"><span class="annot"><span class="annottext">InboundGovernorState muxMode peerAddr m a b
+</span><a href="#local-6989586621679176772"><span class="hs-identifier hs-var">state</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-197"></span><span>    </span><span class="annot"><span class="annottext">InboundGovernorState muxMode peerAddr m a b
+</span><a href="#local-6989586621679176772"><span class="hs-identifier hs-var">state</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">igsConnections :: Map
+  (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#igsConnections"><span class="hs-identifier hs-var">igsConnections</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-198"></span><span>              </span><span class="annot"><span class="annottext">Bool
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+forall a. (?callStack::CallStack) =&gt; Bool -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var">assert</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ConnectionId peerAddr
+</span><a href="#local-6989586621679176773"><span class="hs-identifier hs-var">connId</span></a></span><span> </span><span class="annot"><span class="annottext">ConnectionId peerAddr
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+-&gt; Bool
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-operator hs-var">`Map.member`</span></a></span><span> </span><span class="annot"><span class="annottext">InboundGovernorState muxMode peerAddr m a b
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+forall (muxMode :: MuxMode) peerAddr (m :: * -&gt; *) a b.
+InboundGovernorState muxMode peerAddr m a b
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#igsConnections"><span class="hs-identifier hs-var hs-var">igsConnections</span></a></span><span> </span><span class="annot"><span class="annottext">InboundGovernorState muxMode peerAddr m a b
+</span><a href="#local-6989586621679176772"><span class="hs-identifier hs-var">state</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Map
+   (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+ -&gt; Map
+      (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b))
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-199"></span><span>              </span><span class="annot"><span class="annottext">ConnectionId peerAddr
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Map k a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.delete</span></a></span><span> </span><span class="annot"><span class="annottext">ConnectionId peerAddr
+</span><a href="#local-6989586621679176773"><span class="hs-identifier hs-var">connId</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">InboundGovernorState muxMode peerAddr m a b
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+forall (muxMode :: MuxMode) peerAddr (m :: * -&gt; *) a b.
+InboundGovernorState muxMode peerAddr m a b
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#igsConnections"><span class="hs-identifier hs-var hs-var">igsConnections</span></a></span><span> </span><span class="annot"><span class="annottext">InboundGovernorState muxMode peerAddr m a b
+</span><a href="#local-6989586621679176772"><span class="hs-identifier hs-var">state</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-200"></span><span>          </span><span class="hs-special">}</span><span>
+</span><span id="line-201"></span><span>
+</span><span id="line-202"></span><span>
+</span><span id="line-203"></span><span class="hs-comment">-- | Update a mini-protocol in 'ConnectionState'.  Once a mini-protocol was</span><span>
+</span><span id="line-204"></span><span class="hs-comment">-- restarted we put the new completion action into 'csCompletionMap'.</span><span>
+</span><span id="line-205"></span><span class="hs-comment">--</span><span>
+</span><span id="line-206"></span><span id="local-6989586621679176765"><span id="local-6989586621679176766"><span id="local-6989586621679176767"><span id="local-6989586621679176768"><span id="local-6989586621679176769"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#updateMiniProtocol"><span class="hs-identifier hs-type">updateMiniProtocol</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Ord</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176769"><span class="hs-identifier hs-type">peerAddr</span></a></span><span>
+</span><span id="line-207"></span><span>                   </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.ConnectionId.html#ConnectionId"><span class="hs-identifier hs-type">ConnectionId</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176769"><span class="hs-identifier hs-type">peerAddr</span></a></span><span>
+</span><span id="line-208"></span><span>                   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-type">MiniProtocolNum</span></a></span><span>
+</span><span id="line-209"></span><span>                   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">STM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176768"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Either</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">SomeException</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176767"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-210"></span><span>                   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorState"><span class="hs-identifier hs-type">InboundGovernorState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176766"><span class="hs-identifier hs-type">muxMode</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176769"><span class="hs-identifier hs-type">peerAddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176768"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176765"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176767"><span class="hs-identifier hs-type">b</span></a></span><span>
+</span><span id="line-211"></span><span>                   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorState"><span class="hs-identifier hs-type">InboundGovernorState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176766"><span class="hs-identifier hs-type">muxMode</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176769"><span class="hs-identifier hs-type">peerAddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176768"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176765"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176767"><span class="hs-identifier hs-type">b</span></a></span></span></span></span></span></span><span>
+</span><span id="line-212"></span><span id="updateMiniProtocol"><span class="annot"><span class="annottext">updateMiniProtocol :: ConnectionId peerAddr
+-&gt; MiniProtocolNum
+-&gt; STM m (Either SomeException b)
+-&gt; InboundGovernorState muxMode peerAddr m a b
+-&gt; InboundGovernorState muxMode peerAddr m a b
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#updateMiniProtocol"><span class="hs-identifier hs-var hs-var">updateMiniProtocol</span></a></span></span><span> </span><span id="local-6989586621679176764"><span class="annot"><span class="annottext">ConnectionId peerAddr
+</span><a href="#local-6989586621679176764"><span class="hs-identifier hs-var">connId</span></a></span></span><span> </span><span id="local-6989586621679176763"><span class="annot"><span class="annottext">MiniProtocolNum
+</span><a href="#local-6989586621679176763"><span class="hs-identifier hs-var">miniProtocolNum</span></a></span></span><span> </span><span id="local-6989586621679176762"><span class="annot"><span class="annottext">STM m (Either SomeException b)
+</span><a href="#local-6989586621679176762"><span class="hs-identifier hs-var">completionAction</span></a></span></span><span> </span><span id="local-6989586621679176761"><span class="annot"><span class="annottext">InboundGovernorState muxMode peerAddr m a b
+</span><a href="#local-6989586621679176761"><span class="hs-identifier hs-var">state</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-213"></span><span>    </span><span class="annot"><span class="annottext">InboundGovernorState muxMode peerAddr m a b
+</span><a href="#local-6989586621679176761"><span class="hs-identifier hs-var">state</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">igsConnections :: Map
+  (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#igsConnections"><span class="hs-identifier hs-var">igsConnections</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-214"></span><span>              </span><span class="annot"><span class="annottext">(ConnectionState muxMode peerAddr m a b
+ -&gt; ConnectionState muxMode peerAddr m a b)
+-&gt; ConnectionId peerAddr
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+forall k a. Ord k =&gt; (a -&gt; a) -&gt; k -&gt; Map k a -&gt; Map k a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.adjust</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679176759"><span class="annot"><span class="annottext">connState :: ConnectionState muxMode peerAddr m a b
+</span><a href="#local-6989586621679176759"><span class="hs-identifier hs-var">connState</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#ConnectionState"><span class="hs-identifier hs-type">ConnectionState</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679176758"><span class="annot"><span class="annottext">Map MiniProtocolNum (STM m (Either SomeException b))
+csCompletionMap :: Map MiniProtocolNum (STM m (Either SomeException b))
+csCompletionMap :: forall (muxMode :: MuxMode) peerAddr (m :: * -&gt; *) a b.
+ConnectionState muxMode peerAddr m a b
+-&gt; Map MiniProtocolNum (STM m (Either SomeException b))
+</span><a href="#local-6989586621679176758"><span class="hs-identifier hs-var hs-var">csCompletionMap</span></a></span></span><span> </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-215"></span><span>                           </span><span class="annot"><span class="annottext">ConnectionState muxMode peerAddr m a b
+</span><a href="#local-6989586621679176759"><span class="hs-identifier hs-var">connState</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-216"></span><span>                             </span><span class="annot"><span class="annottext">csCompletionMap :: Map MiniProtocolNum (STM m (Either SomeException b))
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#csCompletionMap"><span class="hs-identifier hs-var">csCompletionMap</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-217"></span><span>                               </span><span class="annot"><span class="annottext">Bool
+-&gt; Map MiniProtocolNum (STM m (Either SomeException b))
+-&gt; Map MiniProtocolNum (STM m (Either SomeException b))
+forall a. (?callStack::CallStack) =&gt; Bool -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var">assert</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">MiniProtocolNum
+</span><a href="#local-6989586621679176763"><span class="hs-identifier hs-var">miniProtocolNum</span></a></span><span> </span><span class="annot"><span class="annottext">MiniProtocolNum
+-&gt; Map MiniProtocolNum (STM m (Either SomeException b)) -&gt; Bool
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-operator hs-var">`Map.member`</span></a></span><span> </span><span class="annot"><span class="annottext">Map MiniProtocolNum (STM m (Either SomeException b))
+</span><a href="#local-6989586621679176758"><span class="hs-identifier hs-var">csCompletionMap</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Map MiniProtocolNum (STM m (Either SomeException b))
+ -&gt; Map MiniProtocolNum (STM m (Either SomeException b)))
+-&gt; Map MiniProtocolNum (STM m (Either SomeException b))
+-&gt; Map MiniProtocolNum (STM m (Either SomeException b))
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-218"></span><span>                               </span><span class="annot"><span class="annottext">MiniProtocolNum
+-&gt; STM m (Either SomeException b)
+-&gt; Map MiniProtocolNum (STM m (Either SomeException b))
+-&gt; Map MiniProtocolNum (STM m (Either SomeException b))
+forall k a. Ord k =&gt; k -&gt; a -&gt; Map k a -&gt; Map k a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.insert</span></a></span><span> </span><span class="annot"><span class="annottext">MiniProtocolNum
+</span><a href="#local-6989586621679176763"><span class="hs-identifier hs-var">miniProtocolNum</span></a></span><span>
+</span><span id="line-219"></span><span>                                          </span><span class="annot"><span class="annottext">STM m (Either SomeException b)
+</span><a href="#local-6989586621679176762"><span class="hs-identifier hs-var">completionAction</span></a></span><span>
+</span><span id="line-220"></span><span>                                          </span><span class="annot"><span class="annottext">Map MiniProtocolNum (STM m (Either SomeException b))
+</span><a href="#local-6989586621679176758"><span class="hs-identifier hs-var">csCompletionMap</span></a></span><span>
+</span><span id="line-221"></span><span>                            </span><span class="hs-special">}</span><span>
+</span><span id="line-222"></span><span>                         </span><span class="hs-special">)</span><span>
+</span><span id="line-223"></span><span>                         </span><span class="annot"><span class="annottext">ConnectionId peerAddr
+</span><a href="#local-6989586621679176764"><span class="hs-identifier hs-var">connId</span></a></span><span>
+</span><span id="line-224"></span><span>                         </span><span class="hs-special">(</span><span class="annot"><span class="annottext">InboundGovernorState muxMode peerAddr m a b
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+forall (muxMode :: MuxMode) peerAddr (m :: * -&gt; *) a b.
+InboundGovernorState muxMode peerAddr m a b
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#igsConnections"><span class="hs-identifier hs-var hs-var">igsConnections</span></a></span><span> </span><span class="annot"><span class="annottext">InboundGovernorState muxMode peerAddr m a b
+</span><a href="#local-6989586621679176761"><span class="hs-identifier hs-var">state</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-225"></span><span>          </span><span class="hs-special">}</span><span>
+</span><span id="line-226"></span><span>
+</span><span id="line-227"></span><span>
+</span><span id="line-228"></span><span class="hs-comment">-- | Each inbound connection is either in 'RemoteIdle', 'RemoteCold' or</span><span>
+</span><span id="line-229"></span><span class="hs-comment">-- 'RemoteEstablished' state.  We only need to support</span><span>
+</span><span id="line-230"></span><span class="hs-comment">-- @PromotedToWarm^{Duplex}_{Remote}@,</span><span>
+</span><span id="line-231"></span><span class="hs-comment">-- @DemotedToCold^{Duplex}_{Remote}@ and</span><span>
+</span><span id="line-232"></span><span class="hs-comment">-- @DemotedToCold^{Unidirectional}_{Remote}@ transitions.</span><span>
+</span><span id="line-233"></span><span class="hs-comment">--</span><span>
+</span><span id="line-234"></span><span class="hs-keyword">data</span><span> </span><span id="RemoteState"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteState"><span class="hs-identifier hs-var">RemoteState</span></a></span></span><span> </span><span id="local-6989586621679176756"><span class="annot"><a href="#local-6989586621679176756"><span class="hs-identifier hs-type">m</span></a></span></span><span>
+</span><span id="line-235"></span><span>    </span><span class="hs-comment">-- | After @PromotedToWarm^{dataFlow}_{Remote}@ a connection is in</span><span>
+</span><span id="line-236"></span><span>    </span><span class="hs-comment">-- 'RemoteWarm' state.</span><span>
+</span><span id="line-237"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-238"></span><span>    </span><span class="hs-glyph">=</span><span> </span><span id="RemoteWarm"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteWarm"><span class="hs-identifier hs-var">RemoteWarm</span></a></span></span><span>
+</span><span id="line-239"></span><span>
+</span><span id="line-240"></span><span>    </span><span class="hs-comment">-- | In this state all established and hot mini-protocols are running and</span><span>
+</span><span id="line-241"></span><span>    </span><span class="hs-comment">-- none of the warm mini-protocols is running.</span><span>
+</span><span id="line-242"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-243"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="RemoteHot"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteHot"><span class="hs-identifier hs-var">RemoteHot</span></a></span></span><span>
+</span><span id="line-244"></span><span>
+</span><span id="line-245"></span><span>    </span><span class="hs-comment">-- | After @DemotedToCold^{dataFlow}_{Remote}@ is detected.  This state</span><span>
+</span><span id="line-246"></span><span>    </span><span class="hs-comment">-- corresponds to 'InboundIdleState'. In this state we are checking</span><span>
+</span><span id="line-247"></span><span>    </span><span class="hs-comment">-- if the responder protocols are idle during protocol idle timeout</span><span>
+</span><span id="line-248"></span><span>    </span><span class="hs-comment">-- (represented by an 'STM' action)</span><span>
+</span><span id="line-249"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-250"></span><span>    </span><span class="hs-comment">-- 'RemoteIdle' is the initial state of an accepted a connection.</span><span>
+</span><span id="line-251"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-252"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="RemoteIdle"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteIdle"><span class="hs-identifier hs-var">RemoteIdle</span></a></span></span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">STM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176756"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-253"></span><span>
+</span><span id="line-254"></span><span>    </span><span class="hs-comment">-- | The 'RemoteCold' state for 'Duplex' connections allows us to have</span><span>
+</span><span id="line-255"></span><span>    </span><span class="hs-comment">-- responders started using the on-demand strategy.  This assures that once</span><span>
+</span><span id="line-256"></span><span>    </span><span class="hs-comment">-- the remote peer start using the connection the local side will be ready</span><span>
+</span><span id="line-257"></span><span>    </span><span class="hs-comment">-- to serve it.</span><span>
+</span><span id="line-258"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-259"></span><span>    </span><span class="hs-comment">-- For a 'Duplex' connection: a 'RemoteIdle' connection transitions to</span><span>
+</span><span id="line-260"></span><span>    </span><span class="hs-comment">-- 'RemoteCold' state after all responders being idle for</span><span>
+</span><span id="line-261"></span><span>    </span><span class="hs-comment">-- @protocolIdleTimeout@. This triggers 'unregisterInboundConnection'.</span><span>
+</span><span id="line-262"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-263"></span><span>    </span><span class="hs-comment">-- For a 'Unidreictional' connection: after all responders terminated.</span><span>
+</span><span id="line-264"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-265"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="RemoteCold"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteCold"><span class="hs-identifier hs-var">RemoteCold</span></a></span></span><span>
+</span><span id="line-266"></span><span>
+</span><span id="line-267"></span><span>
+</span><span id="line-268"></span><span id="local-6989586621679176755"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#remoteEstablished"><span class="hs-identifier hs-type">remoteEstablished</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteState"><span class="hs-identifier hs-type">RemoteState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176755"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteState"><span class="hs-identifier hs-type">RemoteState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176755"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-269"></span><span id="remoteEstablished"><span class="annot"><span class="annottext">remoteEstablished :: RemoteState m -&gt; Maybe (RemoteState m)
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#remoteEstablished"><span class="hs-identifier hs-var hs-var">remoteEstablished</span></a></span></span><span> </span><span id="local-6989586621679176753"><span class="annot"><span class="annottext">a :: RemoteState m
+</span><a href="#local-6989586621679176753"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><span class="annottext">RemoteState m
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteWarm"><span class="hs-identifier hs-var">RemoteWarm</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RemoteState m -&gt; Maybe (RemoteState m)
+forall a. a -&gt; Maybe a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">RemoteState m
+</span><a href="#local-6989586621679176753"><span class="hs-identifier hs-var">a</span></a></span><span>
+</span><span id="line-270"></span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#remoteEstablished"><span class="hs-identifier hs-var">remoteEstablished</span></a></span><span> </span><span id="local-6989586621679176752"><span class="annot"><span class="annottext">a :: RemoteState m
+</span><a href="#local-6989586621679176752"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><span class="annottext">RemoteState m
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteHot"><span class="hs-identifier hs-var">RemoteHot</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RemoteState m -&gt; Maybe (RemoteState m)
+forall a. a -&gt; Maybe a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">RemoteState m
+</span><a href="#local-6989586621679176752"><span class="hs-identifier hs-var">a</span></a></span><span>
+</span><span id="line-271"></span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#remoteEstablished"><span class="hs-identifier hs-var">remoteEstablished</span></a></span><span> </span><span class="annot"><span class="annottext">RemoteState m
+</span><span class="hs-identifier">_</span></span><span>            </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe (RemoteState m)
+forall a. Maybe a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span>
+</span><span id="line-272"></span><span>
+</span><span id="line-273"></span><span id="local-6989586621679176902"><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteEstablished"><span class="hs-identifier hs-type">RemoteEstablished</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteState"><span class="hs-identifier hs-type">RemoteState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176902"><span class="hs-identifier hs-type">m</span></a></span></span><span>
+</span><span id="line-274"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24mRemoteEstablished"><span id="RemoteEstablished"><span class="annot"><span class="annottext">$mRemoteEstablished :: forall r (m :: * -&gt; *).
+RemoteState m -&gt; (Void# -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#%24mRemoteEstablished"><span class="hs-identifier hs-var hs-var">RemoteEstablished</span></a></span></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#remoteEstablished"><span class="hs-identifier hs-type">remoteEstablished</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Just</span></a></span><span> </span><span class="annot"><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span>
+</span><span id="line-275"></span><span>
+</span><span id="line-276"></span><span class="hs-pragma">{-# COMPLETE</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteEstablished"><span class="hs-pragma hs-type">RemoteEstablished</span></a></span><span class="hs-pragma">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteIdle"><span class="hs-pragma hs-type">RemoteIdle</span></a></span><span class="hs-pragma">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteCold"><span class="hs-pragma hs-type">RemoteCold</span></a></span><span> </span><span class="hs-pragma">#-}</span><span>
+</span><span id="line-277"></span><span>
+</span><span id="line-278"></span><span>
+</span><span id="line-279"></span><span class="hs-comment">-- | Set 'csRemoteState' for a given connection.</span><span>
+</span><span id="line-280"></span><span class="hs-comment">--</span><span>
+</span><span id="line-281"></span><span id="local-6989586621679176746"><span id="local-6989586621679176747"><span id="local-6989586621679176748"><span id="local-6989586621679176749"><span id="local-6989586621679176750"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#updateRemoteState"><span class="hs-identifier hs-type">updateRemoteState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Ord</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176750"><span class="hs-identifier hs-type">peerAddr</span></a></span><span>
+</span><span id="line-282"></span><span>                  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.ConnectionId.html#ConnectionId"><span class="hs-identifier hs-type">ConnectionId</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176750"><span class="hs-identifier hs-type">peerAddr</span></a></span><span>
+</span><span id="line-283"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteState"><span class="hs-identifier hs-type">RemoteState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176749"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-284"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorState"><span class="hs-identifier hs-type">InboundGovernorState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176748"><span class="hs-identifier hs-type">muxMode</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176750"><span class="hs-identifier hs-type">peerAddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176749"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176747"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176746"><span class="hs-identifier hs-type">b</span></a></span><span>
+</span><span id="line-285"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorState"><span class="hs-identifier hs-type">InboundGovernorState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176748"><span class="hs-identifier hs-type">muxMode</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176750"><span class="hs-identifier hs-type">peerAddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176749"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176747"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176746"><span class="hs-identifier hs-type">b</span></a></span></span></span></span></span></span><span>
+</span><span id="line-286"></span><span id="updateRemoteState"><span class="annot"><span class="annottext">updateRemoteState :: ConnectionId peerAddr
+-&gt; RemoteState m
+-&gt; InboundGovernorState muxMode peerAddr m a b
+-&gt; InboundGovernorState muxMode peerAddr m a b
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#updateRemoteState"><span class="hs-identifier hs-var hs-var">updateRemoteState</span></a></span></span><span> </span><span id="local-6989586621679176745"><span class="annot"><span class="annottext">ConnectionId peerAddr
+</span><a href="#local-6989586621679176745"><span class="hs-identifier hs-var">connId</span></a></span></span><span> </span><span id="local-6989586621679176744"><span class="annot"><span class="annottext">RemoteState m
+</span><a href="#local-6989586621679176744"><span class="hs-identifier hs-var">csRemoteState</span></a></span></span><span> </span><span id="local-6989586621679176743"><span class="annot"><span class="annottext">InboundGovernorState muxMode peerAddr m a b
+</span><a href="#local-6989586621679176743"><span class="hs-identifier hs-var">state</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-287"></span><span>    </span><span class="annot"><span class="annottext">InboundGovernorState muxMode peerAddr m a b
+</span><a href="#local-6989586621679176743"><span class="hs-identifier hs-var">state</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-288"></span><span>      </span><span class="annot"><span class="annottext">igsConnections :: Map
+  (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#igsConnections"><span class="hs-identifier hs-var">igsConnections</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-289"></span><span>        </span><span class="annot"><span class="annottext">(ConnectionState muxMode peerAddr m a b
+ -&gt; ConnectionState muxMode peerAddr m a b)
+-&gt; ConnectionId peerAddr
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+forall k a. Ord k =&gt; (a -&gt; a) -&gt; k -&gt; Map k a -&gt; Map k a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.adjust</span></a></span><span>
+</span><span id="line-290"></span><span>          </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679176742"><span class="annot"><span class="annottext">ConnectionState muxMode peerAddr m a b
+</span><a href="#local-6989586621679176742"><span class="hs-identifier hs-var">connState</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">ConnectionState muxMode peerAddr m a b
+</span><a href="#local-6989586621679176742"><span class="hs-identifier hs-var">connState</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">RemoteState m
+csRemoteState :: RemoteState m
+csRemoteState :: RemoteState m
+</span><a href="#local-6989586621679176744"><span class="hs-identifier hs-var hs-var">csRemoteState</span></a></span><span> </span><span class="hs-special">}</span><span class="hs-special">)</span><span>
+</span><span id="line-291"></span><span>          </span><span class="annot"><span class="annottext">ConnectionId peerAddr
+</span><a href="#local-6989586621679176745"><span class="hs-identifier hs-var">connId</span></a></span><span>
+</span><span id="line-292"></span><span>          </span><span class="hs-special">(</span><span class="annot"><span class="annottext">InboundGovernorState muxMode peerAddr m a b
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+forall (muxMode :: MuxMode) peerAddr (m :: * -&gt; *) a b.
+InboundGovernorState muxMode peerAddr m a b
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#igsConnections"><span class="hs-identifier hs-var hs-var">igsConnections</span></a></span><span> </span><span class="annot"><span class="annottext">InboundGovernorState muxMode peerAddr m a b
+</span><a href="#local-6989586621679176743"><span class="hs-identifier hs-var">state</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-293"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-294"></span><span>
+</span><span id="line-295"></span><span id="local-6989586621679176737"><span id="local-6989586621679176738"><span id="local-6989586621679176739"><span id="local-6989586621679176740"><span id="local-6989586621679176741"><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#mapRemoteState"><span class="hs-identifier hs-type">mapRemoteState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Ord</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176741"><span class="hs-identifier hs-type">peerAddr</span></a></span><span>
+</span><span id="line-296"></span><span>               </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.ConnectionId.html#ConnectionId"><span class="hs-identifier hs-type">ConnectionId</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176741"><span class="hs-identifier hs-type">peerAddr</span></a></span><span>
+</span><span id="line-297"></span><span>               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteState"><span class="hs-identifier hs-type">RemoteState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176740"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#RemoteState"><span class="hs-identifier hs-type">RemoteState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176740"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-298"></span><span>               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorState"><span class="hs-identifier hs-type">InboundGovernorState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176739"><span class="hs-identifier hs-type">muxMode</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176741"><span class="hs-identifier hs-type">peerAddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176740"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176738"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176737"><span class="hs-identifier hs-type">b</span></a></span><span>
+</span><span id="line-299"></span><span>               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#InboundGovernorState"><span class="hs-identifier hs-type">InboundGovernorState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176739"><span class="hs-identifier hs-type">muxMode</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176741"><span class="hs-identifier hs-type">peerAddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176740"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176738"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176737"><span class="hs-identifier hs-type">b</span></a></span></span></span></span></span></span><span>
+</span><span id="line-300"></span><span id="mapRemoteState"><span class="annot"><span class="annottext">mapRemoteState :: ConnectionId peerAddr
+-&gt; (RemoteState m -&gt; RemoteState m)
+-&gt; InboundGovernorState muxMode peerAddr m a b
+-&gt; InboundGovernorState muxMode peerAddr m a b
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#mapRemoteState"><span class="hs-identifier hs-var hs-var">mapRemoteState</span></a></span></span><span> </span><span id="local-6989586621679176736"><span class="annot"><span class="annottext">ConnectionId peerAddr
+</span><a href="#local-6989586621679176736"><span class="hs-identifier hs-var">connId</span></a></span></span><span> </span><span id="local-6989586621679176735"><span class="annot"><span class="annottext">RemoteState m -&gt; RemoteState m
+</span><a href="#local-6989586621679176735"><span class="hs-identifier hs-var">fn</span></a></span></span><span> </span><span id="local-6989586621679176734"><span class="annot"><span class="annottext">InboundGovernorState muxMode peerAddr m a b
+</span><a href="#local-6989586621679176734"><span class="hs-identifier hs-var">state</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-301"></span><span>    </span><span class="annot"><span class="annottext">InboundGovernorState muxMode peerAddr m a b
+</span><a href="#local-6989586621679176734"><span class="hs-identifier hs-var">state</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-302"></span><span>      </span><span class="annot"><span class="annottext">igsConnections :: Map
+  (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#igsConnections"><span class="hs-identifier hs-var">igsConnections</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-303"></span><span>        </span><span class="annot"><span class="annottext">(ConnectionState muxMode peerAddr m a b
+ -&gt; ConnectionState muxMode peerAddr m a b)
+-&gt; ConnectionId peerAddr
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+forall k a. Ord k =&gt; (a -&gt; a) -&gt; k -&gt; Map k a -&gt; Map k a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.adjust</span></a></span><span>
+</span><span id="line-304"></span><span>          </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679176733"><span class="annot"><span class="annottext">connState :: ConnectionState muxMode peerAddr m a b
+</span><a href="#local-6989586621679176733"><span class="hs-identifier hs-var">connState</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><a href="Ouroboros.Network.InboundGovernor.State.html#ConnectionState"><span class="hs-identifier hs-type">ConnectionState</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679176732"><span class="annot"><span class="annottext">RemoteState m
+csRemoteState :: RemoteState m
+csRemoteState :: forall (muxMode :: MuxMode) peerAddr (m :: * -&gt; *) a b.
+ConnectionState muxMode peerAddr m a b -&gt; RemoteState m
+</span><a href="#local-6989586621679176732"><span class="hs-identifier hs-var hs-var">csRemoteState</span></a></span></span><span> </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-305"></span><span>            </span><span class="annot"><span class="annottext">ConnectionState muxMode peerAddr m a b
+</span><a href="#local-6989586621679176733"><span class="hs-identifier hs-var">connState</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">csRemoteState :: RemoteState m
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#csRemoteState"><span class="hs-identifier hs-var">csRemoteState</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">RemoteState m -&gt; RemoteState m
+</span><a href="#local-6989586621679176735"><span class="hs-identifier hs-var">fn</span></a></span><span> </span><span class="annot"><span class="annottext">RemoteState m
+</span><a href="#local-6989586621679176732"><span class="hs-identifier hs-var">csRemoteState</span></a></span><span> </span><span class="hs-special">}</span><span class="hs-special">)</span><span>
+</span><span id="line-306"></span><span>          </span><span class="annot"><span class="annottext">ConnectionId peerAddr
+</span><a href="#local-6989586621679176736"><span class="hs-identifier hs-var">connId</span></a></span><span>
+</span><span id="line-307"></span><span>          </span><span class="hs-special">(</span><span class="annot"><span class="annottext">InboundGovernorState muxMode peerAddr m a b
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+forall (muxMode :: MuxMode) peerAddr (m :: * -&gt; *) a b.
+InboundGovernorState muxMode peerAddr m a b
+-&gt; Map
+     (ConnectionId peerAddr) (ConnectionState muxMode peerAddr m a b)
+</span><a href="Ouroboros.Network.InboundGovernor.State.html#igsConnections"><span class="hs-identifier hs-var hs-var">igsConnections</span></a></span><span> </span><span class="annot"><span class="annottext">InboundGovernorState muxMode peerAddr m a b
+</span><a href="#local-6989586621679176734"><span class="hs-identifier hs-var">state</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-308"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-309"></span></pre></body></html>

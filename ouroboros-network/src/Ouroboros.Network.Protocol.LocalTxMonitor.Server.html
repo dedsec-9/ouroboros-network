@@ -1,0 +1,607 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DataKinds           #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE GADTs               #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE KindSignatures      #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE LambdaCase          #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE NamedFieldPuns      #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables #-}</span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- | A view of the transaction monitor protocol from the point of view of</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- the server.</span><span>
+</span><span id="line-10"></span><span class="hs-comment">--</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- This provides simple access to the local mempool snapshots, to allow building</span><span>
+</span><span id="line-12"></span><span class="hs-comment">-- more monitoring logic from the client side after submitting transactions.</span><span>
+</span><span id="line-13"></span><span class="hs-comment">--</span><span>
+</span><span id="line-14"></span><span class="hs-comment">-- For execution, 'localTxMonitorServerPeer' is provided for conversion</span><span>
+</span><span id="line-15"></span><span class="hs-comment">-- into the typed protocol.</span><span>
+</span><span id="line-16"></span><span class="hs-comment">--</span><span>
+</span><span id="line-17"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.Protocol.LocalTxMonitor.Server</span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Protocol type for the server</span></span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><span class="hs-comment">-- | The protocol states from the point of view of the server.</span></span><span>
+</span><span id="line-20"></span><span>    </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#LocalTxMonitorServer"><span class="hs-identifier">LocalTxMonitorServer</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStIdle"><span class="hs-identifier">ServerStIdle</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStAcquiring"><span class="hs-identifier">ServerStAcquiring</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStAcquired"><span class="hs-identifier">ServerStAcquired</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStBusy"><span class="hs-identifier">ServerStBusy</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-25"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Execution as a typed protocol</span></span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#localTxMonitorServerPeer"><span class="hs-identifier">localTxMonitorServerPeer</span></a></span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-28"></span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier">Network.TypedProtocol.Core</span></a></span><span>
+</span><span id="line-30"></span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html"><span class="hs-identifier">Ouroboros.Network.Protocol.LocalTxMonitor.Type</span></a></span><span>
+</span><span id="line-32"></span><span>
+</span><span id="line-33"></span><span class="hs-comment">-- | A local tx monitor protocol server, on top of some effect 'm'.</span><span>
+</span><span id="line-34"></span><span class="hs-comment">--</span><span>
+</span><span id="line-35"></span><span class="hs-keyword">newtype</span><span> </span><span id="LocalTxMonitorServer"><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#LocalTxMonitorServer"><span class="hs-identifier hs-var">LocalTxMonitorServer</span></a></span></span><span> </span><span id="local-6989586621679259442"><span class="annot"><a href="#local-6989586621679259442"><span class="hs-identifier hs-type">txid</span></a></span></span><span> </span><span id="local-6989586621679259441"><span class="annot"><a href="#local-6989586621679259441"><span class="hs-identifier hs-type">tx</span></a></span></span><span> </span><span id="local-6989586621679259440"><span class="annot"><a href="#local-6989586621679259440"><span class="hs-identifier hs-type">slot</span></a></span></span><span> </span><span id="local-6989586621679259439"><span class="annot"><a href="#local-6989586621679259439"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679259438"><span class="annot"><a href="#local-6989586621679259438"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="LocalTxMonitorServer"><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#LocalTxMonitorServer"><span class="hs-identifier hs-var">LocalTxMonitorServer</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-36"></span><span>      </span><span id="runLocalTxMonitorServer"><span class="annot"><span class="annottext">LocalTxMonitorServer txid tx slot m a
+-&gt; m (ServerStIdle txid tx slot m a)
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#runLocalTxMonitorServer"><span class="hs-identifier hs-var hs-var">runLocalTxMonitorServer</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679259439"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStIdle"><span class="hs-identifier hs-type">ServerStIdle</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259442"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259441"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259440"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259439"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259438"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="hs-comment">-- | In the 'StIdle' protocol state, the server does not have agency. Instead,</span><span>
+</span><span id="line-40"></span><span class="hs-comment">-- it is waiting for:</span><span>
+</span><span id="line-41"></span><span class="hs-comment">--</span><span>
+</span><span id="line-42"></span><span class="hs-comment">-- * an acquire request,</span><span>
+</span><span id="line-43"></span><span class="hs-comment">-- * a termination message.</span><span>
+</span><span id="line-44"></span><span class="hs-comment">--</span><span>
+</span><span id="line-45"></span><span class="hs-keyword">data</span><span> </span><span id="ServerStIdle"><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStIdle"><span class="hs-identifier hs-var">ServerStIdle</span></a></span></span><span> </span><span id="local-6989586621679259528"><span class="annot"><a href="#local-6989586621679259528"><span class="hs-identifier hs-type">txid</span></a></span></span><span> </span><span id="local-6989586621679259527"><span class="annot"><a href="#local-6989586621679259527"><span class="hs-identifier hs-type">tx</span></a></span></span><span> </span><span id="local-6989586621679259526"><span class="annot"><a href="#local-6989586621679259526"><span class="hs-identifier hs-type">slot</span></a></span></span><span> </span><span id="local-6989586621679259525"><span class="annot"><a href="#local-6989586621679259525"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679259524"><span class="annot"><a href="#local-6989586621679259524"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ServerStIdle"><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStIdle"><span class="hs-identifier hs-var">ServerStIdle</span></a></span></span><span>
+</span><span id="line-46"></span><span>    </span><span class="hs-special">{</span><span> </span><span id="recvMsgAcquire"><span class="annot"><span class="annottext">ServerStIdle txid tx slot m a
+-&gt; m (ServerStAcquiring txid tx slot m a)
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#recvMsgAcquire"><span class="hs-identifier hs-var hs-var">recvMsgAcquire</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679259525"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStAcquiring"><span class="hs-identifier hs-type">ServerStAcquiring</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259528"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259527"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259526"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259525"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259524"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="recvMsgDone"><span class="annot"><span class="annottext">ServerStIdle txid tx slot m a -&gt; m a
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#recvMsgDone"><span class="hs-identifier hs-var hs-var">recvMsgDone</span></a></span></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679259525"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259524"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-48"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span class="hs-comment">-- | In the 'StAcquiring' protocol state, the server has agency and must acquire,</span><span>
+</span><span id="line-51"></span><span class="hs-comment">-- and hold on to, the current / latest snapshot of its mempool.</span><span>
+</span><span id="line-52"></span><span class="hs-comment">--</span><span>
+</span><span id="line-53"></span><span class="hs-keyword">data</span><span> </span><span id="ServerStAcquiring"><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStAcquiring"><span class="hs-identifier hs-var">ServerStAcquiring</span></a></span></span><span> </span><span id="local-6989586621679259432"><span class="annot"><a href="#local-6989586621679259432"><span class="hs-identifier hs-type">txid</span></a></span></span><span> </span><span id="local-6989586621679259431"><span class="annot"><a href="#local-6989586621679259431"><span class="hs-identifier hs-type">tx</span></a></span></span><span> </span><span id="local-6989586621679259430"><span class="annot"><a href="#local-6989586621679259430"><span class="hs-identifier hs-type">slot</span></a></span></span><span> </span><span id="local-6989586621679259429"><span class="annot"><a href="#local-6989586621679259429"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679259428"><span class="annot"><a href="#local-6989586621679259428"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-54"></span><span>  </span><span id="local-6989586621679259423"><span id="local-6989586621679259424"><span id="local-6989586621679259425"><span id="local-6989586621679259426"><span id="local-6989586621679259427"><span id="SendMsgAcquired"><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#SendMsgAcquired"><span class="hs-identifier hs-var">SendMsgAcquired</span></a></span></span><span>
+</span><span id="line-55"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679259427"><span class="hs-identifier hs-type">slot</span></a></span><span>
+</span><span id="line-56"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStAcquired"><span class="hs-identifier hs-type">ServerStAcquired</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259426"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259425"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259427"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259424"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259423"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-57"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStAcquiring"><span class="hs-identifier hs-type">ServerStAcquiring</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259426"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259425"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259427"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259424"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259423"><span class="hs-identifier hs-type">a</span></a></span></span></span></span></span></span><span>
+</span><span id="line-58"></span><span>
+</span><span id="line-59"></span><span class="hs-comment">-- | In the 'StAcquired' protocol state, the server does not have agency and is</span><span>
+</span><span id="line-60"></span><span class="hs-comment">-- waiting for a client to either:</span><span>
+</span><span id="line-61"></span><span class="hs-comment">--</span><span>
+</span><span id="line-62"></span><span class="hs-comment">-- * request the next transaction from the snapshot;</span><span>
+</span><span id="line-63"></span><span class="hs-comment">-- * check the presence of a given transaction, by its id;</span><span>
+</span><span id="line-64"></span><span class="hs-comment">-- * await a change in the snapshot and acquire it;</span><span>
+</span><span id="line-65"></span><span class="hs-comment">-- * release and go back to the 'StIdle' state;</span><span>
+</span><span id="line-66"></span><span class="hs-comment">--</span><span>
+</span><span id="line-67"></span><span class="hs-keyword">data</span><span> </span><span id="ServerStAcquired"><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStAcquired"><span class="hs-identifier hs-var">ServerStAcquired</span></a></span></span><span> </span><span id="local-6989586621679259484"><span class="annot"><a href="#local-6989586621679259484"><span class="hs-identifier hs-type">txid</span></a></span></span><span> </span><span id="local-6989586621679259483"><span class="annot"><a href="#local-6989586621679259483"><span class="hs-identifier hs-type">tx</span></a></span></span><span> </span><span id="local-6989586621679259482"><span class="annot"><a href="#local-6989586621679259482"><span class="hs-identifier hs-type">slot</span></a></span></span><span> </span><span id="local-6989586621679259481"><span class="annot"><a href="#local-6989586621679259481"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679259480"><span class="annot"><a href="#local-6989586621679259480"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ServerStAcquired"><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStAcquired"><span class="hs-identifier hs-var">ServerStAcquired</span></a></span></span><span>
+</span><span id="line-68"></span><span>    </span><span class="hs-special">{</span><span> </span><span id="recvMsgNextTx"><span class="annot"><span class="annottext">ServerStAcquired txid tx slot m a
+-&gt; m (ServerStBusy 'NextTx txid tx slot m a)
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#recvMsgNextTx"><span class="hs-identifier hs-var hs-var">recvMsgNextTx</span></a></span></span><span>       </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679259481"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStBusy"><span class="hs-identifier hs-type">ServerStBusy</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#NextTx"><span class="hs-identifier hs-type">NextTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259484"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259483"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259482"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259481"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259480"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-69"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="recvMsgHasTx"><span class="annot"><span class="annottext">ServerStAcquired txid tx slot m a
+-&gt; txid -&gt; m (ServerStBusy 'HasTx txid tx slot m a)
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#recvMsgHasTx"><span class="hs-identifier hs-var hs-var">recvMsgHasTx</span></a></span></span><span>        </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679259484"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679259481"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStBusy"><span class="hs-identifier hs-type">ServerStBusy</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#HasTx"><span class="hs-identifier hs-type">HasTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259484"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259483"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259482"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259481"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259480"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-70"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="recvMsgGetSizes"><span class="annot"><span class="annottext">ServerStAcquired txid tx slot m a
+-&gt; m (ServerStBusy 'GetSizes txid tx slot m a)
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#recvMsgGetSizes"><span class="hs-identifier hs-var hs-var">recvMsgGetSizes</span></a></span></span><span>     </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679259481"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStBusy"><span class="hs-identifier hs-type">ServerStBusy</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#GetSizes"><span class="hs-identifier hs-type">GetSizes</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259484"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259483"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259482"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259481"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259480"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-71"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="recvMsgAwaitAcquire"><span class="annot"><span class="annottext">ServerStAcquired txid tx slot m a
+-&gt; m (ServerStAcquiring txid tx slot m a)
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#recvMsgAwaitAcquire"><span class="hs-identifier hs-var hs-var">recvMsgAwaitAcquire</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679259481"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStAcquiring"><span class="hs-identifier hs-type">ServerStAcquiring</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259484"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259483"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259482"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259481"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259480"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-72"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="recvMsgRelease"><span class="annot"><span class="annottext">ServerStAcquired txid tx slot m a
+-&gt; m (ServerStIdle txid tx slot m a)
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#recvMsgRelease"><span class="hs-identifier hs-var hs-var">recvMsgRelease</span></a></span></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679259481"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStIdle"><span class="hs-identifier hs-type">ServerStIdle</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259484"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259483"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259482"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259481"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259480"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-73"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-74"></span><span>
+</span><span id="line-75"></span><span class="hs-comment">-- In the 'StBusy' protocol state, the server has agency and is responding to</span><span>
+</span><span id="line-76"></span><span class="hs-comment">-- one of the client request. The state is parameterized by a kind 'StBusyKind'</span><span>
+</span><span id="line-77"></span><span class="hs-comment">-- to highlight the fact that, the server is in a busy state in response to a</span><span>
+</span><span id="line-78"></span><span class="hs-comment">-- particular query, and only responses for this query may be sent back to the</span><span>
+</span><span id="line-79"></span><span class="hs-comment">-- client.</span><span>
+</span><span id="line-80"></span><span class="hs-comment">--</span><span>
+</span><span id="line-81"></span><span class="hs-keyword">data</span><span> </span><span id="ServerStBusy"><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStBusy"><span class="hs-identifier hs-var">ServerStBusy</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679259415"><span class="annot"><a href="#local-6989586621679259415"><span class="hs-identifier hs-type">kind</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#StBusyKind"><span class="hs-identifier hs-type">StBusyKind</span></a></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679259414"><span class="annot"><a href="#local-6989586621679259414"><span class="hs-identifier hs-type">txid</span></a></span></span><span> </span><span id="local-6989586621679259413"><span class="annot"><a href="#local-6989586621679259413"><span class="hs-identifier hs-type">tx</span></a></span></span><span> </span><span id="local-6989586621679259412"><span class="annot"><a href="#local-6989586621679259412"><span class="hs-identifier hs-type">slot</span></a></span></span><span> </span><span id="local-6989586621679259411"><span class="annot"><a href="#local-6989586621679259411"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679259410"><span class="annot"><a href="#local-6989586621679259410"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-82"></span><span>  </span><span id="local-6989586621679259405"><span id="local-6989586621679259406"><span id="local-6989586621679259407"><span id="local-6989586621679259408"><span id="local-6989586621679259409"><span id="SendMsgReplyNextTx"><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#SendMsgReplyNextTx"><span class="hs-identifier hs-var">SendMsgReplyNextTx</span></a></span></span><span>
+</span><span id="line-83"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259409"><span class="hs-identifier hs-type">tx</span></a></span><span>
+</span><span id="line-84"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStAcquired"><span class="hs-identifier hs-type">ServerStAcquired</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259408"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259409"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259407"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259406"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259405"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-85"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStBusy"><span class="hs-identifier hs-type">ServerStBusy</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#NextTx"><span class="hs-identifier hs-type">NextTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259408"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259409"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259407"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259406"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259405"><span class="hs-identifier hs-type">a</span></a></span></span></span></span></span></span><span>
+</span><span id="line-86"></span><span>
+</span><span id="line-87"></span><span>  </span><span id="local-6989586621679259399"><span id="local-6989586621679259400"><span id="local-6989586621679259401"><span id="local-6989586621679259402"><span id="local-6989586621679259403"><span id="SendMsgReplyHasTx"><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#SendMsgReplyHasTx"><span class="hs-identifier hs-var">SendMsgReplyHasTx</span></a></span></span><span>
+</span><span id="line-88"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Bool</span></a></span><span>
+</span><span id="line-89"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStAcquired"><span class="hs-identifier hs-type">ServerStAcquired</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259403"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259402"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259401"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259400"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259399"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-90"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStBusy"><span class="hs-identifier hs-type">ServerStBusy</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#HasTx"><span class="hs-identifier hs-type">HasTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259403"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259402"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259401"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259400"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259399"><span class="hs-identifier hs-type">a</span></a></span></span></span></span></span></span><span>
+</span><span id="line-91"></span><span>
+</span><span id="line-92"></span><span>  </span><span id="local-6989586621679259393"><span id="local-6989586621679259394"><span id="local-6989586621679259395"><span id="local-6989586621679259396"><span id="local-6989586621679259397"><span id="SendMsgReplyGetSizes"><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#SendMsgReplyGetSizes"><span class="hs-identifier hs-var">SendMsgReplyGetSizes</span></a></span></span><span>
+</span><span id="line-93"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#MempoolSizeAndCapacity"><span class="hs-identifier hs-type">MempoolSizeAndCapacity</span></a></span><span>
+</span><span id="line-94"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStAcquired"><span class="hs-identifier hs-type">ServerStAcquired</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259397"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259396"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259395"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259394"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259393"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-95"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStBusy"><span class="hs-identifier hs-type">ServerStBusy</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#GetSizes"><span class="hs-identifier hs-type">GetSizes</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259397"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259396"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259395"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259394"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259393"><span class="hs-identifier hs-type">a</span></a></span></span></span></span></span></span><span>
+</span><span id="line-96"></span><span>
+</span><span id="line-97"></span><span class="hs-comment">-- | Interpret a 'LocalTxMonitorServer' action sequence as a 'Peer' on the</span><span>
+</span><span id="line-98"></span><span class="hs-comment">-- client-side of the 'LocalTxMonitor' protocol.</span><span>
+</span><span id="line-99"></span><span class="hs-comment">--</span><span>
+</span><span id="line-100"></span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#localTxMonitorServerPeer"><span class="hs-identifier hs-type">localTxMonitorServerPeer</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-101"></span><span>     </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679259391"><span class="annot"><a href="#local-6989586621679259391"><span class="hs-identifier hs-type">txid</span></a></span></span><span> </span><span id="local-6989586621679259390"><span class="annot"><a href="#local-6989586621679259390"><span class="hs-identifier hs-type">tx</span></a></span></span><span> </span><span id="local-6989586621679259389"><span class="annot"><a href="#local-6989586621679259389"><span class="hs-identifier hs-type">slot</span></a></span></span><span> </span><span id="local-6989586621679259388"><span class="annot"><a href="#local-6989586621679259388"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679259387"><span class="annot"><a href="#local-6989586621679259387"><span class="hs-identifier hs-type">a</span></a></span></span><span class="hs-operator">.</span><span>
+</span><span id="line-102"></span><span>     </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Monad</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259388"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-103"></span><span>     </span><span class="hs-special">)</span><span>
+</span><span id="line-104"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#LocalTxMonitorServer"><span class="hs-identifier hs-type">LocalTxMonitorServer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259391"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259390"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259389"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259388"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259387"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-105"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-type">Peer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#LocalTxMonitor"><span class="hs-identifier hs-type">LocalTxMonitor</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259391"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259390"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259389"><span class="hs-identifier hs-type">slot</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-type">AsServer</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#StIdle"><span class="hs-identifier hs-type">StIdle</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259388"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259387"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-106"></span><span id="localTxMonitorServerPeer"><span class="annot"><span class="annottext">localTxMonitorServerPeer :: LocalTxMonitorServer txid tx slot m a
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#localTxMonitorServerPeer"><span class="hs-identifier hs-var hs-var">localTxMonitorServerPeer</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#LocalTxMonitorServer"><span class="hs-identifier hs-type">LocalTxMonitorServer</span></a></span><span> </span><span id="local-6989586621679259386"><span class="annot"><span class="annottext">m (ServerStIdle txid tx slot m a)
+</span><a href="#local-6989586621679259386"><span class="hs-identifier hs-var">mServer</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-107"></span><span>    </span><span class="annot"><span class="annottext">m (Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a)
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) a.
+m (Peer ps pr st m a) -&gt; Peer ps pr st m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-var">Effect</span></a></span><span> </span><span class="annot"><span class="annottext">(m (Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a)
+ -&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a)
+-&gt; m (Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a)
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ServerStIdle txid tx slot m a
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a
+</span><a href="#local-6989586621679259384"><span class="hs-identifier hs-var">handleStIdle</span></a></span><span> </span><span class="annot"><span class="annottext">(ServerStIdle txid tx slot m a
+ -&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a)
+-&gt; m (ServerStIdle txid tx slot m a)
+-&gt; m (Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">m (ServerStIdle txid tx slot m a)
+</span><a href="#local-6989586621679259386"><span class="hs-identifier hs-var">mServer</span></a></span><span>
+</span><span id="line-108"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-109"></span><span>    </span><span class="annot"><a href="#local-6989586621679259384"><span class="hs-identifier hs-type">handleStIdle</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-110"></span><span>         </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStIdle"><span class="hs-identifier hs-type">ServerStIdle</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259391"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259390"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259389"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259388"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259387"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-111"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-type">Peer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#LocalTxMonitor"><span class="hs-identifier hs-type">LocalTxMonitor</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259391"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259390"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259389"><span class="hs-identifier hs-type">slot</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-type">AsServer</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#StIdle"><span class="hs-identifier hs-type">StIdle</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259388"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259387"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-112"></span><span>    </span><span id="local-6989586621679259384"><span class="annot"><span class="annottext">handleStIdle :: ServerStIdle txid tx slot m a
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a
+</span><a href="#local-6989586621679259384"><span class="hs-identifier hs-var hs-var">handleStIdle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-113"></span><span>      </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStIdle"><span class="hs-identifier hs-type">ServerStIdle</span></a></span><span class="hs-special">{</span><span id="local-6989586621679259382"><span class="annot"><span class="annottext">m a
+recvMsgDone :: m a
+recvMsgDone :: forall txid tx slot (m :: * -&gt; *) a.
+ServerStIdle txid tx slot m a -&gt; m a
+</span><a href="#local-6989586621679259382"><span class="hs-identifier hs-var hs-var">recvMsgDone</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679259381"><span class="annot"><span class="annottext">m (ServerStAcquiring txid tx slot m a)
+recvMsgAcquire :: m (ServerStAcquiring txid tx slot m a)
+recvMsgAcquire :: forall txid tx slot (m :: * -&gt; *) a.
+ServerStIdle txid tx slot m a
+-&gt; m (ServerStAcquiring txid tx slot m a)
+</span><a href="#local-6989586621679259381"><span class="hs-identifier hs-var hs-var">recvMsgAcquire</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-114"></span><span>        </span><span class="annot"><span class="annottext">TheyHaveAgency 'AsServer 'StIdle
+-&gt; (forall (st' :: LocalTxMonitor txid tx slot).
+    Message (LocalTxMonitor txid tx slot) 'StIdle st'
+    -&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer st' m a)
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a
+forall (pr :: PeerRole) ps (st :: ps) (m :: * -&gt; *) a.
+TheyHaveAgency pr st
+-&gt; (forall (st' :: ps). Message ps st st' -&gt; Peer ps pr st' m a)
+-&gt; Peer ps pr st m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-var">Await</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ClientHasAgency 'StIdle -&gt; PeerHasAgency 'AsClient 'StIdle
+forall ps (st :: ps).
+ClientHasAgency st -&gt; PeerHasAgency 'AsClient st
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-var">ClientAgency</span></a></span><span> </span><span class="annot"><span class="annottext">ClientHasAgency 'StIdle
+forall k k k (txid :: k) (tx :: k) (slot :: k).
+ClientHasAgency 'StIdle
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#TokIdle"><span class="hs-identifier hs-var">TokIdle</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">((forall (st' :: LocalTxMonitor txid tx slot).
+  Message (LocalTxMonitor txid tx slot) 'StIdle st'
+  -&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer st' m a)
+ -&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a)
+-&gt; (forall (st' :: LocalTxMonitor txid tx slot).
+    Message (LocalTxMonitor txid tx slot) 'StIdle st'
+    -&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer st' m a)
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-115"></span><span>          </span><span class="annot"><span class="annottext">Message (LocalTxMonitor txid tx slot) 'StIdle st'
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#MsgAcquire"><span class="hs-identifier hs-var">MsgAcquire</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-116"></span><span>            </span><span class="annot"><span class="annottext">m (Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquiring m a)
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquiring m a
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) a.
+m (Peer ps pr st m a) -&gt; Peer ps pr st m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-var">Effect</span></a></span><span> </span><span class="annot"><span class="annottext">(m (Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquiring m a)
+ -&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquiring m a)
+-&gt; m (Peer
+        (LocalTxMonitor txid tx slot) 'AsServer 'StAcquiring m a)
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquiring m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ServerStAcquiring txid tx slot m a
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquiring m a
+</span><a href="#local-6989586621679259376"><span class="hs-identifier hs-var">handleStAcquiring</span></a></span><span> </span><span class="annot"><span class="annottext">(ServerStAcquiring txid tx slot m a
+ -&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquiring m a)
+-&gt; m (ServerStAcquiring txid tx slot m a)
+-&gt; m (Peer
+        (LocalTxMonitor txid tx slot) 'AsServer 'StAcquiring m a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">m (ServerStAcquiring txid tx slot m a)
+</span><a href="#local-6989586621679259381"><span class="hs-identifier hs-var">recvMsgAcquire</span></a></span><span>
+</span><span id="line-117"></span><span>          </span><span class="annot"><span class="annottext">Message (LocalTxMonitor txid tx slot) 'StIdle st'
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#MsgDone"><span class="hs-identifier hs-var">MsgDone</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-118"></span><span>            </span><span class="annot"><span class="annottext">m (Peer (LocalTxMonitor txid tx slot) 'AsServer 'StDone m a)
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StDone m a
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) a.
+m (Peer ps pr st m a) -&gt; Peer ps pr st m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-var">Effect</span></a></span><span> </span><span class="annot"><span class="annottext">(m (Peer (LocalTxMonitor txid tx slot) 'AsServer 'StDone m a)
+ -&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StDone m a)
+-&gt; m (Peer (LocalTxMonitor txid tx slot) 'AsServer 'StDone m a)
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StDone m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">NobodyHasAgency 'StDone
+-&gt; a -&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StDone m a
+forall ps (st :: ps) a (pr :: PeerRole) (m :: * -&gt; *).
+NobodyHasAgency st -&gt; a -&gt; Peer ps pr st m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-var">Done</span></a></span><span> </span><span class="annot"><span class="annottext">NobodyHasAgency 'StDone
+forall k k k (txid :: k) (tx :: k) (slot :: k).
+NobodyHasAgency 'StDone
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#TokDone"><span class="hs-identifier hs-var">TokDone</span></a></span><span> </span><span class="annot"><span class="annottext">(a -&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StDone m a)
+-&gt; m a
+-&gt; m (Peer (LocalTxMonitor txid tx slot) 'AsServer 'StDone m a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">m a
+</span><a href="#local-6989586621679259382"><span class="hs-identifier hs-var">recvMsgDone</span></a></span><span>
+</span><span id="line-119"></span><span>
+</span><span id="line-120"></span><span>    </span><span class="annot"><a href="#local-6989586621679259376"><span class="hs-identifier hs-type">handleStAcquiring</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-121"></span><span>         </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStAcquiring"><span class="hs-identifier hs-type">ServerStAcquiring</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259391"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259390"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259389"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259388"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259387"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-122"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-type">Peer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#LocalTxMonitor"><span class="hs-identifier hs-type">LocalTxMonitor</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259391"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259390"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259389"><span class="hs-identifier hs-type">slot</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-type">AsServer</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#StAcquiring"><span class="hs-identifier hs-type">StAcquiring</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259388"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259387"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-123"></span><span>    </span><span id="local-6989586621679259376"><span class="annot"><span class="annottext">handleStAcquiring :: ServerStAcquiring txid tx slot m a
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquiring m a
+</span><a href="#local-6989586621679259376"><span class="hs-identifier hs-var hs-var">handleStAcquiring</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-124"></span><span>      </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#SendMsgAcquired"><span class="hs-identifier hs-type">SendMsgAcquired</span></a></span><span> </span><span id="local-6989586621679259372"><span class="annot"><span class="annottext">slot
+</span><a href="#local-6989586621679259372"><span class="hs-identifier hs-var">slot</span></a></span></span><span> </span><span id="local-6989586621679259371"><span class="annot"><span class="annottext">ServerStAcquired txid tx slot m a
+</span><a href="#local-6989586621679259371"><span class="hs-identifier hs-var">serverStAcquired</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-125"></span><span>        </span><span class="annot"><span class="annottext">WeHaveAgency 'AsServer 'StAcquiring
+-&gt; Message (LocalTxMonitor txid tx slot) 'StAcquiring 'StAcquired
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquired m a
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquiring m a
+forall (pr :: PeerRole) ps (st :: ps) (st' :: ps) (m :: * -&gt; *) a.
+WeHaveAgency pr st
+-&gt; Message ps st st' -&gt; Peer ps pr st' m a -&gt; Peer ps pr st m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-var">Yield</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ServerHasAgency 'StAcquiring -&gt; WeHaveAgency 'AsServer 'StAcquiring
+forall ps (st :: ps).
+ServerHasAgency st -&gt; PeerHasAgency 'AsServer st
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-var">ServerAgency</span></a></span><span> </span><span class="annot"><span class="annottext">ServerHasAgency 'StAcquiring
+forall k k k (txid :: k) (tx :: k) (slot :: k).
+ServerHasAgency 'StAcquiring
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#TokAcquiring"><span class="hs-identifier hs-var">TokAcquiring</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">slot
+-&gt; Message (LocalTxMonitor txid tx slot) 'StAcquiring 'StAcquired
+forall k k slot (txid :: k) (tx :: k).
+slot
+-&gt; Message (LocalTxMonitor txid tx slot) 'StAcquiring 'StAcquired
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#MsgAcquired"><span class="hs-identifier hs-var">MsgAcquired</span></a></span><span> </span><span class="annot"><span class="annottext">slot
+</span><a href="#local-6989586621679259372"><span class="hs-identifier hs-var">slot</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquired m a
+ -&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquiring m a)
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquired m a
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquiring m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-126"></span><span>          </span><span class="annot"><span class="annottext">ServerStAcquired txid tx slot m a
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquired m a
+</span><a href="#local-6989586621679259366"><span class="hs-identifier hs-var">handleStAcquired</span></a></span><span> </span><span class="annot"><span class="annottext">ServerStAcquired txid tx slot m a
+</span><a href="#local-6989586621679259371"><span class="hs-identifier hs-var">serverStAcquired</span></a></span><span>
+</span><span id="line-127"></span><span>
+</span><span id="line-128"></span><span>    </span><span class="annot"><a href="#local-6989586621679259366"><span class="hs-identifier hs-type">handleStAcquired</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-129"></span><span>         </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStAcquired"><span class="hs-identifier hs-type">ServerStAcquired</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259391"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259390"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259389"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259388"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259387"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-130"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-type">Peer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#LocalTxMonitor"><span class="hs-identifier hs-type">LocalTxMonitor</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259391"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259390"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259389"><span class="hs-identifier hs-type">slot</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-type">AsServer</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#StAcquired"><span class="hs-identifier hs-type">StAcquired</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259388"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259387"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-131"></span><span>    </span><span id="local-6989586621679259366"><span class="annot"><span class="annottext">handleStAcquired :: ServerStAcquired txid tx slot m a
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquired m a
+</span><a href="#local-6989586621679259366"><span class="hs-identifier hs-var hs-var">handleStAcquired</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-132"></span><span>      </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStAcquired"><span class="hs-identifier hs-type">ServerStAcquired</span></a></span><span>
+</span><span id="line-133"></span><span>        </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679259365"><span class="annot"><span class="annottext">m (ServerStBusy 'NextTx txid tx slot m a)
+recvMsgNextTx :: m (ServerStBusy 'NextTx txid tx slot m a)
+recvMsgNextTx :: forall txid tx slot (m :: * -&gt; *) a.
+ServerStAcquired txid tx slot m a
+-&gt; m (ServerStBusy 'NextTx txid tx slot m a)
+</span><a href="#local-6989586621679259365"><span class="hs-identifier hs-var hs-var">recvMsgNextTx</span></a></span></span><span>
+</span><span id="line-134"></span><span>        </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679259364"><span class="annot"><span class="annottext">txid -&gt; m (ServerStBusy 'HasTx txid tx slot m a)
+recvMsgHasTx :: txid -&gt; m (ServerStBusy 'HasTx txid tx slot m a)
+recvMsgHasTx :: forall txid tx slot (m :: * -&gt; *) a.
+ServerStAcquired txid tx slot m a
+-&gt; txid -&gt; m (ServerStBusy 'HasTx txid tx slot m a)
+</span><a href="#local-6989586621679259364"><span class="hs-identifier hs-var hs-var">recvMsgHasTx</span></a></span></span><span>
+</span><span id="line-135"></span><span>        </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679259363"><span class="annot"><span class="annottext">m (ServerStBusy 'GetSizes txid tx slot m a)
+recvMsgGetSizes :: m (ServerStBusy 'GetSizes txid tx slot m a)
+recvMsgGetSizes :: forall txid tx slot (m :: * -&gt; *) a.
+ServerStAcquired txid tx slot m a
+-&gt; m (ServerStBusy 'GetSizes txid tx slot m a)
+</span><a href="#local-6989586621679259363"><span class="hs-identifier hs-var hs-var">recvMsgGetSizes</span></a></span></span><span>
+</span><span id="line-136"></span><span>        </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679259362"><span class="annot"><span class="annottext">m (ServerStAcquiring txid tx slot m a)
+recvMsgAwaitAcquire :: m (ServerStAcquiring txid tx slot m a)
+recvMsgAwaitAcquire :: forall txid tx slot (m :: * -&gt; *) a.
+ServerStAcquired txid tx slot m a
+-&gt; m (ServerStAcquiring txid tx slot m a)
+</span><a href="#local-6989586621679259362"><span class="hs-identifier hs-var hs-var">recvMsgAwaitAcquire</span></a></span></span><span>
+</span><span id="line-137"></span><span>        </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679259361"><span class="annot"><span class="annottext">m (ServerStIdle txid tx slot m a)
+recvMsgRelease :: m (ServerStIdle txid tx slot m a)
+recvMsgRelease :: forall txid tx slot (m :: * -&gt; *) a.
+ServerStAcquired txid tx slot m a
+-&gt; m (ServerStIdle txid tx slot m a)
+</span><a href="#local-6989586621679259361"><span class="hs-identifier hs-var hs-var">recvMsgRelease</span></a></span></span><span>
+</span><span id="line-138"></span><span>        </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">TheyHaveAgency 'AsServer 'StAcquired
+-&gt; (forall (st' :: LocalTxMonitor txid tx slot).
+    Message (LocalTxMonitor txid tx slot) 'StAcquired st'
+    -&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer st' m a)
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquired m a
+forall (pr :: PeerRole) ps (st :: ps) (m :: * -&gt; *) a.
+TheyHaveAgency pr st
+-&gt; (forall (st' :: ps). Message ps st st' -&gt; Peer ps pr st' m a)
+-&gt; Peer ps pr st m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-var">Await</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ClientHasAgency 'StAcquired -&gt; PeerHasAgency 'AsClient 'StAcquired
+forall ps (st :: ps).
+ClientHasAgency st -&gt; PeerHasAgency 'AsClient st
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-var">ClientAgency</span></a></span><span> </span><span class="annot"><span class="annottext">ClientHasAgency 'StAcquired
+forall k k k (txid :: k) (tx :: k) (slot :: k).
+ClientHasAgency 'StAcquired
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#TokAcquired"><span class="hs-identifier hs-var">TokAcquired</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">((forall (st' :: LocalTxMonitor txid tx slot).
+  Message (LocalTxMonitor txid tx slot) 'StAcquired st'
+  -&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer st' m a)
+ -&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquired m a)
+-&gt; (forall (st' :: LocalTxMonitor txid tx slot).
+    Message (LocalTxMonitor txid tx slot) 'StAcquired st'
+    -&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer st' m a)
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquired m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-139"></span><span>          </span><span class="annot"><span class="annottext">Message (LocalTxMonitor txid tx slot) 'StAcquired st'
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#MsgNextTx"><span class="hs-identifier hs-var">MsgNextTx</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-140"></span><span>            </span><span class="annot"><span class="annottext">m (Peer
+     (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'NextTx) m a)
+-&gt; Peer
+     (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'NextTx) m a
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) a.
+m (Peer ps pr st m a) -&gt; Peer ps pr st m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-var">Effect</span></a></span><span> </span><span class="annot"><span class="annottext">(m (Peer
+      (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'NextTx) m a)
+ -&gt; Peer
+      (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'NextTx) m a)
+-&gt; m (Peer
+        (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'NextTx) m a)
+-&gt; Peer
+     (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'NextTx) m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ServerStBusy 'NextTx txid tx slot m a
+-&gt; Peer
+     (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'NextTx) m a
+</span><a href="#local-6989586621679259358"><span class="hs-identifier hs-var">handleNextTx</span></a></span><span> </span><span class="annot"><span class="annottext">(ServerStBusy 'NextTx txid tx slot m a
+ -&gt; Peer
+      (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'NextTx) m a)
+-&gt; m (ServerStBusy 'NextTx txid tx slot m a)
+-&gt; m (Peer
+        (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'NextTx) m a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">m (ServerStBusy 'NextTx txid tx slot m a)
+</span><a href="#local-6989586621679259365"><span class="hs-identifier hs-var">recvMsgNextTx</span></a></span><span>
+</span><span id="line-141"></span><span>          </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#MsgHasTx"><span class="hs-identifier hs-type">MsgHasTx</span></a></span><span> </span><span id="local-6989586621679259356"><span class="annot"><a href="#local-6989586621679259356"><span class="hs-identifier hs-var">txid</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-142"></span><span>            </span><span class="annot"><span class="annottext">m (Peer
+     (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'HasTx) m a)
+-&gt; Peer
+     (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'HasTx) m a
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) a.
+m (Peer ps pr st m a) -&gt; Peer ps pr st m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-var">Effect</span></a></span><span> </span><span class="annot"><span class="annottext">(m (Peer
+      (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'HasTx) m a)
+ -&gt; Peer
+      (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'HasTx) m a)
+-&gt; m (Peer
+        (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'HasTx) m a)
+-&gt; Peer
+     (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'HasTx) m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ServerStBusy 'HasTx txid tx slot m a
+-&gt; Peer
+     (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'HasTx) m a
+</span><a href="#local-6989586621679259355"><span class="hs-identifier hs-var">handleHasTx</span></a></span><span> </span><span class="annot"><span class="annottext">(ServerStBusy 'HasTx txid tx slot m a
+ -&gt; Peer
+      (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'HasTx) m a)
+-&gt; m (ServerStBusy 'HasTx txid tx slot m a)
+-&gt; m (Peer
+        (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'HasTx) m a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">txid -&gt; m (ServerStBusy 'HasTx txid tx slot m a)
+</span><a href="#local-6989586621679259364"><span class="hs-identifier hs-var">recvMsgHasTx</span></a></span><span> </span><span class="annot"><span class="annottext">txid
+txid
+</span><a href="#local-6989586621679259356"><span class="hs-identifier hs-var">txid</span></a></span><span>
+</span><span id="line-143"></span><span>          </span><span class="annot"><span class="annottext">Message (LocalTxMonitor txid tx slot) 'StAcquired st'
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#MsgGetSizes"><span class="hs-identifier hs-var">MsgGetSizes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-144"></span><span>            </span><span class="annot"><span class="annottext">m (Peer
+     (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'GetSizes) m a)
+-&gt; Peer
+     (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'GetSizes) m a
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) a.
+m (Peer ps pr st m a) -&gt; Peer ps pr st m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-var">Effect</span></a></span><span> </span><span class="annot"><span class="annottext">(m (Peer
+      (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'GetSizes) m a)
+ -&gt; Peer
+      (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'GetSizes) m a)
+-&gt; m (Peer
+        (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'GetSizes) m a)
+-&gt; Peer
+     (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'GetSizes) m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ServerStBusy 'GetSizes txid tx slot m a
+-&gt; Peer
+     (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'GetSizes) m a
+</span><a href="#local-6989586621679259353"><span class="hs-identifier hs-var">handleGetSizes</span></a></span><span> </span><span class="annot"><span class="annottext">(ServerStBusy 'GetSizes txid tx slot m a
+ -&gt; Peer
+      (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'GetSizes) m a)
+-&gt; m (ServerStBusy 'GetSizes txid tx slot m a)
+-&gt; m (Peer
+        (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'GetSizes) m a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">m (ServerStBusy 'GetSizes txid tx slot m a)
+</span><a href="#local-6989586621679259363"><span class="hs-identifier hs-var">recvMsgGetSizes</span></a></span><span>
+</span><span id="line-145"></span><span>          </span><span class="annot"><span class="annottext">Message (LocalTxMonitor txid tx slot) 'StAcquired st'
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#MsgAwaitAcquire"><span class="hs-identifier hs-var">MsgAwaitAcquire</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-146"></span><span>            </span><span class="annot"><span class="annottext">m (Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquiring m a)
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquiring m a
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) a.
+m (Peer ps pr st m a) -&gt; Peer ps pr st m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-var">Effect</span></a></span><span> </span><span class="annot"><span class="annottext">(m (Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquiring m a)
+ -&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquiring m a)
+-&gt; m (Peer
+        (LocalTxMonitor txid tx slot) 'AsServer 'StAcquiring m a)
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquiring m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ServerStAcquiring txid tx slot m a
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquiring m a
+</span><a href="#local-6989586621679259376"><span class="hs-identifier hs-var">handleStAcquiring</span></a></span><span> </span><span class="annot"><span class="annottext">(ServerStAcquiring txid tx slot m a
+ -&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquiring m a)
+-&gt; m (ServerStAcquiring txid tx slot m a)
+-&gt; m (Peer
+        (LocalTxMonitor txid tx slot) 'AsServer 'StAcquiring m a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">m (ServerStAcquiring txid tx slot m a)
+</span><a href="#local-6989586621679259362"><span class="hs-identifier hs-var">recvMsgAwaitAcquire</span></a></span><span>
+</span><span id="line-147"></span><span>          </span><span class="annot"><span class="annottext">Message (LocalTxMonitor txid tx slot) 'StAcquired st'
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#MsgRelease"><span class="hs-identifier hs-var">MsgRelease</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-148"></span><span>            </span><span class="annot"><span class="annottext">m (Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a)
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) a.
+m (Peer ps pr st m a) -&gt; Peer ps pr st m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-var">Effect</span></a></span><span> </span><span class="annot"><span class="annottext">(m (Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a)
+ -&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a)
+-&gt; m (Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a)
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ServerStIdle txid tx slot m a
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a
+</span><a href="#local-6989586621679259384"><span class="hs-identifier hs-var">handleStIdle</span></a></span><span> </span><span class="annot"><span class="annottext">(ServerStIdle txid tx slot m a
+ -&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a)
+-&gt; m (ServerStIdle txid tx slot m a)
+-&gt; m (Peer (LocalTxMonitor txid tx slot) 'AsServer 'StIdle m a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">m (ServerStIdle txid tx slot m a)
+</span><a href="#local-6989586621679259361"><span class="hs-identifier hs-var">recvMsgRelease</span></a></span><span>
+</span><span id="line-149"></span><span>
+</span><span id="line-150"></span><span>    </span><span class="annot"><a href="#local-6989586621679259358"><span class="hs-identifier hs-type">handleNextTx</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-151"></span><span>         </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStBusy"><span class="hs-identifier hs-type">ServerStBusy</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#NextTx"><span class="hs-identifier hs-type">NextTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259391"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259390"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259389"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259388"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259387"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-152"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-type">Peer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#LocalTxMonitor"><span class="hs-identifier hs-type">LocalTxMonitor</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259391"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259390"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259389"><span class="hs-identifier hs-type">slot</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-type">AsServer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#StBusy"><span class="hs-identifier hs-type">StBusy</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#NextTx"><span class="hs-identifier hs-type">NextTx</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="#local-6989586621679259388"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259387"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-153"></span><span>    </span><span id="local-6989586621679259358"><span class="annot"><span class="annottext">handleNextTx :: ServerStBusy 'NextTx txid tx slot m a
+-&gt; Peer
+     (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'NextTx) m a
+</span><a href="#local-6989586621679259358"><span class="hs-identifier hs-var hs-var">handleNextTx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-154"></span><span>      </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#SendMsgReplyNextTx"><span class="hs-identifier hs-type">SendMsgReplyNextTx</span></a></span><span> </span><span id="local-6989586621679259350"><span class="annot"><span class="annottext">Maybe tx
+</span><a href="#local-6989586621679259350"><span class="hs-identifier hs-var">tx</span></a></span></span><span> </span><span id="local-6989586621679259349"><span class="annot"><span class="annottext">ServerStAcquired txid tx slot m a
+</span><a href="#local-6989586621679259349"><span class="hs-identifier hs-var">serverStAcquired</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-155"></span><span>        </span><span class="annot"><span class="annottext">WeHaveAgency 'AsServer ('StBusy 'NextTx)
+-&gt; Message
+     (LocalTxMonitor txid tx slot) ('StBusy 'NextTx) 'StAcquired
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquired m a
+-&gt; Peer
+     (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'NextTx) m a
+forall (pr :: PeerRole) ps (st :: ps) (st' :: ps) (m :: * -&gt; *) a.
+WeHaveAgency pr st
+-&gt; Message ps st st' -&gt; Peer ps pr st' m a -&gt; Peer ps pr st m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-var">Yield</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ServerHasAgency ('StBusy 'NextTx)
+-&gt; WeHaveAgency 'AsServer ('StBusy 'NextTx)
+forall ps (st :: ps).
+ServerHasAgency st -&gt; PeerHasAgency 'AsServer st
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-var">ServerAgency</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TokBusyKind 'NextTx -&gt; ServerHasAgency ('StBusy 'NextTx)
+forall k k k (txid :: k) (tx :: k) (slot :: k) (k :: StBusyKind).
+TokBusyKind k -&gt; ServerHasAgency ('StBusy k)
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#TokBusy"><span class="hs-identifier hs-var">TokBusy</span></a></span><span> </span><span class="annot"><span class="annottext">TokBusyKind 'NextTx
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#TokNextTx"><span class="hs-identifier hs-var">TokNextTx</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Maybe tx
+-&gt; Message
+     (LocalTxMonitor txid tx slot) ('StBusy 'NextTx) 'StAcquired
+forall k k tx (txid :: k) (slot :: k).
+Maybe tx
+-&gt; Message
+     (LocalTxMonitor txid tx slot) ('StBusy 'NextTx) 'StAcquired
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#MsgReplyNextTx"><span class="hs-identifier hs-var">MsgReplyNextTx</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe tx
+</span><a href="#local-6989586621679259350"><span class="hs-identifier hs-var">tx</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquired m a
+ -&gt; Peer
+      (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'NextTx) m a)
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquired m a
+-&gt; Peer
+     (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'NextTx) m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-156"></span><span>          </span><span class="annot"><span class="annottext">ServerStAcquired txid tx slot m a
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquired m a
+</span><a href="#local-6989586621679259366"><span class="hs-identifier hs-var">handleStAcquired</span></a></span><span> </span><span class="annot"><span class="annottext">ServerStAcquired txid tx slot m a
+</span><a href="#local-6989586621679259349"><span class="hs-identifier hs-var">serverStAcquired</span></a></span><span>
+</span><span id="line-157"></span><span>
+</span><span id="line-158"></span><span>    </span><span class="annot"><a href="#local-6989586621679259355"><span class="hs-identifier hs-type">handleHasTx</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-159"></span><span>         </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStBusy"><span class="hs-identifier hs-type">ServerStBusy</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#HasTx"><span class="hs-identifier hs-type">HasTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259391"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259390"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259389"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259388"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259387"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-160"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-type">Peer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#LocalTxMonitor"><span class="hs-identifier hs-type">LocalTxMonitor</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259391"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259390"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259389"><span class="hs-identifier hs-type">slot</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-type">AsServer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#StBusy"><span class="hs-identifier hs-type">StBusy</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#HasTx"><span class="hs-identifier hs-type">HasTx</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="#local-6989586621679259388"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259387"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-161"></span><span>    </span><span id="local-6989586621679259355"><span class="annot"><span class="annottext">handleHasTx :: ServerStBusy 'HasTx txid tx slot m a
+-&gt; Peer
+     (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'HasTx) m a
+</span><a href="#local-6989586621679259355"><span class="hs-identifier hs-var hs-var">handleHasTx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-162"></span><span>      </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#SendMsgReplyHasTx"><span class="hs-identifier hs-type">SendMsgReplyHasTx</span></a></span><span> </span><span id="local-6989586621679259345"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679259345"><span class="hs-identifier hs-var">res</span></a></span></span><span> </span><span id="local-6989586621679259344"><span class="annot"><span class="annottext">ServerStAcquired txid tx slot m a
+</span><a href="#local-6989586621679259344"><span class="hs-identifier hs-var">serverStAcquired</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-163"></span><span>        </span><span class="annot"><span class="annottext">WeHaveAgency 'AsServer ('StBusy 'HasTx)
+-&gt; Message
+     (LocalTxMonitor txid tx slot) ('StBusy 'HasTx) 'StAcquired
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquired m a
+-&gt; Peer
+     (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'HasTx) m a
+forall (pr :: PeerRole) ps (st :: ps) (st' :: ps) (m :: * -&gt; *) a.
+WeHaveAgency pr st
+-&gt; Message ps st st' -&gt; Peer ps pr st' m a -&gt; Peer ps pr st m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-var">Yield</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ServerHasAgency ('StBusy 'HasTx)
+-&gt; WeHaveAgency 'AsServer ('StBusy 'HasTx)
+forall ps (st :: ps).
+ServerHasAgency st -&gt; PeerHasAgency 'AsServer st
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-var">ServerAgency</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TokBusyKind 'HasTx -&gt; ServerHasAgency ('StBusy 'HasTx)
+forall k k k (txid :: k) (tx :: k) (slot :: k) (k :: StBusyKind).
+TokBusyKind k -&gt; ServerHasAgency ('StBusy k)
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#TokBusy"><span class="hs-identifier hs-var">TokBusy</span></a></span><span> </span><span class="annot"><span class="annottext">TokBusyKind 'HasTx
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#TokHasTx"><span class="hs-identifier hs-var">TokHasTx</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool
+-&gt; Message
+     (LocalTxMonitor txid tx slot) ('StBusy 'HasTx) 'StAcquired
+forall k k k (txid :: k) (tx :: k) (slot :: k).
+Bool
+-&gt; Message
+     (LocalTxMonitor txid tx slot) ('StBusy 'HasTx) 'StAcquired
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#MsgReplyHasTx"><span class="hs-identifier hs-var">MsgReplyHasTx</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679259345"><span class="hs-identifier hs-var">res</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquired m a
+ -&gt; Peer
+      (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'HasTx) m a)
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquired m a
+-&gt; Peer
+     (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'HasTx) m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-164"></span><span>          </span><span class="annot"><span class="annottext">ServerStAcquired txid tx slot m a
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquired m a
+</span><a href="#local-6989586621679259366"><span class="hs-identifier hs-var">handleStAcquired</span></a></span><span> </span><span class="annot"><span class="annottext">ServerStAcquired txid tx slot m a
+</span><a href="#local-6989586621679259344"><span class="hs-identifier hs-var">serverStAcquired</span></a></span><span>
+</span><span id="line-165"></span><span>
+</span><span id="line-166"></span><span>    </span><span class="annot"><a href="#local-6989586621679259353"><span class="hs-identifier hs-type">handleGetSizes</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-167"></span><span>         </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#ServerStBusy"><span class="hs-identifier hs-type">ServerStBusy</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#GetSizes"><span class="hs-identifier hs-type">GetSizes</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259391"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259390"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259389"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259388"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259387"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-168"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-type">Peer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#LocalTxMonitor"><span class="hs-identifier hs-type">LocalTxMonitor</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259391"><span class="hs-identifier hs-type">txid</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259390"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259389"><span class="hs-identifier hs-type">slot</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-type">AsServer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#StBusy"><span class="hs-identifier hs-type">StBusy</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#GetSizes"><span class="hs-identifier hs-type">GetSizes</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="#local-6989586621679259388"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679259387"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-169"></span><span>    </span><span id="local-6989586621679259353"><span class="annot"><span class="annottext">handleGetSizes :: ServerStBusy 'GetSizes txid tx slot m a
+-&gt; Peer
+     (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'GetSizes) m a
+</span><a href="#local-6989586621679259353"><span class="hs-identifier hs-var hs-var">handleGetSizes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-170"></span><span>      </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Server.html#SendMsgReplyGetSizes"><span class="hs-identifier hs-type">SendMsgReplyGetSizes</span></a></span><span> </span><span id="local-6989586621679259341"><span class="annot"><span class="annottext">MempoolSizeAndCapacity
+</span><a href="#local-6989586621679259341"><span class="hs-identifier hs-var">sizes</span></a></span></span><span> </span><span id="local-6989586621679259340"><span class="annot"><span class="annottext">ServerStAcquired txid tx slot m a
+</span><a href="#local-6989586621679259340"><span class="hs-identifier hs-var">serverStAcquired</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-171"></span><span>        </span><span class="annot"><span class="annottext">WeHaveAgency 'AsServer ('StBusy 'GetSizes)
+-&gt; Message
+     (LocalTxMonitor txid tx slot) ('StBusy 'GetSizes) 'StAcquired
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquired m a
+-&gt; Peer
+     (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'GetSizes) m a
+forall (pr :: PeerRole) ps (st :: ps) (st' :: ps) (m :: * -&gt; *) a.
+WeHaveAgency pr st
+-&gt; Message ps st st' -&gt; Peer ps pr st' m a -&gt; Peer ps pr st m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-var">Yield</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ServerHasAgency ('StBusy 'GetSizes)
+-&gt; WeHaveAgency 'AsServer ('StBusy 'GetSizes)
+forall ps (st :: ps).
+ServerHasAgency st -&gt; PeerHasAgency 'AsServer st
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/typed-protocols-0.1.0.0/noopt/doc/html/typed-protocols/src"><span class="hs-identifier hs-var">ServerAgency</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TokBusyKind 'GetSizes -&gt; ServerHasAgency ('StBusy 'GetSizes)
+forall k k k (txid :: k) (tx :: k) (slot :: k) (k :: StBusyKind).
+TokBusyKind k -&gt; ServerHasAgency ('StBusy k)
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#TokBusy"><span class="hs-identifier hs-var">TokBusy</span></a></span><span> </span><span class="annot"><span class="annottext">TokBusyKind 'GetSizes
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#TokGetSizes"><span class="hs-identifier hs-var">TokGetSizes</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">MempoolSizeAndCapacity
+-&gt; Message
+     (LocalTxMonitor txid tx slot) ('StBusy 'GetSizes) 'StAcquired
+forall k k k (txid :: k) (tx :: k) (slot :: k).
+MempoolSizeAndCapacity
+-&gt; Message
+     (LocalTxMonitor txid tx slot) ('StBusy 'GetSizes) 'StAcquired
+</span><a href="Ouroboros.Network.Protocol.LocalTxMonitor.Type.html#MsgReplyGetSizes"><span class="hs-identifier hs-var">MsgReplyGetSizes</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSizeAndCapacity
+</span><a href="#local-6989586621679259341"><span class="hs-identifier hs-var">sizes</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquired m a
+ -&gt; Peer
+      (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'GetSizes) m a)
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquired m a
+-&gt; Peer
+     (LocalTxMonitor txid tx slot) 'AsServer ('StBusy 'GetSizes) m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-172"></span><span>          </span><span class="annot"><span class="annottext">ServerStAcquired txid tx slot m a
+-&gt; Peer (LocalTxMonitor txid tx slot) 'AsServer 'StAcquired m a
+</span><a href="#local-6989586621679259366"><span class="hs-identifier hs-var">handleStAcquired</span></a></span><span> </span><span class="annot"><span class="annottext">ServerStAcquired txid tx slot m a
+</span><a href="#local-6989586621679259340"><span class="hs-identifier hs-var">serverStAcquired</span></a></span><span>
+</span><span id="line-173"></span></pre></body></html>

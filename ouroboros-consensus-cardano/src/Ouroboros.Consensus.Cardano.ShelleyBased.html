@@ -12,30 +12,33 @@
 </span><span id="line-12"></span><span>
 </span><span id="line-13"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.HardFork.Combinator</span></a></span><span>
 </span><span id="line-14"></span><span>
-</span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Cardano.Block.html"><span class="hs-identifier">Ouroboros.Consensus.Cardano.Block</span></a></span><span>
-</span><span id="line-16"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier">Ouroboros.Consensus.Shelley.Ledger</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier">ShelleyBlock</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-17"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier">Ouroboros.Consensus.Shelley.Protocol</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">PraosCrypto</span></span><span class="hs-special">)</span><span>
-</span><span id="line-18"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier">Ouroboros.Consensus.Shelley.ShelleyBased</span></a></span><span>
-</span><span id="line-19"></span><span>
-</span><span id="line-20"></span><span class="hs-comment">-- | When the given ledger state corresponds to a Shelley-based era, apply the</span><span>
-</span><span id="line-21"></span><span class="hs-comment">-- given function to it.</span><span>
-</span><span id="line-22"></span><span class="annot"><a href="Ouroboros.Consensus.Cardano.ShelleyBased.html#overShelleyBasedLedgerState"><span class="hs-identifier hs-type">overShelleyBasedLedgerState</span></a></span><span> </span><span class="hs-glyph">::</span><span>
-</span><span id="line-23"></span><span>     </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679241610"><span class="annot"><a href="#local-6989586621679241610"><span class="hs-identifier hs-type">c</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><span class="hs-identifier hs-type">PraosCrypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679241610"><span class="hs-identifier hs-type">c</span></a></span><span>
-</span><span id="line-24"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span>   </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679241693"><span class="annot"><a href="#local-6989586621679241693"><span class="hs-identifier hs-type">era</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">EraCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241693"><span class="hs-identifier hs-type">era</span></a></span><span> </span><span class="annot"><span class="hs-glyph hs-type">~</span></span><span> </span><span class="annot"><a href="#local-6989586621679241610"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241693"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-25"></span><span>      </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241693"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-26"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241693"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-27"></span><span>     </span><span class="hs-special">)</span><span>
-</span><span id="line-28"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Cardano.Block.html#CardanoBlock"><span class="hs-identifier hs-type">CardanoBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241610"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-29"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Cardano.Block.html#CardanoBlock"><span class="hs-identifier hs-type">CardanoBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241610"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-30"></span><span id="overShelleyBasedLedgerState"><span class="annot"><span class="annottext">overShelleyBasedLedgerState :: (forall era.
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Hashes</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">EraIndependentTxBody</span></span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Keys</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">DSignable</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Hash</span></span><span class="hs-special">)</span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Cardano.Block.html"><span class="hs-identifier">Ouroboros.Consensus.Cardano.Block</span></a></span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-protocol-0.1.0.0/noopt/doc/html/ouroboros-consensus-protocol/src"><span class="hs-identifier">Ouroboros.Consensus.Protocol.TPraos</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">PraosCrypto</span></span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier">Ouroboros.Consensus.Shelley.Ledger</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier">ShelleyBlock</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier">Ouroboros.Consensus.Shelley.ShelleyBased</span></a></span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span class="hs-comment">-- | When the given ledger state corresponds to a Shelley-based era, apply the</span><span>
+</span><span id="line-23"></span><span class="hs-comment">-- given function to it.</span><span>
+</span><span id="line-24"></span><span class="annot"><a href="Ouroboros.Consensus.Cardano.ShelleyBased.html#overShelleyBasedLedgerState"><span class="hs-identifier hs-type">overShelleyBasedLedgerState</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-25"></span><span>     </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679327906"><span class="annot"><a href="#local-6989586621679327906"><span class="hs-identifier hs-type">c</span></a></span></span><span class="hs-operator">.</span><span>
+</span><span id="line-26"></span><span>     </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">PraosCrypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679327906"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">DSignable</span></span><span> </span><span class="annot"><a href="#local-6989586621679327906"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Hash</span></span><span> </span><span class="annot"><a href="#local-6989586621679327906"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">EraIndependentTxBody</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span>   </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679327993"><span class="annot"><a href="#local-6989586621679327993"><span class="hs-identifier hs-type">era</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">EraCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679327993"><span class="hs-identifier hs-type">era</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">~</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679327906"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679327993"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span>      </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679327993"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679327993"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span>     </span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Cardano.Block.html#CardanoBlock"><span class="hs-identifier hs-type">CardanoBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679327906"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Cardano.Block.html#CardanoBlock"><span class="hs-identifier hs-type">CardanoBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679327906"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-33"></span><span id="overShelleyBasedLedgerState"><span class="annot"><span class="annottext">overShelleyBasedLedgerState :: (forall era.
  (EraCrypto era ~ c, ShelleyBasedEra era) =&gt;
  LedgerState (ShelleyBlock era) -&gt; LedgerState (ShelleyBlock era))
 -&gt; LedgerState (CardanoBlock c) -&gt; LedgerState (CardanoBlock c)
-</span><a href="Ouroboros.Consensus.Cardano.ShelleyBased.html#overShelleyBasedLedgerState"><span class="hs-identifier hs-var hs-var">overShelleyBasedLedgerState</span></a></span></span><span> </span><span id="local-6989586621679241609"><span class="annot"><span class="annottext">forall era.
+</span><a href="Ouroboros.Consensus.Cardano.ShelleyBased.html#overShelleyBasedLedgerState"><span class="hs-identifier hs-var hs-var">overShelleyBasedLedgerState</span></a></span></span><span> </span><span id="local-6989586621679327905"><span class="annot"><span class="annottext">forall era.
 (EraCrypto era ~ c, ShelleyBasedEra era) =&gt;
 LedgerState (ShelleyBlock era) -&gt; LedgerState (ShelleyBlock era)
-</span><a href="#local-6989586621679241609"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">HardForkLedgerState</span></a></span><span> </span><span id="local-6989586621679241607"><span class="annot"><a href="#local-6989586621679241607"><span class="hs-identifier hs-var">st</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-31"></span><span>    </span><span class="annot"><span class="annottext">HardForkState LedgerState (CardanoEras c)
+</span><a href="#local-6989586621679327905"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">HardForkLedgerState</span></a></span><span> </span><span id="local-6989586621679327903"><span class="annot"><a href="#local-6989586621679327903"><span class="hs-identifier hs-var">st</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-34"></span><span>    </span><span class="annot"><span class="annottext">HardForkState LedgerState (CardanoEras c)
 -&gt; LedgerState (CardanoBlock c)
 forall (xs :: [*]).
 HardForkState LedgerState xs -&gt; LedgerState (HardForkBlock xs)
@@ -44,7 +47,7 @@ HardForkState LedgerState xs -&gt; LedgerState (HardForkBlock xs)
 -&gt; HardForkState LedgerState (CardanoEras c)
 -&gt; LedgerState (CardanoBlock c)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Prod HardForkState (LedgerState -.-&gt; LedgerState) (CardanoEras c)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Prod HardForkState (LedgerState -.-&gt; LedgerState) (CardanoEras c)
 -&gt; HardForkState LedgerState (CardanoEras c)
 -&gt; HardForkState LedgerState (CardanoEras c)
 forall k l (h :: (k -&gt; *) -&gt; l -&gt; *) (f :: k -&gt; *) (g :: k -&gt; *)
@@ -53,24 +56,24 @@ HAp h =&gt;
 Prod h (f -.-&gt; g) xs -&gt; h f xs -&gt; h g xs
 </span><span class="hs-identifier hs-var">hap</span></span><span> </span><span class="annot"><span class="annottext">NP (LedgerState -.-&gt; LedgerState) (CardanoEras c)
 Prod HardForkState (LedgerState -.-&gt; LedgerState) (CardanoEras c)
-</span><a href="#local-6989586621679241605"><span class="hs-identifier hs-var">fs</span></a></span><span> </span><span class="annot"><span class="annottext">HardForkState LedgerState (CardanoEras c)
-</span><a href="#local-6989586621679241607"><span class="hs-identifier hs-var">st</span></a></span><span>
-</span><span id="line-32"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-33"></span><span>    </span><span class="annot"><a href="#local-6989586621679241605"><span class="hs-identifier hs-type">fs</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">NP</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><span class="hs-operator hs-type">-.-&gt;</span></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-34"></span><span>             </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Cardano.Block.html#CardanoEras"><span class="hs-identifier hs-type">CardanoEras</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241610"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-35"></span><span>    </span><span id="local-6989586621679241605"><span class="annot"><span class="annottext">fs :: NP (LedgerState -.-&gt; LedgerState) (CardanoEras c)
-</span><a href="#local-6989586621679241605"><span class="hs-identifier hs-var hs-var">fs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(LedgerState ByronBlock -&gt; LedgerState ByronBlock)
+</span><a href="#local-6989586621679327901"><span class="hs-identifier hs-var">fs</span></a></span><span> </span><span class="annot"><span class="annottext">HardForkState LedgerState (CardanoEras c)
+</span><a href="#local-6989586621679327903"><span class="hs-identifier hs-var">st</span></a></span><span>
+</span><span id="line-35"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-36"></span><span>    </span><span class="annot"><a href="#local-6989586621679327901"><span class="hs-identifier hs-type">fs</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">NP</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><span class="hs-operator hs-type">-.-&gt;</span></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span>             </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Cardano.Block.html#CardanoEras"><span class="hs-identifier hs-type">CardanoEras</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679327906"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span>    </span><span id="local-6989586621679327901"><span class="annot"><span class="annottext">fs :: NP (LedgerState -.-&gt; LedgerState) (CardanoEras c)
+</span><a href="#local-6989586621679327901"><span class="hs-identifier hs-var hs-var">fs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(LedgerState ByronBlock -&gt; LedgerState ByronBlock)
 -&gt; (-.-&gt;) LedgerState LedgerState ByronBlock
 forall k (f :: k -&gt; *) (a :: k) (f' :: k -&gt; *).
 (f a -&gt; f' a) -&gt; (-.-&gt;) f f' a
 </span><span class="hs-identifier hs-var">fn</span></span><span> </span><span class="annot"><span class="annottext">LedgerState ByronBlock -&gt; LedgerState ByronBlock
 forall a. a -&gt; a
-</span><span class="hs-identifier hs-var">id</span></span><span>
-</span><span id="line-36"></span><span>        </span><span class="annot"><span class="annottext">(-.-&gt;) LedgerState LedgerState ByronBlock
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">id</span></a></span><span>
+</span><span id="line-39"></span><span>        </span><span class="annot"><span class="annottext">(-.-&gt;) LedgerState LedgerState ByronBlock
 -&gt; NP
      (LedgerState -.-&gt; LedgerState)
      '[ShelleyBlock (ShelleyEra c), ShelleyBlock (AllegraEra c),
-       ShelleyBlock (MaryEra c)]
+       ShelleyBlock (MaryEra c), ShelleyBlock (AlonzoEra c)]
 -&gt; NP (LedgerState -.-&gt; LedgerState) (CardanoEras c)
 forall k (a :: k -&gt; *) (x :: k) (xs :: [k]).
 a x -&gt; NP a xs -&gt; NP a (x : xs)
@@ -84,11 +87,11 @@ a x -&gt; NP a xs -&gt; NP a (x : xs)
 -&gt; NP
      ((LedgerState :.: ShelleyBlock)
       -.-&gt; (LedgerState :.: ShelleyBlock))
-     '[ShelleyEra c, AllegraEra c, MaryEra c]
+     '[ShelleyEra c, AllegraEra c, MaryEra c, AlonzoEra c]
 -&gt; NP
      (LedgerState -.-&gt; LedgerState)
      '[ShelleyBlock (ShelleyEra c), ShelleyBlock (AllegraEra c),
-       ShelleyBlock (MaryEra c)]
+       ShelleyBlock (MaryEra c), ShelleyBlock (AlonzoEra c)]
 forall (shelleyEras :: [*]) (consensusModeEras :: [*])
        (f :: * -&gt; *) (g :: * -&gt; *).
 AllZip InjectShelley shelleyEras consensusModeEras =&gt;
@@ -97,7 +100,7 @@ AllZip InjectShelley shelleyEras consensusModeEras =&gt;
  f shelleyEra -&gt; g consensusModeEra)
 -&gt; NP f shelleyEras -&gt; NP g consensusModeEras
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-var">injectShelleyNP</span></a></span><span>
-</span><span id="line-37"></span><span>             </span><span class="annot"><span class="annottext">forall shelleyEra.
+</span><span id="line-40"></span><span>             </span><span class="annot"><span class="annottext">forall shelleyEra.
 (-.-&gt;)
   (LedgerState :.: ShelleyBlock)
   (LedgerState :.: ShelleyBlock)
@@ -110,8 +113,8 @@ InjectShelley shelleyEra consensusModeEra =&gt;
   (LedgerState :.: ShelleyBlock)
   shelleyEra
 -&gt; (-.-&gt;) LedgerState LedgerState consensusModeEra
-</span><a href="#local-6989586621679241600"><span class="hs-identifier hs-var">reassoc</span></a></span><span>
-</span><span id="line-38"></span><span>             </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Proxy (And (HasCrypto c) ShelleyBasedEra)
+</span><a href="#local-6989586621679327896"><span class="hs-identifier hs-var">reassoc</span></a></span><span>
+</span><span id="line-41"></span><span>             </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Proxy (And (HasCrypto c) ShelleyBasedEra)
 -&gt; (forall a.
     And (HasCrypto c) ShelleyBasedEra a =&gt;
     (-.-&gt;)
@@ -119,16 +122,16 @@ InjectShelley shelleyEra consensusModeEra =&gt;
 -&gt; NP
      ((LedgerState :.: ShelleyBlock)
       -.-&gt; (LedgerState :.: ShelleyBlock))
-     '[ShelleyEra c, AllegraEra c, MaryEra c]
+     '[ShelleyEra c, AllegraEra c, MaryEra c, AlonzoEra c]
 forall k l (h :: (k -&gt; *) -&gt; l -&gt; *) (c :: k -&gt; Constraint)
        (xs :: l) (proxy :: (k -&gt; Constraint) -&gt; *) (f :: k -&gt; *).
 (HPure h, AllN h c xs) =&gt;
 proxy c -&gt; (forall (a :: k). c a =&gt; f a) -&gt; h f xs
 </span><span class="hs-identifier hs-var">hcpure</span></span><span>
-</span><span id="line-39"></span><span>               </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Proxy (And (HasCrypto c) ShelleyBasedEra)
+</span><span id="line-42"></span><span>               </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Proxy (And (HasCrypto c) ShelleyBasedEra)
 forall k (t :: k). Proxy t
-</span><span class="hs-identifier hs-var">Proxy</span></span><span> </span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">And</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">HasCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241610"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-40"></span><span>               </span><span class="hs-special">(</span><span class="annot"><span class="annottext">((:.:) LedgerState ShelleyBlock a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Proxy</span></a></span><span> </span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">And</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">HasCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679327906"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span>               </span><span class="hs-special">(</span><span class="annot"><span class="annottext">((:.:) LedgerState ShelleyBlock a
  -&gt; (:.:) LedgerState ShelleyBlock a)
 -&gt; (-.-&gt;)
      (LedgerState :.: ShelleyBlock) (LedgerState :.: ShelleyBlock) a
@@ -143,38 +146,38 @@ f (g p) -&gt; (:.:) f g p
 -&gt; (:.:) LedgerState ShelleyBlock a
 -&gt; (:.:) LedgerState ShelleyBlock a
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">LedgerState (ShelleyBlock a) -&gt; LedgerState (ShelleyBlock a)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerState (ShelleyBlock a) -&gt; LedgerState (ShelleyBlock a)
 forall era.
 (EraCrypto era ~ c, ShelleyBasedEra era) =&gt;
 LedgerState (ShelleyBlock era) -&gt; LedgerState (ShelleyBlock era)
-</span><a href="#local-6989586621679241609"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">(LedgerState (ShelleyBlock a) -&gt; LedgerState (ShelleyBlock a))
+</span><a href="#local-6989586621679327905"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">(LedgerState (ShelleyBlock a) -&gt; LedgerState (ShelleyBlock a))
 -&gt; ((:.:) LedgerState ShelleyBlock a
     -&gt; LedgerState (ShelleyBlock a))
 -&gt; (:.:) LedgerState ShelleyBlock a
 -&gt; LedgerState (ShelleyBlock a)
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(:.:) LedgerState ShelleyBlock a -&gt; LedgerState (ShelleyBlock a)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">(:.:) LedgerState ShelleyBlock a -&gt; LedgerState (ShelleyBlock a)
 forall l k (f :: l -&gt; *) (g :: k -&gt; l) (p :: k).
 (:.:) f g p -&gt; f (g p)
 </span><span class="hs-identifier hs-var">unComp</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-41"></span><span>
-</span><span id="line-42"></span><span>    </span><span id="local-6989586621679241647"><span class="annot"><a href="#local-6989586621679241600"><span class="hs-identifier hs-type">reassoc</span></a></span><span> </span><span class="hs-glyph">::</span><span>
-</span><span id="line-43"></span><span>         </span><span class="hs-special">(</span><span>     </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><span class="hs-operator hs-type">:.:</span></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span>
-</span><span id="line-44"></span><span>          </span><span class="annot"><span class="hs-operator hs-type">-.-&gt;</span></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><span class="hs-operator hs-type">:.:</span></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span>
-</span><span id="line-45"></span><span>         </span><span class="hs-special">)</span><span> </span><span class="annot"><a href="#local-6989586621679241647"><span class="hs-identifier hs-type">shelleyEra</span></a></span><span>
-</span><span id="line-46"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span>     </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span>
-</span><span id="line-47"></span><span>          </span><span class="annot"><span class="hs-operator hs-type">-.-&gt;</span></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span>
-</span><span id="line-48"></span><span>         </span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241647"><span class="hs-identifier hs-type">shelleyEra</span></a></span><span class="hs-special">)</span></span><span>
-</span><span id="line-49"></span><span>    </span><span id="local-6989586621679241600"><span class="annot"><span class="annottext">reassoc :: (-.-&gt;)
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span>    </span><span id="local-6989586621679327946"><span class="annot"><a href="#local-6989586621679327896"><span class="hs-identifier hs-type">reassoc</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-46"></span><span>         </span><span class="hs-special">(</span><span>     </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><span class="hs-operator hs-type">:.:</span></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span>
+</span><span id="line-47"></span><span>          </span><span class="annot"><span class="hs-operator hs-type">-.-&gt;</span></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><span class="hs-operator hs-type">:.:</span></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span>
+</span><span id="line-48"></span><span>         </span><span class="hs-special">)</span><span> </span><span class="annot"><a href="#local-6989586621679327946"><span class="hs-identifier hs-type">shelleyEra</span></a></span><span>
+</span><span id="line-49"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span>     </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span>
+</span><span id="line-50"></span><span>          </span><span class="annot"><span class="hs-operator hs-type">-.-&gt;</span></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span>
+</span><span id="line-51"></span><span>         </span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679327946"><span class="hs-identifier hs-type">shelleyEra</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-52"></span><span>    </span><span id="local-6989586621679327896"><span class="annot"><span class="annottext">reassoc :: (-.-&gt;)
   (LedgerState :.: ShelleyBlock)
   (LedgerState :.: ShelleyBlock)
   shelleyEra
 -&gt; (-.-&gt;) LedgerState LedgerState (ShelleyBlock shelleyEra)
-</span><a href="#local-6989586621679241600"><span class="hs-identifier hs-var hs-var">reassoc</span></a></span></span><span> </span><span id="local-6989586621679241594"><span class="annot"><span class="annottext">(-.-&gt;)
+</span><a href="#local-6989586621679327896"><span class="hs-identifier hs-var hs-var">reassoc</span></a></span></span><span> </span><span id="local-6989586621679327890"><span class="annot"><span class="annottext">(-.-&gt;)
   (LedgerState :.: ShelleyBlock)
   (LedgerState :.: ShelleyBlock)
   shelleyEra
-</span><a href="#local-6989586621679241594"><span class="hs-identifier hs-var">g</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(LedgerState (ShelleyBlock shelleyEra)
+</span><a href="#local-6989586621679327890"><span class="hs-identifier hs-var">g</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(LedgerState (ShelleyBlock shelleyEra)
  -&gt; LedgerState (ShelleyBlock shelleyEra))
 -&gt; (-.-&gt;) LedgerState LedgerState (ShelleyBlock shelleyEra)
 forall k (f :: k -&gt; *) (a :: k) (f' :: k -&gt; *).
@@ -186,7 +189,7 @@ forall k (f :: k -&gt; *) (a :: k) (f' :: k -&gt; *).
     -&gt; LedgerState (ShelleyBlock shelleyEra))
 -&gt; (-.-&gt;) LedgerState LedgerState (ShelleyBlock shelleyEra)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(:.:) LedgerState ShelleyBlock shelleyEra
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">(:.:) LedgerState ShelleyBlock shelleyEra
 -&gt; LedgerState (ShelleyBlock shelleyEra)
 forall l k (f :: l -&gt; *) (g :: k -&gt; l) (p :: k).
 (:.:) f g p -&gt; f (g p)
@@ -197,7 +200,7 @@ forall l k (f :: l -&gt; *) (g :: k -&gt; l) (p :: k).
 -&gt; LedgerState (ShelleyBlock shelleyEra)
 -&gt; LedgerState (ShelleyBlock shelleyEra)
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(-.-&gt;)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">(-.-&gt;)
   (LedgerState :.: ShelleyBlock)
   (LedgerState :.: ShelleyBlock)
   shelleyEra
@@ -209,16 +212,16 @@ forall k (f :: k -&gt; *) (g :: k -&gt; *) (a :: k).
   (LedgerState :.: ShelleyBlock)
   (LedgerState :.: ShelleyBlock)
   shelleyEra
-</span><a href="#local-6989586621679241594"><span class="hs-identifier hs-var">g</span></a></span><span> </span><span class="annot"><span class="annottext">((:.:) LedgerState ShelleyBlock shelleyEra
+</span><a href="#local-6989586621679327890"><span class="hs-identifier hs-var">g</span></a></span><span> </span><span class="annot"><span class="annottext">((:.:) LedgerState ShelleyBlock shelleyEra
  -&gt; (:.:) LedgerState ShelleyBlock shelleyEra)
 -&gt; (LedgerState (ShelleyBlock shelleyEra)
     -&gt; (:.:) LedgerState ShelleyBlock shelleyEra)
 -&gt; LedgerState (ShelleyBlock shelleyEra)
 -&gt; (:.:) LedgerState ShelleyBlock shelleyEra
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">LedgerState (ShelleyBlock shelleyEra)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerState (ShelleyBlock shelleyEra)
 -&gt; (:.:) LedgerState ShelleyBlock shelleyEra
 forall l k (f :: l -&gt; *) (g :: k -&gt; l) (p :: k).
 f (g p) -&gt; (:.:) f g p
 </span><span class="hs-identifier hs-var">Comp</span></span><span>
-</span><span id="line-50"></span></pre></body></html>
+</span><span id="line-53"></span></pre></body></html>

@@ -17,8 +17,8 @@
 </span><span id="line-17"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-18"></span><span>
 </span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Codec.Serialise</span></span><span>
-</span><span id="line-20"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Monad.Except</span></span><span>
-</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">GHC.Generics</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Generic</span></span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/mtl-2.2.2/src"><span class="hs-identifier">Control.Monad.Except</span></a></span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">GHC.Generics</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Generic</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-22"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">NoThunks.Class</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">AllowThunk</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">NoThunks</span></span><span class="hs-special">)</span><span>
 </span><span id="line-23"></span><span>
 </span><span id="line-24"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Byron.Spec.Chain.STS.Rule.Chain</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Spec</span></span><span>
@@ -29,30 +29,31 @@
 </span><span id="line-29"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Ledger.Abstract</span></a></span><span>
 </span><span id="line-30"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Ledger.CommonProtocolParams</span></a></span><span>
 </span><span id="line-31"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Ticked</span></a></span><span>
-</span><span id="line-32"></span><span>
-</span><span id="line-33"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Accessors.html"><span class="hs-identifier">Ouroboros.Consensus.ByronSpec.Ledger.Accessors</span></a></span><span>
-</span><span id="line-34"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html"><span class="hs-identifier">Ouroboros.Consensus.ByronSpec.Ledger.Block</span></a></span><span>
-</span><span id="line-35"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Conversions.html"><span class="hs-identifier">Ouroboros.Consensus.ByronSpec.Ledger.Conversions</span></a></span><span>
-</span><span id="line-36"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Genesis.html"><span class="hs-identifier">Ouroboros.Consensus.ByronSpec.Ledger.Genesis</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Genesis.html#ByronSpecGenesis"><span class="hs-identifier">ByronSpecGenesis</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-37"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Orphans.html"><span class="hs-identifier">Ouroboros.Consensus.ByronSpec.Ledger.Orphans</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
-</span><span id="line-38"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Rules.html"><span class="hs-identifier">Ouroboros.Consensus.ByronSpec.Ledger.Rules</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Rules</span></span><span>
-</span><span id="line-39"></span><span>
-</span><span id="line-40"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Util</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-operator">(..:)</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-33"></span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Accessors.html"><span class="hs-identifier">Ouroboros.Consensus.ByronSpec.Ledger.Accessors</span></a></span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html"><span class="hs-identifier">Ouroboros.Consensus.ByronSpec.Ledger.Block</span></a></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Conversions.html"><span class="hs-identifier">Ouroboros.Consensus.ByronSpec.Ledger.Conversions</span></a></span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Genesis.html"><span class="hs-identifier">Ouroboros.Consensus.ByronSpec.Ledger.Genesis</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Genesis.html#ByronSpecGenesis"><span class="hs-identifier">ByronSpecGenesis</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Orphans.html"><span class="hs-identifier">Ouroboros.Consensus.ByronSpec.Ledger.Orphans</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-39"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Rules.html"><span class="hs-identifier">Ouroboros.Consensus.ByronSpec.Ledger.Rules</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-8.10.4/src"><span class="hs-identifier">Rules</span></a></span><span>
+</span><span id="line-40"></span><span>
+</span><span id="line-41"></span><span class="hs-comment">{-------------------------------------------------------------------------------
   State
 -------------------------------------------------------------------------------}</span><span>
-</span><span id="line-43"></span><span>
-</span><span id="line-44"></span><span class="hs-keyword">data</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="LedgerState"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">LedgerState</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ByronSpecLedgerState"><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#ByronSpecLedgerState"><span class="hs-identifier hs-var">ByronSpecLedgerState</span></a></span></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-45"></span><span>      </span><span class="hs-comment">-- | Tip of the ledger (most recently applied block, if any)</span><span>
-</span><span id="line-46"></span><span>      </span><span class="hs-comment">--</span><span>
-</span><span id="line-47"></span><span>      </span><span class="hs-comment">-- The spec state stores the last applied /hash/, but not the /slot/.</span><span>
-</span><span id="line-48"></span><span>      </span><span id="byronSpecLedgerTip"><span class="annot"><span class="annottext">LedgerState ByronSpecBlock -&gt; Maybe SlotNo
-</span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#byronSpecLedgerTip"><span class="hs-identifier hs-var hs-var">byronSpecLedgerTip</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span>
-</span><span id="line-49"></span><span>
-</span><span id="line-50"></span><span>      </span><span class="hs-comment">-- | The spec state proper</span><span>
-</span><span id="line-51"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="byronSpecLedgerState"><span class="annot"><span class="annottext">LedgerState ByronSpecBlock -&gt; State CHAIN
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span class="hs-keyword">data</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="LedgerState"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">LedgerState</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ByronSpecLedgerState"><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#ByronSpecLedgerState"><span class="hs-identifier hs-var">ByronSpecLedgerState</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-46"></span><span>      </span><span class="hs-comment">-- | Tip of the ledger (most recently applied block, if any)</span><span>
+</span><span id="line-47"></span><span>      </span><span class="hs-comment">--</span><span>
+</span><span id="line-48"></span><span>      </span><span class="hs-comment">-- The spec state stores the last applied /hash/, but not the /slot/.</span><span>
+</span><span id="line-49"></span><span>      </span><span id="byronSpecLedgerTip"><span class="annot"><span class="annottext">LedgerState ByronSpecBlock -&gt; Maybe SlotNo
+</span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#byronSpecLedgerTip"><span class="hs-identifier hs-var hs-var">byronSpecLedgerTip</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span>
+</span><span id="line-50"></span><span>
+</span><span id="line-51"></span><span>      </span><span class="hs-comment">-- | The spec state proper</span><span>
+</span><span id="line-52"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="byronSpecLedgerState"><span class="annot"><span class="annottext">LedgerState ByronSpecBlock -&gt; State CHAIN
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#byronSpecLedgerState"><span class="hs-identifier hs-var hs-var">byronSpecLedgerState</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Spec.State</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Spec.CHAIN</span></span><span>
-</span><span id="line-52"></span><span>    </span><span class="hs-special">}</span><span>
-</span><span id="line-53"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679165450"><span id="local-6989586621679165452"><span id="local-6989586621679165454"><span class="annot"><span class="annottext">Int -&gt; LedgerState ByronSpecBlock -&gt; ShowS
+</span><span id="line-53"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-54"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679216222"><span id="local-6989586621679216224"><span id="local-6989586621679216226"><span class="annot"><span class="annottext">Int -&gt; LedgerState ByronSpecBlock -&gt; ShowS
 [LedgerState ByronSpecBlock] -&gt; ShowS
 LedgerState ByronSpecBlock -&gt; String
 (Int -&gt; LedgerState ByronSpecBlock -&gt; ShowS)
@@ -67,7 +68,7 @@ show :: LedgerState ByronSpecBlock -&gt; String
 $cshow :: LedgerState ByronSpecBlock -&gt; String
 showsPrec :: Int -&gt; LedgerState ByronSpecBlock -&gt; ShowS
 $cshowsPrec :: Int -&gt; LedgerState ByronSpecBlock -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679165445"><span id="local-6989586621679165447"><span class="annot"><span class="annottext">LedgerState ByronSpecBlock -&gt; LedgerState ByronSpecBlock -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679216217"><span id="local-6989586621679216219"><span class="annot"><span class="annottext">LedgerState ByronSpecBlock -&gt; LedgerState ByronSpecBlock -&gt; Bool
 (LedgerState ByronSpecBlock -&gt; LedgerState ByronSpecBlock -&gt; Bool)
 -&gt; (LedgerState ByronSpecBlock
     -&gt; LedgerState ByronSpecBlock -&gt; Bool)
@@ -77,7 +78,7 @@ forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 $c/= :: LedgerState ByronSpecBlock -&gt; LedgerState ByronSpecBlock -&gt; Bool
 == :: LedgerState ByronSpecBlock -&gt; LedgerState ByronSpecBlock -&gt; Bool
 $c== :: LedgerState ByronSpecBlock -&gt; LedgerState ByronSpecBlock -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x.
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x.
  LedgerState ByronSpecBlock -&gt; Rep (LedgerState ByronSpecBlock) x)
 -&gt; (forall x.
     Rep (LedgerState ByronSpecBlock) x -&gt; LedgerState ByronSpecBlock)
@@ -92,8 +93,8 @@ $cto :: forall x.
 Rep (LedgerState ByronSpecBlock) x -&gt; LedgerState ByronSpecBlock
 $cfrom :: forall x.
 LedgerState ByronSpecBlock -&gt; Rep (LedgerState ByronSpecBlock) x
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></span><span class="hs-special">)</span><span>
-</span><span id="line-54"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">anyclass</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679165433"><span id="local-6989586621679165435"><span id="local-6989586621679165437"><span id="local-6989586621679165439"><span class="annot"><span class="annottext">[LedgerState ByronSpecBlock] -&gt; Encoding
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">anyclass</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679216205"><span id="local-6989586621679216207"><span id="local-6989586621679216209"><span id="local-6989586621679216211"><span class="annot"><span class="annottext">[LedgerState ByronSpecBlock] -&gt; Encoding
 LedgerState ByronSpecBlock -&gt; Encoding
 (LedgerState ByronSpecBlock -&gt; Encoding)
 -&gt; (forall s. Decoder s (LedgerState ByronSpecBlock))
@@ -117,7 +118,7 @@ $cdecode :: forall s. Decoder s (LedgerState ByronSpecBlock)
 encode :: LedgerState ByronSpecBlock -&gt; Encoding
 $cencode :: LedgerState ByronSpecBlock -&gt; Encoding
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Serialise</span></span></span></span></span></span><span class="hs-special">)</span><span>
-</span><span id="line-55"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679165426"><span id="local-6989586621679165428"><span id="local-6989586621679165430"><span class="annot"><span class="annottext">Context -&gt; LedgerState ByronSpecBlock -&gt; IO (Maybe ThunkInfo)
+</span><span id="line-56"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679216198"><span id="local-6989586621679216200"><span id="local-6989586621679216202"><span class="annot"><span class="annottext">Context -&gt; LedgerState ByronSpecBlock -&gt; IO (Maybe ThunkInfo)
 Proxy (LedgerState ByronSpecBlock) -&gt; String
 (Context -&gt; LedgerState ByronSpecBlock -&gt; IO (Maybe ThunkInfo))
 -&gt; (Context -&gt; LedgerState ByronSpecBlock -&gt; IO (Maybe ThunkInfo))
@@ -135,12 +136,12 @@ $cwNoThunks :: Context -&gt; LedgerState ByronSpecBlock -&gt; IO (Maybe ThunkInf
 noThunks :: Context -&gt; LedgerState ByronSpecBlock -&gt; IO (Maybe ThunkInfo)
 $cnoThunks :: Context -&gt; LedgerState ByronSpecBlock -&gt; IO (Maybe ThunkInfo)
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">NoThunks</span></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AllowThunk</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-56"></span><span>
-</span><span id="line-57"></span><span class="hs-keyword">newtype</span><span> </span><span id="ByronSpecLedgerError"><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#ByronSpecLedgerError"><span class="hs-identifier hs-var">ByronSpecLedgerError</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ByronSpecLedgerError"><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#ByronSpecLedgerError"><span class="hs-identifier hs-var">ByronSpecLedgerError</span></a></span></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-58"></span><span>      </span><span id="unByronSpecLedgerError"><span class="annot"><span class="annottext">ByronSpecLedgerError -&gt; [[PredicateFailure CHAIN]]
-</span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#unByronSpecLedgerError"><span class="hs-identifier hs-var hs-var">unByronSpecLedgerError</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Spec.PredicateFailure</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Spec.CHAIN</span></span><span class="hs-special">]</span><span class="hs-special">]</span><span>
-</span><span id="line-59"></span><span>    </span><span class="hs-special">}</span><span>
-</span><span id="line-60"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679165417"><span id="local-6989586621679165419"><span id="local-6989586621679165421"><span class="annot"><span class="annottext">Int -&gt; ByronSpecLedgerError -&gt; ShowS
+</span><span id="line-57"></span><span>
+</span><span id="line-58"></span><span class="hs-keyword">newtype</span><span> </span><span id="ByronSpecLedgerError"><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#ByronSpecLedgerError"><span class="hs-identifier hs-var">ByronSpecLedgerError</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ByronSpecLedgerError"><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#ByronSpecLedgerError"><span class="hs-identifier hs-var">ByronSpecLedgerError</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-59"></span><span>      </span><span id="unByronSpecLedgerError"><span class="annot"><span class="annottext">ByronSpecLedgerError -&gt; [PredicateFailure CHAIN]
+</span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#unByronSpecLedgerError"><span class="hs-identifier hs-var hs-var">unByronSpecLedgerError</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Spec.PredicateFailure</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Spec.CHAIN</span></span><span class="hs-special">]</span><span>
+</span><span id="line-60"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-61"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679216189"><span id="local-6989586621679216191"><span id="local-6989586621679216193"><span class="annot"><span class="annottext">Int -&gt; ByronSpecLedgerError -&gt; ShowS
 [ByronSpecLedgerError] -&gt; ShowS
 ByronSpecLedgerError -&gt; String
 (Int -&gt; ByronSpecLedgerError -&gt; ShowS)
@@ -155,7 +156,7 @@ show :: ByronSpecLedgerError -&gt; String
 $cshow :: ByronSpecLedgerError -&gt; String
 showsPrec :: Int -&gt; ByronSpecLedgerError -&gt; ShowS
 $cshowsPrec :: Int -&gt; ByronSpecLedgerError -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679165413"><span id="local-6989586621679165415"><span class="annot"><span class="annottext">ByronSpecLedgerError -&gt; ByronSpecLedgerError -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679216185"><span id="local-6989586621679216187"><span class="annot"><span class="annottext">ByronSpecLedgerError -&gt; ByronSpecLedgerError -&gt; Bool
 (ByronSpecLedgerError -&gt; ByronSpecLedgerError -&gt; Bool)
 -&gt; (ByronSpecLedgerError -&gt; ByronSpecLedgerError -&gt; Bool)
 -&gt; Eq ByronSpecLedgerError
@@ -164,8 +165,8 @@ forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 $c/= :: ByronSpecLedgerError -&gt; ByronSpecLedgerError -&gt; Bool
 == :: ByronSpecLedgerError -&gt; ByronSpecLedgerError -&gt; Bool
 $c== :: ByronSpecLedgerError -&gt; ByronSpecLedgerError -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">)</span><span>
-</span><span id="line-61"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679165407"><span id="local-6989586621679165409"><span id="local-6989586621679165411"><span class="annot"><span class="annottext">Context -&gt; ByronSpecLedgerError -&gt; IO (Maybe ThunkInfo)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-62"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679216179"><span id="local-6989586621679216181"><span id="local-6989586621679216183"><span class="annot"><span class="annottext">Context -&gt; ByronSpecLedgerError -&gt; IO (Maybe ThunkInfo)
 Proxy ByronSpecLedgerError -&gt; String
 (Context -&gt; ByronSpecLedgerError -&gt; IO (Maybe ThunkInfo))
 -&gt; (Context -&gt; ByronSpecLedgerError -&gt; IO (Maybe ThunkInfo))
@@ -182,50 +183,50 @@ wNoThunks :: Context -&gt; ByronSpecLedgerError -&gt; IO (Maybe ThunkInfo)
 $cwNoThunks :: Context -&gt; ByronSpecLedgerError -&gt; IO (Maybe ThunkInfo)
 noThunks :: Context -&gt; ByronSpecLedgerError -&gt; IO (Maybe ThunkInfo)
 $cnoThunks :: Context -&gt; ByronSpecLedgerError -&gt; IO (Maybe ThunkInfo)
-</span><a href="#local-6989586621679165407"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">NoThunks</span></a></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AllowThunk</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#ByronSpecLedgerError"><span class="hs-identifier hs-type">ByronSpecLedgerError</span></a></span><span>
-</span><span id="line-62"></span><span>
-</span><span id="line-63"></span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="LedgerCfg"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">LedgerCfg</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Genesis.html#ByronSpecGenesis"><span class="hs-identifier hs-type">ByronSpecGenesis</span></a></span><span>
-</span><span id="line-64"></span><span>
-</span><span id="line-65"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">UpdateLedger</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span>
-</span><span id="line-66"></span><span>
-</span><span id="line-67"></span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#initByronSpecLedgerState"><span class="hs-identifier hs-type">initByronSpecLedgerState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Genesis.html#ByronSpecGenesis"><span class="hs-identifier hs-type">ByronSpecGenesis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span>
-</span><span id="line-68"></span><span id="initByronSpecLedgerState"><span class="annot"><span class="annottext">initByronSpecLedgerState :: ByronSpecGenesis -&gt; LedgerState ByronSpecBlock
-</span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#initByronSpecLedgerState"><span class="hs-identifier hs-var hs-var">initByronSpecLedgerState</span></a></span></span><span> </span><span id="local-6989586621679165404"><span class="annot"><span class="annottext">ByronSpecGenesis
-</span><a href="#local-6989586621679165404"><span class="hs-identifier hs-var">cfg</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByronSpecLedgerState :: Maybe SlotNo -&gt; State CHAIN -&gt; LedgerState ByronSpecBlock
+</span><a href="#local-6989586621679216179"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">NoThunks</span></a></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AllowThunk</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#ByronSpecLedgerError"><span class="hs-identifier hs-type">ByronSpecLedgerError</span></a></span><span>
+</span><span id="line-63"></span><span>
+</span><span id="line-64"></span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="LedgerCfg"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">LedgerCfg</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Genesis.html#ByronSpecGenesis"><span class="hs-identifier hs-type">ByronSpecGenesis</span></a></span><span>
+</span><span id="line-65"></span><span>
+</span><span id="line-66"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">UpdateLedger</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span>
+</span><span id="line-67"></span><span>
+</span><span id="line-68"></span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#initByronSpecLedgerState"><span class="hs-identifier hs-type">initByronSpecLedgerState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Genesis.html#ByronSpecGenesis"><span class="hs-identifier hs-type">ByronSpecGenesis</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span>
+</span><span id="line-69"></span><span id="initByronSpecLedgerState"><span class="annot"><span class="annottext">initByronSpecLedgerState :: ByronSpecGenesis -&gt; LedgerState ByronSpecBlock
+</span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#initByronSpecLedgerState"><span class="hs-identifier hs-var hs-var">initByronSpecLedgerState</span></a></span></span><span> </span><span id="local-6989586621679216176"><span class="annot"><span class="annottext">ByronSpecGenesis
+</span><a href="#local-6989586621679216176"><span class="hs-identifier hs-var">cfg</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByronSpecLedgerState :: Maybe SlotNo -&gt; State CHAIN -&gt; LedgerState ByronSpecBlock
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#ByronSpecLedgerState"><span class="hs-identifier hs-type">ByronSpecLedgerState</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-69"></span><span>      </span><span class="annot"><span class="annottext">byronSpecLedgerTip :: Maybe SlotNo
+</span><span id="line-70"></span><span>      </span><span class="annot"><span class="annottext">byronSpecLedgerTip :: Maybe SlotNo
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#byronSpecLedgerTip"><span class="hs-identifier hs-var">byronSpecLedgerTip</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe SlotNo
 forall a. Maybe a
-</span><span class="hs-identifier hs-var">Nothing</span></span><span>
-</span><span id="line-70"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">byronSpecLedgerState :: State CHAIN
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span>
+</span><span id="line-71"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">byronSpecLedgerState :: State CHAIN
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#byronSpecLedgerState"><span class="hs-identifier hs-var">byronSpecLedgerState</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByronSpecGenesis -&gt; State CHAIN
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Rules.html#initStateCHAIN"><span class="hs-identifier hs-var">Rules.initStateCHAIN</span></a></span><span> </span><span class="annot"><span class="annottext">ByronSpecGenesis
-</span><a href="#local-6989586621679165404"><span class="hs-identifier hs-var">cfg</span></a></span><span>
-</span><span id="line-71"></span><span>    </span><span class="hs-special">}</span><span>
-</span><span id="line-72"></span><span>
-</span><span id="line-73"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+</span><a href="#local-6989586621679216176"><span class="hs-identifier hs-var">cfg</span></a></span><span>
+</span><span id="line-72"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-73"></span><span>
+</span><span id="line-74"></span><span class="hs-comment">{-------------------------------------------------------------------------------
   GetTip
 -------------------------------------------------------------------------------}</span><span>
-</span><span id="line-76"></span><span>
-</span><span id="line-77"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">GetTip</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-78"></span><span>  </span><span id="local-6989586621679165400"><span class="annot"><span class="annottext">getTip :: LedgerState ByronSpecBlock -&gt; Point (LedgerState ByronSpecBlock)
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">getTip</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#ByronSpecLedgerState"><span class="hs-identifier hs-type">ByronSpecLedgerState</span></a></span><span> </span><span id="local-6989586621679165398"><span class="annot"><a href="#local-6989586621679165398"><span class="hs-identifier hs-var">tip</span></a></span></span><span> </span><span id="local-6989586621679165397"><span class="annot"><a href="#local-6989586621679165397"><span class="hs-identifier hs-var">state</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Point ByronSpecBlock -&gt; Point (LedgerState ByronSpecBlock)
+</span><span id="line-77"></span><span>
+</span><span id="line-78"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">GetTip</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-79"></span><span>  </span><span id="local-6989586621679216172"><span class="annot"><span class="annottext">getTip :: LedgerState ByronSpecBlock -&gt; Point (LedgerState ByronSpecBlock)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">getTip</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#ByronSpecLedgerState"><span class="hs-identifier hs-type">ByronSpecLedgerState</span></a></span><span> </span><span id="local-6989586621679216170"><span class="annot"><a href="#local-6989586621679216170"><span class="hs-identifier hs-var">tip</span></a></span></span><span> </span><span id="local-6989586621679216169"><span class="annot"><a href="#local-6989586621679216169"><span class="hs-identifier hs-var">state</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Point ByronSpecBlock -&gt; Point (LedgerState ByronSpecBlock)
 forall b b'.
 Coercible (HeaderHash b) (HeaderHash b') =&gt;
 Point b -&gt; Point b'
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">castPoint</span></a></span><span> </span><span class="annot"><span class="annottext">(Point ByronSpecBlock -&gt; Point (LedgerState ByronSpecBlock))
 -&gt; Point ByronSpecBlock -&gt; Point (LedgerState ByronSpecBlock)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span>
-</span><span id="line-79"></span><span>      </span><span class="annot"><span class="annottext">Maybe SlotNo -&gt; State CHAIN -&gt; Point ByronSpecBlock
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-80"></span><span>      </span><span class="annot"><span class="annottext">Maybe SlotNo -&gt; State CHAIN -&gt; Point ByronSpecBlock
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#getByronSpecTip"><span class="hs-identifier hs-var">getByronSpecTip</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe SlotNo
-</span><a href="#local-6989586621679165398"><span class="hs-identifier hs-var">tip</span></a></span><span> </span><span class="annot"><span class="annottext">State CHAIN
-</span><a href="#local-6989586621679165397"><span class="hs-identifier hs-var">state</span></a></span><span>
-</span><span id="line-80"></span><span>
-</span><span id="line-81"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">GetTip</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Ticked</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-82"></span><span>  </span><span id="local-6989586621679165393"><span class="annot"><span class="annottext">getTip :: Ticked (LedgerState ByronSpecBlock)
+</span><a href="#local-6989586621679216170"><span class="hs-identifier hs-var">tip</span></a></span><span> </span><span class="annot"><span class="annottext">State CHAIN
+</span><a href="#local-6989586621679216169"><span class="hs-identifier hs-var">state</span></a></span><span>
+</span><span id="line-81"></span><span>
+</span><span id="line-82"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">GetTip</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Ticked</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-83"></span><span>  </span><span id="local-6989586621679216165"><span class="annot"><span class="annottext">getTip :: Ticked (LedgerState ByronSpecBlock)
 -&gt; Point (Ticked (LedgerState ByronSpecBlock))
-</span><a href="#local-6989586621679165393"><span class="hs-identifier hs-var hs-var hs-var hs-var">getTip</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#TickedByronSpecLedgerState"><span class="hs-identifier hs-type">TickedByronSpecLedgerState</span></a></span><span> </span><span id="local-6989586621679165391"><span class="annot"><a href="#local-6989586621679165391"><span class="hs-identifier hs-var">tip</span></a></span></span><span> </span><span id="local-6989586621679165390"><span class="annot"><a href="#local-6989586621679165390"><span class="hs-identifier hs-var">state</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Point ByronSpecBlock -&gt; Point (Ticked (LedgerState ByronSpecBlock))
+</span><a href="#local-6989586621679216165"><span class="hs-identifier hs-var hs-var hs-var hs-var">getTip</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#TickedByronSpecLedgerState"><span class="hs-identifier hs-type">TickedByronSpecLedgerState</span></a></span><span> </span><span id="local-6989586621679216163"><span class="annot"><a href="#local-6989586621679216163"><span class="hs-identifier hs-var">tip</span></a></span></span><span> </span><span id="local-6989586621679216162"><span class="annot"><a href="#local-6989586621679216162"><span class="hs-identifier hs-var">state</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Point ByronSpecBlock -&gt; Point (Ticked (LedgerState ByronSpecBlock))
 forall b b'.
 Coercible (HeaderHash b) (HeaderHash b') =&gt;
 Point b -&gt; Point b'
@@ -234,41 +235,41 @@ Point b -&gt; Point b'
 -&gt; Point ByronSpecBlock
 -&gt; Point (Ticked (LedgerState ByronSpecBlock))
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span>
-</span><span id="line-83"></span><span>      </span><span class="annot"><span class="annottext">Maybe SlotNo -&gt; State CHAIN -&gt; Point ByronSpecBlock
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-84"></span><span>      </span><span class="annot"><span class="annottext">Maybe SlotNo -&gt; State CHAIN -&gt; Point ByronSpecBlock
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#getByronSpecTip"><span class="hs-identifier hs-var">getByronSpecTip</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe SlotNo
-</span><a href="#local-6989586621679165391"><span class="hs-identifier hs-var">tip</span></a></span><span> </span><span class="annot"><span class="annottext">State CHAIN
-</span><a href="#local-6989586621679165390"><span class="hs-identifier hs-var">state</span></a></span><span>
-</span><span id="line-84"></span><span>
-</span><span id="line-85"></span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#getByronSpecTip"><span class="hs-identifier hs-type">getByronSpecTip</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Spec.State</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Spec.CHAIN</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span>
-</span><span id="line-86"></span><span id="getByronSpecTip"><span class="annot"><span class="annottext">getByronSpecTip :: Maybe SlotNo -&gt; State CHAIN -&gt; Point ByronSpecBlock
+</span><a href="#local-6989586621679216163"><span class="hs-identifier hs-var">tip</span></a></span><span> </span><span class="annot"><span class="annottext">State CHAIN
+</span><a href="#local-6989586621679216162"><span class="hs-identifier hs-var">state</span></a></span><span>
+</span><span id="line-85"></span><span>
+</span><span id="line-86"></span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#getByronSpecTip"><span class="hs-identifier hs-type">getByronSpecTip</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Spec.State</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Spec.CHAIN</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span>
+</span><span id="line-87"></span><span id="getByronSpecTip"><span class="annot"><span class="annottext">getByronSpecTip :: Maybe SlotNo -&gt; State CHAIN -&gt; Point ByronSpecBlock
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#getByronSpecTip"><span class="hs-identifier hs-var hs-var">getByronSpecTip</span></a></span></span><span> </span><span class="annot"><span class="annottext">Maybe SlotNo
-</span><span class="hs-identifier hs-var">Nothing</span></span><span>     </span><span class="annot"><span class="annottext">State CHAIN
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span>     </span><span class="annot"><span class="annottext">State CHAIN
 </span><span class="hs-identifier">_</span></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Point ByronSpecBlock
 forall block. Point block
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">GenesisPoint</span></a></span><span>
-</span><span id="line-87"></span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#getByronSpecTip"><span class="hs-identifier hs-var">getByronSpecTip</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679165388"><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679165388"><span class="hs-identifier hs-var">slot</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679165387"><span class="annot"><span class="annottext">State CHAIN
-</span><a href="#local-6989586621679165387"><span class="hs-identifier hs-var">state</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; HeaderHash ByronSpecBlock -&gt; Point ByronSpecBlock
+</span><span id="line-88"></span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#getByronSpecTip"><span class="hs-identifier hs-var">getByronSpecTip</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Just</span></a></span><span> </span><span id="local-6989586621679216160"><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679216160"><span class="hs-identifier hs-var">slot</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679216159"><span class="annot"><span class="annottext">State CHAIN
+</span><a href="#local-6989586621679216159"><span class="hs-identifier hs-var">state</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; HeaderHash ByronSpecBlock -&gt; Point ByronSpecBlock
 forall block. SlotNo -&gt; HeaderHash block -&gt; Point block
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">BlockPoint</span></a></span><span>
-</span><span id="line-88"></span><span>                                      </span><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679165388"><span class="hs-identifier hs-var">slot</span></a></span><span>
-</span><span id="line-89"></span><span>                                      </span><span class="hs-special">(</span><span class="annot"><span class="annottext">GetChainState Hash
+</span><span id="line-89"></span><span>                                      </span><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679216160"><span class="hs-identifier hs-var">slot</span></a></span><span>
+</span><span id="line-90"></span><span>                                      </span><span class="hs-special">(</span><span class="annot"><span class="annottext">GetChainState Hash
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Accessors.html#getChainStateHash"><span class="hs-identifier hs-var">getChainStateHash</span></a></span><span> </span><span class="annot"><span class="annottext">State CHAIN
-</span><a href="#local-6989586621679165387"><span class="hs-identifier hs-var">state</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-90"></span><span>
-</span><span id="line-91"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+</span><a href="#local-6989586621679216159"><span class="hs-identifier hs-var">state</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-91"></span><span>
+</span><span id="line-92"></span><span class="hs-comment">{-------------------------------------------------------------------------------
   Ticking
 -------------------------------------------------------------------------------}</span><span>
-</span><span id="line-94"></span><span>
-</span><span id="line-95"></span><span class="hs-keyword">data</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="Ticked"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">Ticked</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span id="TickedByronSpecLedgerState"><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#TickedByronSpecLedgerState"><span class="hs-identifier hs-var">TickedByronSpecLedgerState</span></a></span></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-96"></span><span>      </span><span id="untickedByronSpecLedgerTip"><span class="annot"><span class="annottext">Ticked (LedgerState ByronSpecBlock) -&gt; Maybe SlotNo
-</span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#untickedByronSpecLedgerTip"><span class="hs-identifier hs-var hs-var">untickedByronSpecLedgerTip</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span>
-</span><span id="line-97"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="tickedByronSpecLedgerState"><span class="annot"><span class="annottext">Ticked (LedgerState ByronSpecBlock) -&gt; State CHAIN
+</span><span id="line-95"></span><span>
+</span><span id="line-96"></span><span class="hs-keyword">data</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="Ticked"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">Ticked</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span id="TickedByronSpecLedgerState"><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#TickedByronSpecLedgerState"><span class="hs-identifier hs-var">TickedByronSpecLedgerState</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-97"></span><span>      </span><span id="untickedByronSpecLedgerTip"><span class="annot"><span class="annottext">Ticked (LedgerState ByronSpecBlock) -&gt; Maybe SlotNo
+</span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#untickedByronSpecLedgerTip"><span class="hs-identifier hs-var hs-var">untickedByronSpecLedgerTip</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span>
+</span><span id="line-98"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="tickedByronSpecLedgerState"><span class="annot"><span class="annottext">Ticked (LedgerState ByronSpecBlock) -&gt; State CHAIN
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#tickedByronSpecLedgerState"><span class="hs-identifier hs-var hs-var">tickedByronSpecLedgerState</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Spec.State</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Spec.CHAIN</span></span><span>
-</span><span id="line-98"></span><span>    </span><span class="hs-special">}</span><span>
-</span><span id="line-99"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679165377"><span id="local-6989586621679165379"><span id="local-6989586621679165381"><span class="annot"><span class="annottext">Int -&gt; Ticked (LedgerState ByronSpecBlock) -&gt; ShowS
+</span><span id="line-99"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-100"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679216149"><span id="local-6989586621679216151"><span id="local-6989586621679216153"><span class="annot"><span class="annottext">Int -&gt; Ticked (LedgerState ByronSpecBlock) -&gt; ShowS
 [Ticked (LedgerState ByronSpecBlock)] -&gt; ShowS
 Ticked (LedgerState ByronSpecBlock) -&gt; String
 (Int -&gt; Ticked (LedgerState ByronSpecBlock) -&gt; ShowS)
@@ -283,7 +284,7 @@ show :: Ticked (LedgerState ByronSpecBlock) -&gt; String
 $cshow :: Ticked (LedgerState ByronSpecBlock) -&gt; String
 showsPrec :: Int -&gt; Ticked (LedgerState ByronSpecBlock) -&gt; ShowS
 $cshowsPrec :: Int -&gt; Ticked (LedgerState ByronSpecBlock) -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679165373"><span id="local-6989586621679165375"><span class="annot"><span class="annottext">Ticked (LedgerState ByronSpecBlock)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679216145"><span id="local-6989586621679216147"><span class="annot"><span class="annottext">Ticked (LedgerState ByronSpecBlock)
 -&gt; Ticked (LedgerState ByronSpecBlock) -&gt; Bool
 (Ticked (LedgerState ByronSpecBlock)
  -&gt; Ticked (LedgerState ByronSpecBlock) -&gt; Bool)
@@ -299,8 +300,8 @@ $c/= :: Ticked (LedgerState ByronSpecBlock)
 -&gt; Ticked (LedgerState ByronSpecBlock) -&gt; Bool
 $c== :: Ticked (LedgerState ByronSpecBlock)
 -&gt; Ticked (LedgerState ByronSpecBlock) -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">)</span><span>
-</span><span id="line-100"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679165367"><span id="local-6989586621679165369"><span id="local-6989586621679165371"><span class="annot"><span class="annottext">Context
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-101"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679216139"><span id="local-6989586621679216141"><span id="local-6989586621679216143"><span class="annot"><span class="annottext">Context
 -&gt; Ticked (LedgerState ByronSpecBlock) -&gt; IO (Maybe ThunkInfo)
 Proxy (Ticked (LedgerState ByronSpecBlock)) -&gt; String
 (Context
@@ -324,201 +325,286 @@ noThunks :: Context
 -&gt; Ticked (LedgerState ByronSpecBlock) -&gt; IO (Maybe ThunkInfo)
 $cnoThunks :: Context
 -&gt; Ticked (LedgerState ByronSpecBlock) -&gt; IO (Maybe ThunkInfo)
-</span><a href="#local-6989586621679165367"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">NoThunks</span></a></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AllowThunk</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Ticked</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-101"></span><span>
-</span><span id="line-102"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">IsLedger</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-103"></span><span>  </span><span class="hs-keyword">type</span><span> </span><span id="LedgerErr"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">LedgerErr</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#ByronSpecLedgerError"><span class="hs-identifier hs-type">ByronSpecLedgerError</span></a></span><span>
-</span><span id="line-104"></span><span>
-</span><span id="line-105"></span><span>  </span><span id="local-6989586621679165355"><span class="annot"><span class="annottext">applyChainTick :: LedgerCfg (LedgerState ByronSpecBlock)
+</span><a href="#local-6989586621679216139"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">NoThunks</span></a></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AllowThunk</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Ticked</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-102"></span><span>
+</span><span id="line-103"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">IsLedger</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-104"></span><span>  </span><span class="hs-keyword">type</span><span> </span><span id="LedgerErr"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">LedgerErr</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#ByronSpecLedgerError"><span class="hs-identifier hs-type">ByronSpecLedgerError</span></a></span><span>
+</span><span id="line-105"></span><span>
+</span><span id="line-106"></span><span>  </span><span class="hs-keyword">type</span><span> </span><span id="AuxLedgerEvent"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">AuxLedgerEvent</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-107"></span><span>    </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">VoidLedgerEvent</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-108"></span><span>
+</span><span id="line-109"></span><span>  </span><span id="local-6989586621679216125"><span class="annot"><span class="annottext">applyChainTickLedgerResult :: LedgerCfg (LedgerState ByronSpecBlock)
 -&gt; SlotNo
 -&gt; LedgerState ByronSpecBlock
+-&gt; LedgerResult
+     (LedgerState ByronSpecBlock) (Ticked (LedgerState ByronSpecBlock))
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">applyChainTickLedgerResult</span></a></span></span><span> </span><span id="local-6989586621679216123"><span class="annot"><span class="annottext">LedgerCfg (LedgerState ByronSpecBlock)
+</span><a href="#local-6989586621679216123"><span class="hs-identifier hs-var">cfg</span></a></span></span><span> </span><span id="local-6989586621679216122"><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679216122"><span class="hs-identifier hs-var">slot</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#ByronSpecLedgerState"><span class="hs-identifier hs-type">ByronSpecLedgerState</span></a></span><span> </span><span id="local-6989586621679216121"><span class="annot"><a href="#local-6989586621679216121"><span class="hs-identifier hs-var">tip</span></a></span></span><span> </span><span id="local-6989586621679216120"><span class="annot"><a href="#local-6989586621679216120"><span class="hs-identifier hs-var">state</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-110"></span><span>        </span><span class="annot"><span class="annottext">Ticked (LedgerState ByronSpecBlock)
+-&gt; LedgerResult
+     (LedgerState ByronSpecBlock) (Ticked (LedgerState ByronSpecBlock))
+forall a l. a -&gt; LedgerResult l a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">pureLedgerResult</span></a></span><span>
+</span><span id="line-111"></span><span>      </span><span class="annot"><span class="annottext">(Ticked (LedgerState ByronSpecBlock)
+ -&gt; LedgerResult
+      (LedgerState ByronSpecBlock) (Ticked (LedgerState ByronSpecBlock)))
 -&gt; Ticked (LedgerState ByronSpecBlock)
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">applyChainTick</span></a></span></span><span> </span><span id="local-6989586621679165353"><span class="annot"><span class="annottext">LedgerCfg (LedgerState ByronSpecBlock)
-</span><a href="#local-6989586621679165353"><span class="hs-identifier hs-var">cfg</span></a></span></span><span> </span><span id="local-6989586621679165352"><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679165352"><span class="hs-identifier hs-var">slot</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#ByronSpecLedgerState"><span class="hs-identifier hs-type">ByronSpecLedgerState</span></a></span><span> </span><span id="local-6989586621679165351"><span class="annot"><a href="#local-6989586621679165351"><span class="hs-identifier hs-var">tip</span></a></span></span><span> </span><span id="local-6989586621679165350"><span class="annot"><a href="#local-6989586621679165350"><span class="hs-identifier hs-var">state</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-106"></span><span>      </span><span class="annot"><span class="annottext">TickedByronSpecLedgerState :: Maybe SlotNo -&gt; State CHAIN -&gt; Ticked (LedgerState ByronSpecBlock)
+-&gt; LedgerResult
+     (LedgerState ByronSpecBlock) (Ticked (LedgerState ByronSpecBlock))
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">TickedByronSpecLedgerState :: Maybe SlotNo -&gt; State CHAIN -&gt; Ticked (LedgerState ByronSpecBlock)
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#TickedByronSpecLedgerState"><span class="hs-identifier hs-type">TickedByronSpecLedgerState</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-107"></span><span>          </span><span class="annot"><span class="annottext">untickedByronSpecLedgerTip :: Maybe SlotNo
+</span><span id="line-112"></span><span>            </span><span class="annot"><span class="annottext">untickedByronSpecLedgerTip :: Maybe SlotNo
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#untickedByronSpecLedgerTip"><span class="hs-identifier hs-var">untickedByronSpecLedgerTip</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe SlotNo
-</span><a href="#local-6989586621679165351"><span class="hs-identifier hs-var">tip</span></a></span><span>
-</span><span id="line-108"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">tickedByronSpecLedgerState :: State CHAIN
+</span><a href="#local-6989586621679216121"><span class="hs-identifier hs-var">tip</span></a></span><span>
+</span><span id="line-113"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">tickedByronSpecLedgerState :: State CHAIN
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#tickedByronSpecLedgerState"><span class="hs-identifier hs-var">tickedByronSpecLedgerState</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByronSpecGenesis -&gt; Slot -&gt; State CHAIN -&gt; State CHAIN
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Rules.html#applyChainTick"><span class="hs-identifier hs-var">Rules.applyChainTick</span></a></span><span>
-</span><span id="line-109"></span><span>                                         </span><span class="annot"><span class="annottext">LedgerCfg (LedgerState ByronSpecBlock)
+</span><span id="line-114"></span><span>                                           </span><span class="annot"><span class="annottext">LedgerCfg (LedgerState ByronSpecBlock)
 ByronSpecGenesis
-</span><a href="#local-6989586621679165353"><span class="hs-identifier hs-var">cfg</span></a></span><span>
-</span><span id="line-110"></span><span>                                         </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SlotNo -&gt; Slot
+</span><a href="#local-6989586621679216123"><span class="hs-identifier hs-var">cfg</span></a></span><span>
+</span><span id="line-115"></span><span>                                           </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SlotNo -&gt; Slot
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Conversions.html#toByronSpecSlotNo"><span class="hs-identifier hs-var">toByronSpecSlotNo</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679165352"><span class="hs-identifier hs-var">slot</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-111"></span><span>                                         </span><span class="annot"><span class="annottext">State CHAIN
-</span><a href="#local-6989586621679165350"><span class="hs-identifier hs-var">state</span></a></span><span>
-</span><span id="line-112"></span><span>        </span><span class="hs-special">}</span><span>
-</span><span id="line-113"></span><span>
-</span><span id="line-114"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+</span><a href="#local-6989586621679216122"><span class="hs-identifier hs-var">slot</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-116"></span><span>                                           </span><span class="annot"><span class="annottext">State CHAIN
+</span><a href="#local-6989586621679216120"><span class="hs-identifier hs-var">state</span></a></span><span>
+</span><span id="line-117"></span><span>          </span><span class="hs-special">}</span><span>
+</span><span id="line-118"></span><span>
+</span><span id="line-119"></span><span class="hs-comment">{-------------------------------------------------------------------------------
   Applying blocks
 -------------------------------------------------------------------------------}</span><span>
-</span><span id="line-117"></span><span>
-</span><span id="line-118"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">ApplyBlock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-119"></span><span>  </span><span id="local-6989586621679165340"><span class="annot"><span class="annottext">applyLedgerBlock :: LedgerCfg (LedgerState ByronSpecBlock)
+</span><span id="line-122"></span><span>
+</span><span id="line-123"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">ApplyBlock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-124"></span><span>  </span><span id="local-6989586621679216109"><span class="annot"><span class="annottext">applyBlockLedgerResult :: LedgerCfg (LedgerState ByronSpecBlock)
 -&gt; ByronSpecBlock
 -&gt; Ticked (LedgerState ByronSpecBlock)
 -&gt; Except
      (LedgerErr (LedgerState ByronSpecBlock))
-     (LedgerState ByronSpecBlock)
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">applyLedgerBlock</span></a></span></span><span> </span><span id="local-6989586621679165338"><span class="annot"><span class="annottext">LedgerCfg (LedgerState ByronSpecBlock)
-</span><a href="#local-6989586621679165338"><span class="hs-identifier hs-var">cfg</span></a></span></span><span> </span><span id="local-6989586621679165337"><span class="annot"><span class="annottext">ByronSpecBlock
-</span><a href="#local-6989586621679165337"><span class="hs-identifier hs-var">block</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#TickedByronSpecLedgerState"><span class="hs-identifier hs-type">TickedByronSpecLedgerState</span></a></span><span> </span><span id="local-6989586621679165336"><span class="annot"><a href="#local-6989586621679165336"><span class="hs-identifier hs-var">_tip</span></a></span></span><span> </span><span id="local-6989586621679165335"><span class="annot"><a href="#local-6989586621679165335"><span class="hs-identifier hs-var">state</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-120"></span><span>    </span><span class="annot"><span class="annottext">([[ChainPredicateFailure]] -&gt; ByronSpecLedgerError)
--&gt; Except [[ChainPredicateFailure]] (LedgerState ByronSpecBlock)
--&gt; Except ByronSpecLedgerError (LedgerState ByronSpecBlock)
+     (LedgerResult
+        (LedgerState ByronSpecBlock) (LedgerState ByronSpecBlock))
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">applyBlockLedgerResult</span></a></span></span><span> </span><span id="local-6989586621679216107"><span class="annot"><span class="annottext">LedgerCfg (LedgerState ByronSpecBlock)
+</span><a href="#local-6989586621679216107"><span class="hs-identifier hs-var">cfg</span></a></span></span><span> </span><span id="local-6989586621679216106"><span class="annot"><span class="annottext">ByronSpecBlock
+</span><a href="#local-6989586621679216106"><span class="hs-identifier hs-var">block</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#TickedByronSpecLedgerState"><span class="hs-identifier hs-type">TickedByronSpecLedgerState</span></a></span><span> </span><span id="local-6989586621679216105"><span class="annot"><a href="#local-6989586621679216105"><span class="hs-identifier hs-var">_tip</span></a></span></span><span> </span><span id="local-6989586621679216104"><span class="annot"><a href="#local-6989586621679216104"><span class="hs-identifier hs-var">state</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-125"></span><span>        </span><span class="annot"><span class="annottext">([ChainPredicateFailure] -&gt; ByronSpecLedgerError)
+-&gt; Except
+     [ChainPredicateFailure]
+     (LedgerResult
+        (LedgerState ByronSpecBlock) (LedgerState ByronSpecBlock))
+-&gt; Except
+     ByronSpecLedgerError
+     (LedgerResult
+        (LedgerState ByronSpecBlock) (LedgerState ByronSpecBlock))
 forall e e' a. (e -&gt; e') -&gt; Except e a -&gt; Except e' a
-</span><span class="hs-identifier hs-var">withExcept</span></span><span> </span><span class="annot"><span class="annottext">[[ChainPredicateFailure]] -&gt; ByronSpecLedgerError
-[[PredicateFailure CHAIN]] -&gt; ByronSpecLedgerError
-</span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#ByronSpecLedgerError"><span class="hs-identifier hs-var">ByronSpecLedgerError</span></a></span><span> </span><span class="annot"><span class="annottext">(Except [[ChainPredicateFailure]] (LedgerState ByronSpecBlock)
- -&gt; Except ByronSpecLedgerError (LedgerState ByronSpecBlock))
--&gt; Except [[ChainPredicateFailure]] (LedgerState ByronSpecBlock)
--&gt; Except ByronSpecLedgerError (LedgerState ByronSpecBlock)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-var">withExcept</span></a></span><span> </span><span class="annot"><span class="annottext">[ChainPredicateFailure] -&gt; ByronSpecLedgerError
+[PredicateFailure CHAIN] -&gt; ByronSpecLedgerError
+</span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#ByronSpecLedgerError"><span class="hs-identifier hs-var">ByronSpecLedgerError</span></a></span><span>
+</span><span id="line-126"></span><span>      </span><span class="annot"><span class="annottext">(Except
+   [ChainPredicateFailure]
+   (LedgerResult
+      (LedgerState ByronSpecBlock) (LedgerState ByronSpecBlock))
+ -&gt; Except
+      ByronSpecLedgerError
+      (LedgerResult
+         (LedgerState ByronSpecBlock) (LedgerState ByronSpecBlock)))
+-&gt; Except
+     [ChainPredicateFailure]
+     (LedgerResult
+        (LedgerState ByronSpecBlock) (LedgerState ByronSpecBlock))
+-&gt; Except
+     ByronSpecLedgerError
+     (LedgerResult
+        (LedgerState ByronSpecBlock) (LedgerState ByronSpecBlock))
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span>
-</span><span id="line-121"></span><span>      </span><span class="annot"><span class="annottext">Maybe SlotNo -&gt; State CHAIN -&gt; LedgerState ByronSpecBlock
-</span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#ByronSpecLedgerState"><span class="hs-identifier hs-var">ByronSpecLedgerState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SlotNo -&gt; Maybe SlotNo
-forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ByronSpecBlock -&gt; SlotNo
-forall b. HasHeader b =&gt; b -&gt; SlotNo
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">blockSlot</span></a></span><span> </span><span class="annot"><span class="annottext">ByronSpecBlock
-</span><a href="#local-6989586621679165337"><span class="hs-identifier hs-var">block</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">((Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState)
- -&gt; LedgerState ByronSpecBlock)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">((Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState)
+ -&gt; LedgerResult
+      (LedgerState ByronSpecBlock) (LedgerState ByronSpecBlock))
 -&gt; ExceptT
-     [[ChainPredicateFailure]]
+     [ChainPredicateFailure]
      Identity
      (Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState)
--&gt; Except [[ChainPredicateFailure]] (LedgerState ByronSpecBlock)
+-&gt; Except
+     [ChainPredicateFailure]
+     (LedgerResult
+        (LedgerState ByronSpecBlock) (LedgerState ByronSpecBlock))
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span>
-</span><span id="line-122"></span><span>        </span><span class="hs-comment">-- Note that the CHAIN rule also applies the chain tick. So even</span><span>
-</span><span id="line-123"></span><span>        </span><span class="hs-comment">-- though the ledger we received has already been ticked with</span><span>
-</span><span id="line-124"></span><span>        </span><span class="hs-comment">-- 'applyChainTick', we do it again as part of CHAIN. This is safe, as</span><span>
-</span><span id="line-125"></span><span>        </span><span class="hs-comment">-- it is idempotent. If we wanted to avoid the repeated tick, we would</span><span>
-</span><span id="line-126"></span><span>        </span><span class="hs-comment">-- have to call the subtransitions of CHAIN (except for ticking).</span><span>
-</span><span id="line-127"></span><span>        </span><span class="annot"><span class="annottext">ByronSpecGenesis -&gt; LiftedRule CHAIN
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fmap</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">LedgerState ByronSpecBlock
+-&gt; LedgerResult
+     (LedgerState ByronSpecBlock) (LedgerState ByronSpecBlock)
+forall a l. a -&gt; LedgerResult l a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">pureLedgerResult</span></a></span><span> </span><span class="annot"><span class="annottext">(LedgerState ByronSpecBlock
+ -&gt; LedgerResult
+      (LedgerState ByronSpecBlock) (LedgerState ByronSpecBlock))
+-&gt; ((Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState)
+    -&gt; LedgerState ByronSpecBlock)
+-&gt; (Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState)
+-&gt; LedgerResult
+     (LedgerState ByronSpecBlock) (LedgerState ByronSpecBlock)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe SlotNo -&gt; State CHAIN -&gt; LedgerState ByronSpecBlock
+</span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#ByronSpecLedgerState"><span class="hs-identifier hs-var">ByronSpecLedgerState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SlotNo -&gt; Maybe SlotNo
+forall a. a -&gt; Maybe a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ByronSpecBlock -&gt; SlotNo
+forall b. HasHeader b =&gt; b -&gt; SlotNo
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">blockSlot</span></a></span><span> </span><span class="annot"><span class="annottext">ByronSpecBlock
+</span><a href="#local-6989586621679216106"><span class="hs-identifier hs-var">block</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-127"></span><span>      </span><span class="annot"><span class="annottext">(ExceptT
+   [ChainPredicateFailure]
+   Identity
+   (Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState)
+ -&gt; Except
+      [ChainPredicateFailure]
+      (LedgerResult
+         (LedgerState ByronSpecBlock) (LedgerState ByronSpecBlock)))
+-&gt; ExceptT
+     [ChainPredicateFailure]
+     Identity
+     (Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState)
+-&gt; Except
+     [ChainPredicateFailure]
+     (LedgerResult
+        (LedgerState ByronSpecBlock) (LedgerState ByronSpecBlock))
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-comment">-- Note that the CHAIN rule also applies the chain tick. So even</span><span>
+</span><span id="line-128"></span><span>        </span><span class="hs-comment">-- though the ledger we received has already been ticked with</span><span>
+</span><span id="line-129"></span><span>        </span><span class="hs-comment">-- 'applyChainTick', we do it again as part of CHAIN. This is safe, as</span><span>
+</span><span id="line-130"></span><span>        </span><span class="hs-comment">-- it is idempotent. If we wanted to avoid the repeated tick, we would</span><span>
+</span><span id="line-131"></span><span>        </span><span class="hs-comment">-- have to call the subtransitions of CHAIN (except for ticking).</span><span>
+</span><span id="line-132"></span><span>        </span><span class="annot"><span class="annottext">ByronSpecGenesis -&gt; LiftedRule CHAIN
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Rules.html#liftCHAIN"><span class="hs-identifier hs-var">Rules.liftCHAIN</span></a></span><span>
-</span><span id="line-128"></span><span>          </span><span class="annot"><span class="annottext">LedgerCfg (LedgerState ByronSpecBlock)
+</span><span id="line-133"></span><span>          </span><span class="annot"><span class="annottext">LedgerCfg (LedgerState ByronSpecBlock)
 ByronSpecGenesis
-</span><a href="#local-6989586621679165338"><span class="hs-identifier hs-var">cfg</span></a></span><span>
-</span><span id="line-129"></span><span>          </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ByronSpecBlock -&gt; Block
+</span><a href="#local-6989586621679216107"><span class="hs-identifier hs-var">cfg</span></a></span><span>
+</span><span id="line-134"></span><span>          </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ByronSpecBlock -&gt; Block
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#byronSpecBlock"><span class="hs-identifier hs-var hs-var">byronSpecBlock</span></a></span><span> </span><span class="annot"><span class="annottext">ByronSpecBlock
-</span><a href="#local-6989586621679165337"><span class="hs-identifier hs-var">block</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-130"></span><span>          </span><span class="annot"><span class="annottext">State CHAIN
-</span><a href="#local-6989586621679165335"><span class="hs-identifier hs-var">state</span></a></span><span>
-</span><span id="line-131"></span><span>
-</span><span id="line-132"></span><span>  </span><span id="local-6989586621679165329"><span class="annot"><span class="annottext">reapplyLedgerBlock :: LedgerCfg (LedgerState ByronSpecBlock)
+</span><a href="#local-6989586621679216106"><span class="hs-identifier hs-var">block</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-135"></span><span>          </span><span class="annot"><span class="annottext">State CHAIN
+</span><a href="#local-6989586621679216104"><span class="hs-identifier hs-var">state</span></a></span><span>
+</span><span id="line-136"></span><span>
+</span><span id="line-137"></span><span>  </span><span id="local-6989586621679216098"><span class="annot"><span class="annottext">reapplyBlockLedgerResult :: LedgerCfg (LedgerState ByronSpecBlock)
 -&gt; ByronSpecBlock
 -&gt; Ticked (LedgerState ByronSpecBlock)
--&gt; LedgerState ByronSpecBlock
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">reapplyLedgerBlock</span></a></span></span><span> </span><span id="local-6989586621679165327"><span class="annot"><span class="annottext">LedgerCfg (LedgerState ByronSpecBlock)
-</span><a href="#local-6989586621679165327"><span class="hs-identifier hs-var">cfg</span></a></span></span><span> </span><span id="local-6989586621679165326"><span class="annot"><span class="annottext">ByronSpecBlock
-</span><a href="#local-6989586621679165326"><span class="hs-identifier hs-var">block</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-133"></span><span>      </span><span class="hs-comment">-- The spec doesn't have a &quot;reapply&quot; mode</span><span>
-</span><span id="line-134"></span><span>      </span><span class="annot"><span class="annottext">Except ByronSpecLedgerError (LedgerState ByronSpecBlock)
--&gt; LedgerState ByronSpecBlock
+-&gt; LedgerResult
+     (LedgerState ByronSpecBlock) (LedgerState ByronSpecBlock)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">reapplyBlockLedgerResult</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-138"></span><span>      </span><span class="hs-comment">-- The spec doesn't have a &quot;reapply&quot; mode</span><span>
+</span><span id="line-139"></span><span>      </span><span class="annot"><span class="annottext">Except
+  ByronSpecLedgerError
+  (LedgerResult
+     (LedgerState ByronSpecBlock) (LedgerState ByronSpecBlock))
+-&gt; LedgerResult
+     (LedgerState ByronSpecBlock) (LedgerState ByronSpecBlock)
 forall a b. Except a b -&gt; b
-</span><a href="#local-6989586621679165325"><span class="hs-identifier hs-var">dontExpectError</span></a></span><span> </span><span class="annot"><span class="annottext">(Except ByronSpecLedgerError (LedgerState ByronSpecBlock)
- -&gt; LedgerState ByronSpecBlock)
--&gt; (Ticked (LedgerState ByronSpecBlock)
-    -&gt; Except ByronSpecLedgerError (LedgerState ByronSpecBlock))
+</span><a href="#local-6989586621679216096"><span class="hs-identifier hs-var">dontExpectError</span></a></span><span> </span><span class="annot"><span class="annottext">(Except
+   ByronSpecLedgerError
+   (LedgerResult
+      (LedgerState ByronSpecBlock) (LedgerState ByronSpecBlock))
+ -&gt; LedgerResult
+      (LedgerState ByronSpecBlock) (LedgerState ByronSpecBlock))
+-&gt; (ByronSpecGenesis
+    -&gt; ByronSpecBlock
+    -&gt; Ticked (LedgerState ByronSpecBlock)
+    -&gt; Except
+         ByronSpecLedgerError
+         (LedgerResult
+            (LedgerState ByronSpecBlock) (LedgerState ByronSpecBlock)))
+-&gt; ByronSpecGenesis
+-&gt; ByronSpecBlock
 -&gt; Ticked (LedgerState ByronSpecBlock)
--&gt; LedgerState ByronSpecBlock
-forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">LedgerCfg (LedgerState ByronSpecBlock)
+-&gt; LedgerResult
+     (LedgerState ByronSpecBlock) (LedgerState ByronSpecBlock)
+forall y z x0 x1 x2.
+(y -&gt; z) -&gt; (x0 -&gt; x1 -&gt; x2 -&gt; y) -&gt; x0 -&gt; x1 -&gt; x2 -&gt; z
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-operator hs-var">..:</span></a></span><span> </span><span class="annot"><span class="annottext">ByronSpecGenesis
 -&gt; ByronSpecBlock
 -&gt; Ticked (LedgerState ByronSpecBlock)
 -&gt; Except
-     (LedgerErr (LedgerState ByronSpecBlock))
-     (LedgerState ByronSpecBlock)
+     ByronSpecLedgerError
+     (LedgerResult
+        (LedgerState ByronSpecBlock) (LedgerState ByronSpecBlock))
 forall l blk.
 (ApplyBlock l blk, HasCallStack) =&gt;
-LedgerCfg l -&gt; blk -&gt; Ticked l -&gt; Except (LedgerErr l) l
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">applyLedgerBlock</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerCfg (LedgerState ByronSpecBlock)
-</span><a href="#local-6989586621679165327"><span class="hs-identifier hs-var">cfg</span></a></span><span> </span><span class="annot"><span class="annottext">ByronSpecBlock
-</span><a href="#local-6989586621679165326"><span class="hs-identifier hs-var">block</span></a></span><span>
-</span><span id="line-135"></span><span>    </span><span class="hs-keyword">where</span><span>
-</span><span id="line-136"></span><span>      </span><span id="local-6989586621679165477"><span id="local-6989586621679165478"><span class="annot"><a href="#local-6989586621679165325"><span class="hs-identifier hs-type">dontExpectError</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Except</span></span><span> </span><span class="annot"><a href="#local-6989586621679165478"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679165477"><span class="hs-identifier hs-type">b</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679165477"><span class="hs-identifier hs-type">b</span></a></span></span></span><span>
-</span><span id="line-137"></span><span>      </span><span id="local-6989586621679165325"><span class="annot"><span class="annottext">dontExpectError :: Except a b -&gt; b
-</span><a href="#local-6989586621679165325"><span class="hs-identifier hs-var hs-var">dontExpectError</span></a></span></span><span> </span><span id="local-6989586621679165323"><span class="annot"><span class="annottext">Except a b
-</span><a href="#local-6989586621679165323"><span class="hs-identifier hs-var">mb</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Except a b -&gt; Either a b
+LedgerCfg l
+-&gt; blk -&gt; Ticked l -&gt; Except (LedgerErr l) (LedgerResult l l)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">applyBlockLedgerResult</span></a></span><span>
+</span><span id="line-140"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-141"></span><span>      </span><span id="local-6989586621679216252"><span id="local-6989586621679216253"><span class="annot"><a href="#local-6989586621679216096"><span class="hs-identifier hs-type">dontExpectError</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-type">Except</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679216253"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679216252"><span class="hs-identifier hs-type">b</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679216252"><span class="hs-identifier hs-type">b</span></a></span></span></span><span>
+</span><span id="line-142"></span><span>      </span><span id="local-6989586621679216096"><span class="annot"><span class="annottext">dontExpectError :: Except a b -&gt; b
+</span><a href="#local-6989586621679216096"><span class="hs-identifier hs-var hs-var">dontExpectError</span></a></span></span><span> </span><span id="local-6989586621679216095"><span class="annot"><span class="annottext">Except a b
+</span><a href="#local-6989586621679216095"><span class="hs-identifier hs-var">mb</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Except a b -&gt; Either a b
 forall e a. Except e a -&gt; Either e a
-</span><span class="hs-identifier hs-var">runExcept</span></span><span> </span><span class="annot"><span class="annottext">Except a b
-</span><a href="#local-6989586621679165323"><span class="hs-identifier hs-var">mb</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-138"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Left</span></span><span>  </span><span class="annot"><span class="annottext">a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-var">runExcept</span></a></span><span> </span><span class="annot"><span class="annottext">Except a b
+</span><a href="#local-6989586621679216095"><span class="hs-identifier hs-var">mb</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-143"></span><span>        </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Left</span></a></span><span>  </span><span class="annot"><span class="annottext">a
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; b
 forall a. HasCallStack =&gt; String -&gt; a
-</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">String
-</span><span class="hs-string">&quot;reapplyLedgerBlock: unexpected error&quot;</span></span><span>
-</span><span id="line-139"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Right</span></span><span> </span><span id="local-6989586621679165320"><span class="annot"><span class="annottext">b
-</span><a href="#local-6989586621679165320"><span class="hs-identifier hs-var">b</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">b
-</span><a href="#local-6989586621679165320"><span class="hs-identifier hs-var">b</span></a></span><span>
-</span><span id="line-140"></span><span>
-</span><span id="line-141"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">error</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;reapplyBlockLedgerResult: unexpected error&quot;</span></span><span>
+</span><span id="line-144"></span><span>        </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Right</span></a></span><span> </span><span id="local-6989586621679216092"><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679216092"><span class="hs-identifier hs-var">b</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679216092"><span class="hs-identifier hs-var">b</span></a></span><span>
+</span><span id="line-145"></span><span>
+</span><span id="line-146"></span><span class="hs-comment">{-------------------------------------------------------------------------------
   CommonProtocolParams
 -------------------------------------------------------------------------------}</span><span>
-</span><span id="line-144"></span><span>
-</span><span id="line-145"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">CommonProtocolParams</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-146"></span><span>  </span><span id="local-6989586621679165315"><span class="annot"><span class="annottext">maxHeaderSize :: LedgerState ByronSpecBlock -&gt; Word32
+</span><span id="line-149"></span><span>
+</span><span id="line-150"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">CommonProtocolParams</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-151"></span><span>  </span><span id="local-6989586621679216087"><span class="annot"><span class="annottext">maxHeaderSize :: LedgerState ByronSpecBlock -&gt; Word32
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">maxHeaderSize</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Natural -&gt; Word32
 forall a b. (Integral a, Num b) =&gt; a -&gt; b
-</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">(Natural -&gt; Word32)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="annot"><span class="annottext">(Natural -&gt; Word32)
 -&gt; (LedgerState ByronSpecBlock -&gt; Natural)
 -&gt; LedgerState ByronSpecBlock
 -&gt; Word32
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">PParams -&gt; Natural
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">PParams -&gt; Natural
 </span><span class="hs-identifier hs-var hs-var">Spec._maxHdrSz</span></span><span> </span><span class="annot"><span class="annottext">(PParams -&gt; Natural)
 -&gt; (LedgerState ByronSpecBlock -&gt; PParams)
 -&gt; LedgerState ByronSpecBlock
 -&gt; Natural
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">LedgerState ByronSpecBlock -&gt; PParams
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerState ByronSpecBlock -&gt; PParams
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#getPParams"><span class="hs-identifier hs-var">getPParams</span></a></span><span>
-</span><span id="line-147"></span><span>  </span><span id="local-6989586621679165311"><span class="annot"><span class="annottext">maxTxSize :: LedgerState ByronSpecBlock -&gt; Word32
+</span><span id="line-152"></span><span>  </span><span id="local-6989586621679216083"><span class="annot"><span class="annottext">maxTxSize :: LedgerState ByronSpecBlock -&gt; Word32
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">maxTxSize</span></a></span></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Natural -&gt; Word32
 forall a b. (Integral a, Num b) =&gt; a -&gt; b
-</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">(Natural -&gt; Word32)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="annot"><span class="annottext">(Natural -&gt; Word32)
 -&gt; (LedgerState ByronSpecBlock -&gt; Natural)
 -&gt; LedgerState ByronSpecBlock
 -&gt; Word32
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">PParams -&gt; Natural
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">PParams -&gt; Natural
 </span><span class="hs-identifier hs-var hs-var">Spec._maxTxSz</span></span><span>  </span><span class="annot"><span class="annottext">(PParams -&gt; Natural)
 -&gt; (LedgerState ByronSpecBlock -&gt; PParams)
 -&gt; LedgerState ByronSpecBlock
 -&gt; Natural
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">LedgerState ByronSpecBlock -&gt; PParams
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerState ByronSpecBlock -&gt; PParams
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#getPParams"><span class="hs-identifier hs-var">getPParams</span></a></span><span>
-</span><span id="line-148"></span><span>
-</span><span id="line-149"></span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#getPParams"><span class="hs-identifier hs-type">getPParams</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Spec.PParams</span></span><span>
-</span><span id="line-150"></span><span id="getPParams"><span class="annot"><span class="annottext">getPParams :: LedgerState ByronSpecBlock -&gt; PParams
+</span><span id="line-153"></span><span>
+</span><span id="line-154"></span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#getPParams"><span class="hs-identifier hs-type">getPParams</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Block.html#ByronSpecBlock"><span class="hs-identifier hs-type">ByronSpecBlock</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Spec.PParams</span></span><span>
+</span><span id="line-155"></span><span id="getPParams"><span class="annot"><span class="annottext">getPParams :: LedgerState ByronSpecBlock -&gt; PParams
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#getPParams"><span class="hs-identifier hs-var hs-var">getPParams</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-151"></span><span>      </span><span class="annot"><span class="annottext">UPIState -&gt; PParams
+</span><span id="line-156"></span><span>      </span><span class="annot"><span class="annottext">UPIState -&gt; PParams
 </span><span class="hs-identifier hs-var">Spec.protocolParameters</span></span><span>
-</span><span id="line-152"></span><span>    </span><span class="annot"><span class="annottext">(UPIState -&gt; PParams)
+</span><span id="line-157"></span><span>    </span><span class="annot"><span class="annottext">(UPIState -&gt; PParams)
 -&gt; (LedgerState ByronSpecBlock -&gt; UPIState)
 -&gt; LedgerState ByronSpecBlock
 -&gt; PParams
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">(Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState)
 -&gt; UPIState
 GetChainState UPIState
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Accessors.html#getChainStateUPIState"><span class="hs-identifier hs-var">getChainStateUPIState</span></a></span><span>
-</span><span id="line-153"></span><span>    </span><span class="annot"><span class="annottext">((Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState)
+</span><span id="line-158"></span><span>    </span><span class="annot"><span class="annottext">((Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState)
  -&gt; UPIState)
 -&gt; (LedgerState ByronSpecBlock
     -&gt; (Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState))
 -&gt; LedgerState ByronSpecBlock
 -&gt; UPIState
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">LedgerState ByronSpecBlock
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerState ByronSpecBlock
 -&gt; (Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState)
 LedgerState ByronSpecBlock -&gt; State CHAIN
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Ledger.html#byronSpecLedgerState"><span class="hs-identifier hs-var hs-var">byronSpecLedgerState</span></a></span><span>
-</span><span id="line-154"></span></pre></body></html>
+</span><span id="line-159"></span></pre></body></html>

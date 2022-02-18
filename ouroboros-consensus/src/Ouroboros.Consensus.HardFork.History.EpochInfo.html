@@ -5,199 +5,121 @@
 </span><span id="line-5"></span><span class="hs-comment">-- | Derive 'EpochInfo'</span><span>
 </span><span id="line-6"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Consensus.HardFork.History.EpochInfo</span><span> </span><span class="hs-special">(</span><span>
 </span><span id="line-7"></span><span>    </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.EpochInfo.html#dummyEpochInfo"><span class="hs-identifier">dummyEpochInfo</span></a></span><span>
-</span><span id="line-8"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.EpochInfo.html#snapshotEpochInfo"><span class="hs-identifier">snapshotEpochInfo</span></a></span><span>
+</span><span id="line-8"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.EpochInfo.html#interpreterToEpochInfo"><span class="hs-identifier">interpreterToEpochInfo</span></a></span><span>
 </span><span id="line-9"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.EpochInfo.html#summaryToEpochInfo"><span class="hs-identifier">summaryToEpochInfo</span></a></span><span>
 </span><span id="line-10"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.EpochInfo.html#toPureEpochInfo"><span class="hs-identifier">toPureEpochInfo</span></a></span><span>
 </span><span id="line-11"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-12"></span><span>
-</span><span id="line-13"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Exception</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">throw</span></span><span class="hs-special">)</span><span>
-</span><span id="line-14"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Monad.Except</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Except</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">runExcept</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">throwError</span></span><span class="hs-special">)</span><span>
-</span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">GHC.Stack</span></span><span>
+</span><span id="line-13"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Control.Exception</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">throw</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/mtl-2.2.2/src"><span class="hs-identifier">Control.Monad.Except</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier">Except</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier">runExcept</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/mtl-2.2.2/src"><span class="hs-identifier">throwError</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">GHC.Stack</span></a></span><span>
 </span><span id="line-16"></span><span>
 </span><span id="line-17"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Slotting.EpochInfo.API</span></span><span>
 </span><span id="line-18"></span><span>
-</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Util.IOLike.html"><span class="hs-identifier">Ouroboros.Consensus.Util.IOLike</span></a></span><span>
-</span><span id="line-20"></span><span>
-</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Caching.html"><span class="hs-identifier">Ouroboros.Consensus.HardFork.History.Caching</span></a></span><span>
-</span><span id="line-22"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Qry.html"><span class="hs-identifier">Ouroboros.Consensus.HardFork.History.Qry</span></a></span><span>
-</span><span id="line-23"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Summary.html"><span class="hs-identifier">Ouroboros.Consensus.HardFork.History.Summary</span></a></span><span>
-</span><span id="line-24"></span><span>
-</span><span id="line-25"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Qry.html"><span class="hs-identifier">Ouroboros.Consensus.HardFork.History.Qry</span></a></span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Summary.html"><span class="hs-identifier">Ouroboros.Consensus.HardFork.History.Summary</span></a></span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span class="hs-comment">{-------------------------------------------------------------------------------
   Translation to EpochInfo
 -------------------------------------------------------------------------------}</span><span>
-</span><span id="line-28"></span><span>
-</span><span id="line-29"></span><span class="hs-comment">-- | Construct 'EpochInfo' from a function that returns the hard fork summary</span><span>
-</span><span id="line-30"></span><span class="hs-comment">--</span><span>
-</span><span id="line-31"></span><span class="hs-comment">-- When a particular request fails with a 'PastHorizon' error, we ask for an</span><span>
-</span><span id="line-32"></span><span class="hs-comment">-- updated summary, in the hope that the ledger state has advanced. If the query</span><span>
-</span><span id="line-33"></span><span class="hs-comment">-- /still/ fails with that updated summary, the error is thrown as an exception.</span><span>
-</span><span id="line-34"></span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.EpochInfo.html#summaryToEpochInfo"><span class="hs-identifier hs-type">summaryToEpochInfo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621680015835"><span class="annot"><a href="#local-6989586621680015835"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621680015834"><span class="annot"><a href="#local-6989586621680015834"><span class="hs-identifier hs-type">xs</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier hs-type">MonadSTM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680015835"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier hs-type">MonadThrow</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier hs-type">STM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680015835"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-35"></span><span>                   </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier hs-type">STM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680015835"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Summary.html#Summary"><span class="hs-identifier hs-type">Summary</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680015834"><span class="hs-identifier hs-type">xs</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621680015835"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">EpochInfo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier hs-type">STM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680015835"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-36"></span><span id="summaryToEpochInfo"><span class="annot"><span class="annottext">summaryToEpochInfo :: STM m (Summary xs) -&gt; m (EpochInfo (STM m))
-</span><a href="Ouroboros.Consensus.HardFork.History.EpochInfo.html#summaryToEpochInfo"><span class="hs-identifier hs-var hs-var">summaryToEpochInfo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-37"></span><span>    </span><span class="annot"><span class="annottext">(RunWithCachedSummary xs m -&gt; EpochInfo (STM m))
--&gt; m (RunWithCachedSummary xs m) -&gt; m (EpochInfo (STM m))
-forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">RunWithCachedSummary xs m -&gt; EpochInfo (STM m)
-</span><a href="#local-6989586621680015833"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">(m (RunWithCachedSummary xs m) -&gt; m (EpochInfo (STM m)))
--&gt; (STM m (Summary xs) -&gt; m (RunWithCachedSummary xs m))
--&gt; STM m (Summary xs)
--&gt; m (EpochInfo (STM m))
+</span><span id="line-25"></span><span>
+</span><span id="line-26"></span><span class="hs-comment">-- | Construct an 'EpochInfo' for a /snapshot/ of the ledger state</span><span>
+</span><span id="line-27"></span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.EpochInfo.html#summaryToEpochInfo"><span class="hs-identifier hs-type">summaryToEpochInfo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621680001009"><span class="annot"><a href="#local-6989586621680001009"><span class="hs-identifier hs-type">xs</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Summary.html#Summary"><span class="hs-identifier hs-type">Summary</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680001009"><span class="hs-identifier hs-type">xs</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">EpochInfo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-type">Except</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Qry.html#PastHorizonException"><span class="hs-identifier hs-type">PastHorizonException</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span id="summaryToEpochInfo"><span class="annot"><span class="annottext">summaryToEpochInfo :: Summary xs -&gt; EpochInfo (Except PastHorizonException)
+</span><a href="Ouroboros.Consensus.HardFork.History.EpochInfo.html#summaryToEpochInfo"><span class="hs-identifier hs-var hs-var">summaryToEpochInfo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Interpreter xs -&gt; EpochInfo (Except PastHorizonException)
+forall (xs :: [*]).
+Interpreter xs -&gt; EpochInfo (Except PastHorizonException)
+</span><a href="Ouroboros.Consensus.HardFork.History.EpochInfo.html#interpreterToEpochInfo"><span class="hs-identifier hs-var">interpreterToEpochInfo</span></a></span><span> </span><span class="annot"><span class="annottext">(Interpreter xs -&gt; EpochInfo (Except PastHorizonException))
+-&gt; (Summary xs -&gt; Interpreter xs)
+-&gt; Summary xs
+-&gt; EpochInfo (Except PastHorizonException)
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">STM m (Summary xs) -&gt; m (RunWithCachedSummary xs m)
-forall (m :: * -&gt; *) (xs :: [*]).
-MonadSTM m =&gt;
-STM m (Summary xs) -&gt; m (RunWithCachedSummary xs m)
-</span><a href="Ouroboros.Consensus.HardFork.History.Caching.html#runWithCachedSummary"><span class="hs-identifier hs-var">runWithCachedSummary</span></a></span><span>
-</span><span id="line-38"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-39"></span><span>    </span><span class="annot"><a href="#local-6989586621680015833"><span class="hs-identifier hs-type">go</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Caching.html#RunWithCachedSummary"><span class="hs-identifier hs-type">RunWithCachedSummary</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680015834"><span class="hs-identifier hs-type">xs</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680015835"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">EpochInfo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier hs-type">STM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680015835"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-40"></span><span>    </span><span id="local-6989586621680015833"><span class="annot"><span class="annottext">go :: RunWithCachedSummary xs m -&gt; EpochInfo (STM m)
-</span><a href="#local-6989586621680015833"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span id="local-6989586621680015830"><span class="annot"><span class="annottext">RunWithCachedSummary xs m
-</span><a href="#local-6989586621680015830"><span class="hs-identifier hs-var">run</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">EpochInfo :: forall (m :: * -&gt; *).
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Summary xs -&gt; Interpreter xs
+forall (xs :: [*]). Summary xs -&gt; Interpreter xs
+</span><a href="Ouroboros.Consensus.HardFork.History.Qry.html#mkInterpreter"><span class="hs-identifier hs-var">mkInterpreter</span></a></span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span class="hs-comment">-- | Construct an 'EpochInfo' for a /snapshot/ of the ledger state</span><span>
+</span><span id="line-31"></span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.EpochInfo.html#interpreterToEpochInfo"><span class="hs-identifier hs-type">interpreterToEpochInfo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621680001064"><span class="annot"><a href="#local-6989586621680001064"><span class="hs-identifier hs-type">xs</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Qry.html#Interpreter"><span class="hs-identifier hs-type">Interpreter</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680001064"><span class="hs-identifier hs-type">xs</span></a></span><span>
+</span><span id="line-32"></span><span>                       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">EpochInfo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-type">Except</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Qry.html#PastHorizonException"><span class="hs-identifier hs-type">PastHorizonException</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-33"></span><span id="interpreterToEpochInfo"><span class="annot"><span class="annottext">interpreterToEpochInfo :: Interpreter xs -&gt; EpochInfo (Except PastHorizonException)
+</span><a href="Ouroboros.Consensus.HardFork.History.EpochInfo.html#interpreterToEpochInfo"><span class="hs-identifier hs-var hs-var">interpreterToEpochInfo</span></a></span></span><span> </span><span id="local-6989586621680001006"><span class="annot"><span class="annottext">Interpreter xs
+</span><a href="#local-6989586621680001006"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">EpochInfo :: forall (m :: * -&gt; *).
 (HasCallStack =&gt; EpochNo -&gt; m EpochSize)
 -&gt; (HasCallStack =&gt; EpochNo -&gt; m SlotNo)
 -&gt; (HasCallStack =&gt; SlotNo -&gt; m EpochNo)
 -&gt; (HasCallStack =&gt; SlotNo -&gt; m RelativeTime)
 -&gt; EpochInfo m
 </span><span class="hs-identifier hs-type">EpochInfo</span></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-41"></span><span>          </span><span class="annot"><span class="annottext">epochInfoSize_ :: HasCallStack =&gt; EpochNo -&gt; STM m EpochSize
-</span><span class="hs-identifier hs-var">epochInfoSize_</span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621680015827"><span class="annot"><span class="annottext">EpochNo
-</span><a href="#local-6989586621680015827"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">RunWithCachedSummary xs m -&gt; Qry EpochSize -&gt; STM m EpochSize
-forall (m :: * -&gt; *) (xs :: [*]) a.
-(MonadSTM m, MonadThrow (STM m)) =&gt;
-RunWithCachedSummary xs m -&gt; Qry a -&gt; STM m a
-</span><a href="Ouroboros.Consensus.HardFork.History.Caching.html#cachedRunQueryThrow"><span class="hs-identifier hs-var">cachedRunQueryThrow</span></a></span><span> </span><span class="annot"><span class="annottext">RunWithCachedSummary xs m
-</span><a href="#local-6989586621680015830"><span class="hs-identifier hs-var">run</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">EpochNo -&gt; Qry EpochSize
+</span><span id="line-34"></span><span>      </span><span class="annot"><span class="annottext">epochInfoSize_ :: HasCallStack =&gt; EpochNo -&gt; Except PastHorizonException EpochSize
+</span><span class="hs-identifier hs-var">epochInfoSize_</span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621680001003"><span class="annot"><span class="annottext">EpochNo
+</span><a href="#local-6989586621680001003"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Qry EpochSize -&gt; Except PastHorizonException EpochSize
+forall a. HasCallStack =&gt; Qry a -&gt; Except PastHorizonException a
+</span><a href="#local-6989586621680001002"><span class="hs-identifier hs-var">interpretQuery'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">EpochNo -&gt; Qry EpochSize
 </span><a href="Ouroboros.Consensus.HardFork.History.Qry.html#epochToSize"><span class="hs-identifier hs-var">epochToSize</span></a></span><span>  </span><span class="annot"><span class="annottext">EpochNo
-</span><a href="#local-6989586621680015827"><span class="hs-identifier hs-var">e</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-42"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">epochInfoFirst_ :: HasCallStack =&gt; EpochNo -&gt; STM m SlotNo
-</span><span class="hs-identifier hs-var">epochInfoFirst_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621680015823"><span class="annot"><span class="annottext">EpochNo
-</span><a href="#local-6989586621680015823"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">RunWithCachedSummary xs m -&gt; Qry SlotNo -&gt; STM m SlotNo
-forall (m :: * -&gt; *) (xs :: [*]) a.
-(MonadSTM m, MonadThrow (STM m)) =&gt;
-RunWithCachedSummary xs m -&gt; Qry a -&gt; STM m a
-</span><a href="Ouroboros.Consensus.HardFork.History.Caching.html#cachedRunQueryThrow"><span class="hs-identifier hs-var">cachedRunQueryThrow</span></a></span><span> </span><span class="annot"><span class="annottext">RunWithCachedSummary xs m
-</span><a href="#local-6989586621680015830"><span class="hs-identifier hs-var">run</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">EpochNo -&gt; Qry SlotNo
+</span><a href="#local-6989586621680001003"><span class="hs-identifier hs-var">e</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">epochInfoFirst_ :: HasCallStack =&gt; EpochNo -&gt; Except PastHorizonException SlotNo
+</span><span class="hs-identifier hs-var">epochInfoFirst_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621680000999"><span class="annot"><span class="annottext">EpochNo
+</span><a href="#local-6989586621680000999"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Qry SlotNo -&gt; Except PastHorizonException SlotNo
+forall a. HasCallStack =&gt; Qry a -&gt; Except PastHorizonException a
+</span><a href="#local-6989586621680001002"><span class="hs-identifier hs-var">interpretQuery'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">EpochNo -&gt; Qry SlotNo
 </span><a href="Ouroboros.Consensus.HardFork.History.Qry.html#epochToSlot%27"><span class="hs-identifier hs-var">epochToSlot'</span></a></span><span> </span><span class="annot"><span class="annottext">EpochNo
-</span><a href="#local-6989586621680015823"><span class="hs-identifier hs-var">e</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-43"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">epochInfoEpoch_ :: HasCallStack =&gt; SlotNo -&gt; STM m EpochNo
-</span><span class="hs-identifier hs-var">epochInfoEpoch_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621680015820"><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621680015820"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">RunWithCachedSummary xs m -&gt; Qry EpochNo -&gt; STM m EpochNo
-forall (m :: * -&gt; *) (xs :: [*]) a.
-(MonadSTM m, MonadThrow (STM m)) =&gt;
-RunWithCachedSummary xs m -&gt; Qry a -&gt; STM m a
-</span><a href="Ouroboros.Consensus.HardFork.History.Caching.html#cachedRunQueryThrow"><span class="hs-identifier hs-var">cachedRunQueryThrow</span></a></span><span> </span><span class="annot"><span class="annottext">RunWithCachedSummary xs m
-</span><a href="#local-6989586621680015830"><span class="hs-identifier hs-var">run</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(EpochNo, Word64) -&gt; EpochNo
+</span><a href="#local-6989586621680000999"><span class="hs-identifier hs-var">e</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-36"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">epochInfoEpoch_ :: HasCallStack =&gt; SlotNo -&gt; Except PastHorizonException EpochNo
+</span><span class="hs-identifier hs-var">epochInfoEpoch_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621680000996"><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621680000996"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Qry EpochNo -&gt; Except PastHorizonException EpochNo
+forall a. HasCallStack =&gt; Qry a -&gt; Except PastHorizonException a
+</span><a href="#local-6989586621680001002"><span class="hs-identifier hs-var">interpretQuery'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(EpochNo, Word64) -&gt; EpochNo
 forall a b. (a, b) -&gt; a
-</span><span class="hs-identifier hs-var">fst</span></span><span> </span><span class="annot"><span class="annottext">((EpochNo, Word64) -&gt; EpochNo)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fst</span></a></span><span> </span><span class="annot"><span class="annottext">((EpochNo, Word64) -&gt; EpochNo)
 -&gt; Qry (EpochNo, Word64) -&gt; Qry EpochNo
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; Qry (EpochNo, Word64)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; Qry (EpochNo, Word64)
 </span><a href="Ouroboros.Consensus.HardFork.History.Qry.html#slotToEpoch%27"><span class="hs-identifier hs-var">slotToEpoch'</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621680015820"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-44"></span><span>
-</span><span id="line-45"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">epochInfoSlotToRelativeTime_ :: HasCallStack =&gt; SlotNo -&gt; STM m RelativeTime
-</span><span class="hs-identifier hs-var">epochInfoSlotToRelativeTime_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621680015816"><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621680015816"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
-</span><span id="line-46"></span><span>            </span><span class="annot"><span class="annottext">RunWithCachedSummary xs m -&gt; Qry RelativeTime -&gt; STM m RelativeTime
-forall (m :: * -&gt; *) (xs :: [*]) a.
-(MonadSTM m, MonadThrow (STM m)) =&gt;
-RunWithCachedSummary xs m -&gt; Qry a -&gt; STM m a
-</span><a href="Ouroboros.Consensus.HardFork.History.Caching.html#cachedRunQueryThrow"><span class="hs-identifier hs-var">cachedRunQueryThrow</span></a></span><span> </span><span class="annot"><span class="annottext">RunWithCachedSummary xs m
-</span><a href="#local-6989586621680015830"><span class="hs-identifier hs-var">run</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(RelativeTime, SlotLength) -&gt; RelativeTime
+</span><a href="#local-6989586621680000996"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">epochInfoSlotToRelativeTime_ :: HasCallStack =&gt; SlotNo -&gt; Except PastHorizonException RelativeTime
+</span><span class="hs-identifier hs-var">epochInfoSlotToRelativeTime_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621680000992"><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621680000992"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-39"></span><span>        </span><span class="annot"><span class="annottext">Qry RelativeTime -&gt; Except PastHorizonException RelativeTime
+forall a. HasCallStack =&gt; Qry a -&gt; Except PastHorizonException a
+</span><a href="#local-6989586621680001002"><span class="hs-identifier hs-var">interpretQuery'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(RelativeTime, SlotLength) -&gt; RelativeTime
 forall a b. (a, b) -&gt; a
-</span><span class="hs-identifier hs-var">fst</span></span><span> </span><span class="annot"><span class="annottext">((RelativeTime, SlotLength) -&gt; RelativeTime)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fst</span></a></span><span> </span><span class="annot"><span class="annottext">((RelativeTime, SlotLength) -&gt; RelativeTime)
 -&gt; Qry (RelativeTime, SlotLength) -&gt; Qry RelativeTime
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; Qry (RelativeTime, SlotLength)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; Qry (RelativeTime, SlotLength)
 </span><a href="Ouroboros.Consensus.HardFork.History.Qry.html#slotToWallclock"><span class="hs-identifier hs-var">slotToWallclock</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621680015816"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-47"></span><span>        </span><span class="hs-special">}</span><span>
-</span><span id="line-48"></span><span>
-</span><span id="line-49"></span><span class="hs-comment">-- | Construct an 'EpochInfo' for a /snapshot/ of the ledger state</span><span>
-</span><span id="line-50"></span><span class="hs-comment">--</span><span>
-</span><span id="line-51"></span><span class="hs-comment">-- When a particular request fails with a 'PastHorizon' error, we throw the</span><span>
-</span><span id="line-52"></span><span class="hs-comment">-- error as a /pure/ exception. Such an exception would indicate a bug.</span><span>
-</span><span id="line-53"></span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.EpochInfo.html#snapshotEpochInfo"><span class="hs-identifier hs-type">snapshotEpochInfo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621680015814"><span class="annot"><a href="#local-6989586621680015814"><span class="hs-identifier hs-type">xs</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Summary.html#Summary"><span class="hs-identifier hs-type">Summary</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680015814"><span class="hs-identifier hs-type">xs</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">EpochInfo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Except</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Qry.html#PastHorizonException"><span class="hs-identifier hs-type">PastHorizonException</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-54"></span><span id="snapshotEpochInfo"><span class="annot"><span class="annottext">snapshotEpochInfo :: Summary xs -&gt; EpochInfo (Except PastHorizonException)
-</span><a href="Ouroboros.Consensus.HardFork.History.EpochInfo.html#snapshotEpochInfo"><span class="hs-identifier hs-var hs-var">snapshotEpochInfo</span></a></span></span><span> </span><span id="local-6989586621680015813"><span class="annot"><span class="annottext">Summary xs
-</span><a href="#local-6989586621680015813"><span class="hs-identifier hs-var">summary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">EpochInfo :: forall (m :: * -&gt; *).
-(HasCallStack =&gt; EpochNo -&gt; m EpochSize)
--&gt; (HasCallStack =&gt; EpochNo -&gt; m SlotNo)
--&gt; (HasCallStack =&gt; SlotNo -&gt; m EpochNo)
--&gt; (HasCallStack =&gt; SlotNo -&gt; m RelativeTime)
--&gt; EpochInfo m
-</span><span class="hs-identifier hs-type">EpochInfo</span></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-55"></span><span>      </span><span class="annot"><span class="annottext">epochInfoSize_ :: HasCallStack =&gt; EpochNo -&gt; Except PastHorizonException EpochSize
-</span><span class="hs-identifier hs-var">epochInfoSize_</span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621680015812"><span class="annot"><span class="annottext">EpochNo
-</span><a href="#local-6989586621680015812"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Qry EpochSize -&gt; Except PastHorizonException EpochSize
-forall a. HasCallStack =&gt; Qry a -&gt; Except PastHorizonException a
-</span><a href="#local-6989586621680015811"><span class="hs-identifier hs-var">runQuery'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">EpochNo -&gt; Qry EpochSize
-</span><a href="Ouroboros.Consensus.HardFork.History.Qry.html#epochToSize"><span class="hs-identifier hs-var">epochToSize</span></a></span><span>  </span><span class="annot"><span class="annottext">EpochNo
-</span><a href="#local-6989586621680015812"><span class="hs-identifier hs-var">e</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-56"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">epochInfoFirst_ :: HasCallStack =&gt; EpochNo -&gt; Except PastHorizonException SlotNo
-</span><span class="hs-identifier hs-var">epochInfoFirst_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621680015810"><span class="annot"><span class="annottext">EpochNo
-</span><a href="#local-6989586621680015810"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Qry SlotNo -&gt; Except PastHorizonException SlotNo
-forall a. HasCallStack =&gt; Qry a -&gt; Except PastHorizonException a
-</span><a href="#local-6989586621680015811"><span class="hs-identifier hs-var">runQuery'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">EpochNo -&gt; Qry SlotNo
-</span><a href="Ouroboros.Consensus.HardFork.History.Qry.html#epochToSlot%27"><span class="hs-identifier hs-var">epochToSlot'</span></a></span><span> </span><span class="annot"><span class="annottext">EpochNo
-</span><a href="#local-6989586621680015810"><span class="hs-identifier hs-var">e</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-57"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">epochInfoEpoch_ :: HasCallStack =&gt; SlotNo -&gt; Except PastHorizonException EpochNo
-</span><span class="hs-identifier hs-var">epochInfoEpoch_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621680015809"><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621680015809"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Qry EpochNo -&gt; Except PastHorizonException EpochNo
-forall a. HasCallStack =&gt; Qry a -&gt; Except PastHorizonException a
-</span><a href="#local-6989586621680015811"><span class="hs-identifier hs-var">runQuery'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(EpochNo, Word64) -&gt; EpochNo
-forall a b. (a, b) -&gt; a
-</span><span class="hs-identifier hs-var">fst</span></span><span> </span><span class="annot"><span class="annottext">((EpochNo, Word64) -&gt; EpochNo)
--&gt; Qry (EpochNo, Word64) -&gt; Qry EpochNo
-forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; Qry (EpochNo, Word64)
-</span><a href="Ouroboros.Consensus.HardFork.History.Qry.html#slotToEpoch%27"><span class="hs-identifier hs-var">slotToEpoch'</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621680015809"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-58"></span><span>
-</span><span id="line-59"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">epochInfoSlotToRelativeTime_ :: HasCallStack =&gt; SlotNo -&gt; Except PastHorizonException RelativeTime
-</span><span class="hs-identifier hs-var">epochInfoSlotToRelativeTime_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621680015808"><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621680015808"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
-</span><span id="line-60"></span><span>        </span><span class="annot"><span class="annottext">Qry RelativeTime -&gt; Except PastHorizonException RelativeTime
-forall a. HasCallStack =&gt; Qry a -&gt; Except PastHorizonException a
-</span><a href="#local-6989586621680015811"><span class="hs-identifier hs-var">runQuery'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(RelativeTime, SlotLength) -&gt; RelativeTime
-forall a b. (a, b) -&gt; a
-</span><span class="hs-identifier hs-var">fst</span></span><span> </span><span class="annot"><span class="annottext">((RelativeTime, SlotLength) -&gt; RelativeTime)
--&gt; Qry (RelativeTime, SlotLength) -&gt; Qry RelativeTime
-forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; Qry (RelativeTime, SlotLength)
-</span><a href="Ouroboros.Consensus.HardFork.History.Qry.html#slotToWallclock"><span class="hs-identifier hs-var">slotToWallclock</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621680015808"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-61"></span><span>    </span><span class="hs-special">}</span><span>
-</span><span id="line-62"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-63"></span><span>    </span><span id="local-6989586621680015871"><span class="annot"><a href="#local-6989586621680015811"><span class="hs-identifier hs-type">runQuery'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HasCallStack</span></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Qry.html#Qry"><span class="hs-identifier hs-type">Qry</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680015871"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Except</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Qry.html#PastHorizonException"><span class="hs-identifier hs-type">PastHorizonException</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680015871"><span class="hs-identifier hs-type">a</span></a></span></span><span>
-</span><span id="line-64"></span><span>    </span><span id="local-6989586621680015811"><span class="annot"><span class="annottext">runQuery' :: Qry a -&gt; Except PastHorizonException a
-</span><a href="#local-6989586621680015811"><span class="hs-identifier hs-var hs-var">runQuery'</span></a></span></span><span> </span><span id="local-6989586621680015807"><span class="annot"><span class="annottext">Qry a
-</span><a href="#local-6989586621680015807"><span class="hs-identifier hs-var">q</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(PastHorizonException -&gt; Except PastHorizonException a)
+</span><a href="#local-6989586621680000992"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-40"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-41"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-42"></span><span>    </span><span id="local-6989586621680001051"><span class="annot"><a href="#local-6989586621680001002"><span class="hs-identifier hs-type">interpretQuery'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">HasCallStack</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Qry.html#Qry"><span class="hs-identifier hs-type">Qry</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680001051"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-type">Except</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Qry.html#PastHorizonException"><span class="hs-identifier hs-type">PastHorizonException</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680001051"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-43"></span><span>    </span><span id="local-6989586621680001002"><span class="annot"><span class="annottext">interpretQuery' :: Qry a -&gt; Except PastHorizonException a
+</span><a href="#local-6989586621680001002"><span class="hs-identifier hs-var hs-var">interpretQuery'</span></a></span></span><span> </span><span id="local-6989586621680000990"><span class="annot"><span class="annottext">Qry a
+</span><a href="#local-6989586621680000990"><span class="hs-identifier hs-var">q</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(PastHorizonException -&gt; Except PastHorizonException a)
 -&gt; (a -&gt; Except PastHorizonException a)
 -&gt; Either PastHorizonException a
 -&gt; Except PastHorizonException a
 forall a c b. (a -&gt; c) -&gt; (b -&gt; c) -&gt; Either a b -&gt; c
-</span><span class="hs-identifier hs-var">either</span></span><span> </span><span class="annot"><span class="annottext">PastHorizonException -&gt; Except PastHorizonException a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">either</span></a></span><span> </span><span class="annot"><span class="annottext">PastHorizonException -&gt; Except PastHorizonException a
 forall e (m :: * -&gt; *) a. MonadError e m =&gt; e -&gt; m a
-</span><span class="hs-identifier hs-var">throwError</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; Except PastHorizonException a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/mtl-2.2.2/src"><span class="hs-identifier hs-var">throwError</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; Except PastHorizonException a
 forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
-</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="annot"><span class="annottext">(Either PastHorizonException a -&gt; Except PastHorizonException a)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">(Either PastHorizonException a -&gt; Except PastHorizonException a)
 -&gt; Either PastHorizonException a -&gt; Except PastHorizonException a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Qry a -&gt; Summary xs -&gt; Either PastHorizonException a
-forall a (xs :: [*]).
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Interpreter xs -&gt; Qry a -&gt; Either PastHorizonException a
+forall (xs :: [*]) a.
 HasCallStack =&gt;
-Qry a -&gt; Summary xs -&gt; Either PastHorizonException a
-</span><a href="Ouroboros.Consensus.HardFork.History.Qry.html#runQuery"><span class="hs-identifier hs-var">runQuery</span></a></span><span> </span><span class="annot"><span class="annottext">Qry a
-</span><a href="#local-6989586621680015807"><span class="hs-identifier hs-var">q</span></a></span><span> </span><span class="annot"><span class="annottext">Summary xs
-</span><a href="#local-6989586621680015813"><span class="hs-identifier hs-var">summary</span></a></span><span>
-</span><span id="line-65"></span><span>
-</span><span id="line-66"></span><span class="hs-comment">-- | A dummy 'EpochInfo' that always throws an 'error'.</span><span>
-</span><span id="line-67"></span><span class="hs-comment">--</span><span>
-</span><span id="line-68"></span><span class="hs-comment">-- To be used as a placeholder before a summary is available.</span><span>
-</span><span id="line-69"></span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.EpochInfo.html#dummyEpochInfo"><span class="hs-identifier hs-type">dummyEpochInfo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">EpochInfo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Except</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Qry.html#PastHorizonException"><span class="hs-identifier hs-type">PastHorizonException</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-70"></span><span id="dummyEpochInfo"><span class="annot"><span class="annottext">dummyEpochInfo :: EpochInfo (Except PastHorizonException)
+Interpreter xs -&gt; Qry a -&gt; Either PastHorizonException a
+</span><a href="Ouroboros.Consensus.HardFork.History.Qry.html#interpretQuery"><span class="hs-identifier hs-var">interpretQuery</span></a></span><span> </span><span class="annot"><span class="annottext">Interpreter xs
+</span><a href="#local-6989586621680001006"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Qry a
+</span><a href="#local-6989586621680000990"><span class="hs-identifier hs-var">q</span></a></span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span class="hs-comment">-- | A dummy 'EpochInfo' that always throws an 'error'.</span><span>
+</span><span id="line-46"></span><span class="hs-comment">--</span><span>
+</span><span id="line-47"></span><span class="hs-comment">-- To be used as a placeholder before a summary is available.</span><span>
+</span><span id="line-48"></span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.EpochInfo.html#dummyEpochInfo"><span class="hs-identifier hs-type">dummyEpochInfo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">EpochInfo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-type">Except</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Qry.html#PastHorizonException"><span class="hs-identifier hs-type">PastHorizonException</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-49"></span><span id="dummyEpochInfo"><span class="annot"><span class="annottext">dummyEpochInfo :: EpochInfo (Except PastHorizonException)
 </span><a href="Ouroboros.Consensus.HardFork.History.EpochInfo.html#dummyEpochInfo"><span class="hs-identifier hs-var hs-var">dummyEpochInfo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">EpochInfo :: forall (m :: * -&gt; *).
 (HasCallStack =&gt; EpochNo -&gt; m EpochSize)
 -&gt; (HasCallStack =&gt; EpochNo -&gt; m SlotNo)
@@ -205,41 +127,41 @@ Qry a -&gt; Summary xs -&gt; Either PastHorizonException a
 -&gt; (HasCallStack =&gt; SlotNo -&gt; m RelativeTime)
 -&gt; EpochInfo m
 </span><span class="hs-identifier hs-type">EpochInfo</span></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-71"></span><span>      </span><span class="annot"><span class="annottext">epochInfoSize_ :: HasCallStack =&gt; EpochNo -&gt; Except PastHorizonException EpochSize
+</span><span id="line-50"></span><span>      </span><span class="annot"><span class="annottext">epochInfoSize_ :: HasCallStack =&gt; EpochNo -&gt; Except PastHorizonException EpochSize
 </span><span class="hs-identifier hs-var">epochInfoSize_</span></span><span>               </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="annot"><span class="annottext">EpochNo
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Except PastHorizonException EpochSize
 forall a. HasCallStack =&gt; [Char] -&gt; a
-</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">error</span></a></span><span> </span><span class="annot"><span class="annottext">[Char]
 </span><span class="hs-string">&quot;dummyEpochInfo used&quot;</span></span><span>
-</span><span id="line-72"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">epochInfoFirst_ :: HasCallStack =&gt; EpochNo -&gt; Except PastHorizonException SlotNo
+</span><span id="line-51"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">epochInfoFirst_ :: HasCallStack =&gt; EpochNo -&gt; Except PastHorizonException SlotNo
 </span><span class="hs-identifier hs-var">epochInfoFirst_</span></span><span>              </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="annot"><span class="annottext">EpochNo
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Except PastHorizonException SlotNo
 forall a. HasCallStack =&gt; [Char] -&gt; a
-</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">error</span></a></span><span> </span><span class="annot"><span class="annottext">[Char]
 </span><span class="hs-string">&quot;dummyEpochInfo used&quot;</span></span><span>
-</span><span id="line-73"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">epochInfoEpoch_ :: HasCallStack =&gt; SlotNo -&gt; Except PastHorizonException EpochNo
+</span><span id="line-52"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">epochInfoEpoch_ :: HasCallStack =&gt; SlotNo -&gt; Except PastHorizonException EpochNo
 </span><span class="hs-identifier hs-var">epochInfoEpoch_</span></span><span>              </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="annot"><span class="annottext">SlotNo
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Except PastHorizonException EpochNo
 forall a. HasCallStack =&gt; [Char] -&gt; a
-</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">error</span></a></span><span> </span><span class="annot"><span class="annottext">[Char]
 </span><span class="hs-string">&quot;dummyEpochInfo used&quot;</span></span><span>
-</span><span id="line-74"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">epochInfoSlotToRelativeTime_ :: HasCallStack =&gt; SlotNo -&gt; Except PastHorizonException RelativeTime
+</span><span id="line-53"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">epochInfoSlotToRelativeTime_ :: HasCallStack =&gt; SlotNo -&gt; Except PastHorizonException RelativeTime
 </span><span class="hs-identifier hs-var">epochInfoSlotToRelativeTime_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="annot"><span class="annottext">SlotNo
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Except PastHorizonException RelativeTime
 forall a. HasCallStack =&gt; [Char] -&gt; a
-</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">error</span></a></span><span> </span><span class="annot"><span class="annottext">[Char]
 </span><span class="hs-string">&quot;dummyEpochInfo used&quot;</span></span><span>
-</span><span id="line-75"></span><span>    </span><span class="hs-special">}</span><span>
-</span><span id="line-76"></span><span>
-</span><span id="line-77"></span><span class="hs-comment">-- | Interpret the 'PastHorizonException' as a _pure exception_ via 'throw'</span><span>
-</span><span id="line-78"></span><span class="hs-comment">--</span><span>
-</span><span id="line-79"></span><span class="hs-comment">-- As per usual, this should only be used when the pure exception would</span><span>
-</span><span id="line-80"></span><span class="hs-comment">-- indicate a bug.</span><span>
-</span><span id="line-81"></span><span id="local-6989586621680015803"><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.EpochInfo.html#toPureEpochInfo"><span class="hs-identifier hs-type">toPureEpochInfo</span></a></span><span> </span><span class="hs-glyph">::</span><span>
-</span><span id="line-82"></span><span>     </span><span class="annot"><span class="hs-identifier hs-type">Applicative</span></span><span> </span><span class="annot"><a href="#local-6989586621680015803"><span class="hs-identifier hs-type">f</span></a></span><span>
-</span><span id="line-83"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">EpochInfo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Except</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Qry.html#PastHorizonException"><span class="hs-identifier hs-type">PastHorizonException</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-84"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">EpochInfo</span></span><span> </span><span class="annot"><a href="#local-6989586621680015803"><span class="hs-identifier hs-type">f</span></a></span></span><span>
-</span><span id="line-85"></span><span id="toPureEpochInfo"><span class="annot"><span class="annottext">toPureEpochInfo :: EpochInfo (Except PastHorizonException) -&gt; EpochInfo f
+</span><span id="line-54"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span class="hs-comment">-- | Interpret the 'PastHorizonException' as a _pure exception_ via 'throw'</span><span>
+</span><span id="line-57"></span><span class="hs-comment">--</span><span>
+</span><span id="line-58"></span><span class="hs-comment">-- As per usual, this should only be used when the pure exception would</span><span>
+</span><span id="line-59"></span><span class="hs-comment">-- indicate a bug.</span><span>
+</span><span id="line-60"></span><span id="local-6989586621680000986"><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.EpochInfo.html#toPureEpochInfo"><span class="hs-identifier hs-type">toPureEpochInfo</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-61"></span><span>     </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Applicative</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680000986"><span class="hs-identifier hs-type">f</span></a></span><span>
+</span><span id="line-62"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">EpochInfo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-type">Except</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Qry.html#PastHorizonException"><span class="hs-identifier hs-type">PastHorizonException</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-63"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">EpochInfo</span></span><span> </span><span class="annot"><a href="#local-6989586621680000986"><span class="hs-identifier hs-type">f</span></a></span></span><span>
+</span><span id="line-64"></span><span id="toPureEpochInfo"><span class="annot"><span class="annottext">toPureEpochInfo :: EpochInfo (Except PastHorizonException) -&gt; EpochInfo f
 </span><a href="Ouroboros.Consensus.HardFork.History.EpochInfo.html#toPureEpochInfo"><span class="hs-identifier hs-var hs-var">toPureEpochInfo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(forall a. Except PastHorizonException a -&gt; f a)
 -&gt; EpochInfo (Except PastHorizonException) -&gt; EpochInfo f
 forall (m :: * -&gt; *) (n :: * -&gt; *).
@@ -247,16 +169,16 @@ forall (m :: * -&gt; *) (n :: * -&gt; *).
 </span><span class="hs-identifier hs-var">hoistEpochInfo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(PastHorizonException -&gt; f a)
 -&gt; (a -&gt; f a) -&gt; Either PastHorizonException a -&gt; f a
 forall a c b. (a -&gt; c) -&gt; (b -&gt; c) -&gt; Either a b -&gt; c
-</span><span class="hs-identifier hs-var">either</span></span><span> </span><span class="annot"><span class="annottext">PastHorizonException -&gt; f a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">either</span></a></span><span> </span><span class="annot"><span class="annottext">PastHorizonException -&gt; f a
 forall a e. Exception e =&gt; e -&gt; a
-</span><span class="hs-identifier hs-var">throw</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; f a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">throw</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; f a
 forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
-</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="annot"><span class="annottext">(Either PastHorizonException a -&gt; f a)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">(Either PastHorizonException a -&gt; f a)
 -&gt; (Except PastHorizonException a -&gt; Either PastHorizonException a)
 -&gt; Except PastHorizonException a
 -&gt; f a
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Except PastHorizonException a -&gt; Either PastHorizonException a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Except PastHorizonException a -&gt; Either PastHorizonException a
 forall e a. Except e a -&gt; Either e a
-</span><span class="hs-identifier hs-var">runExcept</span></span><span class="hs-special">)</span><span>
-</span><span id="line-86"></span></pre></body></html>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-var">runExcept</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-65"></span></pre></body></html>

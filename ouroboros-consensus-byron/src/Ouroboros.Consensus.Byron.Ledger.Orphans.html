@@ -8,10 +8,10 @@
 </span><span id="line-8"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Consensus.Byron.Ledger.Orphans</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-9"></span><span>
 </span><span id="line-10"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Codec.Serialise</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Serialise</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">decode</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">encode</span></span><span class="hs-special">)</span><span>
-</span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Monad</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">void</span></span><span class="hs-special">)</span><span>
-</span><span id="line-12"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.ByteString</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">ByteString</span></span><span class="hs-special">)</span><span>
-</span><span id="line-13"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Coerce</span></span><span>
-</span><span id="line-14"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">unpack</span></span><span class="hs-special">)</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Control.Monad</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">void</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier">Data.ByteString</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier">ByteString</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-13"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Coerce</span></a></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier">Data.Text</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier">unpack</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Formatting</span></span><span>
 </span><span id="line-16"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">NoThunks.Class</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">InspectHeap</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">NoThunks</span></span><span class="hs-special">)</span><span>
 </span><span id="line-17"></span><span>
@@ -32,23 +32,23 @@
   Serialise
 -------------------------------------------------------------------------------}</span><span>
 </span><span id="line-34"></span><span>
-</span><span id="line-35"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679157971"><span id="local-6989586621679157973"><span class="annot"><span class="hs-identifier hs-type">Serialise</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CC.ChainValidationState</span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-36"></span><span>  </span><span id="local-6989586621679157969"><span class="annot"><span class="annottext">encode :: ChainValidationState -&gt; Encoding
-</span><a href="#local-6989586621679157969"><span class="hs-identifier hs-var hs-var hs-var hs-var">encode</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ChainValidationState -&gt; Encoding
+</span><span id="line-35"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679161708"><span id="local-6989586621679161710"><span class="annot"><span class="hs-identifier hs-type">Serialise</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CC.ChainValidationState</span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-36"></span><span>  </span><span id="local-6989586621679161706"><span class="annot"><span class="annottext">encode :: ChainValidationState -&gt; Encoding
+</span><a href="#local-6989586621679161706"><span class="hs-identifier hs-var hs-var hs-var hs-var">encode</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ChainValidationState -&gt; Encoding
 forall a. ToCBOR a =&gt; a -&gt; Encoding
 </span><span class="hs-identifier hs-var">Cardano.Binary.toCBOR</span></span><span>
-</span><span id="line-37"></span><span>  </span><span id="local-6989586621679157967"><span class="annot"><span class="annottext">decode :: Decoder s ChainValidationState
-</span><a href="#local-6989586621679157967"><span class="hs-identifier hs-var hs-var hs-var hs-var">decode</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Decoder s ChainValidationState
+</span><span id="line-37"></span><span>  </span><span id="local-6989586621679161704"><span class="annot"><span class="annottext">decode :: Decoder s ChainValidationState
+</span><a href="#local-6989586621679161704"><span class="hs-identifier hs-var hs-var hs-var hs-var">decode</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Decoder s ChainValidationState
 forall a s. FromCBOR a =&gt; Decoder s a
 </span><span class="hs-identifier hs-var">Cardano.Binary.fromCBOR</span></span><span>
 </span><span id="line-38"></span><span>
-</span><span id="line-39"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679157960"><span id="local-6989586621679157962"><span class="annot"><span class="hs-identifier hs-type">Serialise</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CC.KeyHash</span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-40"></span><span>  </span><span id="local-6989586621679157959"><span class="annot"><span class="annottext">encode :: KeyHash -&gt; Encoding
-</span><a href="#local-6989586621679157959"><span class="hs-identifier hs-var hs-var hs-var hs-var">encode</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">KeyHash -&gt; Encoding
+</span><span id="line-39"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679161697"><span id="local-6989586621679161699"><span class="annot"><span class="hs-identifier hs-type">Serialise</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CC.KeyHash</span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-40"></span><span>  </span><span id="local-6989586621679161696"><span class="annot"><span class="annottext">encode :: KeyHash -&gt; Encoding
+</span><a href="#local-6989586621679161696"><span class="hs-identifier hs-var hs-var hs-var hs-var">encode</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">KeyHash -&gt; Encoding
 forall a. ToCBOR a =&gt; a -&gt; Encoding
 </span><span class="hs-identifier hs-var">Cardano.Binary.toCBOR</span></span><span>
-</span><span id="line-41"></span><span>  </span><span id="local-6989586621679157958"><span class="annot"><span class="annottext">decode :: Decoder s KeyHash
-</span><a href="#local-6989586621679157958"><span class="hs-identifier hs-var hs-var hs-var hs-var">decode</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Decoder s KeyHash
+</span><span id="line-41"></span><span>  </span><span id="local-6989586621679161695"><span class="annot"><span class="annottext">decode :: Decoder s KeyHash
+</span><a href="#local-6989586621679161695"><span class="hs-identifier hs-var hs-var hs-var hs-var">decode</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Decoder s KeyHash
 forall a s. FromCBOR a =&gt; Decoder s a
 </span><span class="hs-identifier hs-var">Cardano.Binary.fromCBOR</span></span><span>
 </span><span id="line-42"></span><span>
@@ -57,21 +57,21 @@ forall a s. FromCBOR a =&gt; Decoder s a
 -------------------------------------------------------------------------------}</span><span>
 </span><span id="line-46"></span><span>
 </span><span id="line-47"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CC.HeaderHash</span></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-48"></span><span>  </span><span id="local-6989586621679157955"><span class="annot"><span class="annottext">condense :: HeaderHash -&gt; String
+</span><span id="line-48"></span><span>  </span><span id="local-6989586621679161692"><span class="annot"><span class="annottext">condense :: HeaderHash -&gt; String
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Format String (HeaderHash -&gt; String) -&gt; HeaderHash -&gt; String
 forall a. Format String a -&gt; a
 </span><span class="hs-identifier hs-var">formatToString</span></span><span> </span><span class="annot"><span class="annottext">Format String (HeaderHash -&gt; String)
 forall r. Format r (HeaderHash -&gt; r)
 </span><span class="hs-identifier hs-var">CC.headerHashF</span></span><span>
 </span><span id="line-49"></span><span>
-</span><span id="line-50"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.ABlock</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">ByteString</span></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-51"></span><span>  </span><span id="local-6989586621679157950"><span class="annot"><span class="annottext">condense :: ABlock ByteString -&gt; String
-</span><a href="#local-6989586621679157950"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
-</span><span class="hs-identifier hs-var">unpack</span></span><span>
+</span><span id="line-50"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.ABlock</span></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-type">ByteString</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-51"></span><span>  </span><span id="local-6989586621679161687"><span class="annot"><span class="annottext">condense :: ABlock ByteString -&gt; String
+</span><a href="#local-6989586621679161687"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-var">unpack</span></a></span><span>
 </span><span id="line-52"></span><span>           </span><span class="annot"><span class="annottext">(Text -&gt; String)
 -&gt; (ABlock ByteString -&gt; Text) -&gt; ABlock ByteString -&gt; String
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Format Text ([Tx] -&gt; Text) -&gt; [Tx] -&gt; Text
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Format Text ([Tx] -&gt; Text) -&gt; [Tx] -&gt; Text
 forall a. Format Text a -&gt; a
 </span><span class="hs-identifier hs-var">sformat</span></span><span> </span><span class="annot"><span class="annottext">Format Text ([Tx] -&gt; Text)
 forall a r. Buildable a =&gt; Format r (a -&gt; r)
@@ -79,7 +79,7 @@ forall a r. Buildable a =&gt; Format r (a -&gt; r)
 </span><span id="line-53"></span><span>           </span><span class="annot"><span class="annottext">([Tx] -&gt; Text)
 -&gt; (ABlock ByteString -&gt; [Tx]) -&gt; ABlock ByteString -&gt; Text
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">ATxPayload ByteString -&gt; [Tx]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">ATxPayload ByteString -&gt; [Tx]
 forall a. ATxPayload a -&gt; [Tx]
 </span><span class="hs-identifier hs-var">CC.txpTxs</span></span><span>
 </span><span id="line-54"></span><span>           </span><span class="annot"><span class="annottext">(ATxPayload ByteString -&gt; [Tx])
@@ -87,7 +87,7 @@ forall a. ATxPayload a -&gt; [Tx]
 -&gt; ABlock ByteString
 -&gt; [Tx]
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">ABody ByteString -&gt; ATxPayload ByteString
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">ABody ByteString -&gt; ATxPayload ByteString
 forall a. ABody a -&gt; ATxPayload a
 </span><span class="hs-identifier hs-var hs-var">CC.bodyTxPayload</span></span><span>
 </span><span id="line-55"></span><span>           </span><span class="annot"><span class="annottext">(ABody ByteString -&gt; ATxPayload ByteString)
@@ -95,196 +95,196 @@ forall a. ABody a -&gt; ATxPayload a
 -&gt; ABlock ByteString
 -&gt; ATxPayload ByteString
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">ABlock ByteString -&gt; ABody ByteString
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">ABlock ByteString -&gt; ABody ByteString
 forall a. ABlock a -&gt; ABody a
 </span><span class="hs-identifier hs-var hs-var">CC.blockBody</span></span><span>
 </span><span id="line-56"></span><span>
-</span><span id="line-57"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.AHeader</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">ByteString</span></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-58"></span><span>  </span><span id="local-6989586621679157942"><span class="annot"><span class="annottext">condense :: AHeader ByteString -&gt; String
-</span><a href="#local-6989586621679157942"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span id="local-6989586621679157941"><span class="annot"><span class="annottext">AHeader ByteString
-</span><a href="#local-6989586621679157941"><span class="hs-identifier hs-var">hdr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String
+</span><span id="line-57"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.AHeader</span></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-type">ByteString</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-58"></span><span>  </span><span id="local-6989586621679161679"><span class="annot"><span class="annottext">condense :: AHeader ByteString -&gt; String
+</span><a href="#local-6989586621679161679"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span id="local-6989586621679161678"><span class="annot"><span class="annottext">AHeader ByteString
+</span><a href="#local-6989586621679161678"><span class="hs-identifier hs-var">hdr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String
 forall a. Monoid a =&gt; [a] -&gt; a
-</span><span class="hs-identifier hs-var">mconcat</span></span><span> </span><span class="hs-special">[</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">mconcat</span></a></span><span> </span><span class="hs-special">[</span><span>
 </span><span id="line-59"></span><span>        </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;( hash: &quot;</span></span><span>         </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
-</span><span class="hs-identifier hs-var">unpack</span></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679157940"><span class="hs-identifier hs-var">condensedHash</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-var">unpack</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679161677"><span class="hs-identifier hs-var">condensedHash</span></a></span><span>
 </span><span id="line-60"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;, previousHash: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
-</span><span class="hs-identifier hs-var">unpack</span></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679157939"><span class="hs-identifier hs-var">condensedPrevHash</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-var">unpack</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679161676"><span class="hs-identifier hs-var">condensedPrevHash</span></a></span><span>
 </span><span id="line-61"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;, slot: &quot;</span></span><span>         </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
-</span><span class="hs-identifier hs-var">unpack</span></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679157938"><span class="hs-identifier hs-var">condensedSlot</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-var">unpack</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679161675"><span class="hs-identifier hs-var">condensedSlot</span></a></span><span>
 </span><span id="line-62"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;, issuer: &quot;</span></span><span>       </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">VerificationKey -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">VerificationKey -&gt; String
 forall a. Condense a =&gt; a -&gt; String
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">condense</span></a></span><span> </span><span class="annot"><span class="annottext">VerificationKey
-</span><a href="#local-6989586621679157937"><span class="hs-identifier hs-var">issuer</span></a></span><span>
+</span><a href="#local-6989586621679161674"><span class="hs-identifier hs-var">issuer</span></a></span><span>
 </span><span id="line-63"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;, delegate: &quot;</span></span><span>     </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">VerificationKey -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">VerificationKey -&gt; String
 forall a. Condense a =&gt; a -&gt; String
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">condense</span></a></span><span> </span><span class="annot"><span class="annottext">VerificationKey
-</span><a href="#local-6989586621679157936"><span class="hs-identifier hs-var">delegate</span></a></span><span>
+</span><a href="#local-6989586621679161673"><span class="hs-identifier hs-var">delegate</span></a></span><span>
 </span><span id="line-64"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;)&quot;</span></span><span>
 </span><span id="line-65"></span><span>      </span><span class="hs-special">]</span><span>
 </span><span id="line-66"></span><span>    </span><span class="hs-keyword">where</span><span>
-</span><span id="line-67"></span><span>      </span><span id="local-6989586621679157935"><span class="annot"><span class="annottext">psigCert :: ACertificate ByteString
-</span><a href="#local-6989586621679157935"><span class="hs-identifier hs-var hs-var">psigCert</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ABlockSignature ByteString -&gt; ACertificate ByteString
+</span><span id="line-67"></span><span>      </span><span id="local-6989586621679161672"><span class="annot"><span class="annottext">psigCert :: ACertificate ByteString
+</span><a href="#local-6989586621679161672"><span class="hs-identifier hs-var hs-var">psigCert</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ABlockSignature ByteString -&gt; ACertificate ByteString
 forall a. ABlockSignature a -&gt; ACertificate a
 </span><span class="hs-identifier hs-var hs-var">CC.delegationCertificate</span></span><span> </span><span class="annot"><span class="annottext">(ABlockSignature ByteString -&gt; ACertificate ByteString)
 -&gt; ABlockSignature ByteString -&gt; ACertificate ByteString
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">AHeader ByteString -&gt; ABlockSignature ByteString
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">AHeader ByteString -&gt; ABlockSignature ByteString
 forall a. AHeader a -&gt; ABlockSignature a
 </span><span class="hs-identifier hs-var hs-var">CC.headerSignature</span></span><span> </span><span class="annot"><span class="annottext">AHeader ByteString
-</span><a href="#local-6989586621679157941"><span class="hs-identifier hs-var">hdr</span></a></span><span>
-</span><span id="line-68"></span><span>      </span><span id="local-6989586621679157937"><span class="annot"><span class="annottext">issuer :: VerificationKey
-</span><a href="#local-6989586621679157937"><span class="hs-identifier hs-var hs-var">issuer</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ACertificate ByteString -&gt; VerificationKey
+</span><a href="#local-6989586621679161678"><span class="hs-identifier hs-var">hdr</span></a></span><span>
+</span><span id="line-68"></span><span>      </span><span id="local-6989586621679161674"><span class="annot"><span class="annottext">issuer :: VerificationKey
+</span><a href="#local-6989586621679161674"><span class="hs-identifier hs-var hs-var">issuer</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ACertificate ByteString -&gt; VerificationKey
 forall a. ACertificate a -&gt; VerificationKey
 </span><span class="hs-identifier hs-var hs-var">CC.issuerVK</span></span><span>   </span><span class="annot"><span class="annottext">ACertificate ByteString
-</span><a href="#local-6989586621679157935"><span class="hs-identifier hs-var">psigCert</span></a></span><span>
-</span><span id="line-69"></span><span>      </span><span id="local-6989586621679157936"><span class="annot"><span class="annottext">delegate :: VerificationKey
-</span><a href="#local-6989586621679157936"><span class="hs-identifier hs-var hs-var">delegate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ACertificate ByteString -&gt; VerificationKey
+</span><a href="#local-6989586621679161672"><span class="hs-identifier hs-var">psigCert</span></a></span><span>
+</span><span id="line-69"></span><span>      </span><span id="local-6989586621679161673"><span class="annot"><span class="annottext">delegate :: VerificationKey
+</span><a href="#local-6989586621679161673"><span class="hs-identifier hs-var hs-var">delegate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ACertificate ByteString -&gt; VerificationKey
 forall a. ACertificate a -&gt; VerificationKey
 </span><span class="hs-identifier hs-var hs-var">CC.delegateVK</span></span><span> </span><span class="annot"><span class="annottext">ACertificate ByteString
-</span><a href="#local-6989586621679157935"><span class="hs-identifier hs-var">psigCert</span></a></span><span>
-</span><span id="line-70"></span><span>      </span><span id="local-6989586621679157930"><span class="annot"><span class="annottext">hdrHash :: HeaderHash
-</span><a href="#local-6989586621679157930"><span class="hs-identifier hs-var hs-var">hdrHash</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AHeader ByteString -&gt; HeaderHash
+</span><a href="#local-6989586621679161672"><span class="hs-identifier hs-var">psigCert</span></a></span><span>
+</span><span id="line-70"></span><span>      </span><span id="local-6989586621679161667"><span class="annot"><span class="annottext">hdrHash :: HeaderHash
+</span><a href="#local-6989586621679161667"><span class="hs-identifier hs-var hs-var">hdrHash</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AHeader ByteString -&gt; HeaderHash
 </span><span class="hs-identifier hs-var">CC.headerHashAnnotated</span></span><span> </span><span class="annot"><span class="annottext">AHeader ByteString
-</span><a href="#local-6989586621679157941"><span class="hs-identifier hs-var">hdr</span></a></span><span>
+</span><a href="#local-6989586621679161678"><span class="hs-identifier hs-var">hdr</span></a></span><span>
 </span><span id="line-71"></span><span>
-</span><span id="line-72"></span><span>      </span><span id="local-6989586621679157940"><span class="annot"><span class="annottext">condensedHash :: Text
-</span><a href="#local-6989586621679157940"><span class="hs-identifier hs-var hs-var">condensedHash</span></a></span></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Format Text (HeaderHash -&gt; Text) -&gt; HeaderHash -&gt; Text
+</span><span id="line-72"></span><span>      </span><span id="local-6989586621679161677"><span class="annot"><span class="annottext">condensedHash :: Text
+</span><a href="#local-6989586621679161677"><span class="hs-identifier hs-var hs-var">condensedHash</span></a></span></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Format Text (HeaderHash -&gt; Text) -&gt; HeaderHash -&gt; Text
 forall a. Format Text a -&gt; a
 </span><span class="hs-identifier hs-var">sformat</span></span><span> </span><span class="annot"><span class="annottext">Format Text (HeaderHash -&gt; Text)
 forall r. Format r (HeaderHash -&gt; r)
 </span><span class="hs-identifier hs-var">CC.headerHashF</span></span><span> </span><span class="annot"><span class="annottext">(HeaderHash -&gt; Text) -&gt; HeaderHash -&gt; Text
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">HeaderHash
-</span><a href="#local-6989586621679157930"><span class="hs-identifier hs-var">hdrHash</span></a></span><span>
-</span><span id="line-73"></span><span>      </span><span id="local-6989586621679157939"><span class="annot"><span class="annottext">condensedPrevHash :: Text
-</span><a href="#local-6989586621679157939"><span class="hs-identifier hs-var hs-var">condensedPrevHash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Format Text (HeaderHash -&gt; Text) -&gt; HeaderHash -&gt; Text
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">HeaderHash
+</span><a href="#local-6989586621679161667"><span class="hs-identifier hs-var">hdrHash</span></a></span><span>
+</span><span id="line-73"></span><span>      </span><span id="local-6989586621679161676"><span class="annot"><span class="annottext">condensedPrevHash :: Text
+</span><a href="#local-6989586621679161676"><span class="hs-identifier hs-var hs-var">condensedPrevHash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Format Text (HeaderHash -&gt; Text) -&gt; HeaderHash -&gt; Text
 forall a. Format Text a -&gt; a
 </span><span class="hs-identifier hs-var">sformat</span></span><span> </span><span class="annot"><span class="annottext">Format Text (HeaderHash -&gt; Text)
 forall r. Format r (HeaderHash -&gt; r)
 </span><span class="hs-identifier hs-var">CC.headerHashF</span></span><span> </span><span class="annot"><span class="annottext">(HeaderHash -&gt; Text) -&gt; HeaderHash -&gt; Text
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">AHeader ByteString -&gt; HeaderHash
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">AHeader ByteString -&gt; HeaderHash
 forall a. AHeader a -&gt; HeaderHash
 </span><span class="hs-identifier hs-var">CC.headerPrevHash</span></span><span> </span><span class="annot"><span class="annottext">AHeader ByteString
-</span><a href="#local-6989586621679157941"><span class="hs-identifier hs-var">hdr</span></a></span><span>
-</span><span id="line-74"></span><span>      </span><span id="local-6989586621679157938"><span class="annot"><span class="annottext">condensedSlot :: Text
-</span><a href="#local-6989586621679157938"><span class="hs-identifier hs-var hs-var">condensedSlot</span></a></span></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Format Text (SlotNumber -&gt; Text) -&gt; SlotNumber -&gt; Text
+</span><a href="#local-6989586621679161678"><span class="hs-identifier hs-var">hdr</span></a></span><span>
+</span><span id="line-74"></span><span>      </span><span id="local-6989586621679161675"><span class="annot"><span class="annottext">condensedSlot :: Text
+</span><a href="#local-6989586621679161675"><span class="hs-identifier hs-var hs-var">condensedSlot</span></a></span></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Format Text (SlotNumber -&gt; Text) -&gt; SlotNumber -&gt; Text
 forall a. Format Text a -&gt; a
 </span><span class="hs-identifier hs-var">sformat</span></span><span> </span><span class="annot"><span class="annottext">Format Text (SlotNumber -&gt; Text)
 forall a r. Buildable a =&gt; Format r (a -&gt; r)
 </span><span class="hs-identifier hs-var">build</span></span><span> </span><span class="annot"><span class="annottext">(SlotNumber -&gt; Text) -&gt; SlotNumber -&gt; Text
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
 </span><span id="line-75"></span><span>                            </span><span class="annot"><span class="annottext">Annotated SlotNumber ByteString -&gt; SlotNumber
 forall b a. Annotated b a -&gt; b
 </span><span class="hs-identifier hs-var hs-var">Cardano.Binary.unAnnotated</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AHeader ByteString -&gt; Annotated SlotNumber ByteString
 forall a. AHeader a -&gt; Annotated SlotNumber a
 </span><span class="hs-identifier hs-var hs-var">CC.aHeaderSlot</span></span><span> </span><span class="annot"><span class="annottext">AHeader ByteString
-</span><a href="#local-6989586621679157941"><span class="hs-identifier hs-var">hdr</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679161678"><span class="hs-identifier hs-var">hdr</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-76"></span><span>
-</span><span id="line-77"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.ABoundaryBlock</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">ByteString</span></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-78"></span><span>  </span><span id="local-6989586621679157924"><span class="annot"><span class="annottext">condense :: ABoundaryBlock ByteString -&gt; String
-</span><a href="#local-6989586621679157924"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ABoundaryHeader ByteString -&gt; String
+</span><span id="line-77"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.ABoundaryBlock</span></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-type">ByteString</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-78"></span><span>  </span><span id="local-6989586621679161661"><span class="annot"><span class="annottext">condense :: ABoundaryBlock ByteString -&gt; String
+</span><a href="#local-6989586621679161661"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ABoundaryHeader ByteString -&gt; String
 forall a. Condense a =&gt; a -&gt; String
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">condense</span></a></span><span> </span><span class="annot"><span class="annottext">(ABoundaryHeader ByteString -&gt; String)
 -&gt; (ABoundaryBlock ByteString -&gt; ABoundaryHeader ByteString)
 -&gt; ABoundaryBlock ByteString
 -&gt; String
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">ABoundaryBlock ByteString -&gt; ABoundaryHeader ByteString
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">ABoundaryBlock ByteString -&gt; ABoundaryHeader ByteString
 forall a. ABoundaryBlock a -&gt; ABoundaryHeader a
 </span><span class="hs-identifier hs-var hs-var">CC.boundaryHeader</span></span><span>
 </span><span id="line-79"></span><span>
-</span><span id="line-80"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.ABlockOrBoundary</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">ByteString</span></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-81"></span><span>  </span><span id="local-6989586621679157921"><span class="annot"><span class="annottext">condense :: ABlockOrBoundary ByteString -&gt; String
-</span><a href="#local-6989586621679157921"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.ABOBBlock</span></span><span> </span><span id="local-6989586621679157919"><span class="annot"><span class="annottext">ABlock ByteString
-</span><a href="#local-6989586621679157919"><span class="hs-identifier hs-var">blk</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String
+</span><span id="line-80"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.ABlockOrBoundary</span></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-type">ByteString</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-81"></span><span>  </span><span id="local-6989586621679161658"><span class="annot"><span class="annottext">condense :: ABlockOrBoundary ByteString -&gt; String
+</span><a href="#local-6989586621679161658"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.ABOBBlock</span></span><span> </span><span id="local-6989586621679161656"><span class="annot"><span class="annottext">ABlock ByteString
+</span><a href="#local-6989586621679161656"><span class="hs-identifier hs-var">blk</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String
 forall a. Monoid a =&gt; [a] -&gt; a
-</span><span class="hs-identifier hs-var">mconcat</span></span><span> </span><span class="hs-special">[</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">mconcat</span></a></span><span> </span><span class="hs-special">[</span><span>
 </span><span id="line-82"></span><span>        </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;( header: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">AHeader ByteString -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">AHeader ByteString -&gt; String
 forall a. Condense a =&gt; a -&gt; String
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ABlock ByteString -&gt; AHeader ByteString
 forall a. ABlock a -&gt; AHeader a
 </span><span class="hs-identifier hs-var hs-var">CC.blockHeader</span></span><span> </span><span class="annot"><span class="annottext">ABlock ByteString
-</span><a href="#local-6989586621679157919"><span class="hs-identifier hs-var">blk</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679161656"><span class="hs-identifier hs-var">blk</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-83"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;, body: &quot;</span></span><span>   </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">ABlock ByteString -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">ABlock ByteString -&gt; String
 forall a. Condense a =&gt; a -&gt; String
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">condense</span></a></span><span> </span><span class="annot"><span class="annottext">ABlock ByteString
-</span><a href="#local-6989586621679157919"><span class="hs-identifier hs-var">blk</span></a></span><span>
+</span><a href="#local-6989586621679161656"><span class="hs-identifier hs-var">blk</span></a></span><span>
 </span><span id="line-84"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;)&quot;</span></span><span>
 </span><span id="line-85"></span><span>      </span><span class="hs-special">]</span><span>
-</span><span id="line-86"></span><span>  </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.ABOBBoundary</span></span><span> </span><span id="local-6989586621679157916"><span class="annot"><span class="annottext">ABoundaryBlock ByteString
-</span><a href="#local-6989586621679157916"><span class="hs-identifier hs-var">ebb</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-86"></span><span>  </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.ABOBBoundary</span></span><span> </span><span id="local-6989586621679161653"><span class="annot"><span class="annottext">ABoundaryBlock ByteString
+</span><a href="#local-6989586621679161653"><span class="hs-identifier hs-var">ebb</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-87"></span><span>      </span><span class="annot"><span class="annottext">ABoundaryBlock ByteString -&gt; String
 forall a. Condense a =&gt; a -&gt; String
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">condense</span></a></span><span> </span><span class="annot"><span class="annottext">ABoundaryBlock ByteString
-</span><a href="#local-6989586621679157916"><span class="hs-identifier hs-var">ebb</span></a></span><span>
+</span><a href="#local-6989586621679161653"><span class="hs-identifier hs-var">ebb</span></a></span><span>
 </span><span id="line-88"></span><span>
-</span><span id="line-89"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.ABoundaryHeader</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">ByteString</span></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-90"></span><span>  </span><span id="local-6989586621679157914"><span class="annot"><span class="annottext">condense :: ABoundaryHeader ByteString -&gt; String
-</span><a href="#local-6989586621679157914"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span id="local-6989586621679157913"><span class="annot"><span class="annottext">ABoundaryHeader ByteString
-</span><a href="#local-6989586621679157913"><span class="hs-identifier hs-var">hdr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String
+</span><span id="line-89"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.ABoundaryHeader</span></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-type">ByteString</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-90"></span><span>  </span><span id="local-6989586621679161651"><span class="annot"><span class="annottext">condense :: ABoundaryHeader ByteString -&gt; String
+</span><a href="#local-6989586621679161651"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span id="local-6989586621679161650"><span class="annot"><span class="annottext">ABoundaryHeader ByteString
+</span><a href="#local-6989586621679161650"><span class="hs-identifier hs-var">hdr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String
 forall a. Monoid a =&gt; [a] -&gt; a
-</span><span class="hs-identifier hs-var">mconcat</span></span><span> </span><span class="hs-special">[</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">mconcat</span></a></span><span> </span><span class="hs-special">[</span><span>
 </span><span id="line-91"></span><span>        </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;( ebb: &quot;</span></span><span>          </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; String
 forall a. Condense a =&gt; a -&gt; String
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ABoundaryHeader ByteString -&gt; Word64
 forall a. ABoundaryHeader a -&gt; Word64
 </span><span class="hs-identifier hs-var hs-var">CC.boundaryEpoch</span></span><span> </span><span class="annot"><span class="annottext">ABoundaryHeader ByteString
-</span><a href="#local-6989586621679157913"><span class="hs-identifier hs-var">hdr</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679161650"><span class="hs-identifier hs-var">hdr</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-92"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;, hash: &quot;</span></span><span>         </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679157911"><span class="hs-identifier hs-var">condensedHash</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679161648"><span class="hs-identifier hs-var">condensedHash</span></a></span><span>
 </span><span id="line-93"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;, previousHash: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679157910"><span class="hs-identifier hs-var">condensedPrevHash</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679161647"><span class="hs-identifier hs-var">condensedPrevHash</span></a></span><span>
 </span><span id="line-94"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;)&quot;</span></span><span>
 </span><span id="line-95"></span><span>      </span><span class="hs-special">]</span><span>
 </span><span id="line-96"></span><span>    </span><span class="hs-keyword">where</span><span>
-</span><span id="line-97"></span><span>      </span><span id="local-6989586621679157911"><span class="annot"><span class="annottext">condensedHash :: String
-</span><a href="#local-6989586621679157911"><span class="hs-identifier hs-var hs-var">condensedHash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-97"></span><span>      </span><span id="local-6989586621679161648"><span class="annot"><span class="annottext">condensedHash :: String
+</span><a href="#local-6989586621679161648"><span class="hs-identifier hs-var hs-var">condensedHash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-98"></span><span>            </span><span class="annot"><span class="annottext">Text -&gt; String
-</span><span class="hs-identifier hs-var">unpack</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-var">unpack</span></a></span><span>
 </span><span id="line-99"></span><span>          </span><span class="annot"><span class="annottext">(Text -&gt; String)
 -&gt; (ABoundaryHeader ByteString -&gt; Text)
 -&gt; ABoundaryHeader ByteString
 -&gt; String
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Format Text (HeaderHash -&gt; Text) -&gt; HeaderHash -&gt; Text
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Format Text (HeaderHash -&gt; Text) -&gt; HeaderHash -&gt; Text
 forall a. Format Text a -&gt; a
 </span><span class="hs-identifier hs-var">sformat</span></span><span> </span><span class="annot"><span class="annottext">Format Text (HeaderHash -&gt; Text)
 forall r. Format r (HeaderHash -&gt; r)
@@ -294,173 +294,173 @@ forall r. Format r (HeaderHash -&gt; r)
 -&gt; ABoundaryHeader ByteString
 -&gt; Text
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Hash (ABoundaryHeader ()) -&gt; HeaderHash
-</span><span class="hs-identifier hs-var">coerce</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Hash (ABoundaryHeader ()) -&gt; HeaderHash
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">coerce</span></a></span><span>
 </span><span id="line-101"></span><span>          </span><span class="annot"><span class="annottext">(Hash (ABoundaryHeader ()) -&gt; HeaderHash)
 -&gt; (ABoundaryHeader ByteString -&gt; Hash (ABoundaryHeader ()))
 -&gt; ABoundaryHeader ByteString
 -&gt; HeaderHash
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">ABoundaryHeader ByteString -&gt; Hash (ABoundaryHeader ())
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">ABoundaryHeader ByteString -&gt; Hash (ABoundaryHeader ())
 forall t. Decoded t =&gt; t -&gt; Hash (BaseType t)
 </span><span class="hs-identifier hs-var">Cardano.Crypto.hashDecoded</span></span><span> </span><span class="annot"><span class="annottext">(ABoundaryHeader ByteString -&gt; Hash (ABoundaryHeader ()))
 -&gt; (ABoundaryHeader ByteString -&gt; ABoundaryHeader ByteString)
 -&gt; ABoundaryHeader ByteString
 -&gt; Hash (ABoundaryHeader ())
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; ByteString)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; ByteString)
 -&gt; ABoundaryHeader ByteString -&gt; ABoundaryHeader ByteString
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; ByteString
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fmap</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; ByteString
 </span><span class="hs-identifier hs-var">CC.wrapBoundaryBytes</span></span><span>
 </span><span id="line-102"></span><span>          </span><span class="annot"><span class="annottext">(ABoundaryHeader ByteString -&gt; String)
 -&gt; ABoundaryHeader ByteString -&gt; String
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">ABoundaryHeader ByteString
-</span><a href="#local-6989586621679157913"><span class="hs-identifier hs-var">hdr</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ABoundaryHeader ByteString
+</span><a href="#local-6989586621679161650"><span class="hs-identifier hs-var">hdr</span></a></span><span>
 </span><span id="line-103"></span><span>
-</span><span id="line-104"></span><span>      </span><span id="local-6989586621679157910"><span class="annot"><span class="annottext">condensedPrevHash :: String
-</span><a href="#local-6989586621679157910"><span class="hs-identifier hs-var hs-var">condensedPrevHash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-104"></span><span>      </span><span id="local-6989586621679161647"><span class="annot"><span class="annottext">condensedPrevHash :: String
+</span><a href="#local-6989586621679161647"><span class="hs-identifier hs-var hs-var">condensedPrevHash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-105"></span><span>          </span><span class="annot"><span class="annottext">Text -&gt; String
-</span><span class="hs-identifier hs-var">unpack</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; String) -&gt; Text -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-var">unpack</span></a></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; String) -&gt; Text -&gt; String
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">ABoundaryHeader ByteString -&gt; Either GenesisHash HeaderHash
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">ABoundaryHeader ByteString -&gt; Either GenesisHash HeaderHash
 forall a. ABoundaryHeader a -&gt; Either GenesisHash HeaderHash
 </span><span class="hs-identifier hs-var hs-var">CC.boundaryPrevHash</span></span><span> </span><span class="annot"><span class="annottext">ABoundaryHeader ByteString
-</span><a href="#local-6989586621679157913"><span class="hs-identifier hs-var">hdr</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-106"></span><span>            </span><span class="annot"><span class="hs-identifier hs-type">Left</span></span><span> </span><span class="annot"><span class="annottext">GenesisHash
+</span><a href="#local-6989586621679161650"><span class="hs-identifier hs-var">hdr</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-106"></span><span>            </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Left</span></a></span><span> </span><span class="annot"><span class="annottext">GenesisHash
 </span><span class="hs-identifier">_</span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Text
 </span><span class="hs-string">&quot;Genesis&quot;</span></span><span>
-</span><span id="line-107"></span><span>            </span><span class="annot"><span class="hs-identifier hs-type">Right</span></span><span> </span><span id="local-6989586621679157906"><span class="annot"><span class="annottext">HeaderHash
-</span><a href="#local-6989586621679157906"><span class="hs-identifier hs-var">h</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Format Text (HeaderHash -&gt; Text) -&gt; HeaderHash -&gt; Text
+</span><span id="line-107"></span><span>            </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Right</span></a></span><span> </span><span id="local-6989586621679161643"><span class="annot"><span class="annottext">HeaderHash
+</span><a href="#local-6989586621679161643"><span class="hs-identifier hs-var">h</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Format Text (HeaderHash -&gt; Text) -&gt; HeaderHash -&gt; Text
 forall a. Format Text a -&gt; a
 </span><span class="hs-identifier hs-var">sformat</span></span><span> </span><span class="annot"><span class="annottext">Format Text (HeaderHash -&gt; Text)
 forall r. Format r (HeaderHash -&gt; r)
 </span><span class="hs-identifier hs-var">CC.headerHashF</span></span><span> </span><span class="annot"><span class="annottext">HeaderHash
-</span><a href="#local-6989586621679157906"><span class="hs-identifier hs-var">h</span></a></span><span>
+</span><a href="#local-6989586621679161643"><span class="hs-identifier hs-var">h</span></a></span><span>
 </span><span id="line-108"></span><span>
 </span><span id="line-109"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CC.TxId</span></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-110"></span><span>  </span><span id="local-6989586621679157904"><span class="annot"><span class="annottext">condense :: TxId -&gt; String
-</span><a href="#local-6989586621679157904"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span id="local-6989586621679157903"><span class="annot"><span class="annottext">TxId
-</span><a href="#local-6989586621679157903"><span class="hs-identifier hs-var">hash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span id="line-110"></span><span>  </span><span id="local-6989586621679161641"><span class="annot"><span class="annottext">condense :: TxId -&gt; String
+</span><a href="#local-6989586621679161641"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span id="local-6989586621679161640"><span class="annot"><span class="annottext">TxId
+</span><a href="#local-6989586621679161640"><span class="hs-identifier hs-var">hash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;txid:&quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
-</span><span class="hs-identifier hs-var">unpack</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Format Text (TxId -&gt; Text) -&gt; TxId -&gt; Text
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-var">unpack</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Format Text (TxId -&gt; Text) -&gt; TxId -&gt; Text
 forall a. Format Text a -&gt; a
 </span><span class="hs-identifier hs-var">sformat</span></span><span> </span><span class="annot"><span class="annottext">Format Text (TxId -&gt; Text)
 forall r algo a. Format r (AbstractHash algo a -&gt; r)
 </span><span class="hs-identifier hs-var">shortHashF</span></span><span> </span><span class="annot"><span class="annottext">TxId
-</span><a href="#local-6989586621679157903"><span class="hs-identifier hs-var">hash</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679161640"><span class="hs-identifier hs-var">hash</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-111"></span><span>
 </span><span id="line-112"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CC.UpId</span></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-113"></span><span>  </span><span id="local-6989586621679157901"><span class="annot"><span class="annottext">condense :: UpId -&gt; String
-</span><a href="#local-6989586621679157901"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span id="local-6989586621679157900"><span class="annot"><span class="annottext">UpId
-</span><a href="#local-6989586621679157900"><span class="hs-identifier hs-var">hash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span id="line-113"></span><span>  </span><span id="local-6989586621679161638"><span class="annot"><span class="annottext">condense :: UpId -&gt; String
+</span><a href="#local-6989586621679161638"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span id="local-6989586621679161637"><span class="annot"><span class="annottext">UpId
+</span><a href="#local-6989586621679161637"><span class="hs-identifier hs-var">hash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;upid:&quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
-</span><span class="hs-identifier hs-var">unpack</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Format Text (UpId -&gt; Text) -&gt; UpId -&gt; Text
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-var">unpack</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Format Text (UpId -&gt; Text) -&gt; UpId -&gt; Text
 forall a. Format Text a -&gt; a
 </span><span class="hs-identifier hs-var">sformat</span></span><span> </span><span class="annot"><span class="annottext">Format Text (UpId -&gt; Text)
 forall r algo a. Format r (AbstractHash algo a -&gt; r)
 </span><span class="hs-identifier hs-var">shortHashF</span></span><span> </span><span class="annot"><span class="annottext">UpId
-</span><a href="#local-6989586621679157900"><span class="hs-identifier hs-var">hash</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679161637"><span class="hs-identifier hs-var">hash</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-114"></span><span>
 </span><span id="line-115"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CC.CertificateId</span></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-116"></span><span>  </span><span id="local-6989586621679157898"><span class="annot"><span class="annottext">condense :: CertificateId -&gt; String
-</span><a href="#local-6989586621679157898"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span id="local-6989586621679157897"><span class="annot"><span class="annottext">CertificateId
-</span><a href="#local-6989586621679157897"><span class="hs-identifier hs-var">hash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span id="line-116"></span><span>  </span><span id="local-6989586621679161635"><span class="annot"><span class="annottext">condense :: CertificateId -&gt; String
+</span><a href="#local-6989586621679161635"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span id="local-6989586621679161634"><span class="annot"><span class="annottext">CertificateId
+</span><a href="#local-6989586621679161634"><span class="hs-identifier hs-var">hash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;certificateid: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
-</span><span class="hs-identifier hs-var">unpack</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Format Text (CertificateId -&gt; Text) -&gt; CertificateId -&gt; Text
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-var">unpack</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Format Text (CertificateId -&gt; Text) -&gt; CertificateId -&gt; Text
 forall a. Format Text a -&gt; a
 </span><span class="hs-identifier hs-var">sformat</span></span><span> </span><span class="annot"><span class="annottext">Format Text (CertificateId -&gt; Text)
 forall r algo a. Format r (AbstractHash algo a -&gt; r)
 </span><span class="hs-identifier hs-var">shortHashF</span></span><span> </span><span class="annot"><span class="annottext">CertificateId
-</span><a href="#local-6989586621679157897"><span class="hs-identifier hs-var">hash</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679161634"><span class="hs-identifier hs-var">hash</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-117"></span><span>
 </span><span id="line-118"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CC.VoteId</span></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-119"></span><span>  </span><span id="local-6989586621679157895"><span class="annot"><span class="annottext">condense :: VoteId -&gt; String
-</span><a href="#local-6989586621679157895"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span id="local-6989586621679157894"><span class="annot"><span class="annottext">VoteId
-</span><a href="#local-6989586621679157894"><span class="hs-identifier hs-var">hash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span id="line-119"></span><span>  </span><span id="local-6989586621679161632"><span class="annot"><span class="annottext">condense :: VoteId -&gt; String
+</span><a href="#local-6989586621679161632"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span id="local-6989586621679161631"><span class="annot"><span class="annottext">VoteId
+</span><a href="#local-6989586621679161631"><span class="hs-identifier hs-var">hash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;voteid: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
-</span><span class="hs-identifier hs-var">unpack</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Format Text (VoteId -&gt; Text) -&gt; VoteId -&gt; Text
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-var">unpack</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Format Text (VoteId -&gt; Text) -&gt; VoteId -&gt; Text
 forall a. Format Text a -&gt; a
 </span><span class="hs-identifier hs-var">sformat</span></span><span> </span><span class="annot"><span class="annottext">Format Text (VoteId -&gt; Text)
 forall r algo a. Format r (AbstractHash algo a -&gt; r)
 </span><span class="hs-identifier hs-var">shortHashF</span></span><span> </span><span class="annot"><span class="annottext">VoteId
-</span><a href="#local-6989586621679157894"><span class="hs-identifier hs-var">hash</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679161631"><span class="hs-identifier hs-var">hash</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-120"></span><span>
-</span><span id="line-121"></span><span id="local-6989586621679157893"><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.AMempoolPayload</span></span><span> </span><span class="annot"><a href="#local-6989586621679157893"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-122"></span><span>    </span><span id="local-6989586621679157891"><span class="annot"><span class="annottext">condense :: AMempoolPayload a -&gt; String
-</span><a href="#local-6989586621679157891"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.MempoolTx</span></span><span> </span><span id="local-6989586621679157889"><span class="annot"><span class="annottext">ATxAux a
-</span><a href="#local-6989586621679157889"><span class="hs-identifier hs-var">tx</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-121"></span><span id="local-6989586621679161630"><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.AMempoolPayload</span></span><span> </span><span class="annot"><a href="#local-6989586621679161630"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-122"></span><span>    </span><span id="local-6989586621679161628"><span class="annot"><span class="annottext">condense :: AMempoolPayload a -&gt; String
+</span><a href="#local-6989586621679161628"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.MempoolTx</span></span><span> </span><span id="local-6989586621679161626"><span class="annot"><span class="annottext">ATxAux a
+</span><a href="#local-6989586621679161626"><span class="hs-identifier hs-var">tx</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-123"></span><span>      </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;tx: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
-</span><span class="hs-identifier hs-var">unpack</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Format Text (ATxAux () -&gt; Text) -&gt; ATxAux () -&gt; Text
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-var">unpack</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Format Text (ATxAux () -&gt; Text) -&gt; ATxAux () -&gt; Text
 forall a. Format Text a -&gt; a
 </span><span class="hs-identifier hs-var">sformat</span></span><span> </span><span class="annot"><span class="annottext">Format Text (ATxAux () -&gt; Text)
 forall a r. Buildable a =&gt; Format r (a -&gt; r)
 </span><span class="hs-identifier hs-var">build</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ATxAux a -&gt; ATxAux ()
 forall (f :: * -&gt; *) a. Functor f =&gt; f a -&gt; f ()
-</span><span class="hs-identifier hs-var">void</span></span><span> </span><span class="annot"><span class="annottext">ATxAux a
-</span><a href="#local-6989586621679157889"><span class="hs-identifier hs-var">tx</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-124"></span><span>    </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.MempoolDlg</span></span><span> </span><span id="local-6989586621679157887"><span class="annot"><span class="annottext">ACertificate a
-</span><a href="#local-6989586621679157887"><span class="hs-identifier hs-var">cert</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">void</span></a></span><span> </span><span class="annot"><span class="annottext">ATxAux a
+</span><a href="#local-6989586621679161626"><span class="hs-identifier hs-var">tx</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-124"></span><span>    </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.MempoolDlg</span></span><span> </span><span id="local-6989586621679161624"><span class="annot"><span class="annottext">ACertificate a
+</span><a href="#local-6989586621679161624"><span class="hs-identifier hs-var">cert</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-125"></span><span>      </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;dlg: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
-</span><span class="hs-identifier hs-var">unpack</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Format Text (ACertificate () -&gt; Text) -&gt; ACertificate () -&gt; Text
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-var">unpack</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Format Text (ACertificate () -&gt; Text) -&gt; ACertificate () -&gt; Text
 forall a. Format Text a -&gt; a
 </span><span class="hs-identifier hs-var">sformat</span></span><span> </span><span class="annot"><span class="annottext">Format Text (ACertificate () -&gt; Text)
 forall a r. Buildable a =&gt; Format r (a -&gt; r)
 </span><span class="hs-identifier hs-var">build</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ACertificate a -&gt; ACertificate ()
 forall (f :: * -&gt; *) a. Functor f =&gt; f a -&gt; f ()
-</span><span class="hs-identifier hs-var">void</span></span><span> </span><span class="annot"><span class="annottext">ACertificate a
-</span><a href="#local-6989586621679157887"><span class="hs-identifier hs-var">cert</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-126"></span><span>    </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.MempoolUpdateProposal</span></span><span> </span><span id="local-6989586621679157885"><span class="annot"><span class="annottext">AProposal a
-</span><a href="#local-6989586621679157885"><span class="hs-identifier hs-var">p</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">void</span></a></span><span> </span><span class="annot"><span class="annottext">ACertificate a
+</span><a href="#local-6989586621679161624"><span class="hs-identifier hs-var">cert</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-126"></span><span>    </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.MempoolUpdateProposal</span></span><span> </span><span id="local-6989586621679161622"><span class="annot"><span class="annottext">AProposal a
+</span><a href="#local-6989586621679161622"><span class="hs-identifier hs-var">p</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-127"></span><span>      </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;updateproposal: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
-</span><span class="hs-identifier hs-var">unpack</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Format Text (AProposal () -&gt; Text) -&gt; AProposal () -&gt; Text
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-var">unpack</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Format Text (AProposal () -&gt; Text) -&gt; AProposal () -&gt; Text
 forall a. Format Text a -&gt; a
 </span><span class="hs-identifier hs-var">sformat</span></span><span> </span><span class="annot"><span class="annottext">Format Text (AProposal () -&gt; Text)
 forall a r. Buildable a =&gt; Format r (a -&gt; r)
 </span><span class="hs-identifier hs-var">build</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AProposal a -&gt; AProposal ()
 forall (f :: * -&gt; *) a. Functor f =&gt; f a -&gt; f ()
-</span><span class="hs-identifier hs-var">void</span></span><span> </span><span class="annot"><span class="annottext">AProposal a
-</span><a href="#local-6989586621679157885"><span class="hs-identifier hs-var">p</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-128"></span><span>    </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.MempoolUpdateVote</span></span><span> </span><span id="local-6989586621679157883"><span class="annot"><span class="annottext">AVote a
-</span><a href="#local-6989586621679157883"><span class="hs-identifier hs-var">vote</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">void</span></a></span><span> </span><span class="annot"><span class="annottext">AProposal a
+</span><a href="#local-6989586621679161622"><span class="hs-identifier hs-var">p</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-128"></span><span>    </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.MempoolUpdateVote</span></span><span> </span><span id="local-6989586621679161620"><span class="annot"><span class="annottext">AVote a
+</span><a href="#local-6989586621679161620"><span class="hs-identifier hs-var">vote</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-129"></span><span>      </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;updatevote: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
-</span><span class="hs-identifier hs-var">unpack</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Format Text (AVote () -&gt; Text) -&gt; AVote () -&gt; Text
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-var">unpack</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Format Text (AVote () -&gt; Text) -&gt; AVote () -&gt; Text
 forall a. Format Text a -&gt; a
 </span><span class="hs-identifier hs-var">sformat</span></span><span> </span><span class="annot"><span class="annottext">Format Text (AVote () -&gt; Text)
 forall a r. Buildable a =&gt; Format r (a -&gt; r)
 </span><span class="hs-identifier hs-var">build</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AVote a -&gt; AVote ()
 forall (f :: * -&gt; *) a. Functor f =&gt; f a -&gt; f ()
-</span><span class="hs-identifier hs-var">void</span></span><span> </span><span class="annot"><span class="annottext">AVote a
-</span><a href="#local-6989586621679157883"><span class="hs-identifier hs-var">vote</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">void</span></a></span><span> </span><span class="annot"><span class="annottext">AVote a
+</span><a href="#local-6989586621679161620"><span class="hs-identifier hs-var">vote</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span></span><span>
 </span><span id="line-130"></span><span>
 </span><span id="line-131"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Cardano.Crypto.VerificationKey</span></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-132"></span><span>  </span><span id="local-6989586621679157881"><span class="annot"><span class="annottext">condense :: VerificationKey -&gt; String
-</span><a href="#local-6989586621679157881"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
-</span><span class="hs-identifier hs-var">unpack</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; String)
+</span><span id="line-132"></span><span>  </span><span id="local-6989586621679161618"><span class="annot"><span class="annottext">condense :: VerificationKey -&gt; String
+</span><a href="#local-6989586621679161618"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-var">unpack</span></a></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; String)
 -&gt; (VerificationKey -&gt; Text) -&gt; VerificationKey -&gt; String
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Format Text (VerificationKey -&gt; Text) -&gt; VerificationKey -&gt; Text
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Format Text (VerificationKey -&gt; Text) -&gt; VerificationKey -&gt; Text
 forall a. Format Text a -&gt; a
 </span><span class="hs-identifier hs-var">sformat</span></span><span> </span><span class="annot"><span class="annottext">Format Text (VerificationKey -&gt; Text)
 forall a r. Buildable a =&gt; Format r (a -&gt; r)
@@ -475,6 +475,6 @@ forall a r. Buildable a =&gt; Format r (a -&gt; r)
 </span><span id="line-140"></span><span class="hs-comment">-- Cardano.Chain.Delegation.Validation.Registration.TooLarge is not exported,</span><span>
 </span><span id="line-141"></span><span class="hs-comment">-- but occurs somewhere in CC.ChainValidationError, so we use</span><span>
 </span><span id="line-142"></span><span class="hs-comment">-- 'InspectHeap' instead of deriving one using Generics.</span><span>
-</span><span id="line-143"></span><span id="local-6989586621679157875"><span id="local-6989586621679157877"><span id="local-6989586621679157879"><span class="hs-keyword">deriving</span><span> </span><span class="hs-keyword">via</span><span> </span><span class="annot"><span class="hs-identifier hs-type">InspectHeap</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CC.ChainValidationError</span></span><span>
+</span><span id="line-143"></span><span id="local-6989586621679161612"><span id="local-6989586621679161614"><span id="local-6989586621679161616"><span class="hs-keyword">deriving</span><span> </span><span class="hs-keyword">via</span><span> </span><span class="annot"><span class="hs-identifier hs-type">InspectHeap</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CC.ChainValidationError</span></span><span>
 </span><span id="line-144"></span><span>  </span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NoThunks</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CC.ChainValidationError</span></span></span></span></span><span>
 </span><span id="line-145"></span></pre></body></html>

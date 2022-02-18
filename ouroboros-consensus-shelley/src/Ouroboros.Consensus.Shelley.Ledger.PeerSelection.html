@@ -7,334 +7,342 @@
 </span><span id="line-7"></span><span class="hs-pragma">{-# OPTIONS_GHC -Wno-orphans #-}</span><span>
 </span><span id="line-8"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Consensus.Shelley.Ledger.PeerSelection</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-9"></span><span>
-</span><span id="line-10"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Bifunctor</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">second</span></span><span class="hs-special">)</span><span>
-</span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Foldable</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">toList</span></span><span class="hs-special">)</span><span>
-</span><span id="line-12"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">sortOn</span></span><span class="hs-special">)</span><span>
-</span><span id="line-13"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.List.NonEmpty</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NonEmpty</span></span><span class="hs-special">)</span><span>
-</span><span id="line-14"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.List.NonEmpty</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">NE</span></span><span>
-</span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Map.Strict</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Map</span></span><span class="hs-special">)</span><span>
-</span><span id="line-16"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map.Strict</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Map</span></span><span>
-</span><span id="line-17"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">catMaybes</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">mapMaybe</span></span><span class="hs-special">)</span><span>
-</span><span id="line-18"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Ord</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Down</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Text.Encoding</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">encodeUtf8</span></span><span class="hs-special">)</span><span>
-</span><span id="line-20"></span><span>
-</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Ledger.SupportsPeerSelection</span></a></span><span>
-</span><span id="line-22"></span><span>
-</span><span id="line-23"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Shelley.Spec.Ledger.BaseTypes</span></span><span>
-</span><span id="line-24"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Shelley.Spec.Ledger.Delegation.Certificates</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
-</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Shelley.Spec.Ledger.Keys</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
-</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Shelley.Spec.Ledger.LedgerState</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
-</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Shelley.Spec.Ledger.TxBody</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
-</span><span id="line-28"></span><span>
-</span><span id="line-29"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html"><span class="hs-identifier">Ouroboros.Consensus.Shelley.Eras</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier">EraCrypto</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-30"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html"><span class="hs-identifier">Ouroboros.Consensus.Shelley.Ledger.Block</span></a></span><span>
-</span><span id="line-31"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Ledger.html"><span class="hs-identifier">Ouroboros.Consensus.Shelley.Ledger.Ledger</span></a></span><span>
-</span><span id="line-32"></span><span>
-</span><span id="line-33"></span><span id="local-6989586621679581310"><span id="local-6989586621679581311"><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="#local-6989586621679581311"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="annot"><span class="hs-glyph hs-type">~</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier hs-type">EraCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679581310"><span class="hs-identifier hs-type">era</span></a></span><span>
-</span><span id="line-34"></span><span>      </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerSupportsPeerSelection</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyBlock"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679581310"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-35"></span><span>  </span><span id="local-6989586621679581307"><span class="annot"><span class="annottext">getPeers :: LedgerState (ShelleyBlock era)
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/deepseq-1.4.4.0/src"><span class="hs-identifier">Control.DeepSeq</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/deepseq-1.4.4.0/src"><span class="hs-identifier">force</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Bifunctor</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">second</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Foldable</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">toList</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-13"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.List</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">sortOn</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.List.NonEmpty</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">NonEmpty</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.List.NonEmpty</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">NE</span></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Data.Map.Strict</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Map</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Data.Map.Strict</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Map</span></span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Maybe</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">catMaybes</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">mapMaybe</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Ord</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Down</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier">Data.Text.Encoding</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier">encodeUtf8</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Ledger.SupportsPeerSelection</span></a></span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.BaseTypes</span></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Keys</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.PoolDistr</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Shelley.LedgerState</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Shelley.TxBody</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html"><span class="hs-identifier">Ouroboros.Consensus.Shelley.Eras</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier">EraCrypto</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html"><span class="hs-identifier">Ouroboros.Consensus.Shelley.Ledger.Block</span></a></span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Ledger.html"><span class="hs-identifier">Ouroboros.Consensus.Shelley.Ledger.Ledger</span></a></span><span>
+</span><span id="line-33"></span><span>
+</span><span id="line-34"></span><span id="local-6989586621679729569"><span id="local-6989586621679729570"><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="#local-6989586621679729570"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">~</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier hs-type">EraCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679729569"><span class="hs-identifier hs-type">era</span></a></span><span>
+</span><span id="line-35"></span><span>      </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerSupportsPeerSelection</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyBlock"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679729569"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-36"></span><span>  </span><span id="local-6989586621679729566"><span class="annot"><span class="annottext">getPeers :: LedgerState (ShelleyBlock era)
 -&gt; [(PoolStake, NonEmpty StakePoolRelay)]
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">getPeers</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Ledger.html#ShelleyLedgerState"><span class="hs-identifier hs-type">ShelleyLedgerState</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679581304"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Ledger.html#shelleyLedgerState"><span class="hs-identifier hs-var hs-var">shelleyLedgerState</span></a></span></span><span> </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Maybe (PoolStake, NonEmpty StakePoolRelay)]
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">getPeers</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Ledger.html#ShelleyLedgerState"><span class="hs-identifier hs-type">ShelleyLedgerState</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679729563"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Ledger.html#shelleyLedgerState"><span class="hs-identifier hs-var hs-var">shelleyLedgerState</span></a></span></span><span> </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Maybe (PoolStake, NonEmpty StakePoolRelay)]
 -&gt; [(PoolStake, NonEmpty StakePoolRelay)]
 forall a. [Maybe a] -&gt; [a]
-</span><span class="hs-identifier hs-var">catMaybes</span></span><span>
-</span><span id="line-36"></span><span>      </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PoolStake
-</span><a href="#local-6989586621679581302"><span class="hs-identifier hs-var">poolStake</span></a></span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(NonEmpty StakePoolRelay -&gt; (PoolStake, NonEmpty StakePoolRelay))
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">catMaybes</span></a></span><span>
+</span><span id="line-37"></span><span>      </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PoolStake
+</span><a href="#local-6989586621679729561"><span class="hs-identifier hs-var">poolStake</span></a></span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(NonEmpty StakePoolRelay -&gt; (PoolStake, NonEmpty StakePoolRelay))
 -&gt; Maybe (NonEmpty StakePoolRelay)
 -&gt; Maybe (PoolStake, NonEmpty StakePoolRelay)
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">KeyHash 'StakePool c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">KeyHash 'StakePool c
 -&gt; Map (KeyHash 'StakePool c) (NonEmpty StakePoolRelay)
 -&gt; Maybe (NonEmpty StakePoolRelay)
 forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Map.lookup</span></span><span> </span><span class="annot"><span class="annottext">KeyHash 'StakePool c
-</span><a href="#local-6989586621679581299"><span class="hs-identifier hs-var">stakePool</span></a></span><span> </span><span class="annot"><span class="annottext">Map (KeyHash 'StakePool c) (NonEmpty StakePoolRelay)
-</span><a href="#local-6989586621679581298"><span class="hs-identifier hs-var">poolRelayAddresses</span></a></span><span>
-</span><span id="line-37"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679581299"><span class="annot"><span class="annottext">KeyHash 'StakePool c
-</span><a href="#local-6989586621679581299"><span class="hs-identifier hs-var">stakePool</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679581302"><span class="annot"><span class="annottext">PoolStake
-</span><a href="#local-6989586621679581302"><span class="hs-identifier hs-var">poolStake</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">PoolDistr c -&gt; [(KeyHash 'StakePool c, PoolStake)]
-</span><a href="#local-6989586621679581297"><span class="hs-identifier hs-var">orderByStake</span></a></span><span> </span><span class="annot"><span class="annottext">PoolDistr c
-</span><a href="#local-6989586621679581296"><span class="hs-identifier hs-var">poolDistr</span></a></span><span>
-</span><span id="line-38"></span><span>      </span><span class="hs-special">]</span><span>
-</span><span id="line-39"></span><span>    </span><span class="hs-keyword">where</span><span>
-</span><span id="line-40"></span><span>      </span><span class="annot"><a href="#local-6989586621679581296"><span class="hs-identifier hs-type">poolDistr</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.PoolDistr</span></span><span> </span><span class="annot"><a href="#local-6989586621679581311"><span class="hs-identifier hs-type">c</span></a></span><span>
-</span><span id="line-41"></span><span>      </span><span id="local-6989586621679581296"><span class="annot"><span class="annottext">poolDistr :: PoolDistr c
-</span><a href="#local-6989586621679581296"><span class="hs-identifier hs-var hs-var">poolDistr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NewEpochState era -&gt; PoolDistr (EraCrypto era)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.lookup</span></a></span><span> </span><span class="annot"><span class="annottext">KeyHash 'StakePool c
+</span><a href="#local-6989586621679729558"><span class="hs-identifier hs-var">stakePool</span></a></span><span> </span><span class="annot"><span class="annottext">Map (KeyHash 'StakePool c) (NonEmpty StakePoolRelay)
+</span><a href="#local-6989586621679729557"><span class="hs-identifier hs-var">poolRelayAccessPoints</span></a></span><span>
+</span><span id="line-38"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679729558"><span class="annot"><span class="annottext">KeyHash 'StakePool c
+</span><a href="#local-6989586621679729558"><span class="hs-identifier hs-var">stakePool</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679729561"><span class="annot"><span class="annottext">PoolStake
+</span><a href="#local-6989586621679729561"><span class="hs-identifier hs-var">poolStake</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">PoolDistr c -&gt; [(KeyHash 'StakePool c, PoolStake)]
+</span><a href="#local-6989586621679729556"><span class="hs-identifier hs-var">orderByStake</span></a></span><span> </span><span class="annot"><span class="annottext">PoolDistr c
+</span><a href="#local-6989586621679729555"><span class="hs-identifier hs-var">poolDistr</span></a></span><span>
+</span><span id="line-39"></span><span>      </span><span class="hs-special">]</span><span>
+</span><span id="line-40"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-41"></span><span>      </span><span class="annot"><a href="#local-6989586621679729555"><span class="hs-identifier hs-type">poolDistr</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.PoolDistr</span></span><span> </span><span class="annot"><a href="#local-6989586621679729570"><span class="hs-identifier hs-type">c</span></a></span><span>
+</span><span id="line-42"></span><span>      </span><span id="local-6989586621679729555"><span class="annot"><span class="annottext">poolDistr :: PoolDistr c
+</span><a href="#local-6989586621679729555"><span class="hs-identifier hs-var hs-var">poolDistr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NewEpochState era -&gt; PoolDistr (EraCrypto era)
 forall era. NewEpochState era -&gt; PoolDistr (Crypto era)
 </span><span class="hs-identifier hs-var hs-var">SL.nesPd</span></span><span> </span><span class="annot"><span class="annottext">NewEpochState era
-</span><a href="#local-6989586621679581304"><span class="hs-identifier hs-var">shelleyLedgerState</span></a></span><span>
-</span><span id="line-42"></span><span>
-</span><span id="line-43"></span><span>      </span><span class="hs-comment">-- | Sort stake pools by descending stake</span><span>
-</span><span id="line-44"></span><span>      </span><span class="annot"><a href="#local-6989586621679581297"><span class="hs-identifier hs-type">orderByStake</span></a></span><span> </span><span class="hs-glyph">::</span><span>
-</span><span id="line-45"></span><span>           </span><span class="annot"><span class="hs-identifier hs-type">SL.PoolDistr</span></span><span> </span><span class="annot"><a href="#local-6989586621679581311"><span class="hs-identifier hs-type">c</span></a></span><span>
-</span><span id="line-46"></span><span>        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.KeyHash</span></span><span> </span><span class="hs-special">'</span><span class="annot"><span class="hs-identifier hs-type">SL.StakePool</span></span><span> </span><span class="annot"><a href="#local-6989586621679581311"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">PoolStake</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
-</span><span id="line-47"></span><span>      </span><span id="local-6989586621679581297"><span class="annot"><span class="annottext">orderByStake :: PoolDistr c -&gt; [(KeyHash 'StakePool c, PoolStake)]
-</span><a href="#local-6989586621679581297"><span class="hs-identifier hs-var hs-var">orderByStake</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-48"></span><span>            </span><span class="annot"><span class="annottext">((KeyHash 'StakePool c, PoolStake) -&gt; Down PoolStake)
+</span><a href="#local-6989586621679729563"><span class="hs-identifier hs-var">shelleyLedgerState</span></a></span><span>
+</span><span id="line-43"></span><span>
+</span><span id="line-44"></span><span>      </span><span class="hs-comment">-- | Sort stake pools by descending stake</span><span>
+</span><span id="line-45"></span><span>      </span><span class="annot"><a href="#local-6989586621679729556"><span class="hs-identifier hs-type">orderByStake</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-46"></span><span>           </span><span class="annot"><span class="hs-identifier hs-type">SL.PoolDistr</span></span><span> </span><span class="annot"><a href="#local-6989586621679729570"><span class="hs-identifier hs-type">c</span></a></span><span>
+</span><span id="line-47"></span><span>        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.KeyHash</span></span><span> </span><span class="hs-special">'</span><span class="annot"><span class="hs-identifier hs-type">SL.StakePool</span></span><span> </span><span class="annot"><a href="#local-6989586621679729570"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">PoolStake</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-48"></span><span>      </span><span id="local-6989586621679729556"><span class="annot"><span class="annottext">orderByStake :: PoolDistr c -&gt; [(KeyHash 'StakePool c, PoolStake)]
+</span><a href="#local-6989586621679729556"><span class="hs-identifier hs-var hs-var">orderByStake</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-49"></span><span>            </span><span class="annot"><span class="annottext">((KeyHash 'StakePool c, PoolStake) -&gt; Down PoolStake)
 -&gt; [(KeyHash 'StakePool c, PoolStake)]
 -&gt; [(KeyHash 'StakePool c, PoolStake)]
 forall b a. Ord b =&gt; (a -&gt; b) -&gt; [a] -&gt; [a]
-</span><span class="hs-identifier hs-var">sortOn</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PoolStake -&gt; Down PoolStake
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">sortOn</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PoolStake -&gt; Down PoolStake
 forall a. a -&gt; Down a
-</span><span class="hs-identifier hs-var">Down</span></span><span> </span><span class="annot"><span class="annottext">(PoolStake -&gt; Down PoolStake)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Down</span></a></span><span> </span><span class="annot"><span class="annottext">(PoolStake -&gt; Down PoolStake)
 -&gt; ((KeyHash 'StakePool c, PoolStake) -&gt; PoolStake)
 -&gt; (KeyHash 'StakePool c, PoolStake)
 -&gt; Down PoolStake
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(KeyHash 'StakePool c, PoolStake) -&gt; PoolStake
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">(KeyHash 'StakePool c, PoolStake) -&gt; PoolStake
 forall a b. (a, b) -&gt; b
-</span><span class="hs-identifier hs-var">snd</span></span><span class="hs-special">)</span><span>
-</span><span id="line-49"></span><span>          </span><span class="annot"><span class="annottext">([(KeyHash 'StakePool c, PoolStake)]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">snd</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-50"></span><span>          </span><span class="annot"><span class="annottext">([(KeyHash 'StakePool c, PoolStake)]
  -&gt; [(KeyHash 'StakePool c, PoolStake)])
 -&gt; (PoolDistr c -&gt; [(KeyHash 'StakePool c, PoolStake)])
 -&gt; PoolDistr c
 -&gt; [(KeyHash 'StakePool c, PoolStake)]
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">((KeyHash 'StakePool c, IndividualPoolStake c)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">((KeyHash 'StakePool c, IndividualPoolStake c)
  -&gt; (KeyHash 'StakePool c, PoolStake))
 -&gt; [(KeyHash 'StakePool c, IndividualPoolStake c)]
 -&gt; [(KeyHash 'StakePool c, PoolStake)]
 forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
-</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(IndividualPoolStake c -&gt; PoolStake)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">map</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(IndividualPoolStake c -&gt; PoolStake)
 -&gt; (KeyHash 'StakePool c, IndividualPoolStake c)
 -&gt; (KeyHash 'StakePool c, PoolStake)
 forall (p :: * -&gt; * -&gt; *) b c a.
 Bifunctor p =&gt;
 (b -&gt; c) -&gt; p a b -&gt; p a c
-</span><span class="hs-identifier hs-var">second</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Rational -&gt; PoolStake
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">second</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Rational -&gt; PoolStake
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">PoolStake</span></a></span><span> </span><span class="annot"><span class="annottext">(Rational -&gt; PoolStake)
 -&gt; (IndividualPoolStake c -&gt; Rational)
 -&gt; IndividualPoolStake c
 -&gt; PoolStake
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">IndividualPoolStake c -&gt; Rational
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">IndividualPoolStake c -&gt; Rational
 forall crypto. IndividualPoolStake crypto -&gt; Rational
 </span><span class="hs-identifier hs-var hs-var">SL.individualPoolStake</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-50"></span><span>          </span><span class="annot"><span class="annottext">([(KeyHash 'StakePool c, IndividualPoolStake c)]
+</span><span id="line-51"></span><span>          </span><span class="annot"><span class="annottext">([(KeyHash 'StakePool c, IndividualPoolStake c)]
  -&gt; [(KeyHash 'StakePool c, PoolStake)])
 -&gt; (PoolDistr c -&gt; [(KeyHash 'StakePool c, IndividualPoolStake c)])
 -&gt; PoolDistr c
 -&gt; [(KeyHash 'StakePool c, PoolStake)]
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Map (KeyHash 'StakePool c) (IndividualPoolStake c)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Map (KeyHash 'StakePool c) (IndividualPoolStake c)
 -&gt; [(KeyHash 'StakePool c, IndividualPoolStake c)]
 forall k a. Map k a -&gt; [(k, a)]
-</span><span class="hs-identifier hs-var">Map.toList</span></span><span>
-</span><span id="line-51"></span><span>          </span><span class="annot"><span class="annottext">(Map (KeyHash 'StakePool c) (IndividualPoolStake c)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.toList</span></a></span><span>
+</span><span id="line-52"></span><span>          </span><span class="annot"><span class="annottext">(Map (KeyHash 'StakePool c) (IndividualPoolStake c)
  -&gt; [(KeyHash 'StakePool c, IndividualPoolStake c)])
 -&gt; (PoolDistr c
     -&gt; Map (KeyHash 'StakePool c) (IndividualPoolStake c))
 -&gt; PoolDistr c
 -&gt; [(KeyHash 'StakePool c, IndividualPoolStake c)]
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">PoolDistr c -&gt; Map (KeyHash 'StakePool c) (IndividualPoolStake c)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">PoolDistr c -&gt; Map (KeyHash 'StakePool c) (IndividualPoolStake c)
 forall crypto.
 PoolDistr crypto
 -&gt; Map (KeyHash 'StakePool crypto) (IndividualPoolStake crypto)
 </span><span class="hs-identifier hs-var hs-var">SL.unPoolDistr</span></span><span>
-</span><span id="line-52"></span><span>
-</span><span id="line-53"></span><span>      </span><span class="annot"><a href="#local-6989586621679581288"><span class="hs-identifier hs-type">futurePoolParams</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679581287"><span class="hs-identifier hs-type">poolParams</span></a></span><span> </span><span class="hs-glyph">::</span><span>
-</span><span id="line-54"></span><span>           </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.KeyHash</span></span><span> </span><span class="hs-special">'</span><span class="annot"><span class="hs-identifier hs-type">SL.StakePool</span></span><span> </span><span class="annot"><a href="#local-6989586621679581311"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.PoolParams</span></span><span> </span><span class="annot"><a href="#local-6989586621679581311"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-55"></span><span>      </span><span class="hs-special">(</span><span id="local-6989586621679581288"><span class="annot"><span class="annottext">Map (KeyHash 'StakePool c) (PoolParams c)
-</span><a href="#local-6989586621679581288"><span class="hs-identifier hs-var">futurePoolParams</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679581287"><span class="annot"><span class="annottext">Map (KeyHash 'StakePool c) (PoolParams c)
-</span><a href="#local-6989586621679581287"><span class="hs-identifier hs-var">poolParams</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-56"></span><span>          </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PState c -&gt; Map (KeyHash 'StakePool c) (PoolParams c)
+</span><span id="line-53"></span><span>
+</span><span id="line-54"></span><span>      </span><span class="annot"><a href="#local-6989586621679729547"><span class="hs-identifier hs-type">futurePoolParams</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679729546"><span class="hs-identifier hs-type">poolParams</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-55"></span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-type">Map</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.KeyHash</span></span><span> </span><span class="hs-special">'</span><span class="annot"><span class="hs-identifier hs-type">SL.StakePool</span></span><span> </span><span class="annot"><a href="#local-6989586621679729570"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.PoolParams</span></span><span> </span><span class="annot"><a href="#local-6989586621679729570"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-56"></span><span>      </span><span class="hs-special">(</span><span id="local-6989586621679729547"><span class="annot"><span class="annottext">Map (KeyHash 'StakePool c) (PoolParams c)
+</span><a href="#local-6989586621679729547"><span class="hs-identifier hs-var">futurePoolParams</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679729546"><span class="annot"><span class="annottext">Map (KeyHash 'StakePool c) (PoolParams c)
+</span><a href="#local-6989586621679729546"><span class="hs-identifier hs-var">poolParams</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-57"></span><span>          </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PState c -&gt; Map (KeyHash 'StakePool c) (PoolParams c)
 forall crypto.
 PState crypto
 -&gt; Map (KeyHash 'StakePool crypto) (PoolParams crypto)
 </span><span class="hs-identifier hs-var hs-var">SL._fPParams</span></span><span> </span><span class="annot"><span class="annottext">PState c
-</span><a href="#local-6989586621679581285"><span class="hs-identifier hs-var">pstate</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">PState c -&gt; Map (KeyHash 'StakePool c) (PoolParams c)
+</span><a href="#local-6989586621679729544"><span class="hs-identifier hs-var">pstate</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">PState c -&gt; Map (KeyHash 'StakePool c) (PoolParams c)
 forall crypto.
 PState crypto
 -&gt; Map (KeyHash 'StakePool crypto) (PoolParams crypto)
 </span><span class="hs-identifier hs-var hs-var">SL._pParams</span></span><span> </span><span class="annot"><span class="annottext">PState c
-</span><a href="#local-6989586621679581285"><span class="hs-identifier hs-var">pstate</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-57"></span><span>        </span><span class="hs-keyword">where</span><span>
-</span><span id="line-58"></span><span>          </span><span class="annot"><a href="#local-6989586621679581285"><span class="hs-identifier hs-type">pstate</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.PState</span></span><span> </span><span class="annot"><a href="#local-6989586621679581311"><span class="hs-identifier hs-type">c</span></a></span><span>
-</span><span id="line-59"></span><span>          </span><span id="local-6989586621679581285"><span class="annot"><span class="annottext">pstate :: PState c
-</span><a href="#local-6989586621679581285"><span class="hs-identifier hs-var hs-var">pstate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-60"></span><span>                </span><span class="annot"><span class="annottext">DPState c -&gt; PState c
+</span><a href="#local-6989586621679729544"><span class="hs-identifier hs-var">pstate</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-58"></span><span>        </span><span class="hs-keyword">where</span><span>
+</span><span id="line-59"></span><span>          </span><span class="annot"><a href="#local-6989586621679729544"><span class="hs-identifier hs-type">pstate</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.PState</span></span><span> </span><span class="annot"><a href="#local-6989586621679729570"><span class="hs-identifier hs-type">c</span></a></span><span>
+</span><span id="line-60"></span><span>          </span><span id="local-6989586621679729544"><span class="annot"><span class="annottext">pstate :: PState c
+</span><a href="#local-6989586621679729544"><span class="hs-identifier hs-var hs-var">pstate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-61"></span><span>                </span><span class="annot"><span class="annottext">DPState c -&gt; PState c
 forall crypto. DPState crypto -&gt; PState crypto
 </span><span class="hs-identifier hs-var hs-var">SL._pstate</span></span><span>
-</span><span id="line-61"></span><span>              </span><span class="annot"><span class="annottext">(DPState c -&gt; PState c)
+</span><span id="line-62"></span><span>              </span><span class="annot"><span class="annottext">(DPState c -&gt; PState c)
 -&gt; (NewEpochState era -&gt; DPState c)
 -&gt; NewEpochState era
 -&gt; PState c
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">LedgerState era -&gt; DPState c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerState era -&gt; DPState c
 forall era. LedgerState era -&gt; DPState (Crypto era)
 </span><span class="hs-identifier hs-var hs-var">SL._delegationState</span></span><span>
-</span><span id="line-62"></span><span>              </span><span class="annot"><span class="annottext">(LedgerState era -&gt; DPState c)
+</span><span id="line-63"></span><span>              </span><span class="annot"><span class="annottext">(LedgerState era -&gt; DPState c)
 -&gt; (NewEpochState era -&gt; LedgerState era)
 -&gt; NewEpochState era
 -&gt; DPState c
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">EpochState era -&gt; LedgerState era
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">EpochState era -&gt; LedgerState era
 forall era. EpochState era -&gt; LedgerState era
 </span><span class="hs-identifier hs-var hs-var">SL.esLState</span></span><span>
-</span><span id="line-63"></span><span>              </span><span class="annot"><span class="annottext">(EpochState era -&gt; LedgerState era)
+</span><span id="line-64"></span><span>              </span><span class="annot"><span class="annottext">(EpochState era -&gt; LedgerState era)
 -&gt; (NewEpochState era -&gt; EpochState era)
 -&gt; NewEpochState era
 -&gt; LedgerState era
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">NewEpochState era -&gt; EpochState era
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">NewEpochState era -&gt; EpochState era
 forall era. NewEpochState era -&gt; EpochState era
 </span><span class="hs-identifier hs-var hs-var">SL.nesEs</span></span><span>
-</span><span id="line-64"></span><span>              </span><span class="annot"><span class="annottext">(NewEpochState era -&gt; PState c) -&gt; NewEpochState era -&gt; PState c
+</span><span id="line-65"></span><span>              </span><span class="annot"><span class="annottext">(NewEpochState era -&gt; PState c) -&gt; NewEpochState era -&gt; PState c
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">NewEpochState era
-</span><a href="#local-6989586621679581304"><span class="hs-identifier hs-var">shelleyLedgerState</span></a></span><span>
-</span><span id="line-65"></span><span>
-</span><span id="line-66"></span><span>      </span><span class="annot"><a href="#local-6989586621679581279"><span class="hs-identifier hs-type">relayToRelayAddress</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.StakePoolRelay</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">RelayAddress</span></a></span><span>
-</span><span id="line-67"></span><span>      </span><span id="local-6989586621679581279"><span class="annot"><span class="annottext">relayToRelayAddress :: StakePoolRelay -&gt; Maybe RelayAddress
-</span><a href="#local-6989586621679581279"><span class="hs-identifier hs-var hs-var">relayToRelayAddress</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.SingleHostAddr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SJust</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Port</span></span><span> </span><span id="local-6989586621679581275"><span class="annot"><span class="annottext">Word16
-</span><a href="#local-6989586621679581275"><span class="hs-identifier hs-var">port</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SJust</span></span><span> </span><span id="local-6989586621679581274"><span class="annot"><span class="annottext">IPv4
-</span><a href="#local-6989586621679581274"><span class="hs-identifier hs-var">ipv4</span></a></span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">StrictMaybe IPv6
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">NewEpochState era
+</span><a href="#local-6989586621679729563"><span class="hs-identifier hs-var">shelleyLedgerState</span></a></span><span>
+</span><span id="line-66"></span><span>
+</span><span id="line-67"></span><span>      </span><span class="annot"><a href="#local-6989586621679729538"><span class="hs-identifier hs-type">relayToRelayAccessPoint</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.StakePoolRelay</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">RelayAccessPoint</span></a></span><span>
+</span><span id="line-68"></span><span>      </span><span id="local-6989586621679729538"><span class="annot"><span class="annottext">relayToRelayAccessPoint :: StakePoolRelay -&gt; Maybe RelayAccessPoint
+</span><a href="#local-6989586621679729538"><span class="hs-identifier hs-var hs-var">relayToRelayAccessPoint</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.SingleHostAddr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SJust</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Port</span></span><span> </span><span id="local-6989586621679729534"><span class="annot"><span class="annottext">Word16
+</span><a href="#local-6989586621679729534"><span class="hs-identifier hs-var">port</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SJust</span></span><span> </span><span id="local-6989586621679729533"><span class="annot"><span class="annottext">IPv4
+</span><a href="#local-6989586621679729533"><span class="hs-identifier hs-var">ipv4</span></a></span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">StrictMaybe IPv6
 </span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-68"></span><span>          </span><span class="annot"><span class="annottext">RelayAddress -&gt; Maybe RelayAddress
+</span><span id="line-69"></span><span>          </span><span class="annot"><span class="annottext">RelayAccessPoint -&gt; Maybe RelayAccessPoint
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(RelayAddress -&gt; Maybe RelayAddress)
--&gt; RelayAddress -&gt; Maybe RelayAddress
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">(RelayAccessPoint -&gt; Maybe RelayAccessPoint)
+-&gt; RelayAccessPoint -&gt; Maybe RelayAccessPoint
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">IP -&gt; PortNumber -&gt; RelayAddress
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">RelayAddressAddr</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">IPv4 -&gt; IP
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">IP -&gt; PortNumber -&gt; RelayAccessPoint
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">RelayAccessAddress</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">IPv4 -&gt; IP
 </span><span class="hs-identifier hs-var">IPv4</span></span><span> </span><span class="annot"><span class="annottext">IPv4
-</span><a href="#local-6989586621679581274"><span class="hs-identifier hs-var">ipv4</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word16 -&gt; PortNumber
+</span><a href="#local-6989586621679729533"><span class="hs-identifier hs-var">ipv4</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word16 -&gt; PortNumber
 forall a b. (Integral a, Num b) =&gt; a -&gt; b
-</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">Word16
-</span><a href="#local-6989586621679581275"><span class="hs-identifier hs-var">port</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-69"></span><span>      </span><span class="annot"><a href="#local-6989586621679581279"><span class="hs-identifier hs-var">relayToRelayAddress</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.SingleHostAddr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SJust</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Port</span></span><span> </span><span id="local-6989586621679581271"><span class="annot"><span class="annottext">Word16
-</span><a href="#local-6989586621679581271"><span class="hs-identifier hs-var">port</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">StrictMaybe IPv4
-</span><span class="hs-identifier hs-var">SNothing</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SJust</span></span><span> </span><span id="local-6989586621679581269"><span class="annot"><span class="annottext">IPv6
-</span><a href="#local-6989586621679581269"><span class="hs-identifier hs-var">ipv6</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-70"></span><span>          </span><span class="annot"><span class="annottext">RelayAddress -&gt; Maybe RelayAddress
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="annot"><span class="annottext">Word16
+</span><a href="#local-6989586621679729534"><span class="hs-identifier hs-var">port</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-70"></span><span>      </span><span class="annot"><a href="#local-6989586621679729538"><span class="hs-identifier hs-var">relayToRelayAccessPoint</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.SingleHostAddr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SJust</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Port</span></span><span> </span><span id="local-6989586621679729530"><span class="annot"><span class="annottext">Word16
+</span><a href="#local-6989586621679729530"><span class="hs-identifier hs-var">port</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-71"></span><span>                                                  </span><span class="annot"><span class="annottext">StrictMaybe IPv4
+</span><span class="hs-identifier hs-var">SNothing</span></span><span>
+</span><span id="line-72"></span><span>                                                 </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SJust</span></span><span> </span><span id="local-6989586621679729528"><span class="annot"><span class="annottext">IPv6
+</span><a href="#local-6989586621679729528"><span class="hs-identifier hs-var">ipv6</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-73"></span><span>          </span><span class="annot"><span class="annottext">RelayAccessPoint -&gt; Maybe RelayAccessPoint
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(RelayAddress -&gt; Maybe RelayAddress)
--&gt; RelayAddress -&gt; Maybe RelayAddress
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">(RelayAccessPoint -&gt; Maybe RelayAccessPoint)
+-&gt; RelayAccessPoint -&gt; Maybe RelayAccessPoint
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">IP -&gt; PortNumber -&gt; RelayAddress
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">RelayAddressAddr</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">IPv6 -&gt; IP
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">IP -&gt; PortNumber -&gt; RelayAccessPoint
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">RelayAccessAddress</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">IPv6 -&gt; IP
 </span><span class="hs-identifier hs-var">IPv6</span></span><span> </span><span class="annot"><span class="annottext">IPv6
-</span><a href="#local-6989586621679581269"><span class="hs-identifier hs-var">ipv6</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word16 -&gt; PortNumber
+</span><a href="#local-6989586621679729528"><span class="hs-identifier hs-var">ipv6</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word16 -&gt; PortNumber
 forall a b. (Integral a, Num b) =&gt; a -&gt; b
-</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">Word16
-</span><a href="#local-6989586621679581271"><span class="hs-identifier hs-var">port</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-71"></span><span>      </span><span class="annot"><a href="#local-6989586621679581279"><span class="hs-identifier hs-var">relayToRelayAddress</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.SingleHostName</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SJust</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Port</span></span><span> </span><span id="local-6989586621679581266"><span class="annot"><span class="annottext">Word16
-</span><a href="#local-6989586621679581266"><span class="hs-identifier hs-var">port</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span id="local-6989586621679581265"><span class="annot"><span class="annottext">DnsName
-</span><a href="#local-6989586621679581265"><span class="hs-identifier hs-var">dnsName</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-72"></span><span>          </span><span class="annot"><span class="annottext">RelayAddress -&gt; Maybe RelayAddress
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="annot"><span class="annottext">Word16
+</span><a href="#local-6989586621679729530"><span class="hs-identifier hs-var">port</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-74"></span><span>      </span><span class="annot"><a href="#local-6989586621679729538"><span class="hs-identifier hs-var">relayToRelayAccessPoint</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.SingleHostName</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SJust</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Port</span></span><span> </span><span id="local-6989586621679729525"><span class="annot"><span class="annottext">Word16
+</span><a href="#local-6989586621679729525"><span class="hs-identifier hs-var">port</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span id="local-6989586621679729524"><span class="annot"><span class="annottext">DnsName
+</span><a href="#local-6989586621679729524"><span class="hs-identifier hs-var">dnsName</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-75"></span><span>          </span><span class="annot"><span class="annottext">RelayAccessPoint -&gt; Maybe RelayAccessPoint
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(RelayAddress -&gt; Maybe RelayAddress)
--&gt; RelayAddress -&gt; Maybe RelayAddress
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">(RelayAccessPoint -&gt; Maybe RelayAccessPoint)
+-&gt; RelayAccessPoint -&gt; Maybe RelayAccessPoint
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">DomainAddress -&gt; RelayAddress
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">RelayAddressDomain</span></a></span><span> </span><span class="annot"><span class="annottext">(DomainAddress -&gt; RelayAddress) -&gt; DomainAddress -&gt; RelayAddress
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Domain -&gt; PortNumber -&gt; RelayAccessPoint
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">RelayAccessDomain</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Domain
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-var">encodeUtf8</span></a></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Domain) -&gt; Text -&gt; Domain
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Domain -&gt; PortNumber -&gt; DomainAddress
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">DomainAddress</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Domain
-</span><span class="hs-identifier hs-var">encodeUtf8</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Domain) -&gt; Text -&gt; Domain
-forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">DnsName -&gt; Text
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">DnsName -&gt; Text
 </span><span class="hs-identifier hs-var hs-var">dnsToText</span></span><span> </span><span class="annot"><span class="annottext">DnsName
-</span><a href="#local-6989586621679581265"><span class="hs-identifier hs-var">dnsName</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word16 -&gt; PortNumber
+</span><a href="#local-6989586621679729524"><span class="hs-identifier hs-var">dnsName</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word16 -&gt; PortNumber
 forall a b. (Integral a, Num b) =&gt; a -&gt; b
-</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">Word16
-</span><a href="#local-6989586621679581266"><span class="hs-identifier hs-var">port</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-73"></span><span>      </span><span class="annot"><a href="#local-6989586621679581279"><span class="hs-identifier hs-var">relayToRelayAddress</span></a></span><span> </span><span class="annot"><span class="annottext">StakePoolRelay
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="annot"><span class="annottext">Word16
+</span><a href="#local-6989586621679729525"><span class="hs-identifier hs-var">port</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-76"></span><span>      </span><span class="annot"><a href="#local-6989586621679729538"><span class="hs-identifier hs-var">relayToRelayAccessPoint</span></a></span><span> </span><span class="annot"><span class="annottext">StakePoolRelay
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-74"></span><span>          </span><span class="hs-comment">-- This could be an unsupported relay (SRV records) or an unusable</span><span>
-</span><span id="line-75"></span><span>          </span><span class="hs-comment">-- relay such as a relay with an IP address but without a port number.</span><span>
-</span><span id="line-76"></span><span>          </span><span class="annot"><span class="annottext">Maybe RelayAddress
+</span><span id="line-77"></span><span>          </span><span class="hs-comment">-- This could be an unsupported relay (SRV records) or an unusable</span><span>
+</span><span id="line-78"></span><span>          </span><span class="hs-comment">-- relay such as a relay with an IP address but without a port number.</span><span>
+</span><span id="line-79"></span><span>          </span><span class="annot"><span class="annottext">Maybe RelayAccessPoint
 forall a. Maybe a
-</span><span class="hs-identifier hs-var">Nothing</span></span><span>
-</span><span id="line-77"></span><span>
-</span><span id="line-78"></span><span>      </span><span class="hs-comment">-- | Note that a stake pool can have multiple registered relays</span><span>
-</span><span id="line-79"></span><span>      </span><span class="annot"><a href="#local-6989586621679581261"><span class="hs-identifier hs-type">pparamsRelayAddresses</span></a></span><span> </span><span class="hs-glyph">::</span><span>
-</span><span id="line-80"></span><span>           </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">RelayAddress</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">StakePoolRelay</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-81"></span><span>        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.PoolParams</span></span><span> </span><span class="annot"><a href="#local-6989586621679581311"><span class="hs-identifier hs-type">c</span></a></span><span>
-</span><span id="line-82"></span><span>        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">NonEmpty</span></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">StakePoolRelay</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-83"></span><span>      </span><span id="local-6989586621679581261"><span class="annot"><span class="annottext">pparamsRelayAddresses :: (RelayAddress -&gt; StakePoolRelay)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span>
+</span><span id="line-80"></span><span>
+</span><span id="line-81"></span><span>      </span><span class="hs-comment">-- | Note that a stake pool can have multiple registered relays</span><span>
+</span><span id="line-82"></span><span>      </span><span class="annot"><a href="#local-6989586621679729521"><span class="hs-identifier hs-type">pparamsRelayAccessPoints</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-83"></span><span>           </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">RelayAccessPoint</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">StakePoolRelay</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-84"></span><span>        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.PoolParams</span></span><span> </span><span class="annot"><a href="#local-6989586621679729570"><span class="hs-identifier hs-type">c</span></a></span><span>
+</span><span id="line-85"></span><span>        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">NonEmpty</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">StakePoolRelay</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-86"></span><span>      </span><span id="local-6989586621679729521"><span class="annot"><span class="annottext">pparamsRelayAccessPoints :: (RelayAccessPoint -&gt; StakePoolRelay)
 -&gt; PoolParams c -&gt; Maybe (NonEmpty StakePoolRelay)
-</span><a href="#local-6989586621679581261"><span class="hs-identifier hs-var hs-var">pparamsRelayAddresses</span></a></span></span><span> </span><span id="local-6989586621679581260"><span class="annot"><span class="annottext">RelayAddress -&gt; StakePoolRelay
-</span><a href="#local-6989586621679581260"><span class="hs-identifier hs-var">injStakePoolRelay</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-84"></span><span>            </span><span class="annot"><span class="annottext">[StakePoolRelay] -&gt; Maybe (NonEmpty StakePoolRelay)
+</span><a href="#local-6989586621679729521"><span class="hs-identifier hs-var hs-var">pparamsRelayAccessPoints</span></a></span></span><span> </span><span id="local-6989586621679729520"><span class="annot"><span class="annottext">RelayAccessPoint -&gt; StakePoolRelay
+</span><a href="#local-6989586621679729520"><span class="hs-identifier hs-var">injStakePoolRelay</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-87"></span><span>            </span><span class="annot"><span class="annottext">[StakePoolRelay] -&gt; Maybe (NonEmpty StakePoolRelay)
 forall a. [a] -&gt; Maybe (NonEmpty a)
-</span><span class="hs-identifier hs-var">NE.nonEmpty</span></span><span>
-</span><span id="line-85"></span><span>          </span><span class="annot"><span class="annottext">([StakePoolRelay] -&gt; Maybe (NonEmpty StakePoolRelay))
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">NE.nonEmpty</span></a></span><span>
+</span><span id="line-88"></span><span>          </span><span class="annot"><span class="annottext">([StakePoolRelay] -&gt; Maybe (NonEmpty StakePoolRelay))
 -&gt; (PoolParams c -&gt; [StakePoolRelay])
 -&gt; PoolParams c
 -&gt; Maybe (NonEmpty StakePoolRelay)
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(StakePoolRelay -&gt; Maybe StakePoolRelay)
--&gt; [StakePoolRelay] -&gt; [StakePoolRelay]
-forall a b. (a -&gt; Maybe b) -&gt; [a] -&gt; [b]
-</span><span class="hs-identifier hs-var">mapMaybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(RelayAddress -&gt; StakePoolRelay)
--&gt; Maybe RelayAddress -&gt; Maybe StakePoolRelay
-forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">RelayAddress -&gt; StakePoolRelay
-</span><a href="#local-6989586621679581260"><span class="hs-identifier hs-var">injStakePoolRelay</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe RelayAddress -&gt; Maybe StakePoolRelay)
--&gt; (StakePoolRelay -&gt; Maybe RelayAddress)
--&gt; StakePoolRelay
--&gt; Maybe StakePoolRelay
-forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">StakePoolRelay -&gt; Maybe RelayAddress
-</span><a href="#local-6989586621679581279"><span class="hs-identifier hs-var">relayToRelayAddress</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-86"></span><span>          </span><span class="annot"><span class="annottext">([StakePoolRelay] -&gt; [StakePoolRelay])
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">[StakePoolRelay] -&gt; [StakePoolRelay]
+forall a. NFData a =&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/deepseq-1.4.4.0/src"><span class="hs-identifier hs-var">force</span></a></span><span>
+</span><span id="line-89"></span><span>          </span><span class="annot"><span class="annottext">([StakePoolRelay] -&gt; [StakePoolRelay])
 -&gt; (PoolParams c -&gt; [StakePoolRelay])
 -&gt; PoolParams c
 -&gt; [StakePoolRelay]
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">StrictSeq StakePoolRelay -&gt; [StakePoolRelay]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">(StakePoolRelay -&gt; Maybe StakePoolRelay)
+-&gt; [StakePoolRelay] -&gt; [StakePoolRelay]
+forall a b. (a -&gt; Maybe b) -&gt; [a] -&gt; [b]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">mapMaybe</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(RelayAccessPoint -&gt; StakePoolRelay)
+-&gt; Maybe RelayAccessPoint -&gt; Maybe StakePoolRelay
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fmap</span></a></span><span> </span><span class="annot"><span class="annottext">RelayAccessPoint -&gt; StakePoolRelay
+</span><a href="#local-6989586621679729520"><span class="hs-identifier hs-var">injStakePoolRelay</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe RelayAccessPoint -&gt; Maybe StakePoolRelay)
+-&gt; (StakePoolRelay -&gt; Maybe RelayAccessPoint)
+-&gt; StakePoolRelay
+-&gt; Maybe StakePoolRelay
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">StakePoolRelay -&gt; Maybe RelayAccessPoint
+</span><a href="#local-6989586621679729538"><span class="hs-identifier hs-var">relayToRelayAccessPoint</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-90"></span><span>          </span><span class="annot"><span class="annottext">([StakePoolRelay] -&gt; [StakePoolRelay])
+-&gt; (PoolParams c -&gt; [StakePoolRelay])
+-&gt; PoolParams c
+-&gt; [StakePoolRelay]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">StrictSeq StakePoolRelay -&gt; [StakePoolRelay]
 forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; [a]
-</span><span class="hs-identifier hs-var">toList</span></span><span>
-</span><span id="line-87"></span><span>          </span><span class="annot"><span class="annottext">(StrictSeq StakePoolRelay -&gt; [StakePoolRelay])
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">toList</span></a></span><span>
+</span><span id="line-91"></span><span>          </span><span class="annot"><span class="annottext">(StrictSeq StakePoolRelay -&gt; [StakePoolRelay])
 -&gt; (PoolParams c -&gt; StrictSeq StakePoolRelay)
 -&gt; PoolParams c
 -&gt; [StakePoolRelay]
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">PoolParams c -&gt; StrictSeq StakePoolRelay
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">PoolParams c -&gt; StrictSeq StakePoolRelay
 forall crypto. PoolParams crypto -&gt; StrictSeq StakePoolRelay
 </span><span class="hs-identifier hs-var hs-var">SL._poolRelays</span></span><span>
-</span><span id="line-88"></span><span>
-</span><span id="line-89"></span><span>      </span><span class="hs-comment">-- | Combine the stake pools registered in the future and the current pool</span><span>
-</span><span id="line-90"></span><span>      </span><span class="hs-comment">-- parameters, and remove duplicates.</span><span>
-</span><span id="line-91"></span><span>      </span><span class="annot"><a href="#local-6989586621679581298"><span class="hs-identifier hs-type">poolRelayAddresses</span></a></span><span> </span><span class="hs-glyph">::</span><span>
-</span><span id="line-92"></span><span>           </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.KeyHash</span></span><span> </span><span class="hs-special">'</span><span class="annot"><span class="hs-identifier hs-type">SL.StakePool</span></span><span> </span><span class="annot"><a href="#local-6989586621679581311"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">NonEmpty</span></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">StakePoolRelay</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-93"></span><span>      </span><span id="local-6989586621679581298"><span class="annot"><span class="annottext">poolRelayAddresses :: Map (KeyHash 'StakePool c) (NonEmpty StakePoolRelay)
-</span><a href="#local-6989586621679581298"><span class="hs-identifier hs-var hs-var">poolRelayAddresses</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-94"></span><span>          </span><span class="annot"><span class="annottext">(NonEmpty StakePoolRelay
+</span><span id="line-92"></span><span>
+</span><span id="line-93"></span><span>      </span><span class="hs-comment">-- | Combine the stake pools registered in the future and the current pool</span><span>
+</span><span id="line-94"></span><span>      </span><span class="hs-comment">-- parameters, and remove duplicates.</span><span>
+</span><span id="line-95"></span><span>      </span><span class="annot"><a href="#local-6989586621679729557"><span class="hs-identifier hs-type">poolRelayAccessPoints</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-96"></span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-type">Map</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.KeyHash</span></span><span> </span><span class="hs-special">'</span><span class="annot"><span class="hs-identifier hs-type">SL.StakePool</span></span><span> </span><span class="annot"><a href="#local-6989586621679729570"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">NonEmpty</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">StakePoolRelay</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-97"></span><span>      </span><span id="local-6989586621679729557"><span class="annot"><span class="annottext">poolRelayAccessPoints :: Map (KeyHash 'StakePool c) (NonEmpty StakePoolRelay)
+</span><a href="#local-6989586621679729557"><span class="hs-identifier hs-var hs-var">poolRelayAccessPoints</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-98"></span><span>          </span><span class="annot"><span class="annottext">(NonEmpty StakePoolRelay
  -&gt; NonEmpty StakePoolRelay -&gt; NonEmpty StakePoolRelay)
 -&gt; Map (KeyHash 'StakePool c) (NonEmpty StakePoolRelay)
 -&gt; Map (KeyHash 'StakePool c) (NonEmpty StakePoolRelay)
 -&gt; Map (KeyHash 'StakePool c) (NonEmpty StakePoolRelay)
 forall k a. Ord k =&gt; (a -&gt; a -&gt; a) -&gt; Map k a -&gt; Map k a -&gt; Map k a
-</span><span class="hs-identifier hs-var">Map.unionWith</span></span><span>
-</span><span id="line-95"></span><span>            </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679581256"><span class="annot"><span class="annottext">NonEmpty StakePoolRelay
-</span><a href="#local-6989586621679581256"><span class="hs-identifier hs-var">futureRelays</span></a></span></span><span> </span><span id="local-6989586621679581255"><span class="annot"><span class="annottext">NonEmpty StakePoolRelay
-</span><a href="#local-6989586621679581255"><span class="hs-identifier hs-var">currentRelays</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">NonEmpty StakePoolRelay -&gt; NonEmpty StakePoolRelay
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.unionWith</span></a></span><span>
+</span><span id="line-99"></span><span>            </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679729516"><span class="annot"><span class="annottext">NonEmpty StakePoolRelay
+</span><a href="#local-6989586621679729516"><span class="hs-identifier hs-var">futureRelays</span></a></span></span><span> </span><span id="local-6989586621679729515"><span class="annot"><span class="annottext">NonEmpty StakePoolRelay
+</span><a href="#local-6989586621679729515"><span class="hs-identifier hs-var">currentRelays</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">NonEmpty StakePoolRelay -&gt; NonEmpty StakePoolRelay
 forall a. Eq a =&gt; NonEmpty a -&gt; NonEmpty a
-</span><span class="hs-identifier hs-var">NE.nub</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NonEmpty StakePoolRelay
-</span><a href="#local-6989586621679581256"><span class="hs-identifier hs-var">futureRelays</span></a></span><span> </span><span class="annot"><span class="annottext">NonEmpty StakePoolRelay
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">NE.nub</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NonEmpty StakePoolRelay
+</span><a href="#local-6989586621679729516"><span class="hs-identifier hs-var">futureRelays</span></a></span><span> </span><span class="annot"><span class="annottext">NonEmpty StakePoolRelay
 -&gt; NonEmpty StakePoolRelay -&gt; NonEmpty StakePoolRelay
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">NonEmpty StakePoolRelay
-</span><a href="#local-6989586621679581255"><span class="hs-identifier hs-var">currentRelays</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-96"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(PoolParams c -&gt; Maybe (NonEmpty StakePoolRelay))
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">NonEmpty StakePoolRelay
+</span><a href="#local-6989586621679729515"><span class="hs-identifier hs-var">currentRelays</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-100"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(PoolParams c -&gt; Maybe (NonEmpty StakePoolRelay))
 -&gt; Map (KeyHash 'StakePool c) (PoolParams c)
 -&gt; Map (KeyHash 'StakePool c) (NonEmpty StakePoolRelay)
 forall a b k. (a -&gt; Maybe b) -&gt; Map k a -&gt; Map k b
-</span><span class="hs-identifier hs-var">Map.mapMaybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(RelayAddress -&gt; StakePoolRelay)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.mapMaybe</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(RelayAccessPoint -&gt; StakePoolRelay)
 -&gt; PoolParams c -&gt; Maybe (NonEmpty StakePoolRelay)
-</span><a href="#local-6989586621679581261"><span class="hs-identifier hs-var">pparamsRelayAddresses</span></a></span><span> </span><span class="annot"><span class="annottext">RelayAddress -&gt; StakePoolRelay
+</span><a href="#local-6989586621679729521"><span class="hs-identifier hs-var">pparamsRelayAccessPoints</span></a></span><span> </span><span class="annot"><span class="annottext">RelayAccessPoint -&gt; StakePoolRelay
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">FutureRelay</span></a></span><span class="hs-special">)</span><span>  </span><span class="annot"><span class="annottext">Map (KeyHash 'StakePool c) (PoolParams c)
-</span><a href="#local-6989586621679581288"><span class="hs-identifier hs-var">futurePoolParams</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-97"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(PoolParams c -&gt; Maybe (NonEmpty StakePoolRelay))
+</span><a href="#local-6989586621679729547"><span class="hs-identifier hs-var">futurePoolParams</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-101"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(PoolParams c -&gt; Maybe (NonEmpty StakePoolRelay))
 -&gt; Map (KeyHash 'StakePool c) (PoolParams c)
 -&gt; Map (KeyHash 'StakePool c) (NonEmpty StakePoolRelay)
 forall a b k. (a -&gt; Maybe b) -&gt; Map k a -&gt; Map k b
-</span><span class="hs-identifier hs-var">Map.mapMaybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(RelayAddress -&gt; StakePoolRelay)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.mapMaybe</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(RelayAccessPoint -&gt; StakePoolRelay)
 -&gt; PoolParams c -&gt; Maybe (NonEmpty StakePoolRelay)
-</span><a href="#local-6989586621679581261"><span class="hs-identifier hs-var">pparamsRelayAddresses</span></a></span><span> </span><span class="annot"><span class="annottext">RelayAddress -&gt; StakePoolRelay
+</span><a href="#local-6989586621679729521"><span class="hs-identifier hs-var">pparamsRelayAccessPoints</span></a></span><span> </span><span class="annot"><span class="annottext">RelayAccessPoint -&gt; StakePoolRelay
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">CurrentRelay</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Map (KeyHash 'StakePool c) (PoolParams c)
-</span><a href="#local-6989586621679581287"><span class="hs-identifier hs-var">poolParams</span></a></span><span class="hs-special">)</span></span></span><span>
-</span><span id="line-98"></span></pre></body></html>
+</span><a href="#local-6989586621679729546"><span class="hs-identifier hs-var">poolParams</span></a></span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-102"></span></pre></body></html>

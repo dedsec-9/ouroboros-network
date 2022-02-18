@@ -11,14 +11,14 @@
 </span><span id="line-11"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#dbMarkerParse"><span class="hs-identifier">dbMarkerParse</span></a></span><span>
 </span><span id="line-12"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-13"></span><span>
-</span><span id="line-14"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Monad.Except</span></span><span>
-</span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.ByteString</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">ByteString</span></span><span class="hs-special">)</span><span>
-</span><span id="line-16"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.ByteString.Char8</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">BS.Char8</span></span><span>
-</span><span id="line-17"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.ByteString.Lazy</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">fromStrict</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">toStrict</span></span><span class="hs-special">)</span><span>
-</span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Set</span></span><span>
-</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">)</span><span>
-</span><span id="line-20"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Word</span></span><span>
-</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Text.Read</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">readMaybe</span></span><span class="hs-special">)</span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/mtl-2.2.2/src"><span class="hs-identifier">Control.Monad.Except</span></a></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier">Data.ByteString</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier">ByteString</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier">Data.ByteString.Char8</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">BS.Char8</span></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier">Data.ByteString.Lazy</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier">fromStrict</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier">toStrict</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Data.Set</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Set</span></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier">Data.Text</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier">Text</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Word</span></a></span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Text.Read</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">readMaybe</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-22"></span><span>
 </span><span id="line-23"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier">Ouroboros.Network.Magic</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier">NetworkMagic</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-24"></span><span>
@@ -64,137 +64,137 @@
 </span><span id="line-64"></span><span class="hs-comment">--</span><span>
 </span><span id="line-65"></span><span class="hs-comment">-- Note that an 'FsError' can also be thrown.</span><span>
 </span><span id="line-66"></span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#checkDbMarker"><span class="hs-identifier hs-type">checkDbMarker</span></a></span><span>
-</span><span id="line-67"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679996480"><span class="annot"><a href="#local-6989586621679996480"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679996479"><span class="annot"><a href="#local-6989586621679996479"><span class="hs-identifier hs-type">h</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier hs-type">MonadThrow</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679996480"><span class="hs-identifier hs-type">m</span></a></span><span>
-</span><span id="line-68"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.FS.API.html#HasFS"><span class="hs-identifier hs-type">HasFS</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679996480"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679996479"><span class="hs-identifier hs-type">h</span></a></span><span>
+</span><span id="line-67"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679981656"><span class="annot"><a href="#local-6989586621679981656"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679981655"><span class="annot"><a href="#local-6989586621679981655"><span class="hs-identifier hs-type">h</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">MonadThrow</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679981656"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-68"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.FS.API.html#HasFS"><span class="hs-identifier hs-type">HasFS</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679981656"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679981655"><span class="hs-identifier hs-type">h</span></a></span><span>
 </span><span id="line-69"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.FS.API.Types.html#MountPoint"><span class="hs-identifier hs-type">MountPoint</span></a></span><span>
 </span><span id="line-70"></span><span>     </span><span class="hs-comment">-- ^ Database directory. Should be the mount point of the @HasFS@. Used</span><span>
 </span><span id="line-71"></span><span>     </span><span class="hs-comment">-- in error messages.</span><span>
 </span><span id="line-72"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">NetworkMagic</span></a></span><span>
-</span><span id="line-73"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679996480"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#DbMarkerError"><span class="hs-identifier hs-type">DbMarkerError</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-73"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679981656"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Either</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#DbMarkerError"><span class="hs-identifier hs-type">DbMarkerError</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-74"></span><span id="checkDbMarker"><span class="annot"><span class="annottext">checkDbMarker :: HasFS m h
 -&gt; MountPoint -&gt; NetworkMagic -&gt; m (Either DbMarkerError ())
-</span><a href="Ouroboros.Consensus.Node.DbMarker.html#checkDbMarker"><span class="hs-identifier hs-var hs-var">checkDbMarker</span></a></span></span><span> </span><span id="local-6989586621679996478"><span class="annot"><span class="annottext">HasFS m h
-</span><a href="#local-6989586621679996478"><span class="hs-identifier hs-var">hasFS</span></a></span></span><span> </span><span id="local-6989586621679996477"><span class="annot"><span class="annottext">MountPoint
-</span><a href="#local-6989586621679996477"><span class="hs-identifier hs-var">mountPoint</span></a></span></span><span> </span><span id="local-6989586621679996476"><span class="annot"><span class="annottext">NetworkMagic
-</span><a href="#local-6989586621679996476"><span class="hs-identifier hs-var">networkMagic</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ExceptT DbMarkerError m () -&gt; m (Either DbMarkerError ())
+</span><a href="Ouroboros.Consensus.Node.DbMarker.html#checkDbMarker"><span class="hs-identifier hs-var hs-var">checkDbMarker</span></a></span></span><span> </span><span id="local-6989586621679981654"><span class="annot"><span class="annottext">HasFS m h
+</span><a href="#local-6989586621679981654"><span class="hs-identifier hs-var">hasFS</span></a></span></span><span> </span><span id="local-6989586621679981653"><span class="annot"><span class="annottext">MountPoint
+</span><a href="#local-6989586621679981653"><span class="hs-identifier hs-var">mountPoint</span></a></span></span><span> </span><span id="local-6989586621679981652"><span class="annot"><span class="annottext">NetworkMagic
+</span><a href="#local-6989586621679981652"><span class="hs-identifier hs-var">networkMagic</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ExceptT DbMarkerError m () -&gt; m (Either DbMarkerError ())
 forall e (m :: * -&gt; *) a. ExceptT e m a -&gt; m (Either e a)
-</span><span class="hs-identifier hs-var">runExceptT</span></span><span> </span><span class="annot"><span class="annottext">(ExceptT DbMarkerError m () -&gt; m (Either DbMarkerError ()))
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-var">runExceptT</span></a></span><span> </span><span class="annot"><span class="annottext">(ExceptT DbMarkerError m () -&gt; m (Either DbMarkerError ()))
 -&gt; ExceptT DbMarkerError m () -&gt; m (Either DbMarkerError ())
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-75"></span><span>    </span><span id="local-6989586621679996474"><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679996474"><span class="hs-identifier hs-var">fileExists</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">m Bool -&gt; ExceptT DbMarkerError m Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-75"></span><span>    </span><span id="local-6989586621679981650"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679981650"><span class="hs-identifier hs-var">fileExists</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">m Bool -&gt; ExceptT DbMarkerError m Bool
 forall (t :: (* -&gt; *) -&gt; * -&gt; *) (m :: * -&gt; *) a.
 (MonadTrans t, Monad m) =&gt;
 m a -&gt; t m a
-</span><span class="hs-identifier hs-var">lift</span></span><span> </span><span class="annot"><span class="annottext">(m Bool -&gt; ExceptT DbMarkerError m Bool)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-var">lift</span></a></span><span> </span><span class="annot"><span class="annottext">(m Bool -&gt; ExceptT DbMarkerError m Bool)
 -&gt; m Bool -&gt; ExceptT DbMarkerError m Bool
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">HasFS m h -&gt; FsPath -&gt; m Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">HasFS m h -&gt; FsPath -&gt; m Bool
 forall (m :: * -&gt; *) h.
 HasFS m h -&gt; HasCallStack =&gt; FsPath -&gt; m Bool
 </span><a href="Ouroboros.Consensus.Storage.FS.API.html#doesFileExist"><span class="hs-identifier hs-var hs-var">doesFileExist</span></a></span><span> </span><span class="annot"><span class="annottext">HasFS m h
-</span><a href="#local-6989586621679996478"><span class="hs-identifier hs-var">hasFS</span></a></span><span> </span><span class="annot"><span class="annottext">FsPath
-</span><a href="#local-6989586621679996471"><span class="hs-identifier hs-var">pFile</span></a></span><span>
+</span><a href="#local-6989586621679981654"><span class="hs-identifier hs-var">hasFS</span></a></span><span> </span><span class="annot"><span class="annottext">FsPath
+</span><a href="#local-6989586621679981647"><span class="hs-identifier hs-var">pFile</span></a></span><span>
 </span><span id="line-76"></span><span>    </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679996474"><span class="hs-identifier hs-var">fileExists</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-77"></span><span>      </span><span id="local-6989586621679996470"><span class="annot"><span class="annottext">NetworkMagic
-</span><a href="#local-6989586621679996470"><span class="hs-identifier hs-var">actualNetworkMagic</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">ExceptT DbMarkerError m NetworkMagic
-</span><a href="#local-6989586621679996469"><span class="hs-identifier hs-var">readNetworkMagicFile</span></a></span><span>
+</span><a href="#local-6989586621679981650"><span class="hs-identifier hs-var">fileExists</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-77"></span><span>      </span><span id="local-6989586621679981646"><span class="annot"><span class="annottext">NetworkMagic
+</span><a href="#local-6989586621679981646"><span class="hs-identifier hs-var">actualNetworkMagic</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">ExceptT DbMarkerError m NetworkMagic
+</span><a href="#local-6989586621679981645"><span class="hs-identifier hs-var">readNetworkMagicFile</span></a></span><span>
 </span><span id="line-78"></span><span>      </span><span class="annot"><span class="annottext">Bool -&gt; ExceptT DbMarkerError m () -&gt; ExceptT DbMarkerError m ()
 forall (f :: * -&gt; *). Applicative f =&gt; Bool -&gt; f () -&gt; f ()
-</span><span class="hs-identifier hs-var">when</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NetworkMagic
-</span><a href="#local-6989586621679996470"><span class="hs-identifier hs-var">actualNetworkMagic</span></a></span><span> </span><span class="annot"><span class="annottext">NetworkMagic -&gt; NetworkMagic -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">when</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NetworkMagic
+</span><a href="#local-6989586621679981646"><span class="hs-identifier hs-var">actualNetworkMagic</span></a></span><span> </span><span class="annot"><span class="annottext">NetworkMagic -&gt; NetworkMagic -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
-</span><span class="hs-operator hs-var">/=</span></span><span> </span><span class="annot"><span class="annottext">NetworkMagic
-</span><a href="#local-6989586621679996476"><span class="hs-identifier hs-var">networkMagic</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(ExceptT DbMarkerError m () -&gt; ExceptT DbMarkerError m ())
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">/=</span></a></span><span> </span><span class="annot"><span class="annottext">NetworkMagic
+</span><a href="#local-6989586621679981652"><span class="hs-identifier hs-var">networkMagic</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(ExceptT DbMarkerError m () -&gt; ExceptT DbMarkerError m ())
 -&gt; ExceptT DbMarkerError m () -&gt; ExceptT DbMarkerError m ()
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
 </span><span id="line-79"></span><span>        </span><span class="annot"><span class="annottext">DbMarkerError -&gt; ExceptT DbMarkerError m ()
 forall e (m :: * -&gt; *) a. MonadError e m =&gt; e -&gt; m a
-</span><span class="hs-identifier hs-var">throwError</span></span><span> </span><span class="annot"><span class="annottext">(DbMarkerError -&gt; ExceptT DbMarkerError m ())
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/mtl-2.2.2/src"><span class="hs-identifier hs-var">throwError</span></a></span><span> </span><span class="annot"><span class="annottext">(DbMarkerError -&gt; ExceptT DbMarkerError m ())
 -&gt; DbMarkerError -&gt; ExceptT DbMarkerError m ()
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; NetworkMagic -&gt; NetworkMagic -&gt; DbMarkerError
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; NetworkMagic -&gt; NetworkMagic -&gt; DbMarkerError
 </span><a href="Ouroboros.Consensus.Node.DbMarker.html#NetworkMagicMismatch"><span class="hs-identifier hs-var">NetworkMagicMismatch</span></a></span><span>
 </span><span id="line-80"></span><span>          </span><span class="annot"><span class="annottext">FilePath
-</span><a href="#local-6989586621679996464"><span class="hs-identifier hs-var">fullPath</span></a></span><span>
+</span><a href="#local-6989586621679981640"><span class="hs-identifier hs-var">fullPath</span></a></span><span>
 </span><span id="line-81"></span><span>          </span><span class="annot"><span class="annottext">NetworkMagic
-</span><a href="#local-6989586621679996470"><span class="hs-identifier hs-var">actualNetworkMagic</span></a></span><span>
+</span><a href="#local-6989586621679981646"><span class="hs-identifier hs-var">actualNetworkMagic</span></a></span><span>
 </span><span id="line-82"></span><span>          </span><span class="annot"><span class="annottext">NetworkMagic
-</span><a href="#local-6989586621679996476"><span class="hs-identifier hs-var">networkMagic</span></a></span><span>
+</span><a href="#local-6989586621679981652"><span class="hs-identifier hs-var">networkMagic</span></a></span><span>
 </span><span id="line-83"></span><span>    </span><span class="hs-keyword">else</span><span> </span><span class="hs-keyword">do</span><span>
 </span><span id="line-84"></span><span>      </span><span class="annot"><span class="annottext">m () -&gt; ExceptT DbMarkerError m ()
 forall (t :: (* -&gt; *) -&gt; * -&gt; *) (m :: * -&gt; *) a.
 (MonadTrans t, Monad m) =&gt;
 m a -&gt; t m a
-</span><span class="hs-identifier hs-var">lift</span></span><span> </span><span class="annot"><span class="annottext">(m () -&gt; ExceptT DbMarkerError m ())
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-var">lift</span></a></span><span> </span><span class="annot"><span class="annottext">(m () -&gt; ExceptT DbMarkerError m ())
 -&gt; m () -&gt; ExceptT DbMarkerError m ()
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">HasFS m h -&gt; Bool -&gt; FsPath -&gt; m ()
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">HasFS m h -&gt; Bool -&gt; FsPath -&gt; m ()
 forall (m :: * -&gt; *) h.
 HasFS m h -&gt; HasCallStack =&gt; Bool -&gt; FsPath -&gt; m ()
 </span><a href="Ouroboros.Consensus.Storage.FS.API.html#createDirectoryIfMissing"><span class="hs-identifier hs-var hs-var">createDirectoryIfMissing</span></a></span><span> </span><span class="annot"><span class="annottext">HasFS m h
-</span><a href="#local-6989586621679996478"><span class="hs-identifier hs-var">hasFS</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
-</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="annot"><span class="annottext">FsPath
-</span><a href="#local-6989586621679996462"><span class="hs-identifier hs-var">root</span></a></span><span>
-</span><span id="line-85"></span><span>      </span><span id="local-6989586621679996461"><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679996461"><span class="hs-identifier hs-var">isEmpty</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">m Bool -&gt; ExceptT DbMarkerError m Bool
+</span><a href="#local-6989586621679981654"><span class="hs-identifier hs-var">hasFS</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">False</span></a></span><span> </span><span class="annot"><span class="annottext">FsPath
+</span><a href="#local-6989586621679981638"><span class="hs-identifier hs-var">root</span></a></span><span>
+</span><span id="line-85"></span><span>      </span><span id="local-6989586621679981637"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679981637"><span class="hs-identifier hs-var">isEmpty</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">m Bool -&gt; ExceptT DbMarkerError m Bool
 forall (t :: (* -&gt; *) -&gt; * -&gt; *) (m :: * -&gt; *) a.
 (MonadTrans t, Monad m) =&gt;
 m a -&gt; t m a
-</span><span class="hs-identifier hs-var">lift</span></span><span> </span><span class="annot"><span class="annottext">(m Bool -&gt; ExceptT DbMarkerError m Bool)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-var">lift</span></a></span><span> </span><span class="annot"><span class="annottext">(m Bool -&gt; ExceptT DbMarkerError m Bool)
 -&gt; m Bool -&gt; ExceptT DbMarkerError m Bool
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Set FilePath -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Set FilePath -&gt; Bool
 forall a. Set a -&gt; Bool
-</span><span class="hs-identifier hs-var">Set.null</span></span><span> </span><span class="annot"><span class="annottext">(Set FilePath -&gt; Bool) -&gt; m (Set FilePath) -&gt; m Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.null</span></a></span><span> </span><span class="annot"><span class="annottext">(Set FilePath -&gt; Bool) -&gt; m (Set FilePath) -&gt; m Bool
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">HasFS m h -&gt; FsPath -&gt; m (Set FilePath)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">HasFS m h -&gt; FsPath -&gt; m (Set FilePath)
 forall (m :: * -&gt; *) h.
 HasFS m h -&gt; HasCallStack =&gt; FsPath -&gt; m (Set FilePath)
 </span><a href="Ouroboros.Consensus.Storage.FS.API.html#listDirectory"><span class="hs-identifier hs-var hs-var">listDirectory</span></a></span><span> </span><span class="annot"><span class="annottext">HasFS m h
-</span><a href="#local-6989586621679996478"><span class="hs-identifier hs-var">hasFS</span></a></span><span> </span><span class="annot"><span class="annottext">FsPath
-</span><a href="#local-6989586621679996462"><span class="hs-identifier hs-var">root</span></a></span><span>
+</span><a href="#local-6989586621679981654"><span class="hs-identifier hs-var">hasFS</span></a></span><span> </span><span class="annot"><span class="annottext">FsPath
+</span><a href="#local-6989586621679981638"><span class="hs-identifier hs-var">root</span></a></span><span>
 </span><span id="line-86"></span><span>      </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679996461"><span class="hs-identifier hs-var">isEmpty</span></a></span><span> </span><span class="hs-keyword">then</span><span>
+</span><a href="#local-6989586621679981637"><span class="hs-identifier hs-var">isEmpty</span></a></span><span> </span><span class="hs-keyword">then</span><span>
 </span><span id="line-87"></span><span>        </span><span class="annot"><span class="annottext">ExceptT DbMarkerError m ()
-</span><a href="#local-6989586621679996457"><span class="hs-identifier hs-var">createNetworkMagicFile</span></a></span><span>
+</span><a href="#local-6989586621679981633"><span class="hs-identifier hs-var">createNetworkMagicFile</span></a></span><span>
 </span><span id="line-88"></span><span>      </span><span class="hs-keyword">else</span><span>
 </span><span id="line-89"></span><span>        </span><span class="annot"><span class="annottext">DbMarkerError -&gt; ExceptT DbMarkerError m ()
 forall e (m :: * -&gt; *) a. MonadError e m =&gt; e -&gt; m a
-</span><span class="hs-identifier hs-var">throwError</span></span><span> </span><span class="annot"><span class="annottext">(DbMarkerError -&gt; ExceptT DbMarkerError m ())
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/mtl-2.2.2/src"><span class="hs-identifier hs-var">throwError</span></a></span><span> </span><span class="annot"><span class="annottext">(DbMarkerError -&gt; ExceptT DbMarkerError m ())
 -&gt; DbMarkerError -&gt; ExceptT DbMarkerError m ()
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; DbMarkerError
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; DbMarkerError
 </span><a href="Ouroboros.Consensus.Node.DbMarker.html#NoDbMarkerAndNotEmpty"><span class="hs-identifier hs-var">NoDbMarkerAndNotEmpty</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath
-</span><a href="#local-6989586621679996464"><span class="hs-identifier hs-var">fullPath</span></a></span><span>
+</span><a href="#local-6989586621679981640"><span class="hs-identifier hs-var">fullPath</span></a></span><span>
 </span><span id="line-90"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-91"></span><span>    </span><span id="local-6989586621679996462"><span class="annot"><span class="annottext">root :: FsPath
-</span><a href="#local-6989586621679996462"><span class="hs-identifier hs-var hs-var">root</span></a></span></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[FilePath] -&gt; FsPath
+</span><span id="line-91"></span><span>    </span><span id="local-6989586621679981638"><span class="annot"><span class="annottext">root :: FsPath
+</span><a href="#local-6989586621679981638"><span class="hs-identifier hs-var hs-var">root</span></a></span></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[FilePath] -&gt; FsPath
 </span><a href="Ouroboros.Consensus.Storage.FS.API.Types.html#mkFsPath"><span class="hs-identifier hs-var">mkFsPath</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
-</span><span id="line-92"></span><span>    </span><span id="local-6989586621679996471"><span class="annot"><span class="annottext">pFile :: FsPath
-</span><a href="#local-6989586621679996471"><span class="hs-identifier hs-var hs-var">pFile</span></a></span></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Text] -&gt; FsPath
+</span><span id="line-92"></span><span>    </span><span id="local-6989586621679981647"><span class="annot"><span class="annottext">pFile :: FsPath
+</span><a href="#local-6989586621679981647"><span class="hs-identifier hs-var hs-var">pFile</span></a></span></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Text] -&gt; FsPath
 </span><a href="Ouroboros.Consensus.Storage.FS.API.Types.html#fsPathFromList"><span class="hs-identifier hs-var">fsPathFromList</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Text
 </span><a href="Ouroboros.Consensus.Node.DbMarker.html#dbMarkerFile"><span class="hs-identifier hs-var">dbMarkerFile</span></a></span><span class="hs-special">]</span><span>
-</span><span id="line-93"></span><span>    </span><span id="local-6989586621679996464"><span class="annot"><span class="annottext">fullPath :: FilePath
-</span><a href="#local-6989586621679996464"><span class="hs-identifier hs-var hs-var">fullPath</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MountPoint -&gt; FsPath -&gt; FilePath
+</span><span id="line-93"></span><span>    </span><span id="local-6989586621679981640"><span class="annot"><span class="annottext">fullPath :: FilePath
+</span><a href="#local-6989586621679981640"><span class="hs-identifier hs-var hs-var">fullPath</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MountPoint -&gt; FsPath -&gt; FilePath
 </span><a href="Ouroboros.Consensus.Storage.FS.API.Types.html#fsToFilePath"><span class="hs-identifier hs-var">fsToFilePath</span></a></span><span> </span><span class="annot"><span class="annottext">MountPoint
-</span><a href="#local-6989586621679996477"><span class="hs-identifier hs-var">mountPoint</span></a></span><span> </span><span class="annot"><span class="annottext">FsPath
-</span><a href="#local-6989586621679996471"><span class="hs-identifier hs-var">pFile</span></a></span><span>
+</span><a href="#local-6989586621679981653"><span class="hs-identifier hs-var">mountPoint</span></a></span><span> </span><span class="annot"><span class="annottext">FsPath
+</span><a href="#local-6989586621679981647"><span class="hs-identifier hs-var">pFile</span></a></span><span>
 </span><span id="line-94"></span><span>
-</span><span id="line-95"></span><span>    </span><span class="annot"><a href="#local-6989586621679996469"><span class="hs-identifier hs-type">readNetworkMagicFile</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ExceptT</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#DbMarkerError"><span class="hs-identifier hs-type">DbMarkerError</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679996480"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">NetworkMagic</span></a></span><span>
-</span><span id="line-96"></span><span>    </span><span id="local-6989586621679996469"><span class="annot"><span class="annottext">readNetworkMagicFile :: ExceptT DbMarkerError m NetworkMagic
-</span><a href="#local-6989586621679996469"><span class="hs-identifier hs-var hs-var">readNetworkMagicFile</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">m (Either DbMarkerError NetworkMagic)
+</span><span id="line-95"></span><span>    </span><span class="annot"><a href="#local-6989586621679981645"><span class="hs-identifier hs-type">readNetworkMagicFile</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-type">ExceptT</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#DbMarkerError"><span class="hs-identifier hs-type">DbMarkerError</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679981656"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">NetworkMagic</span></a></span><span>
+</span><span id="line-96"></span><span>    </span><span id="local-6989586621679981645"><span class="annot"><span class="annottext">readNetworkMagicFile :: ExceptT DbMarkerError m NetworkMagic
+</span><a href="#local-6989586621679981645"><span class="hs-identifier hs-var hs-var">readNetworkMagicFile</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">m (Either DbMarkerError NetworkMagic)
 -&gt; ExceptT DbMarkerError m NetworkMagic
 forall e (m :: * -&gt; *) a. m (Either e a) -&gt; ExceptT e m a
-</span><span class="hs-identifier hs-var">ExceptT</span></span><span> </span><span class="annot"><span class="annottext">(m (Either DbMarkerError NetworkMagic)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-var">ExceptT</span></a></span><span> </span><span class="annot"><span class="annottext">(m (Either DbMarkerError NetworkMagic)
  -&gt; ExceptT DbMarkerError m NetworkMagic)
 -&gt; m (Either DbMarkerError NetworkMagic)
 -&gt; ExceptT DbMarkerError m NetworkMagic
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
 </span><span id="line-97"></span><span>      </span><span class="annot"><span class="annottext">HasFS m h
 -&gt; FsPath
 -&gt; OpenMode
@@ -204,83 +204,83 @@ forall (m :: * -&gt; *) h a.
 (HasCallStack, MonadThrow m) =&gt;
 HasFS m h -&gt; FsPath -&gt; OpenMode -&gt; (Handle h -&gt; m a) -&gt; m a
 </span><a href="Ouroboros.Consensus.Storage.FS.API.html#withFile"><span class="hs-identifier hs-var">withFile</span></a></span><span> </span><span class="annot"><span class="annottext">HasFS m h
-</span><a href="#local-6989586621679996478"><span class="hs-identifier hs-var">hasFS</span></a></span><span> </span><span class="annot"><span class="annottext">FsPath
-</span><a href="#local-6989586621679996471"><span class="hs-identifier hs-var">pFile</span></a></span><span> </span><span class="annot"><span class="annottext">OpenMode
+</span><a href="#local-6989586621679981654"><span class="hs-identifier hs-var">hasFS</span></a></span><span> </span><span class="annot"><span class="annottext">FsPath
+</span><a href="#local-6989586621679981647"><span class="hs-identifier hs-var">pFile</span></a></span><span> </span><span class="annot"><span class="annottext">OpenMode
 </span><a href="Ouroboros.Consensus.Storage.FS.API.Types.html#ReadMode"><span class="hs-identifier hs-var">ReadMode</span></a></span><span> </span><span class="annot"><span class="annottext">((Handle h -&gt; m (Either DbMarkerError NetworkMagic))
  -&gt; m (Either DbMarkerError NetworkMagic))
 -&gt; (Handle h -&gt; m (Either DbMarkerError NetworkMagic))
 -&gt; m (Either DbMarkerError NetworkMagic)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679996449"><span class="annot"><span class="annottext">Handle h
-</span><a href="#local-6989586621679996449"><span class="hs-identifier hs-var">h</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-98"></span><span>        </span><span id="local-6989586621679996448"><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679996448"><span class="hs-identifier hs-var">bs</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; ByteString
-</span><span class="hs-identifier hs-var">toStrict</span></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; ByteString) -&gt; m ByteString -&gt; m ByteString
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679981625"><span class="annot"><span class="annottext">Handle h
+</span><a href="#local-6989586621679981625"><span class="hs-identifier hs-var">h</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-98"></span><span>        </span><span id="local-6989586621679981624"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679981624"><span class="hs-identifier hs-var">bs</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; ByteString
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-var">toStrict</span></a></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; ByteString) -&gt; m ByteString -&gt; m ByteString
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">HasFS m h -&gt; Handle h -&gt; m ByteString
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">HasFS m h -&gt; Handle h -&gt; m ByteString
 forall (m :: * -&gt; *) h.
 Monad m =&gt;
 HasFS m h -&gt; Handle h -&gt; m ByteString
 </span><a href="Ouroboros.Consensus.Storage.FS.API.html#hGetAll"><span class="hs-identifier hs-var">hGetAll</span></a></span><span> </span><span class="annot"><span class="annottext">HasFS m h
-</span><a href="#local-6989586621679996478"><span class="hs-identifier hs-var">hasFS</span></a></span><span> </span><span class="annot"><span class="annottext">Handle h
-</span><a href="#local-6989586621679996449"><span class="hs-identifier hs-var">h</span></a></span><span>
+</span><a href="#local-6989586621679981654"><span class="hs-identifier hs-var">hasFS</span></a></span><span> </span><span class="annot"><span class="annottext">Handle h
+</span><a href="#local-6989586621679981625"><span class="hs-identifier hs-var">h</span></a></span><span>
 </span><span id="line-99"></span><span>        </span><span class="annot"><span class="annottext">ExceptT DbMarkerError m NetworkMagic
 -&gt; m (Either DbMarkerError NetworkMagic)
 forall e (m :: * -&gt; *) a. ExceptT e m a -&gt; m (Either e a)
-</span><span class="hs-identifier hs-var">runExceptT</span></span><span> </span><span class="annot"><span class="annottext">(ExceptT DbMarkerError m NetworkMagic
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-var">runExceptT</span></a></span><span> </span><span class="annot"><span class="annottext">(ExceptT DbMarkerError m NetworkMagic
  -&gt; m (Either DbMarkerError NetworkMagic))
 -&gt; ExceptT DbMarkerError m NetworkMagic
 -&gt; m (Either DbMarkerError NetworkMagic)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; ByteString -&gt; ExceptT DbMarkerError m NetworkMagic
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; ByteString -&gt; ExceptT DbMarkerError m NetworkMagic
 forall (m :: * -&gt; *).
 Monad m =&gt;
 FilePath -&gt; ByteString -&gt; ExceptT DbMarkerError m NetworkMagic
 </span><a href="Ouroboros.Consensus.Node.DbMarker.html#dbMarkerParse"><span class="hs-identifier hs-var">dbMarkerParse</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath
-</span><a href="#local-6989586621679996464"><span class="hs-identifier hs-var">fullPath</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679996448"><span class="hs-identifier hs-var">bs</span></a></span><span>
+</span><a href="#local-6989586621679981640"><span class="hs-identifier hs-var">fullPath</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679981624"><span class="hs-identifier hs-var">bs</span></a></span><span>
 </span><span id="line-100"></span><span>
-</span><span id="line-101"></span><span>    </span><span class="annot"><a href="#local-6989586621679996457"><span class="hs-identifier hs-type">createNetworkMagicFile</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ExceptT</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#DbMarkerError"><span class="hs-identifier hs-type">DbMarkerError</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679996480"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
-</span><span id="line-102"></span><span>    </span><span id="local-6989586621679996457"><span class="annot"><span class="annottext">createNetworkMagicFile :: ExceptT DbMarkerError m ()
-</span><a href="#local-6989586621679996457"><span class="hs-identifier hs-var hs-var">createNetworkMagicFile</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">m () -&gt; ExceptT DbMarkerError m ()
+</span><span id="line-101"></span><span>    </span><span class="annot"><a href="#local-6989586621679981633"><span class="hs-identifier hs-type">createNetworkMagicFile</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-type">ExceptT</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#DbMarkerError"><span class="hs-identifier hs-type">DbMarkerError</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679981656"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-102"></span><span>    </span><span id="local-6989586621679981633"><span class="annot"><span class="annottext">createNetworkMagicFile :: ExceptT DbMarkerError m ()
+</span><a href="#local-6989586621679981633"><span class="hs-identifier hs-var hs-var">createNetworkMagicFile</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">m () -&gt; ExceptT DbMarkerError m ()
 forall (t :: (* -&gt; *) -&gt; * -&gt; *) (m :: * -&gt; *) a.
 (MonadTrans t, Monad m) =&gt;
 m a -&gt; t m a
-</span><span class="hs-identifier hs-var">lift</span></span><span> </span><span class="annot"><span class="annottext">(m () -&gt; ExceptT DbMarkerError m ())
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-var">lift</span></a></span><span> </span><span class="annot"><span class="annottext">(m () -&gt; ExceptT DbMarkerError m ())
 -&gt; m () -&gt; ExceptT DbMarkerError m ()
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
 </span><span id="line-103"></span><span>      </span><span class="annot"><span class="annottext">HasFS m h -&gt; FsPath -&gt; OpenMode -&gt; (Handle h -&gt; m ()) -&gt; m ()
 forall (m :: * -&gt; *) h a.
 (HasCallStack, MonadThrow m) =&gt;
 HasFS m h -&gt; FsPath -&gt; OpenMode -&gt; (Handle h -&gt; m a) -&gt; m a
 </span><a href="Ouroboros.Consensus.Storage.FS.API.html#withFile"><span class="hs-identifier hs-var">withFile</span></a></span><span> </span><span class="annot"><span class="annottext">HasFS m h
-</span><a href="#local-6989586621679996478"><span class="hs-identifier hs-var">hasFS</span></a></span><span> </span><span class="annot"><span class="annottext">FsPath
-</span><a href="#local-6989586621679996471"><span class="hs-identifier hs-var">pFile</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AllowExisting -&gt; OpenMode
+</span><a href="#local-6989586621679981654"><span class="hs-identifier hs-var">hasFS</span></a></span><span> </span><span class="annot"><span class="annottext">FsPath
+</span><a href="#local-6989586621679981647"><span class="hs-identifier hs-var">pFile</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AllowExisting -&gt; OpenMode
 </span><a href="Ouroboros.Consensus.Storage.FS.API.Types.html#AppendMode"><span class="hs-identifier hs-var">AppendMode</span></a></span><span> </span><span class="annot"><span class="annottext">AllowExisting
 </span><a href="Ouroboros.Consensus.Storage.FS.API.Types.html#MustBeNew"><span class="hs-identifier hs-var">MustBeNew</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">((Handle h -&gt; m ()) -&gt; m ()) -&gt; (Handle h -&gt; m ()) -&gt; m ()
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679996444"><span class="annot"><span class="annottext">Handle h
-</span><a href="#local-6989586621679996444"><span class="hs-identifier hs-var">h</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679981620"><span class="annot"><span class="annottext">Handle h
+</span><a href="#local-6989586621679981620"><span class="hs-identifier hs-var">h</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
 </span><span id="line-104"></span><span>        </span><span class="annot"><span class="annottext">m Word64 -&gt; m ()
 forall (f :: * -&gt; *) a. Functor f =&gt; f a -&gt; f ()
-</span><span class="hs-identifier hs-var">void</span></span><span> </span><span class="annot"><span class="annottext">(m Word64 -&gt; m ()) -&gt; m Word64 -&gt; m ()
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">void</span></a></span><span> </span><span class="annot"><span class="annottext">(m Word64 -&gt; m ()) -&gt; m Word64 -&gt; m ()
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">HasFS m h -&gt; Handle h -&gt; ByteString -&gt; m Word64
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">HasFS m h -&gt; Handle h -&gt; ByteString -&gt; m Word64
 forall (m :: * -&gt; *) h.
 (HasCallStack, Monad m) =&gt;
 HasFS m h -&gt; Handle h -&gt; ByteString -&gt; m Word64
 </span><a href="Ouroboros.Consensus.Storage.FS.API.html#hPutAll"><span class="hs-identifier hs-var">hPutAll</span></a></span><span> </span><span class="annot"><span class="annottext">HasFS m h
-</span><a href="#local-6989586621679996478"><span class="hs-identifier hs-var">hasFS</span></a></span><span> </span><span class="annot"><span class="annottext">Handle h
-</span><a href="#local-6989586621679996444"><span class="hs-identifier hs-var">h</span></a></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; m Word64) -&gt; ByteString -&gt; m Word64
+</span><a href="#local-6989586621679981654"><span class="hs-identifier hs-var">hasFS</span></a></span><span> </span><span class="annot"><span class="annottext">Handle h
+</span><a href="#local-6989586621679981620"><span class="hs-identifier hs-var">h</span></a></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; m Word64) -&gt; ByteString -&gt; m Word64
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
 </span><span id="line-105"></span><span>          </span><span class="annot"><span class="annottext">ByteString -&gt; ByteString
-</span><span class="hs-identifier hs-var">fromStrict</span></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; ByteString) -&gt; ByteString -&gt; ByteString
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-var">fromStrict</span></a></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; ByteString) -&gt; ByteString -&gt; ByteString
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">NetworkMagic -&gt; ByteString
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">NetworkMagic -&gt; ByteString
 </span><a href="Ouroboros.Consensus.Node.DbMarker.html#dbMarkerContents"><span class="hs-identifier hs-var">dbMarkerContents</span></a></span><span> </span><span class="annot"><span class="annottext">NetworkMagic
-</span><a href="#local-6989586621679996476"><span class="hs-identifier hs-var">networkMagic</span></a></span><span>
+</span><a href="#local-6989586621679981652"><span class="hs-identifier hs-var">networkMagic</span></a></span><span>
 </span><span id="line-106"></span><span>
 </span><span id="line-107"></span><span class="hs-comment">{-------------------------------------------------------------------------------
   Error
@@ -291,7 +291,7 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span id="line-113"></span><span>    </span><span class="hs-comment">-- contained a different 'NetworkMagic' than the expected one. This</span><span>
 </span><span id="line-114"></span><span>    </span><span class="hs-comment">-- indicates that this database folder corresponds to another net.</span><span>
 </span><span id="line-115"></span><span>    </span><span id="NetworkMagicMismatch"><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#NetworkMagicMismatch"><span class="hs-identifier hs-var">NetworkMagicMismatch</span></a></span></span><span>
-</span><span id="line-116"></span><span>      </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span>         </span><span class="hs-comment">-- ^ The full path to the 'dbMarkerFile'</span><span>
+</span><span id="line-116"></span><span>      </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span>         </span><span class="hs-comment">-- ^ The full path to the 'dbMarkerFile'</span><span>
 </span><span id="line-117"></span><span>      </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">NetworkMagic</span></a></span><span>  </span><span class="hs-comment">-- ^ Actual</span><span>
 </span><span id="line-118"></span><span>      </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">NetworkMagic</span></a></span><span>  </span><span class="hs-comment">-- ^ Expected</span><span>
 </span><span id="line-119"></span><span>
@@ -300,13 +300,13 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span id="line-122"></span><span>    </span><span class="hs-comment">-- or it is a database folder, but its 'dbMarkerFile' has been</span><span>
 </span><span id="line-123"></span><span>    </span><span class="hs-comment">-- deleted.</span><span>
 </span><span id="line-124"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="NoDbMarkerAndNotEmpty"><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#NoDbMarkerAndNotEmpty"><span class="hs-identifier hs-var">NoDbMarkerAndNotEmpty</span></a></span></span><span>
-</span><span id="line-125"></span><span>      </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span>         </span><span class="hs-comment">-- ^ The full path to the 'dbMarkerFile'</span><span>
+</span><span id="line-125"></span><span>      </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span>         </span><span class="hs-comment">-- ^ The full path to the 'dbMarkerFile'</span><span>
 </span><span id="line-126"></span><span>
 </span><span id="line-127"></span><span>    </span><span class="hs-comment">-- | The database folder contained a 'dbMarkerFile' that could not</span><span>
 </span><span id="line-128"></span><span>    </span><span class="hs-comment">-- be read. The file has been tampered with or it was corrupted somehow.</span><span>
 </span><span id="line-129"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="CorruptDbMarker"><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#CorruptDbMarker"><span class="hs-identifier hs-var">CorruptDbMarker</span></a></span></span><span>
-</span><span id="line-130"></span><span>      </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span>         </span><span class="hs-comment">-- ^ The full path to the 'dbMarkerFile'</span><span>
-</span><span id="line-131"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679996437"><span id="local-6989586621679996439"><span class="annot"><span class="annottext">DbMarkerError -&gt; DbMarkerError -&gt; Bool
+</span><span id="line-130"></span><span>      </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span>         </span><span class="hs-comment">-- ^ The full path to the 'dbMarkerFile'</span><span>
+</span><span id="line-131"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679981613"><span id="local-6989586621679981615"><span class="annot"><span class="annottext">DbMarkerError -&gt; DbMarkerError -&gt; Bool
 (DbMarkerError -&gt; DbMarkerError -&gt; Bool)
 -&gt; (DbMarkerError -&gt; DbMarkerError -&gt; Bool) -&gt; Eq DbMarkerError
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -314,7 +314,7 @@ forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 $c/= :: DbMarkerError -&gt; DbMarkerError -&gt; Bool
 == :: DbMarkerError -&gt; DbMarkerError -&gt; Bool
 $c== :: DbMarkerError -&gt; DbMarkerError -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679996430"><span id="local-6989586621679996432"><span id="local-6989586621679996434"><span class="annot"><span class="annottext">Int -&gt; DbMarkerError -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679981606"><span id="local-6989586621679981608"><span id="local-6989586621679981610"><span class="annot"><span class="annottext">Int -&gt; DbMarkerError -&gt; ShowS
 [DbMarkerError] -&gt; ShowS
 DbMarkerError -&gt; FilePath
 (Int -&gt; DbMarkerError -&gt; ShowS)
@@ -329,58 +329,58 @@ show :: DbMarkerError -&gt; FilePath
 $cshow :: DbMarkerError -&gt; FilePath
 showsPrec :: Int -&gt; DbMarkerError -&gt; ShowS
 $cshowsPrec :: Int -&gt; DbMarkerError -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-132"></span><span>
-</span><span id="line-133"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679996423"><span id="local-6989586621679996425"><span class="annot"><span class="hs-identifier hs-type">Exception</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#DbMarkerError"><span class="hs-identifier hs-type">DbMarkerError</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-134"></span><span>  </span><span id="local-6989586621679996420"><span class="annot"><span class="annottext">displayException :: DbMarkerError -&gt; FilePath
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">displayException</span></span></span><span> </span><span id="local-6989586621679996418"><span class="annot"><span class="annottext">DbMarkerError
-</span><a href="#local-6989586621679996418"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">DbMarkerError
-</span><a href="#local-6989586621679996418"><span class="hs-identifier hs-var">e</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-135"></span><span>    </span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#NetworkMagicMismatch"><span class="hs-identifier hs-type">NetworkMagicMismatch</span></a></span><span> </span><span id="local-6989586621679996417"><span class="annot"><span class="annottext">FilePath
-</span><a href="#local-6989586621679996417"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679996416"><span class="annot"><span class="annottext">NetworkMagic
-</span><a href="#local-6989586621679996416"><span class="hs-identifier hs-var">actual</span></a></span></span><span> </span><span id="local-6989586621679996415"><span class="annot"><span class="annottext">NetworkMagic
-</span><a href="#local-6989586621679996415"><span class="hs-identifier hs-var">expected</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-133"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679981599"><span id="local-6989586621679981601"><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Exception</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#DbMarkerError"><span class="hs-identifier hs-type">DbMarkerError</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-134"></span><span>  </span><span id="local-6989586621679981596"><span class="annot"><span class="annottext">displayException :: DbMarkerError -&gt; FilePath
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">displayException</span></a></span></span><span> </span><span id="local-6989586621679981594"><span class="annot"><span class="annottext">DbMarkerError
+</span><a href="#local-6989586621679981594"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">DbMarkerError
+</span><a href="#local-6989586621679981594"><span class="hs-identifier hs-var">e</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-135"></span><span>    </span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#NetworkMagicMismatch"><span class="hs-identifier hs-type">NetworkMagicMismatch</span></a></span><span> </span><span id="local-6989586621679981593"><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679981593"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679981592"><span class="annot"><span class="annottext">NetworkMagic
+</span><a href="#local-6989586621679981592"><span class="hs-identifier hs-var">actual</span></a></span></span><span> </span><span id="local-6989586621679981591"><span class="annot"><span class="annottext">NetworkMagic
+</span><a href="#local-6989586621679981591"><span class="hs-identifier hs-var">expected</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
 </span><span id="line-136"></span><span>      </span><span class="annot"><span class="annottext">FilePath
 </span><span class="hs-string">&quot;Wrong NetworkMagic in \&quot;&quot;</span></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; ShowS
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">FilePath
-</span><a href="#local-6989586621679996417"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679981593"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; ShowS
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath
 </span><span class="hs-string">&quot;\&quot;: &quot;</span></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; ShowS
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">NetworkMagic -&gt; FilePath
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">NetworkMagic -&gt; FilePath
 forall a. Show a =&gt; a -&gt; FilePath
-</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">NetworkMagic
-</span><a href="#local-6989586621679996416"><span class="hs-identifier hs-var">actual</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="annot"><span class="annottext">NetworkMagic
+</span><a href="#local-6989586621679981592"><span class="hs-identifier hs-var">actual</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; ShowS
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span>
 </span><span id="line-137"></span><span>      </span><span class="annot"><span class="annottext">FilePath
 </span><span class="hs-string">&quot;, but expected: &quot;</span></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; ShowS
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">NetworkMagic -&gt; FilePath
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">NetworkMagic -&gt; FilePath
 forall a. Show a =&gt; a -&gt; FilePath
-</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">NetworkMagic
-</span><a href="#local-6989586621679996415"><span class="hs-identifier hs-var">expected</span></a></span><span>
-</span><span id="line-138"></span><span>    </span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#NoDbMarkerAndNotEmpty"><span class="hs-identifier hs-type">NoDbMarkerAndNotEmpty</span></a></span><span> </span><span id="local-6989586621679996413"><span class="annot"><span class="annottext">FilePath
-</span><a href="#local-6989586621679996413"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="annot"><span class="annottext">NetworkMagic
+</span><a href="#local-6989586621679981591"><span class="hs-identifier hs-var">expected</span></a></span><span>
+</span><span id="line-138"></span><span>    </span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#NoDbMarkerAndNotEmpty"><span class="hs-identifier hs-type">NoDbMarkerAndNotEmpty</span></a></span><span> </span><span id="local-6989586621679981589"><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679981589"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
 </span><span id="line-139"></span><span>      </span><span class="annot"><span class="annottext">FilePath
 </span><span class="hs-string">&quot;Missing \&quot;&quot;</span></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; ShowS
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">FilePath
-</span><a href="#local-6989586621679996413"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679981589"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; ShowS
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath
 </span><span class="hs-string">&quot;\&quot; but the folder was not empty&quot;</span></span><span>
-</span><span id="line-140"></span><span>    </span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#CorruptDbMarker"><span class="hs-identifier hs-type">CorruptDbMarker</span></a></span><span> </span><span id="local-6989586621679996412"><span class="annot"><span class="annottext">FilePath
-</span><a href="#local-6989586621679996412"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-140"></span><span>    </span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#CorruptDbMarker"><span class="hs-identifier hs-type">CorruptDbMarker</span></a></span><span> </span><span id="local-6989586621679981588"><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679981588"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
 </span><span id="line-141"></span><span>      </span><span class="annot"><span class="annottext">FilePath
 </span><span class="hs-string">&quot;Corrupt or unreadable \&quot;&quot;</span></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; ShowS
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">FilePath
-</span><a href="#local-6989586621679996412"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679981588"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; ShowS
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath
 </span><span class="hs-string">&quot;\&quot;&quot;</span></span><span>
 </span><span id="line-142"></span><span>
 </span><span id="line-143"></span><span class="hs-comment">{-------------------------------------------------------------------------------
@@ -389,7 +389,7 @@ forall a. Semigroup a =&gt; a -&gt; a -&gt; a
 </span><span id="line-146"></span><span>
 </span><span id="line-147"></span><span class="hs-comment">-- | For legacy reasons it was using 'ProtocolMagicId' not 'NetworkMagic'</span><span>
 </span><span id="line-148"></span><span class="hs-comment">-- which are really the same thing.</span><span>
-</span><span id="line-149"></span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#dbMarkerFile"><span class="hs-identifier hs-type">dbMarkerFile</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-149"></span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#dbMarkerFile"><span class="hs-identifier hs-type">dbMarkerFile</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-type">Text</span></a></span><span>
 </span><span id="line-150"></span><span id="dbMarkerFile"><span class="annot"><span class="annottext">dbMarkerFile :: Text
 </span><a href="Ouroboros.Consensus.Node.DbMarker.html#dbMarkerFile"><span class="hs-identifier hs-var hs-var">dbMarkerFile</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
 </span><span class="hs-string">&quot;protocolMagicId&quot;</span></span><span>
@@ -401,50 +401,50 @@ forall a. Semigroup a =&gt; a -&gt; a -&gt; a
 </span><span id="line-156"></span><span class="hs-comment">-- Type annotation on @pmid@ is here so that /if/ the type changes, this</span><span>
 </span><span id="line-157"></span><span class="hs-comment">-- code will fail to build. This is important, because if we change the</span><span>
 </span><span id="line-158"></span><span class="hs-comment">-- type, we must consider how this affects existing DB deployments.</span><span>
-</span><span id="line-159"></span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#dbMarkerContents"><span class="hs-identifier hs-type">dbMarkerContents</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">NetworkMagic</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ByteString</span></span><span>
+</span><span id="line-159"></span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#dbMarkerContents"><span class="hs-identifier hs-type">dbMarkerContents</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">NetworkMagic</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-type">ByteString</span></a></span><span>
 </span><span id="line-160"></span><span id="dbMarkerContents"><span class="annot"><span class="annottext">dbMarkerContents :: NetworkMagic -&gt; ByteString
-</span><a href="Ouroboros.Consensus.Node.DbMarker.html#dbMarkerContents"><span class="hs-identifier hs-var hs-var">dbMarkerContents</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">NetworkMagic</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679996410"><span class="annot"><span class="annottext">Word32
-</span><a href="#local-6989586621679996410"><span class="hs-identifier hs-var">nm</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Word32</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="Ouroboros.Consensus.Node.DbMarker.html#dbMarkerContents"><span class="hs-identifier hs-var hs-var">dbMarkerContents</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">NetworkMagic</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679981586"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679981586"><span class="hs-identifier hs-var">nm</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-161"></span><span>    </span><span class="annot"><span class="annottext">FilePath -&gt; ByteString
-</span><span class="hs-identifier hs-var">BS.Char8.pack</span></span><span> </span><span class="annot"><span class="annottext">(FilePath -&gt; ByteString) -&gt; FilePath -&gt; ByteString
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-var">BS.Char8.pack</span></a></span><span> </span><span class="annot"><span class="annottext">(FilePath -&gt; ByteString) -&gt; FilePath -&gt; ByteString
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; FilePath
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; FilePath
 forall a. Show a =&gt; a -&gt; FilePath
-</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Word32
-</span><a href="#local-6989586621679996410"><span class="hs-identifier hs-var">nm</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679981586"><span class="hs-identifier hs-var">nm</span></a></span><span>
 </span><span id="line-162"></span><span>
 </span><span id="line-163"></span><span class="hs-comment">-- | Parse contents of the DB marker file</span><span>
 </span><span id="line-164"></span><span class="hs-comment">--</span><span>
 </span><span id="line-165"></span><span class="hs-comment">-- Must be inverse to 'dbMarkerContents'</span><span>
-</span><span id="line-166"></span><span id="local-6989586621679996503"><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#dbMarkerParse"><span class="hs-identifier hs-type">dbMarkerParse</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span> </span><span class="annot"><a href="#local-6989586621679996503"><span class="hs-identifier hs-type">m</span></a></span><span>
-</span><span id="line-167"></span><span>              </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span>
-</span><span id="line-168"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ByteString</span></span><span>
-</span><span id="line-169"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ExceptT</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#DbMarkerError"><span class="hs-identifier hs-type">DbMarkerError</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679996503"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">NetworkMagic</span></a></span></span><span>
+</span><span id="line-166"></span><span id="local-6989586621679981679"><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#dbMarkerParse"><span class="hs-identifier hs-type">dbMarkerParse</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Monad</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679981679"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-167"></span><span>              </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span>
+</span><span id="line-168"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-type">ByteString</span></a></span><span>
+</span><span id="line-169"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-type">ExceptT</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#DbMarkerError"><span class="hs-identifier hs-type">DbMarkerError</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679981679"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">NetworkMagic</span></a></span></span><span>
 </span><span id="line-170"></span><span id="dbMarkerParse"><span class="annot"><span class="annottext">dbMarkerParse :: FilePath -&gt; ByteString -&gt; ExceptT DbMarkerError m NetworkMagic
-</span><a href="Ouroboros.Consensus.Node.DbMarker.html#dbMarkerParse"><span class="hs-identifier hs-var hs-var">dbMarkerParse</span></a></span></span><span> </span><span id="local-6989586621679996408"><span class="annot"><span class="annottext">FilePath
-</span><a href="#local-6989586621679996408"><span class="hs-identifier hs-var">fullPath</span></a></span></span><span> </span><span id="local-6989586621679996407"><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679996407"><span class="hs-identifier hs-var">bs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="Ouroboros.Consensus.Node.DbMarker.html#dbMarkerParse"><span class="hs-identifier hs-var hs-var">dbMarkerParse</span></a></span></span><span> </span><span id="local-6989586621679981584"><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679981584"><span class="hs-identifier hs-var">fullPath</span></a></span></span><span> </span><span id="local-6989586621679981583"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679981583"><span class="hs-identifier hs-var">bs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-171"></span><span>    </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; Maybe Word32
 forall a. Read a =&gt; FilePath -&gt; Maybe a
-</span><span class="hs-identifier hs-var">readMaybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ByteString -&gt; FilePath
-</span><span class="hs-identifier hs-var">BS.Char8.unpack</span></span><span> </span><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679996407"><span class="hs-identifier hs-var">bs</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-172"></span><span>      </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679996405"><span class="annot"><span class="annottext">Word32
-</span><a href="#local-6989586621679996405"><span class="hs-identifier hs-var">nm</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">NetworkMagic -&gt; ExceptT DbMarkerError m NetworkMagic
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">readMaybe</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ByteString -&gt; FilePath
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-var">BS.Char8.unpack</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679981583"><span class="hs-identifier hs-var">bs</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-172"></span><span>      </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Just</span></a></span><span> </span><span id="local-6989586621679981581"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679981581"><span class="hs-identifier hs-var">nm</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">NetworkMagic -&gt; ExceptT DbMarkerError m NetworkMagic
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
-</span><span class="hs-identifier hs-var">return</span></span><span>     </span><span class="annot"><span class="annottext">(NetworkMagic -&gt; ExceptT DbMarkerError m NetworkMagic)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span>     </span><span class="annot"><span class="annottext">(NetworkMagic -&gt; ExceptT DbMarkerError m NetworkMagic)
 -&gt; NetworkMagic -&gt; ExceptT DbMarkerError m NetworkMagic
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; NetworkMagic
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; NetworkMagic
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">NetworkMagic</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
-</span><a href="#local-6989586621679996405"><span class="hs-identifier hs-var">nm</span></a></span><span>
+</span><a href="#local-6989586621679981581"><span class="hs-identifier hs-var">nm</span></a></span><span>
 </span><span id="line-173"></span><span>      </span><span class="annot"><span class="annottext">Maybe Word32
-</span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">DbMarkerError -&gt; ExceptT DbMarkerError m NetworkMagic
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">DbMarkerError -&gt; ExceptT DbMarkerError m NetworkMagic
 forall e (m :: * -&gt; *) a. MonadError e m =&gt; e -&gt; m a
-</span><span class="hs-identifier hs-var">throwError</span></span><span> </span><span class="annot"><span class="annottext">(DbMarkerError -&gt; ExceptT DbMarkerError m NetworkMagic)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/mtl-2.2.2/src"><span class="hs-identifier hs-var">throwError</span></a></span><span> </span><span class="annot"><span class="annottext">(DbMarkerError -&gt; ExceptT DbMarkerError m NetworkMagic)
 -&gt; DbMarkerError -&gt; ExceptT DbMarkerError m NetworkMagic
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; DbMarkerError
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; DbMarkerError
 </span><a href="Ouroboros.Consensus.Node.DbMarker.html#CorruptDbMarker"><span class="hs-identifier hs-var">CorruptDbMarker</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath
-</span><a href="#local-6989586621679996408"><span class="hs-identifier hs-var">fullPath</span></a></span><span>
+</span><a href="#local-6989586621679981584"><span class="hs-identifier hs-var">fullPath</span></a></span><span>
 </span><span id="line-174"></span></pre></body></html>

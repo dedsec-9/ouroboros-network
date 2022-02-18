@@ -1,40 +1,39 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE GeneralizedNewtypeDeriving #-}</span><span>
 </span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE NamedFieldPuns             #-}</span><span>
 </span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables        #-}</span><span>
-</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE TypeFamilies               #-}</span><span>
-</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE StandaloneDeriving         #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE StandaloneDeriving         #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE TypeFamilies               #-}</span><span>
 </span><span id="line-6"></span><span>
-</span><span id="line-7"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.BlockFetch.DeltaQ</span><span> </span><span class="hs-special">(</span><span>
-</span><span id="line-8"></span><span>    </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#GSV"><span class="hs-identifier">GSV</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-9"></span><span>    </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#Distribution"><span class="hs-identifier">Distribution</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-10"></span><span>    </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#DeltaQ"><span class="hs-identifier">DeltaQ</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-11"></span><span>    </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier">PeerGSV</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
-</span><span id="line-12"></span><span>    </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#SizeInBytes"><span class="hs-identifier">SizeInBytes</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-13"></span><span>    </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#PeerFetchInFlightLimits"><span class="hs-identifier">PeerFetchInFlightLimits</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
-</span><span id="line-14"></span><span>    </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#calculatePeerFetchInFlightLimits"><span class="hs-identifier">calculatePeerFetchInFlightLimits</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-15"></span><span>    </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#estimateResponseDeadlineProbability"><span class="hs-identifier">estimateResponseDeadlineProbability</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-16"></span><span>    </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#estimateExpectedResponseDuration"><span class="hs-identifier">estimateExpectedResponseDuration</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-17"></span><span>    </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#comparePeerGSV"><span class="hs-identifier">comparePeerGSV</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-18"></span><span class="hs-comment">--    estimateBlockFetchResponse,</span><span>
-</span><span id="line-19"></span><span class="hs-comment">--    blockArrivalShedule,</span><span>
-</span><span id="line-20"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-21"></span><span>
-</span><span id="line-22"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Fixed</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Fixed</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Pico</span></span><span class="hs-special">)</span><span>
+</span><span id="line-7"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.BlockFetch.DeltaQ</span><span>
+</span><span id="line-8"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#GSV"><span class="hs-identifier">GSV</span></a></span><span>
+</span><span id="line-9"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#Distribution"><span class="hs-identifier">Distribution</span></a></span><span>
+</span><span id="line-10"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#DeltaQ"><span class="hs-identifier">DeltaQ</span></a></span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier">PeerGSV</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#SizeInBytes"><span class="hs-identifier">SizeInBytes</span></a></span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#PeerFetchInFlightLimits"><span class="hs-identifier">PeerFetchInFlightLimits</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#calculatePeerFetchInFlightLimits"><span class="hs-identifier">calculatePeerFetchInFlightLimits</span></a></span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#estimateResponseDeadlineProbability"><span class="hs-identifier">estimateResponseDeadlineProbability</span></a></span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#estimateExpectedResponseDuration"><span class="hs-identifier">estimateExpectedResponseDuration</span></a></span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#comparePeerGSV"><span class="hs-identifier">comparePeerGSV</span></a></span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#comparePeerGSV%27"><span class="hs-identifier">comparePeerGSV'</span></a></span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier">Control.Monad.Class.MonadTime</span></a></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Fixed</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Fixed</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Pico</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-23"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Hashable</span></span><span>
-</span><span id="line-24"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Set</span></span><span class="hs-special">)</span><span>
-</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Set</span></span><span>
-</span><span id="line-26"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier">Control.Monad.Class.MonadTime</span></a></span><span>
-</span><span id="line-27"></span><span>
-</span><span id="line-28"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html"><span class="hs-identifier">Ouroboros.Network.DeltaQ</span></a></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Data.Set</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Set</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Data.Set</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Set</span></span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html"><span class="hs-identifier">Ouroboros.Network.DeltaQ</span></a></span><span>
+</span><span id="line-28"></span><span>
 </span><span id="line-29"></span><span>
-</span><span id="line-30"></span><span>
-</span><span id="line-31"></span><span class="hs-keyword">data</span><span> </span><span id="PeerFetchInFlightLimits"><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#PeerFetchInFlightLimits"><span class="hs-identifier hs-var">PeerFetchInFlightLimits</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="PeerFetchInFlightLimits"><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#PeerFetchInFlightLimits"><span class="hs-identifier hs-var">PeerFetchInFlightLimits</span></a></span></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-32"></span><span>       </span><span id="inFlightBytesHighWatermark"><span class="annot"><span class="annottext">PeerFetchInFlightLimits -&gt; SizeInBytes
+</span><span id="line-30"></span><span class="hs-keyword">data</span><span> </span><span id="PeerFetchInFlightLimits"><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#PeerFetchInFlightLimits"><span class="hs-identifier hs-var">PeerFetchInFlightLimits</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="PeerFetchInFlightLimits"><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#PeerFetchInFlightLimits"><span class="hs-identifier hs-var">PeerFetchInFlightLimits</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-31"></span><span>       </span><span id="inFlightBytesHighWatermark"><span class="annot"><span class="annottext">PeerFetchInFlightLimits -&gt; SizeInBytes
 </span><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#inFlightBytesHighWatermark"><span class="hs-identifier hs-var hs-var">inFlightBytesHighWatermark</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#SizeInBytes"><span class="hs-identifier hs-type">SizeInBytes</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-33"></span><span>       </span><span id="inFlightBytesLowWatermark"><span class="annot"><span class="annottext">PeerFetchInFlightLimits -&gt; SizeInBytes
+</span><span id="line-32"></span><span>       </span><span id="inFlightBytesLowWatermark"><span class="annot"><span class="annottext">PeerFetchInFlightLimits -&gt; SizeInBytes
 </span><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#inFlightBytesLowWatermark"><span class="hs-identifier hs-var hs-var">inFlightBytesLowWatermark</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#SizeInBytes"><span class="hs-identifier hs-type">SizeInBytes</span></a></span><span>
-</span><span id="line-34"></span><span>     </span><span class="hs-special">}</span><span>
-</span><span id="line-35"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679212410"><span id="local-6989586621679212412"><span id="local-6989586621679212414"><span class="annot"><span class="annottext">Int -&gt; PeerFetchInFlightLimits -&gt; ShowS
+</span><span id="line-33"></span><span>     </span><span class="hs-special">}</span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679245174"><span id="local-6989586621679245176"><span id="local-6989586621679245178"><span class="annot"><span class="annottext">Int -&gt; PeerFetchInFlightLimits -&gt; ShowS
 [PeerFetchInFlightLimits] -&gt; ShowS
 PeerFetchInFlightLimits -&gt; String
 (Int -&gt; PeerFetchInFlightLimits -&gt; ShowS)
@@ -49,330 +48,352 @@ show :: PeerFetchInFlightLimits -&gt; String
 $cshow :: PeerFetchInFlightLimits -&gt; String
 showsPrec :: Int -&gt; PeerFetchInFlightLimits -&gt; ShowS
 $cshowsPrec :: Int -&gt; PeerFetchInFlightLimits -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span>
-</span><span id="line-36"></span><span>
-</span><span id="line-37"></span><span class="hs-comment">-- | Order two PeerGSVs based on `g`.</span><span>
-</span><span id="line-38"></span><span class="hs-comment">-- Incase the g values are within +/- 5% of each other `peer` is used as a tie breaker.</span><span>
-</span><span id="line-39"></span><span class="hs-comment">-- The salt is unique per running node, which avoids all nodes prefering the same peer in case of</span><span>
-</span><span id="line-40"></span><span class="hs-comment">-- a tie.</span><span>
-</span><span id="line-41"></span><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#comparePeerGSV"><span class="hs-identifier hs-type">comparePeerGSV</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679212408"><span class="annot"><a href="#local-6989586621679212408"><span class="hs-identifier hs-type">peer</span></a></span></span><span class="hs-operator">.</span><span>
-</span><span id="line-42"></span><span>      </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="#local-6989586621679212408"><span class="hs-identifier hs-type">peer</span></a></span><span>
-</span><span id="line-43"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="annot"><a href="#local-6989586621679212408"><span class="hs-identifier hs-type">peer</span></a></span><span>
-</span><span id="line-44"></span><span>      </span><span class="hs-special">)</span><span>
-</span><span id="line-45"></span><span>      </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><a href="#local-6989586621679212408"><span class="hs-identifier hs-type">peer</span></a></span><span>
-</span><span id="line-46"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
-</span><span id="line-47"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier hs-type">PeerGSV</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679212408"><span class="hs-identifier hs-type">peer</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-48"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier hs-type">PeerGSV</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679212408"><span class="hs-identifier hs-type">peer</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-49"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ordering</span></span><span>
-</span><span id="line-50"></span><span id="comparePeerGSV"><span class="annot"><span class="annottext">comparePeerGSV :: Set peer -&gt; Int -&gt; (PeerGSV, peer) -&gt; (PeerGSV, peer) -&gt; Ordering
-</span><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#comparePeerGSV"><span class="hs-identifier hs-var hs-var">comparePeerGSV</span></a></span></span><span> </span><span id="local-6989586621679212407"><span class="annot"><span class="annottext">Set peer
-</span><a href="#local-6989586621679212407"><span class="hs-identifier hs-var">activePeers</span></a></span></span><span> </span><span id="local-6989586621679212406"><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679212406"><span class="hs-identifier hs-var">salt</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679212405"><span class="annot"><span class="annottext">PeerGSV
-</span><a href="#local-6989586621679212405"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679212404"><span class="annot"><span class="annottext">peer
-</span><a href="#local-6989586621679212404"><span class="hs-identifier hs-var">a_p</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679212403"><span class="annot"><span class="annottext">PeerGSV
-</span><a href="#local-6989586621679212403"><span class="hs-identifier hs-var">b</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679212402"><span class="annot"><span class="annottext">peer
-</span><a href="#local-6989586621679212402"><span class="hs-identifier hs-var">b_p</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-51"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679212401"><span class="annot"><span class="annottext">gs_a :: DiffTime
-</span><a href="#local-6989586621679212401"><span class="hs-identifier hs-var hs-var">gs_a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">peer -&gt; Bool
-</span><a href="#local-6989586621679212400"><span class="hs-identifier hs-var">isActive</span></a></span><span> </span><span class="annot"><span class="annottext">peer
-</span><a href="#local-6989586621679212404"><span class="hs-identifier hs-var">a_p</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679212399"><span class="hs-identifier hs-var">activeAdvantage</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; DiffTime
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span class="hs-comment">-- | Order two PeerGSVs based on `g`.</span><span>
+</span><span id="line-37"></span><span class="hs-comment">-- Incase the g values are within +/- 5% of each other `peer` is used as a tie breaker.</span><span>
+</span><span id="line-38"></span><span class="hs-comment">-- The salt is unique per running node, which avoids all nodes prefering the same peer in case of</span><span>
+</span><span id="line-39"></span><span class="hs-comment">-- a tie.</span><span>
+</span><span id="line-40"></span><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#comparePeerGSV"><span class="hs-identifier hs-type">comparePeerGSV</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679245200"><span class="annot"><a href="#local-6989586621679245200"><span class="hs-identifier hs-type">peer</span></a></span></span><span class="hs-operator">.</span><span>
+</span><span id="line-41"></span><span>      </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="#local-6989586621679245200"><span class="hs-identifier hs-type">peer</span></a></span><span>
+</span><span id="line-42"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Ord</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679245200"><span class="hs-identifier hs-type">peer</span></a></span><span>
+</span><span id="line-43"></span><span>      </span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span>      </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-type">Set</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679245200"><span class="hs-identifier hs-type">peer</span></a></span><span>
+</span><span id="line-45"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span>
+</span><span id="line-46"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier hs-type">PeerGSV</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679245200"><span class="hs-identifier hs-type">peer</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier hs-type">PeerGSV</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679245200"><span class="hs-identifier hs-type">peer</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-48"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Ordering</span></a></span><span>
+</span><span id="line-49"></span><span id="comparePeerGSV"><span class="annot"><span class="annottext">comparePeerGSV :: Set peer -&gt; Int -&gt; (PeerGSV, peer) -&gt; (PeerGSV, peer) -&gt; Ordering
+</span><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#comparePeerGSV"><span class="hs-identifier hs-var hs-var">comparePeerGSV</span></a></span></span><span> </span><span id="local-6989586621679245172"><span class="annot"><span class="annottext">Set peer
+</span><a href="#local-6989586621679245172"><span class="hs-identifier hs-var">activePeers</span></a></span></span><span> </span><span id="local-6989586621679245171"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679245171"><span class="hs-identifier hs-var">salt</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679245170"><span class="annot"><span class="annottext">PeerGSV
+</span><a href="#local-6989586621679245170"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679245169"><span class="annot"><span class="annottext">peer
+</span><a href="#local-6989586621679245169"><span class="hs-identifier hs-var">a_p</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679245168"><span class="annot"><span class="annottext">PeerGSV
+</span><a href="#local-6989586621679245168"><span class="hs-identifier hs-var">b</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679245167"><span class="annot"><span class="annottext">peer
+</span><a href="#local-6989586621679245167"><span class="hs-identifier hs-var">b_p</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-50"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679245166"><span class="annot"><span class="annottext">gs_a :: DiffTime
+</span><a href="#local-6989586621679245166"><span class="hs-identifier hs-var hs-var">gs_a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">peer -&gt; Bool
+</span><a href="#local-6989586621679245165"><span class="hs-identifier hs-var">isActive</span></a></span><span> </span><span class="annot"><span class="annottext">peer
+</span><a href="#local-6989586621679245169"><span class="hs-identifier hs-var">a_p</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679245164"><span class="hs-identifier hs-var">activeAdvantage</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; DiffTime
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">*</span></span><span> </span><span class="annot"><span class="annottext">PeerGSV -&gt; DiffTime
-</span><a href="#local-6989586621679212397"><span class="hs-identifier hs-var">gs</span></a></span><span> </span><span class="annot"><span class="annottext">PeerGSV
-</span><a href="#local-6989586621679212405"><span class="hs-identifier hs-var">a</span></a></span><span>
-</span><span id="line-52"></span><span>                               </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">PeerGSV -&gt; DiffTime
-</span><a href="#local-6989586621679212397"><span class="hs-identifier hs-var">gs</span></a></span><span> </span><span class="annot"><span class="annottext">PeerGSV
-</span><a href="#local-6989586621679212405"><span class="hs-identifier hs-var">a</span></a></span><span>
-</span><span id="line-53"></span><span>        </span><span id="local-6989586621679212396"><span class="annot"><span class="annottext">gs_b :: DiffTime
-</span><a href="#local-6989586621679212396"><span class="hs-identifier hs-var hs-var">gs_b</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">peer -&gt; Bool
-</span><a href="#local-6989586621679212400"><span class="hs-identifier hs-var">isActive</span></a></span><span> </span><span class="annot"><span class="annottext">peer
-</span><a href="#local-6989586621679212402"><span class="hs-identifier hs-var">b_p</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679212399"><span class="hs-identifier hs-var">activeAdvantage</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; DiffTime
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">*</span></a></span><span> </span><span class="annot"><span class="annottext">PeerGSV -&gt; DiffTime
+</span><a href="#local-6989586621679245162"><span class="hs-identifier hs-var">gs</span></a></span><span> </span><span class="annot"><span class="annottext">PeerGSV
+</span><a href="#local-6989586621679245170"><span class="hs-identifier hs-var">a</span></a></span><span>
+</span><span id="line-51"></span><span>                               </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">PeerGSV -&gt; DiffTime
+</span><a href="#local-6989586621679245162"><span class="hs-identifier hs-var">gs</span></a></span><span> </span><span class="annot"><span class="annottext">PeerGSV
+</span><a href="#local-6989586621679245170"><span class="hs-identifier hs-var">a</span></a></span><span>
+</span><span id="line-52"></span><span>        </span><span id="local-6989586621679245161"><span class="annot"><span class="annottext">gs_b :: DiffTime
+</span><a href="#local-6989586621679245161"><span class="hs-identifier hs-var hs-var">gs_b</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">peer -&gt; Bool
+</span><a href="#local-6989586621679245165"><span class="hs-identifier hs-var">isActive</span></a></span><span> </span><span class="annot"><span class="annottext">peer
+</span><a href="#local-6989586621679245167"><span class="hs-identifier hs-var">b_p</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679245164"><span class="hs-identifier hs-var">activeAdvantage</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; DiffTime
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">*</span></span><span> </span><span class="annot"><span class="annottext">PeerGSV -&gt; DiffTime
-</span><a href="#local-6989586621679212397"><span class="hs-identifier hs-var">gs</span></a></span><span> </span><span class="annot"><span class="annottext">PeerGSV
-</span><a href="#local-6989586621679212403"><span class="hs-identifier hs-var">b</span></a></span><span>
-</span><span id="line-54"></span><span>                               </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">PeerGSV -&gt; DiffTime
-</span><a href="#local-6989586621679212397"><span class="hs-identifier hs-var">gs</span></a></span><span> </span><span class="annot"><span class="annottext">PeerGSV
-</span><a href="#local-6989586621679212403"><span class="hs-identifier hs-var">b</span></a></span><span> </span><span class="hs-keyword">in</span><span>
-</span><span id="line-55"></span><span>    </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">*</span></a></span><span> </span><span class="annot"><span class="annottext">PeerGSV -&gt; DiffTime
+</span><a href="#local-6989586621679245162"><span class="hs-identifier hs-var">gs</span></a></span><span> </span><span class="annot"><span class="annottext">PeerGSV
+</span><a href="#local-6989586621679245168"><span class="hs-identifier hs-var">b</span></a></span><span>
+</span><span id="line-53"></span><span>                               </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">PeerGSV -&gt; DiffTime
+</span><a href="#local-6989586621679245162"><span class="hs-identifier hs-var">gs</span></a></span><span> </span><span class="annot"><span class="annottext">PeerGSV
+</span><a href="#local-6989586621679245168"><span class="hs-identifier hs-var">b</span></a></span><span> </span><span class="hs-keyword">in</span><span>
+</span><span id="line-54"></span><span>    </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime
 forall a. Num a =&gt; a -&gt; a
-</span><span class="hs-identifier hs-var">abs</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679212401"><span class="hs-identifier hs-var">gs_a</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; DiffTime
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">abs</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679245166"><span class="hs-identifier hs-var">gs_a</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; DiffTime
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679212396"><span class="hs-identifier hs-var">gs_b</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-glyph hs-var">-</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679245161"><span class="hs-identifier hs-var">gs_b</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; Bool
 forall a. Ord a =&gt; a -&gt; a -&gt; Bool
-</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="annottext">DiffTime
-</span><span class="hs-number">0.05</span></span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; DiffTime
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&lt;</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-number">0.05</span></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; DiffTime
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">*</span></span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679212401"><span class="hs-identifier hs-var">gs_a</span></a></span><span>
-</span><span id="line-56"></span><span>       </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Ordering
-forall a. Ord a =&gt; a -&gt; a -&gt; Ordering
-</span><span class="hs-identifier hs-var">compare</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; peer -&gt; Int
-forall a. Hashable a =&gt; Int -&gt; a -&gt; Int
-</span><span class="hs-identifier hs-var">hashWithSalt</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679212406"><span class="hs-identifier hs-var">salt</span></a></span><span> </span><span class="annot"><span class="annottext">peer
-</span><a href="#local-6989586621679212404"><span class="hs-identifier hs-var">a_p</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; peer -&gt; Int
-forall a. Hashable a =&gt; Int -&gt; a -&gt; Int
-</span><span class="hs-identifier hs-var">hashWithSalt</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679212406"><span class="hs-identifier hs-var">salt</span></a></span><span> </span><span class="annot"><span class="annottext">peer
-</span><a href="#local-6989586621679212402"><span class="hs-identifier hs-var">b_p</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-57"></span><span>       </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; Ordering
-forall a. Ord a =&gt; a -&gt; a -&gt; Ordering
-</span><span class="hs-identifier hs-var">compare</span></span><span> </span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679212401"><span class="hs-identifier hs-var">gs_a</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679212396"><span class="hs-identifier hs-var">gs_b</span></a></span><span>
-</span><span id="line-58"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-59"></span><span>    </span><span class="hs-comment">-- In order to avoid switching between peers with similar g we give</span><span>
-</span><span id="line-60"></span><span>    </span><span class="hs-comment">-- active peers a slight advantage.</span><span>
-</span><span id="line-61"></span><span>    </span><span class="annot"><a href="#local-6989586621679212399"><span class="hs-identifier hs-type">activeAdvantage</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">DiffTime</span></span><span>
-</span><span id="line-62"></span><span>    </span><span id="local-6989586621679212399"><span class="annot"><span class="annottext">activeAdvantage :: DiffTime
-</span><a href="#local-6989586621679212399"><span class="hs-identifier hs-var hs-var">activeAdvantage</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
-</span><span class="hs-number">0.8</span></span><span>
-</span><span id="line-63"></span><span>
-</span><span id="line-64"></span><span>    </span><span class="annot"><a href="#local-6989586621679212400"><span class="hs-identifier hs-type">isActive</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679212408"><span class="hs-identifier hs-type">peer</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
-</span><span id="line-65"></span><span>    </span><span id="local-6989586621679212400"><span class="annot"><span class="annottext">isActive :: peer -&gt; Bool
-</span><a href="#local-6989586621679212400"><span class="hs-identifier hs-var hs-var">isActive</span></a></span></span><span> </span><span id="local-6989586621679212391"><span class="annot"><span class="annottext">peer
-</span><a href="#local-6989586621679212391"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">peer -&gt; Set peer -&gt; Bool
-forall a. Ord a =&gt; a -&gt; Set a -&gt; Bool
-</span><span class="hs-identifier hs-var">Set.member</span></span><span> </span><span class="annot"><span class="annottext">peer
-</span><a href="#local-6989586621679212391"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">Set peer
-</span><a href="#local-6989586621679212407"><span class="hs-identifier hs-var">activePeers</span></a></span><span>
-</span><span id="line-66"></span><span>
-</span><span id="line-67"></span><span>    </span><span class="annot"><a href="#local-6989586621679212397"><span class="hs-identifier hs-type">gs</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier hs-type">PeerGSV</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">DiffTime</span></span><span>
-</span><span id="line-68"></span><span>    </span><span id="local-6989586621679212397"><span class="annot"><span class="annottext">gs :: PeerGSV -&gt; DiffTime
-</span><a href="#local-6989586621679212397"><span class="hs-identifier hs-var hs-var">gs</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier hs-type">PeerGSV</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">outboundGSV :: PeerGSV -&gt; GSV
-</span><a href="Ouroboros.Network.DeltaQ.html#outboundGSV"><span class="hs-identifier hs-var">outboundGSV</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#GSV"><span class="hs-identifier hs-type">GSV</span></a></span><span> </span><span id="local-6989586621679212386"><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679212386"><span class="hs-identifier hs-var">g_out</span></a></span></span><span> </span><span id="local-6989586621679212385"><span class="annot"><span class="annottext">SizeInBytes -&gt; DiffTime
-</span><a href="#local-6989586621679212385"><span class="hs-identifier hs-var">_s_out</span></a></span></span><span> </span><span id="local-6989586621679212384"><span class="annot"><span class="annottext">Distribution DiffTime
-</span><a href="#local-6989586621679212384"><span class="hs-identifier hs-var">_v_out</span></a></span></span><span class="hs-special">,</span><span>
-</span><span id="line-69"></span><span>                 </span><span class="annot"><span class="annottext">inboundGSV :: PeerGSV -&gt; GSV
-</span><a href="Ouroboros.Network.DeltaQ.html#inboundGSV"><span class="hs-identifier hs-var">inboundGSV</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#GSV"><span class="hs-identifier hs-type">GSV</span></a></span><span> </span><span id="local-6989586621679212382"><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679212382"><span class="hs-identifier hs-var">g_in</span></a></span></span><span>  </span><span id="local-6989586621679212381"><span class="annot"><span class="annottext">SizeInBytes -&gt; DiffTime
-</span><a href="#local-6989586621679212381"><span class="hs-identifier hs-var">_s_in</span></a></span></span><span>  </span><span id="local-6989586621679212380"><span class="annot"><span class="annottext">Distribution DiffTime
-</span><a href="#local-6989586621679212380"><span class="hs-identifier hs-var">_v_in</span></a></span></span><span>
-</span><span id="line-70"></span><span>               </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679212386"><span class="hs-identifier hs-var">g_out</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; DiffTime
-forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679212382"><span class="hs-identifier hs-var">g_in</span></a></span><span>
-</span><span id="line-71"></span><span>
-</span><span id="line-72"></span><span>
-</span><span id="line-73"></span><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#calculatePeerFetchInFlightLimits"><span class="hs-identifier hs-type">calculatePeerFetchInFlightLimits</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier hs-type">PeerGSV</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#PeerFetchInFlightLimits"><span class="hs-identifier hs-type">PeerFetchInFlightLimits</span></a></span><span>
-</span><span id="line-74"></span><span id="calculatePeerFetchInFlightLimits"><span class="annot"><span class="annottext">calculatePeerFetchInFlightLimits :: PeerGSV -&gt; PeerFetchInFlightLimits
-</span><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#calculatePeerFetchInFlightLimits"><span class="hs-identifier hs-var hs-var">calculatePeerFetchInFlightLimits</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier hs-type">PeerGSV</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-75"></span><span>                                   </span><span class="annot"><span class="annottext">outboundGSV :: PeerGSV -&gt; GSV
-</span><a href="Ouroboros.Network.DeltaQ.html#outboundGSV"><span class="hs-identifier hs-var">outboundGSV</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#GSV"><span class="hs-identifier hs-type">GSV</span></a></span><span> </span><span id="local-6989586621679212378"><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679212378"><span class="hs-identifier hs-var">g_out</span></a></span></span><span> </span><span id="local-6989586621679212377"><span class="annot"><span class="annottext">SizeInBytes -&gt; DiffTime
-</span><a href="#local-6989586621679212377"><span class="hs-identifier hs-var">_s_out</span></a></span></span><span> </span><span id="local-6989586621679212376"><span class="annot"><span class="annottext">Distribution DiffTime
-</span><a href="#local-6989586621679212376"><span class="hs-identifier hs-var">_v_out</span></a></span></span><span class="hs-special">,</span><span>
-</span><span id="line-76"></span><span>                                   </span><span class="annot"><span class="annottext">inboundGSV :: PeerGSV -&gt; GSV
-</span><a href="Ouroboros.Network.DeltaQ.html#inboundGSV"><span class="hs-identifier hs-var">inboundGSV</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#GSV"><span class="hs-identifier hs-type">GSV</span></a></span><span> </span><span id="local-6989586621679212375"><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679212375"><span class="hs-identifier hs-var">g_in</span></a></span></span><span>   </span><span id="local-6989586621679212374"><span class="annot"><span class="annottext">SizeInBytes -&gt; DiffTime
-</span><a href="#local-6989586621679212374"><span class="hs-identifier hs-var">s_in</span></a></span></span><span>  </span><span id="local-6989586621679212373"><span class="annot"><span class="annottext">Distribution DiffTime
-</span><a href="#local-6989586621679212373"><span class="hs-identifier hs-var">_v_in</span></a></span></span><span>
-</span><span id="line-77"></span><span>                                 </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-78"></span><span>    </span><span class="annot"><span class="annottext">PeerFetchInFlightLimits :: SizeInBytes -&gt; SizeInBytes -&gt; PeerFetchInFlightLimits
-</span><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#PeerFetchInFlightLimits"><span class="hs-identifier hs-type">PeerFetchInFlightLimits</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-79"></span><span>      </span><span class="annot"><span class="annottext">SizeInBytes
-inFlightBytesLowWatermark :: SizeInBytes
-inFlightBytesLowWatermark :: SizeInBytes
-</span><a href="#local-6989586621679212372"><span class="hs-identifier hs-var hs-var">inFlightBytesLowWatermark</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-80"></span><span>      </span><span class="annot"><span class="annottext">SizeInBytes
-inFlightBytesHighWatermark :: SizeInBytes
-inFlightBytesHighWatermark :: SizeInBytes
-</span><a href="#local-6989586621679212371"><span class="hs-identifier hs-var hs-var">inFlightBytesHighWatermark</span></a></span><span>
-</span><span id="line-81"></span><span>    </span><span class="hs-special">}</span><span>
-</span><span id="line-82"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-83"></span><span>    </span><span class="hs-comment">-- To keep the remote end busy at all times, we want to make sure that by</span><span>
-</span><span id="line-84"></span><span>    </span><span class="hs-comment">-- the time it finishes sending its last response that there's another</span><span>
-</span><span id="line-85"></span><span>    </span><span class="hs-comment">-- request at the remote end that's ready to go. So we must initiate another</span><span>
-</span><span id="line-86"></span><span>    </span><span class="hs-comment">-- request g_out seconds before the remote end becomes idle.</span><span>
-</span><span id="line-87"></span><span>    </span><span class="hs-comment">--</span><span>
-</span><span id="line-88"></span><span>    </span><span class="hs-comment">-- Now it turns out to be more convenient to measure this not in time, but</span><span>
-</span><span id="line-89"></span><span>    </span><span class="hs-comment">-- based on the number of bytes of requests that are in-flight. This of</span><span>
-</span><span id="line-90"></span><span>    </span><span class="hs-comment">-- course directly corresponds to time, via S_in.</span><span>
-</span><span id="line-91"></span><span>    </span><span class="hs-comment">--</span><span>
-</span><span id="line-92"></span><span>    </span><span class="hs-comment">-- The units of S_in is seconds / octet. We need to calculate the number</span><span>
-</span><span id="line-93"></span><span>    </span><span class="hs-comment">-- of bytes that can be in flight during a time interval t. So we need</span><span>
-</span><span id="line-94"></span><span>    </span><span class="hs-comment">-- octets / second * seconds-in-flight = octets.</span><span>
-</span><span id="line-95"></span><span>    </span><span class="hs-comment">--</span><span>
-</span><span id="line-96"></span><span>    </span><span class="hs-comment">-- &gt; (1/s_in) * t   or equivalently  t/s_in</span><span>
-</span><span id="line-97"></span><span>    </span><span class="hs-comment">--</span><span>
-</span><span id="line-98"></span><span>    </span><span class="hs-comment">-- So for a remote peer, g_out seconds before it becomes idle, it will have</span><span>
-</span><span id="line-99"></span><span>    </span><span class="hs-comment">-- \( g_in\/s_in \) bytes inbound. Our request will arrive after g_out</span><span>
-</span><span id="line-100"></span><span>    </span><span class="hs-comment">-- seconds, we should request at minimum \( g_in\/s_in \) bytes.</span><span>
-</span><span id="line-101"></span><span>    </span><span class="hs-comment">--</span><span>
-</span><span id="line-102"></span><span>    </span><span class="hs-comment">-- We should also account for the fact that we do not have perfect</span><span>
-</span><span id="line-103"></span><span>    </span><span class="hs-comment">-- scheduling and cannot initiate the request at exactly the right time, so</span><span>
-</span><span id="line-104"></span><span>    </span><span class="hs-comment">-- we should request it slightly early (and thus request correspondingly</span><span>
-</span><span id="line-105"></span><span>    </span><span class="hs-comment">-- more). Lets say our maximum schedule delay is @d@ seconds.</span><span>
-</span><span id="line-106"></span><span>    </span><span class="hs-comment">--</span><span>
-</span><span id="line-107"></span><span>    </span><span id="local-6989586621679212372"><span class="annot"><span class="annottext">inFlightBytesLowWatermark :: SizeInBytes
-</span><a href="#local-6989586621679212372"><span class="hs-identifier hs-var hs-var">inFlightBytesLowWatermark</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-108"></span><span>        </span><span class="annot"><span class="annottext">SizeInBytes -&gt; SizeInBytes -&gt; SizeInBytes
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">*</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; DiffTime
 forall a. Ord a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-identifier hs-var">max</span></span><span> </span><span class="annot"><span class="annottext">SizeInBytes
-</span><a href="#local-6989586621679212369"><span class="hs-identifier hs-var">minLowWaterMark</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Pico -&gt; SizeInBytes
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">max</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679245166"><span class="hs-identifier hs-var">gs_a</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679245161"><span class="hs-identifier hs-var">gs_b</span></a></span><span>
+</span><span id="line-55"></span><span>       </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Ordering
+forall a. Ord a =&gt; a -&gt; a -&gt; Ordering
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">compare</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; peer -&gt; Int
+forall a. Hashable a =&gt; Int -&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">hashWithSalt</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679245171"><span class="hs-identifier hs-var">salt</span></a></span><span> </span><span class="annot"><span class="annottext">peer
+</span><a href="#local-6989586621679245169"><span class="hs-identifier hs-var">a_p</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; peer -&gt; Int
+forall a. Hashable a =&gt; Int -&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">hashWithSalt</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679245171"><span class="hs-identifier hs-var">salt</span></a></span><span> </span><span class="annot"><span class="annottext">peer
+</span><a href="#local-6989586621679245167"><span class="hs-identifier hs-var">b_p</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-56"></span><span>       </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; Ordering
+forall a. Ord a =&gt; a -&gt; a -&gt; Ordering
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">compare</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679245166"><span class="hs-identifier hs-var">gs_a</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679245161"><span class="hs-identifier hs-var">gs_b</span></a></span><span>
+</span><span id="line-57"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-58"></span><span>    </span><span class="hs-comment">-- In order to avoid switching between peers with similar g we give</span><span>
+</span><span id="line-59"></span><span>    </span><span class="hs-comment">-- active peers a slight advantage.</span><span>
+</span><span id="line-60"></span><span>    </span><span class="annot"><a href="#local-6989586621679245164"><span class="hs-identifier hs-type">activeAdvantage</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span>
+</span><span id="line-61"></span><span>    </span><span id="local-6989586621679245164"><span class="annot"><span class="annottext">activeAdvantage :: DiffTime
+</span><a href="#local-6989586621679245164"><span class="hs-identifier hs-var hs-var">activeAdvantage</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-number">0.8</span></span><span>
+</span><span id="line-62"></span><span>
+</span><span id="line-63"></span><span>    </span><span class="annot"><a href="#local-6989586621679245165"><span class="hs-identifier hs-type">isActive</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679245200"><span class="hs-identifier hs-type">peer</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Bool</span></a></span><span>
+</span><span id="line-64"></span><span>    </span><span id="local-6989586621679245165"><span class="annot"><span class="annottext">isActive :: peer -&gt; Bool
+</span><a href="#local-6989586621679245165"><span class="hs-identifier hs-var hs-var">isActive</span></a></span></span><span> </span><span id="local-6989586621679245155"><span class="annot"><span class="annottext">peer
+</span><a href="#local-6989586621679245155"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">peer -&gt; Set peer -&gt; Bool
+forall a. Ord a =&gt; a -&gt; Set a -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.member</span></a></span><span> </span><span class="annot"><span class="annottext">peer
+</span><a href="#local-6989586621679245155"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">Set peer
+</span><a href="#local-6989586621679245172"><span class="hs-identifier hs-var">activePeers</span></a></span><span>
+</span><span id="line-65"></span><span>
+</span><span id="line-66"></span><span>    </span><span class="annot"><a href="#local-6989586621679245162"><span class="hs-identifier hs-type">gs</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier hs-type">PeerGSV</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span>
+</span><span id="line-67"></span><span>    </span><span id="local-6989586621679245162"><span class="annot"><span class="annottext">gs :: PeerGSV -&gt; DiffTime
+</span><a href="#local-6989586621679245162"><span class="hs-identifier hs-var hs-var">gs</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier hs-type">PeerGSV</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">outboundGSV :: PeerGSV -&gt; GSV
+</span><a href="Ouroboros.Network.DeltaQ.html#outboundGSV"><span class="hs-identifier hs-var">outboundGSV</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#GSV"><span class="hs-identifier hs-type">GSV</span></a></span><span> </span><span id="local-6989586621679245150"><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679245150"><span class="hs-identifier hs-var">g_out</span></a></span></span><span> </span><span id="local-6989586621679245149"><span class="annot"><span class="annottext">SizeInBytes -&gt; DiffTime
+</span><a href="#local-6989586621679245149"><span class="hs-identifier hs-var">_s_out</span></a></span></span><span> </span><span id="local-6989586621679245148"><span class="annot"><span class="annottext">Distribution DiffTime
+</span><a href="#local-6989586621679245148"><span class="hs-identifier hs-var">_v_out</span></a></span></span><span class="hs-special">,</span><span>
+</span><span id="line-68"></span><span>                 </span><span class="annot"><span class="annottext">inboundGSV :: PeerGSV -&gt; GSV
+</span><a href="Ouroboros.Network.DeltaQ.html#inboundGSV"><span class="hs-identifier hs-var">inboundGSV</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#GSV"><span class="hs-identifier hs-type">GSV</span></a></span><span> </span><span id="local-6989586621679245146"><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679245146"><span class="hs-identifier hs-var">g_in</span></a></span></span><span>  </span><span id="local-6989586621679245145"><span class="annot"><span class="annottext">SizeInBytes -&gt; DiffTime
+</span><a href="#local-6989586621679245145"><span class="hs-identifier hs-var">_s_in</span></a></span></span><span>  </span><span id="local-6989586621679245144"><span class="annot"><span class="annottext">Distribution DiffTime
+</span><a href="#local-6989586621679245144"><span class="hs-identifier hs-var">_v_in</span></a></span></span><span>
+</span><span id="line-69"></span><span>               </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679245150"><span class="hs-identifier hs-var">g_out</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; DiffTime
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679245146"><span class="hs-identifier hs-var">g_in</span></a></span><span>
+</span><span id="line-70"></span><span>
+</span><span id="line-71"></span><span class="hs-comment">-- | Order two PeerGSVs based on `g`.</span><span>
+</span><span id="line-72"></span><span class="hs-comment">-- Like comparePeerGSV but doesn't take active status into account</span><span>
+</span><span id="line-73"></span><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#comparePeerGSV%27"><span class="hs-identifier hs-type">comparePeerGSV'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679245142"><span class="annot"><a href="#local-6989586621679245142"><span class="hs-identifier hs-type">peer</span></a></span></span><span class="hs-operator">.</span><span>
+</span><span id="line-74"></span><span>      </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="#local-6989586621679245142"><span class="hs-identifier hs-type">peer</span></a></span><span>
+</span><span id="line-75"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Ord</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679245142"><span class="hs-identifier hs-type">peer</span></a></span><span>
+</span><span id="line-76"></span><span>      </span><span class="hs-special">)</span><span>
+</span><span id="line-77"></span><span>      </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span>
+</span><span id="line-78"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier hs-type">PeerGSV</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679245142"><span class="hs-identifier hs-type">peer</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-79"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier hs-type">PeerGSV</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679245142"><span class="hs-identifier hs-type">peer</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-80"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Ordering</span></a></span><span>
+</span><span id="line-81"></span><span id="comparePeerGSV%27"><span class="annot"><span class="annottext">comparePeerGSV' :: Int -&gt; (PeerGSV, peer) -&gt; (PeerGSV, peer) -&gt; Ordering
+</span><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#comparePeerGSV%27"><span class="hs-identifier hs-var hs-var">comparePeerGSV'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set peer -&gt; Int -&gt; (PeerGSV, peer) -&gt; (PeerGSV, peer) -&gt; Ordering
+forall peer.
+(Hashable peer, Ord peer) =&gt;
+Set peer -&gt; Int -&gt; (PeerGSV, peer) -&gt; (PeerGSV, peer) -&gt; Ordering
+</span><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#comparePeerGSV"><span class="hs-identifier hs-var">comparePeerGSV</span></a></span><span> </span><span class="annot"><span class="annottext">Set peer
+forall a. Set a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.empty</span></a></span><span>
+</span><span id="line-82"></span><span>
+</span><span id="line-83"></span><span>
+</span><span id="line-84"></span><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#calculatePeerFetchInFlightLimits"><span class="hs-identifier hs-type">calculatePeerFetchInFlightLimits</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier hs-type">PeerGSV</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#PeerFetchInFlightLimits"><span class="hs-identifier hs-type">PeerFetchInFlightLimits</span></a></span><span>
+</span><span id="line-85"></span><span id="calculatePeerFetchInFlightLimits"><span class="annot"><span class="annottext">calculatePeerFetchInFlightLimits :: PeerGSV -&gt; PeerFetchInFlightLimits
+</span><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#calculatePeerFetchInFlightLimits"><span class="hs-identifier hs-var hs-var">calculatePeerFetchInFlightLimits</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier hs-type">PeerGSV</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-86"></span><span>                                   </span><span class="annot"><span class="annottext">outboundGSV :: PeerGSV -&gt; GSV
+</span><a href="Ouroboros.Network.DeltaQ.html#outboundGSV"><span class="hs-identifier hs-var">outboundGSV</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#GSV"><span class="hs-identifier hs-type">GSV</span></a></span><span> </span><span id="local-6989586621679245140"><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679245140"><span class="hs-identifier hs-var">g_out</span></a></span></span><span> </span><span id="local-6989586621679245139"><span class="annot"><span class="annottext">SizeInBytes -&gt; DiffTime
+</span><a href="#local-6989586621679245139"><span class="hs-identifier hs-var">_s_out</span></a></span></span><span> </span><span id="local-6989586621679245138"><span class="annot"><span class="annottext">Distribution DiffTime
+</span><a href="#local-6989586621679245138"><span class="hs-identifier hs-var">_v_out</span></a></span></span><span class="hs-special">,</span><span>
+</span><span id="line-87"></span><span>                                   </span><span class="annot"><span class="annottext">inboundGSV :: PeerGSV -&gt; GSV
+</span><a href="Ouroboros.Network.DeltaQ.html#inboundGSV"><span class="hs-identifier hs-var">inboundGSV</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#GSV"><span class="hs-identifier hs-type">GSV</span></a></span><span> </span><span id="local-6989586621679245137"><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679245137"><span class="hs-identifier hs-var">g_in</span></a></span></span><span>   </span><span id="local-6989586621679245136"><span class="annot"><span class="annottext">SizeInBytes -&gt; DiffTime
+</span><a href="#local-6989586621679245136"><span class="hs-identifier hs-var">s_in</span></a></span></span><span>  </span><span id="local-6989586621679245135"><span class="annot"><span class="annottext">Distribution DiffTime
+</span><a href="#local-6989586621679245135"><span class="hs-identifier hs-var">_v_in</span></a></span></span><span>
+</span><span id="line-88"></span><span>                                 </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-89"></span><span>    </span><span class="annot"><span class="annottext">PeerFetchInFlightLimits :: SizeInBytes -&gt; SizeInBytes -&gt; PeerFetchInFlightLimits
+</span><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#PeerFetchInFlightLimits"><span class="hs-identifier hs-type">PeerFetchInFlightLimits</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-90"></span><span>      </span><span class="annot"><span class="annottext">SizeInBytes
+inFlightBytesLowWatermark :: SizeInBytes
+inFlightBytesLowWatermark :: SizeInBytes
+</span><a href="#local-6989586621679245134"><span class="hs-identifier hs-var hs-var">inFlightBytesLowWatermark</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-91"></span><span>      </span><span class="annot"><span class="annottext">SizeInBytes
+inFlightBytesHighWatermark :: SizeInBytes
+inFlightBytesHighWatermark :: SizeInBytes
+</span><a href="#local-6989586621679245133"><span class="hs-identifier hs-var hs-var">inFlightBytesHighWatermark</span></a></span><span>
+</span><span id="line-92"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-93"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-94"></span><span>    </span><span class="hs-comment">-- To keep the remote end busy at all times, we want to make sure that by</span><span>
+</span><span id="line-95"></span><span>    </span><span class="hs-comment">-- the time it finishes sending its last response that there's another</span><span>
+</span><span id="line-96"></span><span>    </span><span class="hs-comment">-- request at the remote end that's ready to go. So we must initiate another</span><span>
+</span><span id="line-97"></span><span>    </span><span class="hs-comment">-- request g_out seconds before the remote end becomes idle.</span><span>
+</span><span id="line-98"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-99"></span><span>    </span><span class="hs-comment">-- Now it turns out to be more convenient to measure this not in time, but</span><span>
+</span><span id="line-100"></span><span>    </span><span class="hs-comment">-- based on the number of bytes of requests that are in-flight. This of</span><span>
+</span><span id="line-101"></span><span>    </span><span class="hs-comment">-- course directly corresponds to time, via S_in.</span><span>
+</span><span id="line-102"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-103"></span><span>    </span><span class="hs-comment">-- The units of S_in is seconds / octet. We need to calculate the number</span><span>
+</span><span id="line-104"></span><span>    </span><span class="hs-comment">-- of bytes that can be in flight during a time interval t. So we need</span><span>
+</span><span id="line-105"></span><span>    </span><span class="hs-comment">-- octets / second * seconds-in-flight = octets.</span><span>
+</span><span id="line-106"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-107"></span><span>    </span><span class="hs-comment">-- &gt; (1/s_in) * t   or equivalently  t/s_in</span><span>
+</span><span id="line-108"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-109"></span><span>    </span><span class="hs-comment">-- So for a remote peer, g_out seconds before it becomes idle, it will have</span><span>
+</span><span id="line-110"></span><span>    </span><span class="hs-comment">-- \( g_in\/s_in \) bytes inbound. Our request will arrive after g_out</span><span>
+</span><span id="line-111"></span><span>    </span><span class="hs-comment">-- seconds, we should request at minimum \( g_in\/s_in \) bytes.</span><span>
+</span><span id="line-112"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-113"></span><span>    </span><span class="hs-comment">-- We should also account for the fact that we do not have perfect</span><span>
+</span><span id="line-114"></span><span>    </span><span class="hs-comment">-- scheduling and cannot initiate the request at exactly the right time, so</span><span>
+</span><span id="line-115"></span><span>    </span><span class="hs-comment">-- we should request it slightly early (and thus request correspondingly</span><span>
+</span><span id="line-116"></span><span>    </span><span class="hs-comment">-- more). Lets say our maximum schedule delay is @d@ seconds.</span><span>
+</span><span id="line-117"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-118"></span><span>    </span><span id="local-6989586621679245134"><span class="annot"><span class="annottext">inFlightBytesLowWatermark :: SizeInBytes
+</span><a href="#local-6989586621679245134"><span class="hs-identifier hs-var hs-var">inFlightBytesLowWatermark</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-119"></span><span>        </span><span class="annot"><span class="annottext">SizeInBytes -&gt; SizeInBytes -&gt; SizeInBytes
+forall a. Ord a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">max</span></a></span><span> </span><span class="annot"><span class="annottext">SizeInBytes
+</span><a href="#local-6989586621679245132"><span class="hs-identifier hs-var">minLowWaterMark</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Pico -&gt; SizeInBytes
 forall a b. (RealFrac a, Integral b) =&gt; a -&gt; b
-</span><span class="hs-identifier hs-var">ceiling</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">DiffTime -&gt; Pico
-</span><a href="#local-6989586621679212367"><span class="hs-identifier hs-var">seconds</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679212378"><span class="hs-identifier hs-var">g_out</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; DiffTime
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">ceiling</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">DiffTime -&gt; Pico
+</span><a href="#local-6989586621679245130"><span class="hs-identifier hs-var">seconds</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679245140"><span class="hs-identifier hs-var">g_out</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; DiffTime
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679212375"><span class="hs-identifier hs-var">g_in</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; DiffTime
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679245137"><span class="hs-identifier hs-var">g_in</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; DiffTime
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679212366"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Pico -&gt; Pico -&gt; Pico
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679245129"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Pico -&gt; Pico -&gt; Pico
 forall a. Fractional a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">/</span></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; Pico
-</span><a href="#local-6989586621679212367"><span class="hs-identifier hs-var">seconds</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SizeInBytes -&gt; DiffTime
-</span><a href="#local-6989586621679212374"><span class="hs-identifier hs-var">s_in</span></a></span><span> </span><span class="annot"><span class="annottext">SizeInBytes
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">/</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; Pico
+</span><a href="#local-6989586621679245130"><span class="hs-identifier hs-var">seconds</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SizeInBytes -&gt; DiffTime
+</span><a href="#local-6989586621679245136"><span class="hs-identifier hs-var">s_in</span></a></span><span> </span><span class="annot"><span class="annottext">SizeInBytes
 </span><span class="hs-number">1</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-109"></span><span>      </span><span class="hs-keyword">where</span><span>
-</span><span id="line-110"></span><span>        </span><span class="hs-comment">-- To ensure that blockfetch can do pipelining we enforce a minimal</span><span>
-</span><span id="line-111"></span><span>        </span><span class="hs-comment">-- low water mark of at least 3 64k blocks</span><span>
-</span><span id="line-112"></span><span>        </span><span class="annot"><a href="#local-6989586621679212369"><span class="hs-identifier hs-type">minLowWaterMark</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#SizeInBytes"><span class="hs-identifier hs-type">SizeInBytes</span></a></span><span>
-</span><span id="line-113"></span><span>        </span><span id="local-6989586621679212369"><span class="annot"><span class="annottext">minLowWaterMark :: SizeInBytes
-</span><a href="#local-6989586621679212369"><span class="hs-identifier hs-var hs-var">minLowWaterMark</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SizeInBytes
+</span><span id="line-120"></span><span>      </span><span class="hs-keyword">where</span><span>
+</span><span id="line-121"></span><span>        </span><span class="hs-comment">-- To ensure that blockfetch can do pipelining we enforce a minimal</span><span>
+</span><span id="line-122"></span><span>        </span><span class="hs-comment">-- low water mark of at least 3 64k blocks</span><span>
+</span><span id="line-123"></span><span>        </span><span class="annot"><a href="#local-6989586621679245132"><span class="hs-identifier hs-type">minLowWaterMark</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#SizeInBytes"><span class="hs-identifier hs-type">SizeInBytes</span></a></span><span>
+</span><span id="line-124"></span><span>        </span><span id="local-6989586621679245132"><span class="annot"><span class="annottext">minLowWaterMark :: SizeInBytes
+</span><a href="#local-6989586621679245132"><span class="hs-identifier hs-var hs-var">minLowWaterMark</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SizeInBytes
 </span><span class="hs-number">3</span></span><span> </span><span class="annot"><span class="annottext">SizeInBytes -&gt; SizeInBytes -&gt; SizeInBytes
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">*</span></span><span> </span><span class="annot"><span class="annottext">SizeInBytes
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">*</span></a></span><span> </span><span class="annot"><span class="annottext">SizeInBytes
 </span><span class="hs-number">64</span></span><span> </span><span class="annot"><span class="annottext">SizeInBytes -&gt; SizeInBytes -&gt; SizeInBytes
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">*</span></span><span> </span><span class="annot"><span class="annottext">SizeInBytes
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">*</span></a></span><span> </span><span class="annot"><span class="annottext">SizeInBytes
 </span><span class="hs-number">1024</span></span><span>
-</span><span id="line-114"></span><span>
-</span><span id="line-115"></span><span>        </span><span class="annot"><a href="#local-6989586621679212367"><span class="hs-identifier hs-type">seconds</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">DiffTime</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Fixed.Pico</span></span><span>
-</span><span id="line-116"></span><span>        </span><span id="local-6989586621679212367"><span class="annot"><span class="annottext">seconds :: DiffTime -&gt; Pico
-</span><a href="#local-6989586621679212367"><span class="hs-identifier hs-var hs-var">seconds</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; Pico
-forall a b. (Real a, Fractional b) =&gt; a -&gt; b
-</span><span class="hs-identifier hs-var">realToFrac</span></span><span>
-</span><span id="line-117"></span><span>      </span><span class="hs-comment">--FIXME: s is now a function of bytes, not unit seconds / octet</span><span>
-</span><span id="line-118"></span><span>
-</span><span id="line-119"></span><span>    </span><span id="local-6989586621679212366"><span class="annot"><span class="annottext">d :: DiffTime
-</span><a href="#local-6989586621679212366"><span class="hs-identifier hs-var hs-var">d</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
-</span><span class="hs-number">2e-2</span></span><span> </span><span class="hs-comment">-- 20 milliseconds, we desire to make a new descison every 10ms.</span><span>
-</span><span id="line-120"></span><span>             </span><span class="hs-comment">-- This gives us some margin.</span><span>
-</span><span id="line-121"></span><span>
-</span><span id="line-122"></span><span>    </span><span class="hs-comment">-- But note that the minimum here is based on the assumption that we can</span><span>
-</span><span id="line-123"></span><span>    </span><span class="hs-comment">-- react as the /leading/ edge of the low watermark arrives, but in fact</span><span>
-</span><span id="line-124"></span><span>    </span><span class="hs-comment">-- we can only react when the /trailing/ edge arrives. So when we </span><span>
 </span><span id="line-125"></span><span>
-</span><span id="line-126"></span><span>    </span><span class="hs-comment">-- The high watermark is a bit arbitrary. It's just about making sure we</span><span>
-</span><span id="line-127"></span><span>    </span><span class="hs-comment">-- have a bit of a buffer so we can ask for more in one go, rather than</span><span>
-</span><span id="line-128"></span><span>    </span><span class="hs-comment">-- asking for lots of small requests very frequently.</span><span>
-</span><span id="line-129"></span><span>    </span><span id="local-6989586621679212371"><span class="annot"><span class="annottext">inFlightBytesHighWatermark :: SizeInBytes
-</span><a href="#local-6989586621679212371"><span class="hs-identifier hs-var hs-var">inFlightBytesHighWatermark</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SizeInBytes
-</span><a href="#local-6989586621679212372"><span class="hs-identifier hs-var">inFlightBytesLowWatermark</span></a></span><span> </span><span class="annot"><span class="annottext">SizeInBytes -&gt; SizeInBytes -&gt; SizeInBytes
+</span><span id="line-126"></span><span>        </span><span class="annot"><a href="#local-6989586621679245130"><span class="hs-identifier hs-type">seconds</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Fixed.Pico</span></a></span><span>
+</span><span id="line-127"></span><span>        </span><span id="local-6989586621679245130"><span class="annot"><span class="annottext">seconds :: DiffTime -&gt; Pico
+</span><a href="#local-6989586621679245130"><span class="hs-identifier hs-var hs-var">seconds</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; Pico
+forall a b. (Real a, Fractional b) =&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">realToFrac</span></a></span><span>
+</span><span id="line-128"></span><span>      </span><span class="hs-comment">--FIXME: s is now a function of bytes, not unit seconds / octet</span><span>
+</span><span id="line-129"></span><span>
+</span><span id="line-130"></span><span>    </span><span id="local-6989586621679245129"><span class="annot"><span class="annottext">d :: DiffTime
+</span><a href="#local-6989586621679245129"><span class="hs-identifier hs-var hs-var">d</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-number">2e-2</span></span><span> </span><span class="hs-comment">-- 20 milliseconds, we desire to make a new descison every 10ms.</span><span>
+</span><span id="line-131"></span><span>             </span><span class="hs-comment">-- This gives us some margin.</span><span>
+</span><span id="line-132"></span><span>
+</span><span id="line-133"></span><span>    </span><span class="hs-comment">-- But note that the minimum here is based on the assumption that we can</span><span>
+</span><span id="line-134"></span><span>    </span><span class="hs-comment">-- react as the /leading/ edge of the low watermark arrives, but in fact</span><span>
+</span><span id="line-135"></span><span>    </span><span class="hs-comment">-- we can only react when the /trailing/ edge arrives. So when we</span><span>
+</span><span id="line-136"></span><span>
+</span><span id="line-137"></span><span>    </span><span class="hs-comment">-- The high watermark is a bit arbitrary. It's just about making sure we</span><span>
+</span><span id="line-138"></span><span>    </span><span class="hs-comment">-- have a bit of a buffer so we can ask for more in one go, rather than</span><span>
+</span><span id="line-139"></span><span>    </span><span class="hs-comment">-- asking for lots of small requests very frequently.</span><span>
+</span><span id="line-140"></span><span>    </span><span id="local-6989586621679245133"><span class="annot"><span class="annottext">inFlightBytesHighWatermark :: SizeInBytes
+</span><a href="#local-6989586621679245133"><span class="hs-identifier hs-var hs-var">inFlightBytesHighWatermark</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SizeInBytes
+</span><a href="#local-6989586621679245134"><span class="hs-identifier hs-var">inFlightBytesLowWatermark</span></a></span><span> </span><span class="annot"><span class="annottext">SizeInBytes -&gt; SizeInBytes -&gt; SizeInBytes
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">*</span></span><span> </span><span class="annot"><span class="annottext">SizeInBytes
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">*</span></a></span><span> </span><span class="annot"><span class="annottext">SizeInBytes
 </span><span class="hs-number">2</span></span><span>
-</span><span id="line-130"></span><span>
-</span><span id="line-131"></span><span>
-</span><span id="line-132"></span><span class="hs-comment">-- | Given the 'PeerGSV', the bytes already in flight and the size of new</span><span>
-</span><span id="line-133"></span><span class="hs-comment">-- blocks to download, estimate the probability of the download completing</span><span>
-</span><span id="line-134"></span><span class="hs-comment">-- within the deadline.</span><span>
-</span><span id="line-135"></span><span class="hs-comment">--</span><span>
-</span><span id="line-136"></span><span class="hs-comment">-- This is an appropriate estimator to use in a situation where meeting a</span><span>
-</span><span id="line-137"></span><span class="hs-comment">-- known deadline is the goal.</span><span>
-</span><span id="line-138"></span><span class="hs-comment">--</span><span>
-</span><span id="line-139"></span><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#estimateResponseDeadlineProbability"><span class="hs-identifier hs-type">estimateResponseDeadlineProbability</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier hs-type">PeerGSV</span></a></span><span>
-</span><span id="line-140"></span><span>                                    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#SizeInBytes"><span class="hs-identifier hs-type">SizeInBytes</span></a></span><span>
-</span><span id="line-141"></span><span>                                    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#SizeInBytes"><span class="hs-identifier hs-type">SizeInBytes</span></a></span><span>
-</span><span id="line-142"></span><span>                                    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">DiffTime</span></span><span>
-</span><span id="line-143"></span><span>                                    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Double</span></span><span>
-</span><span id="line-144"></span><span id="estimateResponseDeadlineProbability"><span class="annot"><span class="annottext">estimateResponseDeadlineProbability :: PeerGSV -&gt; SizeInBytes -&gt; SizeInBytes -&gt; DiffTime -&gt; Double
-</span><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#estimateResponseDeadlineProbability"><span class="hs-identifier hs-var hs-var">estimateResponseDeadlineProbability</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier hs-type">PeerGSV</span></a></span><span class="hs-special">{</span><span id="local-6989586621679212364"><span class="annot"><span class="annottext">GSV
+</span><span id="line-141"></span><span>
+</span><span id="line-142"></span><span>
+</span><span id="line-143"></span><span class="hs-comment">-- | Given the 'PeerGSV', the bytes already in flight and the size of new</span><span>
+</span><span id="line-144"></span><span class="hs-comment">-- blocks to download, estimate the probability of the download completing</span><span>
+</span><span id="line-145"></span><span class="hs-comment">-- within the deadline.</span><span>
+</span><span id="line-146"></span><span class="hs-comment">--</span><span>
+</span><span id="line-147"></span><span class="hs-comment">-- This is an appropriate estimator to use in a situation where meeting a</span><span>
+</span><span id="line-148"></span><span class="hs-comment">-- known deadline is the goal.</span><span>
+</span><span id="line-149"></span><span class="hs-comment">--</span><span>
+</span><span id="line-150"></span><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#estimateResponseDeadlineProbability"><span class="hs-identifier hs-type">estimateResponseDeadlineProbability</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier hs-type">PeerGSV</span></a></span><span>
+</span><span id="line-151"></span><span>                                    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#SizeInBytes"><span class="hs-identifier hs-type">SizeInBytes</span></a></span><span>
+</span><span id="line-152"></span><span>                                    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#SizeInBytes"><span class="hs-identifier hs-type">SizeInBytes</span></a></span><span>
+</span><span id="line-153"></span><span>                                    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span>
+</span><span id="line-154"></span><span>                                    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Double</span></a></span><span>
+</span><span id="line-155"></span><span id="estimateResponseDeadlineProbability"><span class="annot"><span class="annottext">estimateResponseDeadlineProbability :: PeerGSV -&gt; SizeInBytes -&gt; SizeInBytes -&gt; DiffTime -&gt; Double
+</span><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#estimateResponseDeadlineProbability"><span class="hs-identifier hs-var hs-var">estimateResponseDeadlineProbability</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier hs-type">PeerGSV</span></a></span><span class="hs-special">{</span><span id="local-6989586621679245127"><span class="annot"><span class="annottext">GSV
 outboundGSV :: GSV
 outboundGSV :: PeerGSV -&gt; GSV
-</span><a href="#local-6989586621679212364"><span class="hs-identifier hs-var hs-var">outboundGSV</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679212363"><span class="annot"><span class="annottext">GSV
+</span><a href="#local-6989586621679245127"><span class="hs-identifier hs-var hs-var">outboundGSV</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679245126"><span class="annot"><span class="annottext">GSV
 inboundGSV :: GSV
 inboundGSV :: PeerGSV -&gt; GSV
-</span><a href="#local-6989586621679212363"><span class="hs-identifier hs-var hs-var">inboundGSV</span></a></span></span><span class="hs-special">}</span><span>
-</span><span id="line-145"></span><span>                                    </span><span id="local-6989586621679212362"><span class="annot"><span class="annottext">SizeInBytes
-</span><a href="#local-6989586621679212362"><span class="hs-identifier hs-var">bytesInFlight</span></a></span></span><span> </span><span id="local-6989586621679212361"><span class="annot"><span class="annottext">SizeInBytes
-</span><a href="#local-6989586621679212361"><span class="hs-identifier hs-var">bytesRequested</span></a></span></span><span> </span><span id="local-6989586621679212360"><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679212360"><span class="hs-identifier hs-var">deadline</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-146"></span><span>    </span><span class="annot"><span class="annottext">DiffTime -&gt; DeltaQ -&gt; Double
+</span><a href="#local-6989586621679245126"><span class="hs-identifier hs-var hs-var">inboundGSV</span></a></span></span><span class="hs-special">}</span><span>
+</span><span id="line-156"></span><span>                                    </span><span id="local-6989586621679245125"><span class="annot"><span class="annottext">SizeInBytes
+</span><a href="#local-6989586621679245125"><span class="hs-identifier hs-var">bytesInFlight</span></a></span></span><span> </span><span id="local-6989586621679245124"><span class="annot"><span class="annottext">SizeInBytes
+</span><a href="#local-6989586621679245124"><span class="hs-identifier hs-var">bytesRequested</span></a></span></span><span> </span><span id="local-6989586621679245123"><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679245123"><span class="hs-identifier hs-var">deadline</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-157"></span><span>    </span><span class="annot"><span class="annottext">DiffTime -&gt; DeltaQ -&gt; Double
 </span><a href="Ouroboros.Network.DeltaQ.html#deltaqProbabilityMassBeforeDeadline"><span class="hs-identifier hs-var">deltaqProbabilityMassBeforeDeadline</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679212360"><span class="hs-identifier hs-var">deadline</span></a></span><span> </span><span class="annot"><span class="annottext">(DeltaQ -&gt; Double) -&gt; DeltaQ -&gt; Double
+</span><a href="#local-6989586621679245123"><span class="hs-identifier hs-var">deadline</span></a></span><span> </span><span class="annot"><span class="annottext">(DeltaQ -&gt; Double) -&gt; DeltaQ -&gt; Double
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span>
-</span><span id="line-147"></span><span>        </span><span class="annot"><span class="annottext">GSV -&gt; SizeInBytes -&gt; DeltaQ
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-158"></span><span>        </span><span class="annot"><span class="annottext">GSV -&gt; SizeInBytes -&gt; DeltaQ
 </span><a href="Ouroboros.Network.DeltaQ.html#gsvTrailingEdgeArrive"><span class="hs-identifier hs-var">gsvTrailingEdgeArrive</span></a></span><span> </span><span class="annot"><span class="annottext">GSV
-</span><a href="#local-6989586621679212364"><span class="hs-identifier hs-var">outboundGSV</span></a></span><span> </span><span class="annot"><span class="annottext">SizeInBytes
-</span><a href="#local-6989586621679212357"><span class="hs-identifier hs-var">reqSize</span></a></span><span>
-</span><span id="line-148"></span><span>     </span><span class="annot"><span class="annottext">DeltaQ -&gt; DeltaQ -&gt; DeltaQ
+</span><a href="#local-6989586621679245127"><span class="hs-identifier hs-var">outboundGSV</span></a></span><span> </span><span class="annot"><span class="annottext">SizeInBytes
+</span><a href="#local-6989586621679245120"><span class="hs-identifier hs-var">reqSize</span></a></span><span>
+</span><span id="line-159"></span><span>     </span><span class="annot"><span class="annottext">DeltaQ -&gt; DeltaQ -&gt; DeltaQ
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">GSV -&gt; SizeInBytes -&gt; DeltaQ
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">GSV -&gt; SizeInBytes -&gt; DeltaQ
 </span><a href="Ouroboros.Network.DeltaQ.html#gsvTrailingEdgeArrive"><span class="hs-identifier hs-var">gsvTrailingEdgeArrive</span></a></span><span> </span><span class="annot"><span class="annottext">GSV
-</span><a href="#local-6989586621679212363"><span class="hs-identifier hs-var">inboundGSV</span></a></span><span> </span><span class="annot"><span class="annottext">SizeInBytes
-</span><a href="#local-6989586621679212356"><span class="hs-identifier hs-var">respSize</span></a></span><span>
-</span><span id="line-149"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-150"></span><span>    </span><span id="local-6989586621679212357"><span class="annot"><span class="annottext">reqSize :: SizeInBytes
-</span><a href="#local-6989586621679212357"><span class="hs-identifier hs-var hs-var">reqSize</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SizeInBytes
+</span><a href="#local-6989586621679245126"><span class="hs-identifier hs-var">inboundGSV</span></a></span><span> </span><span class="annot"><span class="annottext">SizeInBytes
+</span><a href="#local-6989586621679245119"><span class="hs-identifier hs-var">respSize</span></a></span><span>
+</span><span id="line-160"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-161"></span><span>    </span><span id="local-6989586621679245120"><span class="annot"><span class="annottext">reqSize :: SizeInBytes
+</span><a href="#local-6989586621679245120"><span class="hs-identifier hs-var hs-var">reqSize</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SizeInBytes
 </span><span class="hs-number">100</span></span><span> </span><span class="hs-comment">-- TODO not exact, but it's small</span><span>
-</span><span id="line-151"></span><span>    </span><span id="local-6989586621679212356"><span class="annot"><span class="annottext">respSize :: SizeInBytes
-</span><a href="#local-6989586621679212356"><span class="hs-identifier hs-var hs-var">respSize</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SizeInBytes
-</span><a href="#local-6989586621679212362"><span class="hs-identifier hs-var">bytesInFlight</span></a></span><span> </span><span class="annot"><span class="annottext">SizeInBytes -&gt; SizeInBytes -&gt; SizeInBytes
+</span><span id="line-162"></span><span>    </span><span id="local-6989586621679245119"><span class="annot"><span class="annottext">respSize :: SizeInBytes
+</span><a href="#local-6989586621679245119"><span class="hs-identifier hs-var hs-var">respSize</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SizeInBytes
+</span><a href="#local-6989586621679245125"><span class="hs-identifier hs-var">bytesInFlight</span></a></span><span> </span><span class="annot"><span class="annottext">SizeInBytes -&gt; SizeInBytes -&gt; SizeInBytes
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">SizeInBytes
-</span><a href="#local-6989586621679212361"><span class="hs-identifier hs-var">bytesRequested</span></a></span><span>
-</span><span id="line-152"></span><span>
-</span><span id="line-153"></span><span>
-</span><span id="line-154"></span><span class="hs-comment">-- | Given the 'PeerGSV', the bytes already in flight and the size of new</span><span>
-</span><span id="line-155"></span><span class="hs-comment">-- blocks to download, estimate the expected (mean) time to complete the</span><span>
-</span><span id="line-156"></span><span class="hs-comment">-- download.</span><span>
-</span><span id="line-157"></span><span class="hs-comment">--</span><span>
-</span><span id="line-158"></span><span class="hs-comment">-- This is an appropriate estimator to use when trying to minimising the</span><span>
-</span><span id="line-159"></span><span class="hs-comment">-- expected overall download time case in the long run (rather than optimising</span><span>
-</span><span id="line-160"></span><span class="hs-comment">-- for the worst case in the short term).</span><span>
-</span><span id="line-161"></span><span class="hs-comment">--</span><span>
-</span><span id="line-162"></span><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#estimateExpectedResponseDuration"><span class="hs-identifier hs-type">estimateExpectedResponseDuration</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier hs-type">PeerGSV</span></a></span><span>
-</span><span id="line-163"></span><span>                                 </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#SizeInBytes"><span class="hs-identifier hs-type">SizeInBytes</span></a></span><span> </span><span class="hs-comment">-- ^ Request size</span><span>
-</span><span id="line-164"></span><span>                                 </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#SizeInBytes"><span class="hs-identifier hs-type">SizeInBytes</span></a></span><span> </span><span class="hs-comment">-- ^ Expected response size</span><span>
-</span><span id="line-165"></span><span>                                 </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">DiffTime</span></span><span>
-</span><span id="line-166"></span><span id="estimateExpectedResponseDuration"><span class="annot"><span class="annottext">estimateExpectedResponseDuration :: PeerGSV -&gt; SizeInBytes -&gt; SizeInBytes -&gt; DiffTime
-</span><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#estimateExpectedResponseDuration"><span class="hs-identifier hs-var hs-var">estimateExpectedResponseDuration</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier hs-type">PeerGSV</span></a></span><span class="hs-special">{</span><span id="local-6989586621679212355"><span class="annot"><span class="annottext">GSV
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="annot"><span class="annottext">SizeInBytes
+</span><a href="#local-6989586621679245124"><span class="hs-identifier hs-var">bytesRequested</span></a></span><span>
+</span><span id="line-163"></span><span>
+</span><span id="line-164"></span><span>
+</span><span id="line-165"></span><span class="hs-comment">-- | Given the 'PeerGSV', the bytes already in flight and the size of new</span><span>
+</span><span id="line-166"></span><span class="hs-comment">-- blocks to download, estimate the expected (mean) time to complete the</span><span>
+</span><span id="line-167"></span><span class="hs-comment">-- download.</span><span>
+</span><span id="line-168"></span><span class="hs-comment">--</span><span>
+</span><span id="line-169"></span><span class="hs-comment">-- This is an appropriate estimator to use when trying to minimising the</span><span>
+</span><span id="line-170"></span><span class="hs-comment">-- expected overall download time case in the long run (rather than optimising</span><span>
+</span><span id="line-171"></span><span class="hs-comment">-- for the worst case in the short term).</span><span>
+</span><span id="line-172"></span><span class="hs-comment">--</span><span>
+</span><span id="line-173"></span><span class="annot"><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#estimateExpectedResponseDuration"><span class="hs-identifier hs-type">estimateExpectedResponseDuration</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier hs-type">PeerGSV</span></a></span><span>
+</span><span id="line-174"></span><span>                                 </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#SizeInBytes"><span class="hs-identifier hs-type">SizeInBytes</span></a></span><span> </span><span class="hs-comment">-- ^ Request size</span><span>
+</span><span id="line-175"></span><span>                                 </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#SizeInBytes"><span class="hs-identifier hs-type">SizeInBytes</span></a></span><span> </span><span class="hs-comment">-- ^ Expected response size</span><span>
+</span><span id="line-176"></span><span>                                 </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span>
+</span><span id="line-177"></span><span id="estimateExpectedResponseDuration"><span class="annot"><span class="annottext">estimateExpectedResponseDuration :: PeerGSV -&gt; SizeInBytes -&gt; SizeInBytes -&gt; DiffTime
+</span><a href="Ouroboros.Network.BlockFetch.DeltaQ.html#estimateExpectedResponseDuration"><span class="hs-identifier hs-var hs-var">estimateExpectedResponseDuration</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.DeltaQ.html#PeerGSV"><span class="hs-identifier hs-type">PeerGSV</span></a></span><span class="hs-special">{</span><span id="local-6989586621679245118"><span class="annot"><span class="annottext">GSV
 outboundGSV :: GSV
 outboundGSV :: PeerGSV -&gt; GSV
-</span><a href="#local-6989586621679212355"><span class="hs-identifier hs-var hs-var">outboundGSV</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679212354"><span class="annot"><span class="annottext">GSV
+</span><a href="#local-6989586621679245118"><span class="hs-identifier hs-var hs-var">outboundGSV</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679245117"><span class="annot"><span class="annottext">GSV
 inboundGSV :: GSV
 inboundGSV :: PeerGSV -&gt; GSV
-</span><a href="#local-6989586621679212354"><span class="hs-identifier hs-var hs-var">inboundGSV</span></a></span></span><span class="hs-special">}</span><span>
-</span><span id="line-167"></span><span>                           </span><span id="local-6989586621679212353"><span class="annot"><span class="annottext">SizeInBytes
-</span><a href="#local-6989586621679212353"><span class="hs-identifier hs-var">bytesInFlight</span></a></span></span><span> </span><span id="local-6989586621679212352"><span class="annot"><span class="annottext">SizeInBytes
-</span><a href="#local-6989586621679212352"><span class="hs-identifier hs-var">bytesRequested</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-168"></span><span>    </span><span class="annot"><span class="annottext">DeltaQ -&gt; DiffTime
+</span><a href="#local-6989586621679245117"><span class="hs-identifier hs-var hs-var">inboundGSV</span></a></span></span><span class="hs-special">}</span><span>
+</span><span id="line-178"></span><span>                           </span><span id="local-6989586621679245116"><span class="annot"><span class="annottext">SizeInBytes
+</span><a href="#local-6989586621679245116"><span class="hs-identifier hs-var">bytesInFlight</span></a></span></span><span> </span><span id="local-6989586621679245115"><span class="annot"><span class="annottext">SizeInBytes
+</span><a href="#local-6989586621679245115"><span class="hs-identifier hs-var">bytesRequested</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-179"></span><span>    </span><span class="annot"><span class="annottext">DeltaQ -&gt; DiffTime
 </span><a href="Ouroboros.Network.DeltaQ.html#deltaqQ50thPercentile"><span class="hs-identifier hs-var">deltaqQ50thPercentile</span></a></span><span> </span><span class="annot"><span class="annottext">(DeltaQ -&gt; DiffTime) -&gt; DeltaQ -&gt; DiffTime
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span>
-</span><span id="line-169"></span><span>        </span><span class="annot"><span class="annottext">GSV -&gt; SizeInBytes -&gt; DeltaQ
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-180"></span><span>        </span><span class="annot"><span class="annottext">GSV -&gt; SizeInBytes -&gt; DeltaQ
 </span><a href="Ouroboros.Network.DeltaQ.html#gsvTrailingEdgeArrive"><span class="hs-identifier hs-var">gsvTrailingEdgeArrive</span></a></span><span> </span><span class="annot"><span class="annottext">GSV
-</span><a href="#local-6989586621679212355"><span class="hs-identifier hs-var">outboundGSV</span></a></span><span> </span><span class="annot"><span class="annottext">SizeInBytes
-</span><a href="#local-6989586621679212350"><span class="hs-identifier hs-var">reqSize</span></a></span><span>
-</span><span id="line-170"></span><span>     </span><span class="annot"><span class="annottext">DeltaQ -&gt; DeltaQ -&gt; DeltaQ
+</span><a href="#local-6989586621679245118"><span class="hs-identifier hs-var">outboundGSV</span></a></span><span> </span><span class="annot"><span class="annottext">SizeInBytes
+</span><a href="#local-6989586621679245113"><span class="hs-identifier hs-var">reqSize</span></a></span><span>
+</span><span id="line-181"></span><span>     </span><span class="annot"><span class="annottext">DeltaQ -&gt; DeltaQ -&gt; DeltaQ
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">GSV -&gt; SizeInBytes -&gt; DeltaQ
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">GSV -&gt; SizeInBytes -&gt; DeltaQ
 </span><a href="Ouroboros.Network.DeltaQ.html#gsvTrailingEdgeArrive"><span class="hs-identifier hs-var">gsvTrailingEdgeArrive</span></a></span><span> </span><span class="annot"><span class="annottext">GSV
-</span><a href="#local-6989586621679212354"><span class="hs-identifier hs-var">inboundGSV</span></a></span><span> </span><span class="annot"><span class="annottext">SizeInBytes
-</span><a href="#local-6989586621679212349"><span class="hs-identifier hs-var">respSize</span></a></span><span>
-</span><span id="line-171"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-172"></span><span>    </span><span id="local-6989586621679212350"><span class="annot"><span class="annottext">reqSize :: SizeInBytes
-</span><a href="#local-6989586621679212350"><span class="hs-identifier hs-var hs-var">reqSize</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SizeInBytes
+</span><a href="#local-6989586621679245117"><span class="hs-identifier hs-var">inboundGSV</span></a></span><span> </span><span class="annot"><span class="annottext">SizeInBytes
+</span><a href="#local-6989586621679245112"><span class="hs-identifier hs-var">respSize</span></a></span><span>
+</span><span id="line-182"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-183"></span><span>    </span><span id="local-6989586621679245113"><span class="annot"><span class="annottext">reqSize :: SizeInBytes
+</span><a href="#local-6989586621679245113"><span class="hs-identifier hs-var hs-var">reqSize</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SizeInBytes
 </span><span class="hs-number">100</span></span><span> </span><span class="hs-comment">-- TODO not exact, but it's small</span><span>
-</span><span id="line-173"></span><span>    </span><span id="local-6989586621679212349"><span class="annot"><span class="annottext">respSize :: SizeInBytes
-</span><a href="#local-6989586621679212349"><span class="hs-identifier hs-var hs-var">respSize</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SizeInBytes
-</span><a href="#local-6989586621679212353"><span class="hs-identifier hs-var">bytesInFlight</span></a></span><span> </span><span class="annot"><span class="annottext">SizeInBytes -&gt; SizeInBytes -&gt; SizeInBytes
+</span><span id="line-184"></span><span>    </span><span id="local-6989586621679245112"><span class="annot"><span class="annottext">respSize :: SizeInBytes
+</span><a href="#local-6989586621679245112"><span class="hs-identifier hs-var hs-var">respSize</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SizeInBytes
+</span><a href="#local-6989586621679245116"><span class="hs-identifier hs-var">bytesInFlight</span></a></span><span> </span><span class="annot"><span class="annottext">SizeInBytes -&gt; SizeInBytes -&gt; SizeInBytes
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">SizeInBytes
-</span><a href="#local-6989586621679212352"><span class="hs-identifier hs-var">bytesRequested</span></a></span><span>
-</span><span id="line-174"></span><span>
-</span><span id="line-175"></span><span class="hs-comment">{-
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="annot"><span class="annottext">SizeInBytes
+</span><a href="#local-6989586621679245115"><span class="hs-identifier hs-var">bytesRequested</span></a></span><span>
+</span><span id="line-185"></span><span>
+</span><span id="line-186"></span><span class="hs-comment">{-
 estimateBlockFetchResponse :: PeerGSV
                            -&gt; PeerFetchInFlight header
                            -&gt; [SizeInBytes]
@@ -403,4 +424,4 @@ blockArrivalShedule gsvs
 
     cumulativeSumFrom n = tail . scanl (+) n
 -}</span><span>
-</span><span id="line-206"></span></pre></body></html>
+</span><span id="line-217"></span></pre></body></html>

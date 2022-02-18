@@ -1,0 +1,723 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE FlexibleContexts    #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables #-}</span><span>
+</span><span id="line-3"></span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- Constants used in 'Ouroboros.Network.Diffusion'</span><span>
+</span><span id="line-5"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.Diffusion.Policies</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-6"></span><span>
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/strict-stm-0.1.0.0/noopt/doc/html/strict-stm/src"><span class="hs-identifier">Control.Monad.Class.MonadSTM.Strict</span></a></span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier">Control.Monad.Class.MonadTime</span></a></span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.List</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">sortOn</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">unfoldr</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Data.Map.Strict</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Map</span></span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Data.Set</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Set</span></span><span>
+</span><span id="line-13"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Word</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Word32</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">System.Random</span></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">System.Random</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Rnd</span></span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier">Ouroboros.Network.ConnectionManager.Types</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier">ConnectionType</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-18"></span><span>                     </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier">Provenance</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier">PrunePolicy</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier">Ouroboros.Network.InboundGovernor</span></a></span><span>
+</span><span id="line-20"></span><span>                     </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier">InboundGovernorObservableState</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html"><span class="hs-identifier">Ouroboros.Network.PeerSelection.Governor.Types</span></a></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.PeerMetric.html"><span class="hs-identifier">Ouroboros.Network.PeerSelection.PeerMetric</span></a></span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="hs-comment">-- | Timeout for 'spsDeactivateTimeout'.</span><span>
+</span><span id="line-26"></span><span class="hs-comment">--</span><span>
+</span><span id="line-27"></span><span class="hs-comment">-- The maximal timeout on 'ChainSync' (in 'StMustReply' state) is @269s@.</span><span>
+</span><span id="line-28"></span><span class="hs-comment">--</span><span>
+</span><span id="line-29"></span><span class="annot"><a href="Ouroboros.Network.Diffusion.Policies.html#deactivateTimeout"><span class="hs-identifier hs-type">deactivateTimeout</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span>
+</span><span id="line-30"></span><span id="deactivateTimeout"><span class="annot"><span class="annottext">deactivateTimeout :: DiffTime
+</span><a href="Ouroboros.Network.Diffusion.Policies.html#deactivateTimeout"><span class="hs-identifier hs-var hs-var">deactivateTimeout</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-number">300</span></span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="hs-comment">-- | Timeout for 'spsCloseConnectionTimeout'.</span><span>
+</span><span id="line-33"></span><span class="hs-comment">--</span><span>
+</span><span id="line-34"></span><span class="hs-comment">-- This timeout depends on 'KeepAlive' and 'TipSample' timeouts.  'KeepAlive'</span><span>
+</span><span id="line-35"></span><span class="hs-comment">-- keeps agancy most of the time, but 'TipSample' can give away its agency for</span><span>
+</span><span id="line-36"></span><span class="hs-comment">-- longer periods of time.  Here we allow it to get 6 blocks (assuming a new</span><span>
+</span><span id="line-37"></span><span class="hs-comment">-- block every @20s@).</span><span>
+</span><span id="line-38"></span><span class="hs-comment">--</span><span>
+</span><span id="line-39"></span><span class="annot"><a href="Ouroboros.Network.Diffusion.Policies.html#closeConnectionTimeout"><span class="hs-identifier hs-type">closeConnectionTimeout</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span>
+</span><span id="line-40"></span><span id="closeConnectionTimeout"><span class="annot"><span class="annottext">closeConnectionTimeout :: DiffTime
+</span><a href="Ouroboros.Network.Diffusion.Policies.html#closeConnectionTimeout"><span class="hs-identifier hs-var hs-var">closeConnectionTimeout</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-number">120</span></span><span>
+</span><span id="line-41"></span><span>
+</span><span id="line-42"></span><span>
+</span><span id="line-43"></span><span class="annot"><a href="Ouroboros.Network.Diffusion.Policies.html#simplePeerSelectionPolicy"><span class="hs-identifier hs-type">simplePeerSelectionPolicy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679265848"><span class="annot"><a href="#local-6989586621679265848"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679265847"><span class="annot"><a href="#local-6989586621679265847"><span class="hs-identifier hs-type">peerAddr</span></a></span></span><span class="hs-operator">.</span><span>
+</span><span id="line-44"></span><span>                             </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">MonadSTM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265848"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-45"></span><span>                             </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Ord</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265847"><span class="hs-identifier hs-type">peerAddr</span></a></span><span>
+</span><span id="line-46"></span><span>                             </span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span>                          </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/strict-stm-0.1.0.0/noopt/doc/html/strict-stm/src"><span class="hs-identifier hs-type">StrictTVar</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265848"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">StdGen</span></span><span>
+</span><span id="line-48"></span><span>                          </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">STM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265848"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#ChurnMode"><span class="hs-identifier hs-type">ChurnMode</span></a></span><span>
+</span><span id="line-49"></span><span>                          </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.PeerMetric.html#PeerMetrics"><span class="hs-identifier hs-type">PeerMetrics</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265848"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265847"><span class="hs-identifier hs-type">peerAddr</span></a></span><span>
+</span><span id="line-50"></span><span>                          </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#PeerSelectionPolicy"><span class="hs-identifier hs-type">PeerSelectionPolicy</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265847"><span class="hs-identifier hs-type">peerAddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265848"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-51"></span><span id="simplePeerSelectionPolicy"><span class="annot"><span class="annottext">simplePeerSelectionPolicy :: StrictTVar m StdGen
+-&gt; STM m ChurnMode
+-&gt; PeerMetrics m peerAddr
+-&gt; PeerSelectionPolicy peerAddr m
+</span><a href="Ouroboros.Network.Diffusion.Policies.html#simplePeerSelectionPolicy"><span class="hs-identifier hs-var hs-var">simplePeerSelectionPolicy</span></a></span></span><span> </span><span id="local-6989586621679265846"><span class="annot"><span class="annottext">StrictTVar m StdGen
+</span><a href="#local-6989586621679265846"><span class="hs-identifier hs-var">rngVar</span></a></span></span><span> </span><span id="local-6989586621679265845"><span class="annot"><span class="annottext">STM m ChurnMode
+</span><a href="#local-6989586621679265845"><span class="hs-identifier hs-var">getChurnMode</span></a></span></span><span> </span><span id="local-6989586621679265844"><span class="annot"><span class="annottext">PeerMetrics m peerAddr
+</span><a href="#local-6989586621679265844"><span class="hs-identifier hs-var">metrics</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PeerSelectionPolicy :: forall peeraddr (m :: * -&gt; *).
+PickPolicy peeraddr m
+-&gt; PickPolicy peeraddr m
+-&gt; PickPolicy peeraddr m
+-&gt; PickPolicy peeraddr m
+-&gt; PickPolicy peeraddr m
+-&gt; PickPolicy peeraddr m
+-&gt; DiffTime
+-&gt; Int
+-&gt; DiffTime
+-&gt; DiffTime
+-&gt; DiffTime
+-&gt; PeerSelectionPolicy peeraddr m
+</span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#PeerSelectionPolicy"><span class="hs-identifier hs-type">PeerSelectionPolicy</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-52"></span><span>      </span><span class="annot"><span class="annottext">policyPickKnownPeersForGossip :: PickPolicy peerAddr m
+</span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#policyPickKnownPeersForGossip"><span class="hs-identifier hs-var">policyPickKnownPeersForGossip</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PickPolicy peerAddr m
+</span><a href="#local-6989586621679265841"><span class="hs-identifier hs-var">simplePromotionPolicy</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-53"></span><span>      </span><span class="annot"><span class="annottext">policyPickColdPeersToPromote :: PickPolicy peerAddr m
+</span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#policyPickColdPeersToPromote"><span class="hs-identifier hs-var">policyPickColdPeersToPromote</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PickPolicy peerAddr m
+</span><a href="#local-6989586621679265841"><span class="hs-identifier hs-var">simplePromotionPolicy</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-54"></span><span>      </span><span class="annot"><span class="annottext">policyPickWarmPeersToPromote :: PickPolicy peerAddr m
+</span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#policyPickWarmPeersToPromote"><span class="hs-identifier hs-var">policyPickWarmPeersToPromote</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PickPolicy peerAddr m
+</span><a href="#local-6989586621679265841"><span class="hs-identifier hs-var">simplePromotionPolicy</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span>      </span><span class="annot"><span class="annottext">policyPickHotPeersToDemote :: PickPolicy peerAddr m
+</span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#policyPickHotPeersToDemote"><span class="hs-identifier hs-var">policyPickHotPeersToDemote</span></a></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PickPolicy peerAddr m
+</span><a href="#local-6989586621679265837"><span class="hs-identifier hs-var">hotDemotionPolicy</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-57"></span><span>      </span><span class="annot"><span class="annottext">policyPickWarmPeersToDemote :: PickPolicy peerAddr m
+</span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#policyPickWarmPeersToDemote"><span class="hs-identifier hs-var">policyPickWarmPeersToDemote</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PickPolicy peerAddr m
+</span><a href="#local-6989586621679265835"><span class="hs-identifier hs-var">warmDemotionPolicy</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-58"></span><span>      </span><span class="annot"><span class="annottext">policyPickColdPeersToForget :: PickPolicy peerAddr m
+</span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#policyPickColdPeersToForget"><span class="hs-identifier hs-var">policyPickColdPeersToForget</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PickPolicy peerAddr m
+</span><a href="#local-6989586621679265833"><span class="hs-identifier hs-var">coldForgetPolicy</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-59"></span><span>
+</span><span id="line-60"></span><span>      </span><span class="annot"><span class="annottext">policyFindPublicRootTimeout :: DiffTime
+</span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#policyFindPublicRootTimeout"><span class="hs-identifier hs-var">policyFindPublicRootTimeout</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-number">5</span></span><span class="hs-special">,</span><span>    </span><span class="hs-comment">-- seconds</span><span>
+</span><span id="line-61"></span><span>      </span><span class="annot"><span class="annottext">policyMaxInProgressGossipReqs :: Int
+</span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#policyMaxInProgressGossipReqs"><span class="hs-identifier hs-var">policyMaxInProgressGossipReqs</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span class="hs-special">,</span><span>
+</span><span id="line-62"></span><span>      </span><span class="annot"><span class="annottext">policyGossipRetryTime :: DiffTime
+</span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#policyGossipRetryTime"><span class="hs-identifier hs-var">policyGossipRetryTime</span></a></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-number">3600</span></span><span class="hs-special">,</span><span> </span><span class="hs-comment">-- seconds</span><span>
+</span><span id="line-63"></span><span>      </span><span class="annot"><span class="annottext">policyGossipBatchWaitTime :: DiffTime
+</span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#policyGossipBatchWaitTime"><span class="hs-identifier hs-var">policyGossipBatchWaitTime</span></a></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-number">3</span></span><span class="hs-special">,</span><span>    </span><span class="hs-comment">-- seconds</span><span>
+</span><span id="line-64"></span><span>      </span><span class="annot"><span class="annottext">policyGossipOverallTimeout :: DiffTime
+</span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#policyGossipOverallTimeout"><span class="hs-identifier hs-var">policyGossipOverallTimeout</span></a></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-number">10</span></span><span>    </span><span class="hs-comment">-- seconds</span><span>
+</span><span id="line-65"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-66"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-67"></span><span>
+</span><span id="line-68"></span><span>     </span><span class="hs-comment">-- Add scaled random number in order to prevent ordering based on SockAddr</span><span>
+</span><span id="line-69"></span><span>    </span><span class="annot"><a href="#local-6989586621679265827"><span class="hs-identifier hs-type">addRand</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-type">Set.Set</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265847"><span class="hs-identifier hs-type">peerAddr</span></a></span><span>
+</span><span id="line-70"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679265847"><span class="hs-identifier hs-type">peerAddr</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679265847"><span class="hs-identifier hs-type">peerAddr</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-71"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">STM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265848"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-type">Map.Map</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265847"><span class="hs-identifier hs-type">peerAddr</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-72"></span><span>    </span><span id="local-6989586621679265827"><span class="annot"><span class="annottext">addRand :: Set peerAddr
+-&gt; (peerAddr -&gt; Word32 -&gt; (peerAddr, Word32))
+-&gt; STM m (Map peerAddr Word32)
+</span><a href="#local-6989586621679265827"><span class="hs-identifier hs-var hs-var">addRand</span></a></span></span><span> </span><span id="local-6989586621679265826"><span class="annot"><span class="annottext">Set peerAddr
+</span><a href="#local-6989586621679265826"><span class="hs-identifier hs-var">available</span></a></span></span><span> </span><span id="local-6989586621679265825"><span class="annot"><span class="annottext">peerAddr -&gt; Word32 -&gt; (peerAddr, Word32)
+</span><a href="#local-6989586621679265825"><span class="hs-identifier hs-var">scaleFn</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-73"></span><span>      </span><span id="local-6989586621679265824"><span class="annot"><span class="annottext">StdGen
+</span><a href="#local-6989586621679265824"><span class="hs-identifier hs-var">inRng</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">StrictTVar m StdGen -&gt; STM m StdGen
+forall (m :: * -&gt; *) a. MonadSTM m =&gt; StrictTVar m a -&gt; STM m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/strict-stm-0.1.0.0/noopt/doc/html/strict-stm/src"><span class="hs-identifier hs-var">readTVar</span></a></span><span> </span><span class="annot"><span class="annottext">StrictTVar m StdGen
+</span><a href="#local-6989586621679265846"><span class="hs-identifier hs-var">rngVar</span></a></span><span>
+</span><span id="line-74"></span><span>
+</span><span id="line-75"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679265822"><span class="annot"><span class="annottext">StdGen
+</span><a href="#local-6989586621679265822"><span class="hs-identifier hs-var">rng</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679265821"><span class="annot"><span class="annottext">StdGen
+</span><a href="#local-6989586621679265821"><span class="hs-identifier hs-var">rng'</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StdGen -&gt; (StdGen, StdGen)
+forall g. RandomGen g =&gt; g -&gt; (g, g)
+</span><span class="hs-identifier hs-var">split</span></span><span> </span><span class="annot"><span class="annottext">StdGen
+</span><a href="#local-6989586621679265824"><span class="hs-identifier hs-var">inRng</span></a></span><span>
+</span><span id="line-76"></span><span>          </span><span id="local-6989586621679265819"><span class="annot"><span class="annottext">rns :: [Word32]
+</span><a href="#local-6989586621679265819"><span class="hs-identifier hs-var hs-var">rns</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; [Word32] -&gt; [Word32]
+forall a. Int -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">take</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set peerAddr -&gt; Int
+forall a. Set a -&gt; Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.size</span></a></span><span> </span><span class="annot"><span class="annottext">Set peerAddr
+</span><a href="#local-6989586621679265826"><span class="hs-identifier hs-var">available</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([Word32] -&gt; [Word32]) -&gt; [Word32] -&gt; [Word32]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">(StdGen -&gt; Maybe (Word32, StdGen)) -&gt; StdGen -&gt; [Word32]
+forall b a. (b -&gt; Maybe (a, b)) -&gt; b -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">unfoldr</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Word32, StdGen) -&gt; Maybe (Word32, StdGen)
+forall a. a -&gt; Maybe a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">((Word32, StdGen) -&gt; Maybe (Word32, StdGen))
+-&gt; (StdGen -&gt; (Word32, StdGen)) -&gt; StdGen -&gt; Maybe (Word32, StdGen)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">StdGen -&gt; (Word32, StdGen)
+forall a g. (Random a, RandomGen g) =&gt; g -&gt; (a, g)
+</span><span class="hs-identifier hs-var">random</span></span><span class="hs-special">)</span><span>  </span><span class="annot"><span class="annottext">StdGen
+</span><a href="#local-6989586621679265822"><span class="hs-identifier hs-var">rng</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-77"></span><span>          </span><span id="local-6989586621679265814"><span class="annot"><span class="annottext">available' :: Map peerAddr Word32
+</span><a href="#local-6989586621679265814"><span class="hs-identifier hs-var hs-var">available'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(peerAddr, Word32)] -&gt; Map peerAddr Word32
+forall k a. Ord k =&gt; [(k, a)] -&gt; Map k a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.fromList</span></a></span><span> </span><span class="annot"><span class="annottext">([(peerAddr, Word32)] -&gt; Map peerAddr Word32)
+-&gt; [(peerAddr, Word32)] -&gt; Map peerAddr Word32
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">(peerAddr -&gt; Word32 -&gt; (peerAddr, Word32))
+-&gt; [peerAddr] -&gt; [Word32] -&gt; [(peerAddr, Word32)]
+forall a b c. (a -&gt; b -&gt; c) -&gt; [a] -&gt; [b] -&gt; [c]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">zipWith</span></a></span><span> </span><span class="annot"><span class="annottext">peerAddr -&gt; Word32 -&gt; (peerAddr, Word32)
+</span><a href="#local-6989586621679265825"><span class="hs-identifier hs-var">scaleFn</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set peerAddr -&gt; [peerAddr]
+forall a. Set a -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.toList</span></a></span><span> </span><span class="annot"><span class="annottext">Set peerAddr
+</span><a href="#local-6989586621679265826"><span class="hs-identifier hs-var">available</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Word32]
+</span><a href="#local-6989586621679265819"><span class="hs-identifier hs-var">rns</span></a></span><span>
+</span><span id="line-78"></span><span>      </span><span class="annot"><span class="annottext">StrictTVar m StdGen -&gt; StdGen -&gt; STM m ()
+forall (m :: * -&gt; *) a.
+(MonadSTM m, HasCallStack) =&gt;
+StrictTVar m a -&gt; a -&gt; STM m ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/strict-stm-0.1.0.0/noopt/doc/html/strict-stm/src"><span class="hs-identifier hs-var">writeTVar</span></a></span><span> </span><span class="annot"><span class="annottext">StrictTVar m StdGen
+</span><a href="#local-6989586621679265846"><span class="hs-identifier hs-var">rngVar</span></a></span><span> </span><span class="annot"><span class="annottext">StdGen
+</span><a href="#local-6989586621679265821"><span class="hs-identifier hs-var">rng'</span></a></span><span>
+</span><span id="line-79"></span><span>      </span><span class="annot"><span class="annottext">Map peerAddr Word32 -&gt; STM m (Map peerAddr Word32)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">Map peerAddr Word32
+</span><a href="#local-6989586621679265814"><span class="hs-identifier hs-var">available'</span></a></span><span>
+</span><span id="line-80"></span><span>
+</span><span id="line-81"></span><span>    </span><span class="annot"><a href="#local-6989586621679265837"><span class="hs-identifier hs-type">hotDemotionPolicy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#PickPolicy"><span class="hs-identifier hs-type">PickPolicy</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265847"><span class="hs-identifier hs-type">peerAddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265848"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-82"></span><span>    </span><span id="local-6989586621679265837"><span class="annot"><span class="annottext">hotDemotionPolicy :: PickPolicy peerAddr m
+</span><a href="#local-6989586621679265837"><span class="hs-identifier hs-var hs-var">hotDemotionPolicy</span></a></span></span><span> </span><span class="annot"><span class="annottext">peerAddr -&gt; PeerSource
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">peerAddr -&gt; Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">peerAddr -&gt; Bool
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679265809"><span class="annot"><span class="annottext">Set peerAddr
+</span><a href="#local-6989586621679265809"><span class="hs-identifier hs-var">available</span></a></span></span><span> </span><span id="local-6989586621679265808"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679265808"><span class="hs-identifier hs-var">pickNum</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-83"></span><span>        </span><span id="local-6989586621679265807"><span class="annot"><span class="annottext">ChurnMode
+</span><a href="#local-6989586621679265807"><span class="hs-identifier hs-var">mode</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">STM m ChurnMode
+</span><a href="#local-6989586621679265845"><span class="hs-identifier hs-var">getChurnMode</span></a></span><span>
+</span><span id="line-84"></span><span>        </span><span id="local-6989586621679265806"><span class="annot"><span class="annottext">Map peerAddr Int
+</span><a href="#local-6989586621679265806"><span class="hs-identifier hs-var">scores</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">ChurnMode
+</span><a href="#local-6989586621679265807"><span class="hs-identifier hs-var">mode</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-85"></span><span>                       </span><span class="annot"><span class="annottext">ChurnMode
+</span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#ChurnModeNormal"><span class="hs-identifier hs-var">ChurnModeNormal</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-86"></span><span>                           </span><span id="local-6989586621679265804"><span class="annot"><span class="annottext">Map peerAddr Int
+</span><a href="#local-6989586621679265804"><span class="hs-identifier hs-var">hup</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">SlotMetric peerAddr -&gt; Map peerAddr Int
+forall p. Ord p =&gt; SlotMetric p -&gt; Map p Int
+</span><a href="Ouroboros.Network.PeerSelection.PeerMetric.html#upstreamyness"><span class="hs-identifier hs-var">upstreamyness</span></a></span><span> </span><span class="annot"><span class="annottext">(SlotMetric peerAddr -&gt; Map peerAddr Int)
+-&gt; STM m (SlotMetric peerAddr) -&gt; STM m (Map peerAddr Int)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">PeerMetrics m peerAddr -&gt; STM m (SlotMetric peerAddr)
+forall (m :: * -&gt; *) p.
+MonadSTM m =&gt;
+PeerMetrics m p -&gt; STM m (SlotMetric p)
+</span><a href="Ouroboros.Network.PeerSelection.PeerMetric.html#getHeaderMetrics"><span class="hs-identifier hs-var">getHeaderMetrics</span></a></span><span> </span><span class="annot"><span class="annottext">PeerMetrics m peerAddr
+</span><a href="#local-6989586621679265844"><span class="hs-identifier hs-var">metrics</span></a></span><span>
+</span><span id="line-87"></span><span>                           </span><span id="local-6989586621679265800"><span class="annot"><span class="annottext">Map peerAddr Int
+</span><a href="#local-6989586621679265800"><span class="hs-identifier hs-var">bup</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">SlotMetric (peerAddr, Word32) -&gt; Map peerAddr Int
+forall p. Ord p =&gt; SlotMetric (p, Word32) -&gt; Map p Int
+</span><a href="Ouroboros.Network.PeerSelection.PeerMetric.html#fetchynessBlocks"><span class="hs-identifier hs-var">fetchynessBlocks</span></a></span><span> </span><span class="annot"><span class="annottext">(SlotMetric (peerAddr, Word32) -&gt; Map peerAddr Int)
+-&gt; STM m (SlotMetric (peerAddr, Word32))
+-&gt; STM m (Map peerAddr Int)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">PeerMetrics m peerAddr -&gt; STM m (SlotMetric (peerAddr, Word32))
+forall (m :: * -&gt; *) p.
+MonadSTM m =&gt;
+PeerMetrics m p -&gt; STM m (SlotMetric (p, Word32))
+</span><a href="Ouroboros.Network.PeerSelection.PeerMetric.html#getFetchedMetrics"><span class="hs-identifier hs-var">getFetchedMetrics</span></a></span><span> </span><span class="annot"><span class="annottext">PeerMetrics m peerAddr
+</span><a href="#local-6989586621679265844"><span class="hs-identifier hs-var">metrics</span></a></span><span>
+</span><span id="line-88"></span><span>                           </span><span class="annot"><span class="annottext">Map peerAddr Int -&gt; STM m (Map peerAddr Int)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">(Map peerAddr Int -&gt; STM m (Map peerAddr Int))
+-&gt; Map peerAddr Int -&gt; STM m (Map peerAddr Int)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int -&gt; Int)
+-&gt; Map peerAddr Int -&gt; Map peerAddr Int -&gt; Map peerAddr Int
+forall k a. Ord k =&gt; (a -&gt; a -&gt; a) -&gt; Map k a -&gt; Map k a -&gt; Map k a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.unionWith</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">(+)</span></a></span><span> </span><span class="annot"><span class="annottext">Map peerAddr Int
+</span><a href="#local-6989586621679265804"><span class="hs-identifier hs-var">hup</span></a></span><span> </span><span class="annot"><span class="annottext">Map peerAddr Int
+</span><a href="#local-6989586621679265800"><span class="hs-identifier hs-var">bup</span></a></span><span>
+</span><span id="line-89"></span><span>
+</span><span id="line-90"></span><span>                       </span><span class="annot"><span class="annottext">ChurnMode
+</span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#ChurnModeBulkSync"><span class="hs-identifier hs-var">ChurnModeBulkSync</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-91"></span><span>                           </span><span class="annot"><span class="annottext">SlotMetric (peerAddr, Word32) -&gt; Map peerAddr Int
+forall p. Ord p =&gt; SlotMetric (p, Word32) -&gt; Map p Int
+</span><a href="Ouroboros.Network.PeerSelection.PeerMetric.html#fetchynessBytes"><span class="hs-identifier hs-var">fetchynessBytes</span></a></span><span> </span><span class="annot"><span class="annottext">(SlotMetric (peerAddr, Word32) -&gt; Map peerAddr Int)
+-&gt; STM m (SlotMetric (peerAddr, Word32))
+-&gt; STM m (Map peerAddr Int)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">PeerMetrics m peerAddr -&gt; STM m (SlotMetric (peerAddr, Word32))
+forall (m :: * -&gt; *) p.
+MonadSTM m =&gt;
+PeerMetrics m p -&gt; STM m (SlotMetric (p, Word32))
+</span><a href="Ouroboros.Network.PeerSelection.PeerMetric.html#getFetchedMetrics"><span class="hs-identifier hs-var">getFetchedMetrics</span></a></span><span> </span><span class="annot"><span class="annottext">PeerMetrics m peerAddr
+</span><a href="#local-6989586621679265844"><span class="hs-identifier hs-var">metrics</span></a></span><span>
+</span><span id="line-92"></span><span>        </span><span id="local-6989586621679265793"><span class="annot"><span class="annottext">Map peerAddr Word32
+</span><a href="#local-6989586621679265793"><span class="hs-identifier hs-var">available'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Set peerAddr
+-&gt; (peerAddr -&gt; Word32 -&gt; (peerAddr, Word32))
+-&gt; STM m (Map peerAddr Word32)
+</span><a href="#local-6989586621679265827"><span class="hs-identifier hs-var">addRand</span></a></span><span> </span><span class="annot"><span class="annottext">Set peerAddr
+</span><a href="#local-6989586621679265809"><span class="hs-identifier hs-var">available</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span>
+</span><span id="line-93"></span><span>        </span><span class="annot"><span class="annottext">Set peerAddr -&gt; STM m (Set peerAddr)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">(Set peerAddr -&gt; STM m (Set peerAddr))
+-&gt; Set peerAddr -&gt; STM m (Set peerAddr)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">[peerAddr] -&gt; Set peerAddr
+forall a. Ord a =&gt; [a] -&gt; Set a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.fromList</span></a></span><span>
+</span><span id="line-94"></span><span>             </span><span class="annot"><span class="annottext">([peerAddr] -&gt; Set peerAddr)
+-&gt; (Map peerAddr Word32 -&gt; [peerAddr])
+-&gt; Map peerAddr Word32
+-&gt; Set peerAddr
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">((peerAddr, Word32) -&gt; peerAddr)
+-&gt; [(peerAddr, Word32)] -&gt; [peerAddr]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">map</span></a></span><span> </span><span class="annot"><span class="annottext">(peerAddr, Word32) -&gt; peerAddr
+forall a b. (a, b) -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fst</span></a></span><span>
+</span><span id="line-95"></span><span>             </span><span class="annot"><span class="annottext">([(peerAddr, Word32)] -&gt; [peerAddr])
+-&gt; (Map peerAddr Word32 -&gt; [(peerAddr, Word32)])
+-&gt; Map peerAddr Word32
+-&gt; [peerAddr]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; [(peerAddr, Word32)] -&gt; [(peerAddr, Word32)]
+forall a. Int -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">take</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679265808"><span class="hs-identifier hs-var">pickNum</span></a></span><span>
+</span><span id="line-96"></span><span>             </span><span class="annot"><span class="annottext">([(peerAddr, Word32)] -&gt; [(peerAddr, Word32)])
+-&gt; (Map peerAddr Word32 -&gt; [(peerAddr, Word32)])
+-&gt; Map peerAddr Word32
+-&gt; [(peerAddr, Word32)]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">((peerAddr, Word32) -&gt; (Int, Word32))
+-&gt; [(peerAddr, Word32)] -&gt; [(peerAddr, Word32)]
+forall b a. Ord b =&gt; (a -&gt; b) -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">sortOn</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621679265791"><span class="annot"><span class="annottext">peerAddr
+</span><a href="#local-6989586621679265791"><span class="hs-identifier hs-var">peer</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679265790"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679265790"><span class="hs-identifier hs-var">rn</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-97"></span><span>                          </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; peerAddr -&gt; Map peerAddr Int -&gt; Int
+forall k a. Ord k =&gt; a -&gt; k -&gt; Map k a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.findWithDefault</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">peerAddr
+</span><a href="#local-6989586621679265791"><span class="hs-identifier hs-var">peer</span></a></span><span> </span><span class="annot"><span class="annottext">Map peerAddr Int
+</span><a href="#local-6989586621679265806"><span class="hs-identifier hs-var">scores</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679265790"><span class="hs-identifier hs-var">rn</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-98"></span><span>             </span><span class="annot"><span class="annottext">([(peerAddr, Word32)] -&gt; [(peerAddr, Word32)])
+-&gt; (Map peerAddr Word32 -&gt; [(peerAddr, Word32)])
+-&gt; Map peerAddr Word32
+-&gt; [(peerAddr, Word32)]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Map peerAddr Word32 -&gt; [(peerAddr, Word32)]
+forall k a. Map k a -&gt; [(k, a)]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.assocs</span></a></span><span>
+</span><span id="line-99"></span><span>             </span><span class="annot"><span class="annottext">(Map peerAddr Word32 -&gt; Set peerAddr)
+-&gt; Map peerAddr Word32 -&gt; Set peerAddr
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Map peerAddr Word32
+</span><a href="#local-6989586621679265793"><span class="hs-identifier hs-var">available'</span></a></span><span>
+</span><span id="line-100"></span><span>
+</span><span id="line-101"></span><span>    </span><span class="hs-comment">-- Randomly pick peers to demote, peeers with knownPeerTepid set are twice</span><span>
+</span><span id="line-102"></span><span>    </span><span class="hs-comment">-- as likely to be demoted.</span><span>
+</span><span id="line-103"></span><span>    </span><span class="annot"><a href="#local-6989586621679265835"><span class="hs-identifier hs-type">warmDemotionPolicy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#PickPolicy"><span class="hs-identifier hs-type">PickPolicy</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265847"><span class="hs-identifier hs-type">peerAddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265848"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-104"></span><span>    </span><span id="local-6989586621679265835"><span class="annot"><span class="annottext">warmDemotionPolicy :: PickPolicy peerAddr m
+</span><a href="#local-6989586621679265835"><span class="hs-identifier hs-var hs-var">warmDemotionPolicy</span></a></span></span><span> </span><span class="annot"><span class="annottext">peerAddr -&gt; PeerSource
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">peerAddr -&gt; Int
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679265787"><span class="annot"><span class="annottext">peerAddr -&gt; Bool
+</span><a href="#local-6989586621679265787"><span class="hs-identifier hs-var">isTepid</span></a></span></span><span> </span><span id="local-6989586621679265786"><span class="annot"><span class="annottext">Set peerAddr
+</span><a href="#local-6989586621679265786"><span class="hs-identifier hs-var">available</span></a></span></span><span> </span><span id="local-6989586621679265785"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679265785"><span class="hs-identifier hs-var">pickNum</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-105"></span><span>      </span><span id="local-6989586621679265784"><span class="annot"><span class="annottext">Map peerAddr Word32
+</span><a href="#local-6989586621679265784"><span class="hs-identifier hs-var">available'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Set peerAddr
+-&gt; (peerAddr -&gt; Word32 -&gt; (peerAddr, Word32))
+-&gt; STM m (Map peerAddr Word32)
+</span><a href="#local-6989586621679265827"><span class="hs-identifier hs-var">addRand</span></a></span><span> </span><span class="annot"><span class="annottext">Set peerAddr
+</span><a href="#local-6989586621679265786"><span class="hs-identifier hs-var">available</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(peerAddr -&gt; Bool) -&gt; peerAddr -&gt; Word32 -&gt; (peerAddr, Word32)
+</span><a href="#local-6989586621679265783"><span class="hs-identifier hs-var">tepidWeight</span></a></span><span> </span><span class="annot"><span class="annottext">peerAddr -&gt; Bool
+</span><a href="#local-6989586621679265787"><span class="hs-identifier hs-var">isTepid</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-106"></span><span>      </span><span class="annot"><span class="annottext">Set peerAddr -&gt; STM m (Set peerAddr)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">(Set peerAddr -&gt; STM m (Set peerAddr))
+-&gt; Set peerAddr -&gt; STM m (Set peerAddr)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">[peerAddr] -&gt; Set peerAddr
+forall a. Ord a =&gt; [a] -&gt; Set a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.fromList</span></a></span><span>
+</span><span id="line-107"></span><span>             </span><span class="annot"><span class="annottext">([peerAddr] -&gt; Set peerAddr)
+-&gt; (Map peerAddr Word32 -&gt; [peerAddr])
+-&gt; Map peerAddr Word32
+-&gt; Set peerAddr
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">((peerAddr, Word32) -&gt; peerAddr)
+-&gt; [(peerAddr, Word32)] -&gt; [peerAddr]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">map</span></a></span><span> </span><span class="annot"><span class="annottext">(peerAddr, Word32) -&gt; peerAddr
+forall a b. (a, b) -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fst</span></a></span><span>
+</span><span id="line-108"></span><span>             </span><span class="annot"><span class="annottext">([(peerAddr, Word32)] -&gt; [peerAddr])
+-&gt; (Map peerAddr Word32 -&gt; [(peerAddr, Word32)])
+-&gt; Map peerAddr Word32
+-&gt; [peerAddr]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; [(peerAddr, Word32)] -&gt; [(peerAddr, Word32)]
+forall a. Int -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">take</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679265785"><span class="hs-identifier hs-var">pickNum</span></a></span><span>
+</span><span id="line-109"></span><span>             </span><span class="annot"><span class="annottext">([(peerAddr, Word32)] -&gt; [(peerAddr, Word32)])
+-&gt; (Map peerAddr Word32 -&gt; [(peerAddr, Word32)])
+-&gt; Map peerAddr Word32
+-&gt; [(peerAddr, Word32)]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">((peerAddr, Word32) -&gt; Word32)
+-&gt; [(peerAddr, Word32)] -&gt; [(peerAddr, Word32)]
+forall b a. Ord b =&gt; (a -&gt; b) -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">sortOn</span></a></span><span> </span><span class="annot"><span class="annottext">(peerAddr, Word32) -&gt; Word32
+forall a b. (a, b) -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">snd</span></a></span><span>
+</span><span id="line-110"></span><span>             </span><span class="annot"><span class="annottext">([(peerAddr, Word32)] -&gt; [(peerAddr, Word32)])
+-&gt; (Map peerAddr Word32 -&gt; [(peerAddr, Word32)])
+-&gt; Map peerAddr Word32
+-&gt; [(peerAddr, Word32)]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Map peerAddr Word32 -&gt; [(peerAddr, Word32)]
+forall k a. Map k a -&gt; [(k, a)]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.assocs</span></a></span><span>
+</span><span id="line-111"></span><span>             </span><span class="annot"><span class="annottext">(Map peerAddr Word32 -&gt; Set peerAddr)
+-&gt; Map peerAddr Word32 -&gt; Set peerAddr
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Map peerAddr Word32
+</span><a href="#local-6989586621679265784"><span class="hs-identifier hs-var">available'</span></a></span><span>
+</span><span id="line-112"></span><span>
+</span><span id="line-113"></span><span>
+</span><span id="line-114"></span><span>    </span><span class="hs-comment">-- Randomly pick peers to forget, peers with failures are more likely to</span><span>
+</span><span id="line-115"></span><span>    </span><span class="hs-comment">-- be forgotten.</span><span>
+</span><span id="line-116"></span><span>    </span><span class="annot"><a href="#local-6989586621679265833"><span class="hs-identifier hs-type">coldForgetPolicy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#PickPolicy"><span class="hs-identifier hs-type">PickPolicy</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265847"><span class="hs-identifier hs-type">peerAddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265848"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-117"></span><span>    </span><span id="local-6989586621679265833"><span class="annot"><span class="annottext">coldForgetPolicy :: PickPolicy peerAddr m
+</span><a href="#local-6989586621679265833"><span class="hs-identifier hs-var hs-var">coldForgetPolicy</span></a></span></span><span> </span><span class="annot"><span class="annottext">peerAddr -&gt; PeerSource
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679265782"><span class="annot"><span class="annottext">peerAddr -&gt; Int
+</span><a href="#local-6989586621679265782"><span class="hs-identifier hs-var">failCnt</span></a></span></span><span> </span><span class="annot"><span class="annottext">peerAddr -&gt; Bool
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679265781"><span class="annot"><span class="annottext">Set peerAddr
+</span><a href="#local-6989586621679265781"><span class="hs-identifier hs-var">available</span></a></span></span><span> </span><span id="local-6989586621679265780"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679265780"><span class="hs-identifier hs-var">pickNum</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-118"></span><span>      </span><span id="local-6989586621679265779"><span class="annot"><span class="annottext">Map peerAddr Word32
+</span><a href="#local-6989586621679265779"><span class="hs-identifier hs-var">available'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Set peerAddr
+-&gt; (peerAddr -&gt; Word32 -&gt; (peerAddr, Word32))
+-&gt; STM m (Map peerAddr Word32)
+</span><a href="#local-6989586621679265827"><span class="hs-identifier hs-var">addRand</span></a></span><span> </span><span class="annot"><span class="annottext">Set peerAddr
+</span><a href="#local-6989586621679265781"><span class="hs-identifier hs-var">available</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(peerAddr -&gt; Int) -&gt; peerAddr -&gt; Word32 -&gt; (peerAddr, Word32)
+</span><a href="#local-6989586621679265778"><span class="hs-identifier hs-var">failWeight</span></a></span><span> </span><span class="annot"><span class="annottext">peerAddr -&gt; Int
+</span><a href="#local-6989586621679265782"><span class="hs-identifier hs-var">failCnt</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-119"></span><span>      </span><span class="annot"><span class="annottext">Set peerAddr -&gt; STM m (Set peerAddr)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">(Set peerAddr -&gt; STM m (Set peerAddr))
+-&gt; Set peerAddr -&gt; STM m (Set peerAddr)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">[peerAddr] -&gt; Set peerAddr
+forall a. Ord a =&gt; [a] -&gt; Set a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.fromList</span></a></span><span>
+</span><span id="line-120"></span><span>             </span><span class="annot"><span class="annottext">([peerAddr] -&gt; Set peerAddr)
+-&gt; (Map peerAddr Word32 -&gt; [peerAddr])
+-&gt; Map peerAddr Word32
+-&gt; Set peerAddr
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">((peerAddr, Word32) -&gt; peerAddr)
+-&gt; [(peerAddr, Word32)] -&gt; [peerAddr]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">map</span></a></span><span> </span><span class="annot"><span class="annottext">(peerAddr, Word32) -&gt; peerAddr
+forall a b. (a, b) -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fst</span></a></span><span>
+</span><span id="line-121"></span><span>             </span><span class="annot"><span class="annottext">([(peerAddr, Word32)] -&gt; [peerAddr])
+-&gt; (Map peerAddr Word32 -&gt; [(peerAddr, Word32)])
+-&gt; Map peerAddr Word32
+-&gt; [peerAddr]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; [(peerAddr, Word32)] -&gt; [(peerAddr, Word32)]
+forall a. Int -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">take</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679265780"><span class="hs-identifier hs-var">pickNum</span></a></span><span>
+</span><span id="line-122"></span><span>             </span><span class="annot"><span class="annottext">([(peerAddr, Word32)] -&gt; [(peerAddr, Word32)])
+-&gt; (Map peerAddr Word32 -&gt; [(peerAddr, Word32)])
+-&gt; Map peerAddr Word32
+-&gt; [(peerAddr, Word32)]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">((peerAddr, Word32) -&gt; Word32)
+-&gt; [(peerAddr, Word32)] -&gt; [(peerAddr, Word32)]
+forall b a. Ord b =&gt; (a -&gt; b) -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">sortOn</span></a></span><span> </span><span class="annot"><span class="annottext">(peerAddr, Word32) -&gt; Word32
+forall a b. (a, b) -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">snd</span></a></span><span>
+</span><span id="line-123"></span><span>             </span><span class="annot"><span class="annottext">([(peerAddr, Word32)] -&gt; [(peerAddr, Word32)])
+-&gt; (Map peerAddr Word32 -&gt; [(peerAddr, Word32)])
+-&gt; Map peerAddr Word32
+-&gt; [(peerAddr, Word32)]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Map peerAddr Word32 -&gt; [(peerAddr, Word32)]
+forall k a. Map k a -&gt; [(k, a)]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.assocs</span></a></span><span>
+</span><span id="line-124"></span><span>             </span><span class="annot"><span class="annottext">(Map peerAddr Word32 -&gt; Set peerAddr)
+-&gt; Map peerAddr Word32 -&gt; Set peerAddr
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Map peerAddr Word32
+</span><a href="#local-6989586621679265779"><span class="hs-identifier hs-var">available'</span></a></span><span>
+</span><span id="line-125"></span><span>
+</span><span id="line-126"></span><span>    </span><span class="annot"><a href="#local-6989586621679265841"><span class="hs-identifier hs-type">simplePromotionPolicy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#PickPolicy"><span class="hs-identifier hs-type">PickPolicy</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265847"><span class="hs-identifier hs-type">peerAddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265848"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-127"></span><span>    </span><span id="local-6989586621679265841"><span class="annot"><span class="annottext">simplePromotionPolicy :: PickPolicy peerAddr m
+</span><a href="#local-6989586621679265841"><span class="hs-identifier hs-var hs-var">simplePromotionPolicy</span></a></span></span><span> </span><span class="annot"><span class="annottext">peerAddr -&gt; PeerSource
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">peerAddr -&gt; Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">peerAddr -&gt; Bool
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679265777"><span class="annot"><span class="annottext">Set peerAddr
+</span><a href="#local-6989586621679265777"><span class="hs-identifier hs-var">available</span></a></span></span><span> </span><span id="local-6989586621679265776"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679265776"><span class="hs-identifier hs-var">pickNum</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-128"></span><span>      </span><span id="local-6989586621679265775"><span class="annot"><span class="annottext">Map peerAddr Word32
+</span><a href="#local-6989586621679265775"><span class="hs-identifier hs-var">available'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Set peerAddr
+-&gt; (peerAddr -&gt; Word32 -&gt; (peerAddr, Word32))
+-&gt; STM m (Map peerAddr Word32)
+</span><a href="#local-6989586621679265827"><span class="hs-identifier hs-var">addRand</span></a></span><span> </span><span class="annot"><span class="annottext">Set peerAddr
+</span><a href="#local-6989586621679265777"><span class="hs-identifier hs-var">available</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span>
+</span><span id="line-129"></span><span>      </span><span class="annot"><span class="annottext">Set peerAddr -&gt; STM m (Set peerAddr)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">(Set peerAddr -&gt; STM m (Set peerAddr))
+-&gt; Set peerAddr -&gt; STM m (Set peerAddr)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">[peerAddr] -&gt; Set peerAddr
+forall a. Ord a =&gt; [a] -&gt; Set a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.fromList</span></a></span><span>
+</span><span id="line-130"></span><span>             </span><span class="annot"><span class="annottext">([peerAddr] -&gt; Set peerAddr)
+-&gt; (Map peerAddr Word32 -&gt; [peerAddr])
+-&gt; Map peerAddr Word32
+-&gt; Set peerAddr
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">((peerAddr, Word32) -&gt; peerAddr)
+-&gt; [(peerAddr, Word32)] -&gt; [peerAddr]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">map</span></a></span><span> </span><span class="annot"><span class="annottext">(peerAddr, Word32) -&gt; peerAddr
+forall a b. (a, b) -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fst</span></a></span><span>
+</span><span id="line-131"></span><span>             </span><span class="annot"><span class="annottext">([(peerAddr, Word32)] -&gt; [peerAddr])
+-&gt; (Map peerAddr Word32 -&gt; [(peerAddr, Word32)])
+-&gt; Map peerAddr Word32
+-&gt; [peerAddr]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; [(peerAddr, Word32)] -&gt; [(peerAddr, Word32)]
+forall a. Int -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">take</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679265776"><span class="hs-identifier hs-var">pickNum</span></a></span><span>
+</span><span id="line-132"></span><span>             </span><span class="annot"><span class="annottext">([(peerAddr, Word32)] -&gt; [(peerAddr, Word32)])
+-&gt; (Map peerAddr Word32 -&gt; [(peerAddr, Word32)])
+-&gt; Map peerAddr Word32
+-&gt; [(peerAddr, Word32)]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">((peerAddr, Word32) -&gt; Word32)
+-&gt; [(peerAddr, Word32)] -&gt; [(peerAddr, Word32)]
+forall b a. Ord b =&gt; (a -&gt; b) -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">sortOn</span></a></span><span> </span><span class="annot"><span class="annottext">(peerAddr, Word32) -&gt; Word32
+forall a b. (a, b) -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">snd</span></a></span><span>
+</span><span id="line-133"></span><span>             </span><span class="annot"><span class="annottext">([(peerAddr, Word32)] -&gt; [(peerAddr, Word32)])
+-&gt; (Map peerAddr Word32 -&gt; [(peerAddr, Word32)])
+-&gt; Map peerAddr Word32
+-&gt; [(peerAddr, Word32)]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Map peerAddr Word32 -&gt; [(peerAddr, Word32)]
+forall k a. Map k a -&gt; [(k, a)]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.assocs</span></a></span><span>
+</span><span id="line-134"></span><span>             </span><span class="annot"><span class="annottext">(Map peerAddr Word32 -&gt; Set peerAddr)
+-&gt; Map peerAddr Word32 -&gt; Set peerAddr
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Map peerAddr Word32
+</span><a href="#local-6989586621679265775"><span class="hs-identifier hs-var">available'</span></a></span><span>
+</span><span id="line-135"></span><span>
+</span><span id="line-136"></span><span>    </span><span class="hs-comment">-- Failures lowers r</span><span>
+</span><span id="line-137"></span><span>    </span><span class="annot"><a href="#local-6989586621679265778"><span class="hs-identifier hs-type">failWeight</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679265847"><span class="hs-identifier hs-type">peerAddr</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-138"></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679265847"><span class="hs-identifier hs-type">peerAddr</span></a></span><span>
+</span><span id="line-139"></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span>
+</span><span id="line-140"></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679265847"><span class="hs-identifier hs-type">peerAddr</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-141"></span><span>    </span><span id="local-6989586621679265778"><span class="annot"><span class="annottext">failWeight :: (peerAddr -&gt; Int) -&gt; peerAddr -&gt; Word32 -&gt; (peerAddr, Word32)
+</span><a href="#local-6989586621679265778"><span class="hs-identifier hs-var hs-var">failWeight</span></a></span></span><span> </span><span id="local-6989586621679265774"><span class="annot"><span class="annottext">peerAddr -&gt; Int
+</span><a href="#local-6989586621679265774"><span class="hs-identifier hs-var">failCnt</span></a></span></span><span> </span><span id="local-6989586621679265773"><span class="annot"><span class="annottext">peerAddr
+</span><a href="#local-6989586621679265773"><span class="hs-identifier hs-var">peer</span></a></span></span><span> </span><span id="local-6989586621679265772"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679265772"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-142"></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">peerAddr
+</span><a href="#local-6989586621679265773"><span class="hs-identifier hs-var">peer</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679265772"><span class="hs-identifier hs-var">r</span></a></span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; Word32 -&gt; Word32
+forall a. Integral a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">`div`</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Word32
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">peerAddr -&gt; Int
+</span><a href="#local-6989586621679265774"><span class="hs-identifier hs-var">failCnt</span></a></span><span> </span><span class="annot"><span class="annottext">peerAddr
+</span><a href="#local-6989586621679265773"><span class="hs-identifier hs-var">peer</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-143"></span><span>
+</span><span id="line-144"></span><span>    </span><span class="hs-comment">-- Tepid flag cuts r in half</span><span>
+</span><span id="line-145"></span><span>    </span><span class="annot"><a href="#local-6989586621679265783"><span class="hs-identifier hs-type">tepidWeight</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679265847"><span class="hs-identifier hs-type">peerAddr</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Bool</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-146"></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679265847"><span class="hs-identifier hs-type">peerAddr</span></a></span><span>
+</span><span id="line-147"></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span>
+</span><span id="line-148"></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679265847"><span class="hs-identifier hs-type">peerAddr</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-149"></span><span>    </span><span id="local-6989586621679265783"><span class="annot"><span class="annottext">tepidWeight :: (peerAddr -&gt; Bool) -&gt; peerAddr -&gt; Word32 -&gt; (peerAddr, Word32)
+</span><a href="#local-6989586621679265783"><span class="hs-identifier hs-var hs-var">tepidWeight</span></a></span></span><span> </span><span id="local-6989586621679265770"><span class="annot"><span class="annottext">peerAddr -&gt; Bool
+</span><a href="#local-6989586621679265770"><span class="hs-identifier hs-var">isTepid</span></a></span></span><span> </span><span id="local-6989586621679265769"><span class="annot"><span class="annottext">peerAddr
+</span><a href="#local-6989586621679265769"><span class="hs-identifier hs-var">peer</span></a></span></span><span> </span><span id="local-6989586621679265768"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679265768"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-150"></span><span>          </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">peerAddr -&gt; Bool
+</span><a href="#local-6989586621679265770"><span class="hs-identifier hs-var">isTepid</span></a></span><span> </span><span class="annot"><span class="annottext">peerAddr
+</span><a href="#local-6989586621679265769"><span class="hs-identifier hs-var">peer</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">peerAddr
+</span><a href="#local-6989586621679265769"><span class="hs-identifier hs-var">peer</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679265768"><span class="hs-identifier hs-var">r</span></a></span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; Word32 -&gt; Word32
+forall a. Integral a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">`div`</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><span class="hs-number">2</span></span><span class="hs-special">)</span><span>
+</span><span id="line-151"></span><span>                          </span><span class="hs-keyword">else</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">peerAddr
+</span><a href="#local-6989586621679265769"><span class="hs-identifier hs-var">peer</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679265768"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-152"></span><span>
+</span><span id="line-153"></span><span>
+</span><span id="line-154"></span><span class="hs-comment">--</span><span>
+</span><span id="line-155"></span><span class="hs-comment">-- PrunePolicy</span><span>
+</span><span id="line-156"></span><span class="hs-comment">--</span><span>
+</span><span id="line-157"></span><span>
+</span><span id="line-158"></span><span class="hs-comment">-- | Sort by upstreamness and a random score.</span><span>
+</span><span id="line-159"></span><span class="hs-comment">--</span><span>
+</span><span id="line-160"></span><span class="hs-comment">-- Note: this 'PrunePolicy' does not depend on 'igsConnections'.  We put</span><span>
+</span><span id="line-161"></span><span class="hs-comment">-- 'igsPrng' in 'InboundGovernorState' only to show that we can have</span><span>
+</span><span id="line-162"></span><span class="hs-comment">-- a 'PrunePolicy' which depends on the 'InboundGovernorState' as a more</span><span>
+</span><span id="line-163"></span><span class="hs-comment">-- refined policy would do.</span><span>
+</span><span id="line-164"></span><span class="hs-comment">--</span><span>
+</span><span id="line-165"></span><span class="hs-comment">-- /complexity:/ \(\mathcal{O}(n\log\;n)\)</span><span>
+</span><span id="line-166"></span><span class="hs-comment">--</span><span>
+</span><span id="line-167"></span><span class="hs-comment">-- TODO: complexity could be improved.</span><span>
+</span><span id="line-168"></span><span class="hs-comment">--</span><span>
+</span><span id="line-169"></span><span id="local-6989586621679265766"><span id="local-6989586621679265767"><span class="annot"><a href="Ouroboros.Network.Diffusion.Policies.html#prunePolicy"><span class="hs-identifier hs-type">prunePolicy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">MonadSTM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265767"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-170"></span><span>               </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Ord</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265766"><span class="hs-identifier hs-type">peerAddr</span></a></span><span>
+</span><span id="line-171"></span><span>               </span><span class="hs-special">)</span><span>
+</span><span id="line-172"></span><span>            </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/strict-stm-0.1.0.0/noopt/doc/html/strict-stm/src"><span class="hs-identifier hs-type">StrictTVar</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265767"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-type">InboundGovernorObservableState</span></a></span><span>
+</span><span id="line-173"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-type">PrunePolicy</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265766"><span class="hs-identifier hs-type">peerAddr</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">STM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679265767"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-174"></span><span id="prunePolicy"><span class="annot"><span class="annottext">prunePolicy :: StrictTVar m InboundGovernorObservableState
+-&gt; PrunePolicy peerAddr (STM m)
+</span><a href="Ouroboros.Network.Diffusion.Policies.html#prunePolicy"><span class="hs-identifier hs-var hs-var">prunePolicy</span></a></span></span><span> </span><span id="local-6989586621679265764"><span class="annot"><span class="annottext">StrictTVar m InboundGovernorObservableState
+</span><a href="#local-6989586621679265764"><span class="hs-identifier hs-var">stateVar</span></a></span></span><span> </span><span id="local-6989586621679265763"><span class="annot"><span class="annottext">Map peerAddr ConnectionType
+</span><a href="#local-6989586621679265763"><span class="hs-identifier hs-var">mp</span></a></span></span><span> </span><span id="local-6989586621679265762"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679265762"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-175"></span><span>    </span><span id="local-6989586621679265761"><span class="annot"><span class="annottext">InboundGovernorObservableState
+</span><a href="#local-6989586621679265761"><span class="hs-identifier hs-var">state</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">StrictTVar m InboundGovernorObservableState
+-&gt; STM m InboundGovernorObservableState
+forall (m :: * -&gt; *) a. MonadSTM m =&gt; StrictTVar m a -&gt; STM m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/strict-stm-0.1.0.0/noopt/doc/html/strict-stm/src"><span class="hs-identifier hs-var">readTVar</span></a></span><span> </span><span class="annot"><span class="annottext">StrictTVar m InboundGovernorObservableState
+</span><a href="#local-6989586621679265764"><span class="hs-identifier hs-var">stateVar</span></a></span><span>
+</span><span id="line-176"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679265760"><span class="annot"><span class="annottext">StdGen
+</span><a href="#local-6989586621679265760"><span class="hs-identifier hs-var">prng'</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679265759"><span class="annot"><span class="annottext">StdGen
+</span><a href="#local-6989586621679265759"><span class="hs-identifier hs-var">prng''</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StdGen -&gt; (StdGen, StdGen)
+forall g. RandomGen g =&gt; g -&gt; (g, g)
+</span><span class="hs-identifier hs-var">Rnd.split</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">InboundGovernorObservableState -&gt; StdGen
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var hs-var">igosPrng</span></a></span><span> </span><span class="annot"><span class="annottext">InboundGovernorObservableState
+</span><a href="#local-6989586621679265761"><span class="hs-identifier hs-var">state</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-177"></span><span>    </span><span class="annot"><span class="annottext">StrictTVar m InboundGovernorObservableState
+-&gt; InboundGovernorObservableState -&gt; STM m ()
+forall (m :: * -&gt; *) a.
+(MonadSTM m, HasCallStack) =&gt;
+StrictTVar m a -&gt; a -&gt; STM m ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/strict-stm-0.1.0.0/noopt/doc/html/strict-stm/src"><span class="hs-identifier hs-var">writeTVar</span></a></span><span> </span><span class="annot"><span class="annottext">StrictTVar m InboundGovernorObservableState
+</span><a href="#local-6989586621679265764"><span class="hs-identifier hs-var">stateVar</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">InboundGovernorObservableState
+</span><a href="#local-6989586621679265761"><span class="hs-identifier hs-var">state</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">igosPrng :: StdGen
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var">igosPrng</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StdGen
+</span><a href="#local-6989586621679265759"><span class="hs-identifier hs-var">prng''</span></a></span><span> </span><span class="hs-special">}</span><span class="hs-special">)</span><span>
+</span><span id="line-178"></span><span>
+</span><span id="line-179"></span><span>    </span><span class="annot"><span class="annottext">Set peerAddr -&gt; STM m (Set peerAddr)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span>
+</span><span id="line-180"></span><span>      </span><span class="annot"><span class="annottext">(Set peerAddr -&gt; STM m (Set peerAddr))
+-&gt; Set peerAddr -&gt; STM m (Set peerAddr)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">[peerAddr] -&gt; Set peerAddr
+forall a. Ord a =&gt; [a] -&gt; Set a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.fromList</span></a></span><span>
+</span><span id="line-181"></span><span>      </span><span class="annot"><span class="annottext">([peerAddr] -&gt; Set peerAddr)
+-&gt; ([Int] -&gt; [peerAddr]) -&gt; [Int] -&gt; Set peerAddr
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; [peerAddr] -&gt; [peerAddr]
+forall a. Int -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">take</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679265762"><span class="hs-identifier hs-var">n</span></a></span><span>
+</span><span id="line-182"></span><span>      </span><span class="annot"><span class="annottext">([peerAddr] -&gt; [peerAddr])
+-&gt; ([Int] -&gt; [peerAddr]) -&gt; [Int] -&gt; [peerAddr]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">(((peerAddr, ConnectionType), Int) -&gt; peerAddr)
+-&gt; [((peerAddr, ConnectionType), Int)] -&gt; [peerAddr]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">map</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(peerAddr, ConnectionType) -&gt; peerAddr
+forall a b. (a, b) -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fst</span></a></span><span> </span><span class="annot"><span class="annottext">((peerAddr, ConnectionType) -&gt; peerAddr)
+-&gt; (((peerAddr, ConnectionType), Int)
+    -&gt; (peerAddr, ConnectionType))
+-&gt; ((peerAddr, ConnectionType), Int)
+-&gt; peerAddr
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">((peerAddr, ConnectionType), Int) -&gt; (peerAddr, ConnectionType)
+forall a b. (a, b) -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fst</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-183"></span><span>      </span><span class="hs-comment">-- 'True' values (upstream / outbound connections) will sort last.</span><span>
+</span><span id="line-184"></span><span>      </span><span class="annot"><span class="annottext">([((peerAddr, ConnectionType), Int)] -&gt; [peerAddr])
+-&gt; ([Int] -&gt; [((peerAddr, ConnectionType), Int)])
+-&gt; [Int]
+-&gt; [peerAddr]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">(((peerAddr, ConnectionType), Int) -&gt; (Bool, Int, ConnectionType))
+-&gt; [((peerAddr, ConnectionType), Int)]
+-&gt; [((peerAddr, ConnectionType), Int)]
+forall b a. Ord b =&gt; (a -&gt; b) -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">sortOn</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">peerAddr
+</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679265757"><span class="annot"><span class="annottext">ConnectionType
+</span><a href="#local-6989586621679265757"><span class="hs-identifier hs-var">connType</span></a></span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span id="local-6989586621679265756"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679265756"><span class="hs-identifier hs-var">score</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ConnectionType -&gt; Bool
+</span><a href="#local-6989586621679265755"><span class="hs-identifier hs-var">isUpstream</span></a></span><span> </span><span class="annot"><span class="annottext">ConnectionType
+</span><a href="#local-6989586621679265757"><span class="hs-identifier hs-var">connType</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679265756"><span class="hs-identifier hs-var">score</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ConnectionType
+</span><a href="#local-6989586621679265757"><span class="hs-identifier hs-var">connType</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-185"></span><span>      </span><span class="annot"><span class="annottext">([((peerAddr, ConnectionType), Int)]
+ -&gt; [((peerAddr, ConnectionType), Int)])
+-&gt; ([Int] -&gt; [((peerAddr, ConnectionType), Int)])
+-&gt; [Int]
+-&gt; [((peerAddr, ConnectionType), Int)]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">[(peerAddr, ConnectionType)]
+-&gt; [Int] -&gt; [((peerAddr, ConnectionType), Int)]
+forall a b. [a] -&gt; [b] -&gt; [(a, b)]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">zip</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map peerAddr ConnectionType -&gt; [(peerAddr, ConnectionType)]
+forall k a. Map k a -&gt; [(k, a)]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.assocs</span></a></span><span> </span><span class="annot"><span class="annottext">Map peerAddr ConnectionType
+</span><a href="#local-6989586621679265763"><span class="hs-identifier hs-var">mp</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-186"></span><span>      </span><span class="annot"><span class="annottext">([Int] -&gt; Set peerAddr) -&gt; [Int] -&gt; Set peerAddr
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">StdGen -&gt; [Int]
+forall a g. (Random a, RandomGen g) =&gt; g -&gt; [a]
+</span><span class="hs-identifier hs-var">Rnd.randoms</span></span><span> </span><span class="annot"><span class="annottext">StdGen
+</span><a href="#local-6989586621679265760"><span class="hs-identifier hs-var">prng'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span>
+</span><span id="line-187"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-188"></span><span>    </span><span class="annot"><a href="#local-6989586621679265755"><span class="hs-identifier hs-type">isUpstream</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-type">ConnectionType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Bool</span></a></span><span>
+</span><span id="line-189"></span><span>    </span><span id="local-6989586621679265755"><span class="annot"><span class="annottext">isUpstream :: ConnectionType -&gt; Bool
+</span><a href="#local-6989586621679265755"><span class="hs-identifier hs-var hs-var">isUpstream</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679265753"><span class="annot"><span class="annottext">ConnectionType
+</span><a href="#local-6989586621679265753"><span class="hs-identifier hs-var">connType</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-190"></span><span>      </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">ConnectionType
+</span><a href="#local-6989586621679265753"><span class="hs-identifier hs-var">connType</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-191"></span><span>        </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-type">UnnegotiatedConn</span></a></span><span> </span><span class="annot"><span class="annottext">Provenance
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var">Outbound</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">True</span></a></span><span>
+</span><span id="line-192"></span><span>        </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-type">UnnegotiatedConn</span></a></span><span> </span><span class="annot"><span class="annottext">Provenance
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var">Inbound</span></a></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">False</span></a></span><span>
+</span><span id="line-193"></span><span>        </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-type">OutboundIdleConn</span></a></span><span> </span><span class="annot"><span class="annottext">DataFlow
+</span><span class="hs-identifier">_</span></span><span>        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">True</span></a></span><span>
+</span><span id="line-194"></span><span>        </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-type">InboundIdleConn</span></a></span><span>         </span><span class="annot"><span class="annottext">DataFlow
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">False</span></a></span><span>
+</span><span id="line-195"></span><span>        </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-type">NegotiatedConn</span></a></span><span> </span><span class="annot"><span class="annottext">Provenance
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var">Outbound</span></a></span><span> </span><span class="annot"><span class="annottext">DataFlow
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">True</span></a></span><span>
+</span><span id="line-196"></span><span>        </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-type">NegotiatedConn</span></a></span><span> </span><span class="annot"><span class="annottext">Provenance
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var">Inbound</span></a></span><span>  </span><span class="annot"><span class="annottext">DataFlow
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">False</span></a></span><span>
+</span><span id="line-197"></span><span>        </span><span class="annot"><span class="annottext">ConnectionType
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var">DuplexConn</span></a></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">True</span></a></span><span>
+</span><span id="line-198"></span></pre></body></html>

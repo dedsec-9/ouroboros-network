@@ -6,10 +6,10 @@
 </span><span id="line-6"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Test.ThreadNet.Util.NodeRestarts.html#shrinkNodeRestarts"><span class="hs-identifier">shrinkNodeRestarts</span></a></span><span>
 </span><span id="line-7"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-8"></span><span>
-</span><span id="line-9"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Map.Strict</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Map</span></span><span class="hs-special">)</span><span>
-</span><span id="line-10"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map.Strict</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Map</span></span><span>
-</span><span id="line-11"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Set</span></span><span>
-</span><span id="line-12"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Traversable</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">forM</span></span><span class="hs-special">)</span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Data.Map.Strict</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Map</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Data.Map.Strict</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Map</span></span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Data.Set</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Set</span></span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Traversable</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">forM</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-13"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Test.QuickCheck</span></span><span>
 </span><span id="line-14"></span><span>
 </span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Block</span></a></span><span>
@@ -25,7 +25,7 @@
 </span><span id="line-25"></span><span>    </span><span class="hs-comment">-- delegation certificate transaction</span><span>
 </span><span id="line-26"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="NodeRestart"><span class="annot"><a href="Test.ThreadNet.Util.NodeRestarts.html#NodeRestart"><span class="hs-identifier hs-var">NodeRestart</span></a></span></span><span>
 </span><span id="line-27"></span><span>    </span><span class="hs-comment">-- ^ restart the node without rekeying</span><span>
-</span><span id="line-28"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679258804"><span id="local-6989586621679258806"><span class="annot"><span class="annottext">NodeRestart -&gt; NodeRestart -&gt; Bool
+</span><span id="line-28"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679261453"><span id="local-6989586621679261455"><span class="annot"><span class="annottext">NodeRestart -&gt; NodeRestart -&gt; Bool
 (NodeRestart -&gt; NodeRestart -&gt; Bool)
 -&gt; (NodeRestart -&gt; NodeRestart -&gt; Bool) -&gt; Eq NodeRestart
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -33,7 +33,7 @@ forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 $c/= :: NodeRestart -&gt; NodeRestart -&gt; Bool
 == :: NodeRestart -&gt; NodeRestart -&gt; Bool
 $c== :: NodeRestart -&gt; NodeRestart -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679258788"><span id="local-6989586621679258790"><span id="local-6989586621679258792"><span id="local-6989586621679258794"><span id="local-6989586621679258796"><span id="local-6989586621679258798"><span id="local-6989586621679258800"><span class="annot"><span class="annottext">Eq NodeRestart
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679261437"><span id="local-6989586621679261439"><span id="local-6989586621679261441"><span id="local-6989586621679261443"><span id="local-6989586621679261445"><span id="local-6989586621679261447"><span id="local-6989586621679261449"><span class="annot"><span class="annottext">Eq NodeRestart
 Eq NodeRestart
 -&gt; (NodeRestart -&gt; NodeRestart -&gt; Ordering)
 -&gt; (NodeRestart -&gt; NodeRestart -&gt; Bool)
@@ -71,7 +71,7 @@ $c&lt; :: NodeRestart -&gt; NodeRestart -&gt; Bool
 compare :: NodeRestart -&gt; NodeRestart -&gt; Ordering
 $ccompare :: NodeRestart -&gt; NodeRestart -&gt; Ordering
 $cp1Ord :: Eq NodeRestart
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679258781"><span id="local-6989586621679258783"><span id="local-6989586621679258785"><span class="annot"><span class="annottext">Int -&gt; NodeRestart -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></a></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679261430"><span id="local-6989586621679261432"><span id="local-6989586621679261434"><span class="annot"><span class="annottext">Int -&gt; NodeRestart -&gt; ShowS
 [NodeRestart] -&gt; ShowS
 NodeRestart -&gt; String
 (Int -&gt; NodeRestart -&gt; ShowS)
@@ -86,20 +86,20 @@ show :: NodeRestart -&gt; String
 $cshow :: NodeRestart -&gt; String
 showsPrec :: Int -&gt; NodeRestart -&gt; ShowS
 $cshowsPrec :: Int -&gt; NodeRestart -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-29"></span><span>
 </span><span id="line-30"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="annot"><a href="Test.ThreadNet.Util.NodeRestarts.html#NodeRestart"><span class="hs-identifier hs-type">NodeRestart</span></a></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-31"></span><span>  </span><span id="local-6989586621679258777"><span class="annot"><span class="annottext">condense :: NodeRestart -&gt; String
+</span><span id="line-31"></span><span>  </span><span id="local-6989586621679261426"><span class="annot"><span class="annottext">condense :: NodeRestart -&gt; String
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NodeRestart -&gt; String
 forall a. Show a =&gt; a -&gt; String
-</span><span class="hs-identifier hs-var">show</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">show</span></a></span><span>
 </span><span id="line-32"></span><span>
 </span><span id="line-33"></span><span class="hs-comment">-- | Which nodes are scheduled to restart in each slot</span><span>
 </span><span id="line-34"></span><span class="hs-comment">--</span><span>
 </span><span id="line-35"></span><span class="hs-comment">-- INVARIANT no element 'Map' is empty</span><span>
 </span><span id="line-36"></span><span class="hs-comment">--</span><span>
-</span><span id="line-37"></span><span class="hs-keyword">newtype</span><span> </span><span id="NodeRestarts"><span class="annot"><a href="Test.ThreadNet.Util.NodeRestarts.html#NodeRestarts"><span class="hs-identifier hs-var">NodeRestarts</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="NodeRestarts"><span class="annot"><a href="Test.ThreadNet.Util.NodeRestarts.html#NodeRestarts"><span class="hs-identifier hs-var">NodeRestarts</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">CoreNodeId</span></a></span><span> </span><span class="annot"><a href="Test.ThreadNet.Util.NodeRestarts.html#NodeRestart"><span class="hs-identifier hs-type">NodeRestart</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-38"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679258770"><span id="local-6989586621679258772"><span class="annot"><span class="annottext">NodeRestarts -&gt; NodeRestarts -&gt; Bool
+</span><span id="line-37"></span><span class="hs-keyword">newtype</span><span> </span><span id="NodeRestarts"><span class="annot"><a href="Test.ThreadNet.Util.NodeRestarts.html#NodeRestarts"><span class="hs-identifier hs-var">NodeRestarts</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="NodeRestarts"><span class="annot"><a href="Test.ThreadNet.Util.NodeRestarts.html#NodeRestarts"><span class="hs-identifier hs-var">NodeRestarts</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-type">Map</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-type">Map</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">CoreNodeId</span></a></span><span> </span><span class="annot"><a href="Test.ThreadNet.Util.NodeRestarts.html#NodeRestart"><span class="hs-identifier hs-type">NodeRestart</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679261419"><span id="local-6989586621679261421"><span class="annot"><span class="annottext">NodeRestarts -&gt; NodeRestarts -&gt; Bool
 (NodeRestarts -&gt; NodeRestarts -&gt; Bool)
 -&gt; (NodeRestarts -&gt; NodeRestarts -&gt; Bool) -&gt; Eq NodeRestarts
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -107,7 +107,7 @@ forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 $c/= :: NodeRestarts -&gt; NodeRestarts -&gt; Bool
 == :: NodeRestarts -&gt; NodeRestarts -&gt; Bool
 $c== :: NodeRestarts -&gt; NodeRestarts -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679258764"><span id="local-6989586621679258766"><span id="local-6989586621679258768"><span class="annot"><span class="annottext">Int -&gt; NodeRestarts -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679261413"><span id="local-6989586621679261415"><span id="local-6989586621679261417"><span class="annot"><span class="annottext">Int -&gt; NodeRestarts -&gt; ShowS
 [NodeRestarts] -&gt; ShowS
 NodeRestarts -&gt; String
 (Int -&gt; NodeRestarts -&gt; ShowS)
@@ -122,37 +122,37 @@ show :: NodeRestarts -&gt; String
 $cshow :: NodeRestarts -&gt; String
 showsPrec :: Int -&gt; NodeRestarts -&gt; ShowS
 $cshowsPrec :: Int -&gt; NodeRestarts -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-39"></span><span>
 </span><span id="line-40"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="annot"><a href="Test.ThreadNet.Util.NodeRestarts.html#NodeRestarts"><span class="hs-identifier hs-type">NodeRestarts</span></a></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-41"></span><span>  </span><span id="local-6989586621679258762"><span class="annot"><span class="annottext">condense :: NodeRestarts -&gt; String
-</span><a href="#local-6989586621679258762"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.ThreadNet.Util.NodeRestarts.html#NodeRestarts"><span class="hs-identifier hs-type">NodeRestarts</span></a></span><span> </span><span id="local-6989586621679258761"><span class="annot"><span class="annottext">Map SlotNo (Map CoreNodeId NodeRestart)
-</span><a href="#local-6989586621679258761"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(SlotNo, [(NodeId, NodeRestart)])] -&gt; String
+</span><span id="line-41"></span><span>  </span><span id="local-6989586621679261411"><span class="annot"><span class="annottext">condense :: NodeRestarts -&gt; String
+</span><a href="#local-6989586621679261411"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.ThreadNet.Util.NodeRestarts.html#NodeRestarts"><span class="hs-identifier hs-type">NodeRestarts</span></a></span><span> </span><span id="local-6989586621679261410"><span class="annot"><span class="annottext">Map SlotNo (Map CoreNodeId NodeRestart)
+</span><a href="#local-6989586621679261410"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(SlotNo, [(NodeId, NodeRestart)])] -&gt; String
 forall a. Condense a =&gt; a -&gt; String
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">condense</span></a></span><span>
 </span><span id="line-42"></span><span>      </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679258760"><span class="hs-identifier hs-var">slot</span></a></span><span> </span><span class="annot"><span class="annottext">([(NodeId, NodeRestart)] -&gt; (SlotNo, [(NodeId, NodeRestart)]))
+</span><a href="#local-6989586621679261409"><span class="hs-identifier hs-var">slot</span></a></span><span> </span><span class="annot"><span class="annottext">([(NodeId, NodeRestart)] -&gt; (SlotNo, [(NodeId, NodeRestart)]))
 -&gt; [(NodeId, NodeRestart)] -&gt; (SlotNo, [(NodeId, NodeRestart)])
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
 </span><span id="line-43"></span><span>        </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CoreNodeId -&gt; NodeId
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">fromCoreNodeId</span></a></span><span> </span><span class="annot"><span class="annottext">CoreNodeId
-</span><a href="#local-6989586621679258758"><span class="hs-identifier hs-var">cid</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">NodeRestart
-</span><a href="#local-6989586621679258757"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-44"></span><span>        </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679258758"><span class="annot"><span class="annottext">CoreNodeId
-</span><a href="#local-6989586621679258758"><span class="hs-identifier hs-var">cid</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679258757"><span class="annot"><span class="annottext">NodeRestart
-</span><a href="#local-6989586621679258757"><span class="hs-identifier hs-var">r</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId NodeRestart -&gt; [(CoreNodeId, NodeRestart)]
+</span><a href="#local-6989586621679261407"><span class="hs-identifier hs-var">cid</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">NodeRestart
+</span><a href="#local-6989586621679261406"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span>        </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679261407"><span class="annot"><span class="annottext">CoreNodeId
+</span><a href="#local-6989586621679261407"><span class="hs-identifier hs-var">cid</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679261406"><span class="annot"><span class="annottext">NodeRestart
+</span><a href="#local-6989586621679261406"><span class="hs-identifier hs-var">r</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId NodeRestart -&gt; [(CoreNodeId, NodeRestart)]
 forall k a. Map k a -&gt; [(k, a)]
-</span><span class="hs-identifier hs-var">Map.toAscList</span></span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId NodeRestart
-</span><a href="#local-6989586621679258755"><span class="hs-identifier hs-var">m'</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.toAscList</span></a></span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId NodeRestart
+</span><a href="#local-6989586621679261404"><span class="hs-identifier hs-var">m'</span></a></span><span>
 </span><span id="line-45"></span><span>        </span><span class="hs-special">]</span><span>
-</span><span id="line-46"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679258760"><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679258760"><span class="hs-identifier hs-var">slot</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679258755"><span class="annot"><span class="annottext">Map CoreNodeId NodeRestart
-</span><a href="#local-6989586621679258755"><span class="hs-identifier hs-var">m'</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Map SlotNo (Map CoreNodeId NodeRestart)
+</span><span id="line-46"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679261409"><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679261409"><span class="hs-identifier hs-var">slot</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679261404"><span class="annot"><span class="annottext">Map CoreNodeId NodeRestart
+</span><a href="#local-6989586621679261404"><span class="hs-identifier hs-var">m'</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Map SlotNo (Map CoreNodeId NodeRestart)
 -&gt; [(SlotNo, Map CoreNodeId NodeRestart)]
 forall k a. Map k a -&gt; [(k, a)]
-</span><span class="hs-identifier hs-var">Map.toAscList</span></span><span> </span><span class="annot"><span class="annottext">Map SlotNo (Map CoreNodeId NodeRestart)
-</span><a href="#local-6989586621679258761"><span class="hs-identifier hs-var">m</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.toAscList</span></a></span><span> </span><span class="annot"><span class="annottext">Map SlotNo (Map CoreNodeId NodeRestart)
+</span><a href="#local-6989586621679261410"><span class="hs-identifier hs-var">m</span></a></span><span>
 </span><span id="line-47"></span><span>      </span><span class="hs-special">]</span><span>
 </span><span id="line-48"></span><span>
 </span><span id="line-49"></span><span class="annot"><a href="Test.ThreadNet.Util.NodeRestarts.html#noRestarts"><span class="hs-identifier hs-type">noRestarts</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Test.ThreadNet.Util.NodeRestarts.html#NodeRestarts"><span class="hs-identifier hs-type">NodeRestarts</span></a></span><span>
@@ -160,7 +160,7 @@ forall k a. Map k a -&gt; [(k, a)]
 </span><a href="Test.ThreadNet.Util.NodeRestarts.html#noRestarts"><span class="hs-identifier hs-var hs-var">noRestarts</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map SlotNo (Map CoreNodeId NodeRestart) -&gt; NodeRestarts
 </span><a href="Test.ThreadNet.Util.NodeRestarts.html#NodeRestarts"><span class="hs-identifier hs-var">NodeRestarts</span></a></span><span> </span><span class="annot"><span class="annottext">Map SlotNo (Map CoreNodeId NodeRestart)
 forall k a. Map k a
-</span><span class="hs-identifier hs-var">Map.empty</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.empty</span></a></span><span>
 </span><span id="line-51"></span><span>
 </span><span id="line-52"></span><span class="hs-comment">-- | Generate a valid 'NodeRestarts'</span><span>
 </span><span id="line-53"></span><span class="hs-comment">--</span><span>
@@ -174,64 +174,64 @@ forall k a. Map k a
 </span><span id="line-61"></span><span class="hs-comment">--</span><span>
 </span><span id="line-62"></span><span class="annot"><a href="Test.ThreadNet.Util.NodeRestarts.html#genNodeRestarts"><span class="hs-identifier hs-type">genNodeRestarts</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Test.ThreadNet.Util.NodeJoinPlan.html#NodeJoinPlan"><span class="hs-identifier hs-type">NodeJoinPlan</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Test.Util.Slots.html#NumSlots"><span class="hs-identifier hs-type">NumSlots</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="annot"><a href="Test.ThreadNet.Util.NodeRestarts.html#NodeRestarts"><span class="hs-identifier hs-type">NodeRestarts</span></a></span><span>
 </span><span id="line-63"></span><span id="genNodeRestarts"><span class="annot"><span class="annottext">genNodeRestarts :: NodeJoinPlan -&gt; NumSlots -&gt; Gen NodeRestarts
-</span><a href="Test.ThreadNet.Util.NodeRestarts.html#genNodeRestarts"><span class="hs-identifier hs-var hs-var">genNodeRestarts</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.ThreadNet.Util.NodeJoinPlan.html#NodeJoinPlan"><span class="hs-identifier hs-type">NodeJoinPlan</span></a></span><span> </span><span id="local-6989586621679258752"><span class="annot"><span class="annottext">Map CoreNodeId SlotNo
-</span><a href="#local-6989586621679258752"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Util.Slots.html#NumSlots"><span class="hs-identifier hs-type">NumSlots</span></a></span><span> </span><span id="local-6989586621679258750"><span class="annot"><span class="annottext">Word64
-</span><a href="#local-6989586621679258750"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span>
+</span><a href="Test.ThreadNet.Util.NodeRestarts.html#genNodeRestarts"><span class="hs-identifier hs-var hs-var">genNodeRestarts</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.ThreadNet.Util.NodeJoinPlan.html#NodeJoinPlan"><span class="hs-identifier hs-type">NodeJoinPlan</span></a></span><span> </span><span id="local-6989586621679261401"><span class="annot"><span class="annottext">Map CoreNodeId SlotNo
+</span><a href="#local-6989586621679261401"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Util.Slots.html#NumSlots"><span class="hs-identifier hs-type">NumSlots</span></a></span><span> </span><span id="local-6989586621679261399"><span class="annot"><span class="annottext">Word64
+</span><a href="#local-6989586621679261399"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span>
 </span><span id="line-64"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Word64
-</span><a href="#local-6989586621679258750"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; Word64 -&gt; Bool
+</span><a href="#local-6989586621679261399"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; Word64 -&gt; Bool
 forall a. Ord a =&gt; a -&gt; a -&gt; Bool
-</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&lt;</span></a></span><span> </span><span class="annot"><span class="annottext">Word64
 </span><span class="hs-number">1</span></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NodeRestarts -&gt; Gen NodeRestarts
 forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
-</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="annot"><span class="annottext">NodeRestarts
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">NodeRestarts
 </span><a href="Test.ThreadNet.Util.NodeRestarts.html#noRestarts"><span class="hs-identifier hs-var">noRestarts</span></a></span><span>
 </span><span id="line-65"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-66"></span><span>  </span><span class="annot"><span class="annottext">([(SlotNo, Map CoreNodeId NodeRestart)] -&gt; NodeRestarts)
 -&gt; Gen [(SlotNo, Map CoreNodeId NodeRestart)] -&gt; Gen NodeRestarts
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map SlotNo (Map CoreNodeId NodeRestart) -&gt; NodeRestarts
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fmap</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map SlotNo (Map CoreNodeId NodeRestart) -&gt; NodeRestarts
 </span><a href="Test.ThreadNet.Util.NodeRestarts.html#NodeRestarts"><span class="hs-identifier hs-var">NodeRestarts</span></a></span><span> </span><span class="annot"><span class="annottext">(Map SlotNo (Map CoreNodeId NodeRestart) -&gt; NodeRestarts)
 -&gt; ([(SlotNo, Map CoreNodeId NodeRestart)]
     -&gt; Map SlotNo (Map CoreNodeId NodeRestart))
 -&gt; [(SlotNo, Map CoreNodeId NodeRestart)]
 -&gt; NodeRestarts
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(Map CoreNodeId NodeRestart -&gt; Bool)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">(Map CoreNodeId NodeRestart -&gt; Bool)
 -&gt; Map SlotNo (Map CoreNodeId NodeRestart)
 -&gt; Map SlotNo (Map CoreNodeId NodeRestart)
 forall a k. (a -&gt; Bool) -&gt; Map k a -&gt; Map k a
-</span><span class="hs-identifier hs-var">Map.filter</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool
-</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="annot"><span class="annottext">(Bool -&gt; Bool)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.filter</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">not</span></a></span><span> </span><span class="annot"><span class="annottext">(Bool -&gt; Bool)
 -&gt; (Map CoreNodeId NodeRestart -&gt; Bool)
 -&gt; Map CoreNodeId NodeRestart
 -&gt; Bool
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId NodeRestart -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId NodeRestart -&gt; Bool
 forall k a. Map k a -&gt; Bool
-</span><span class="hs-identifier hs-var">Map.null</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Map SlotNo (Map CoreNodeId NodeRestart)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.null</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Map SlotNo (Map CoreNodeId NodeRestart)
  -&gt; Map SlotNo (Map CoreNodeId NodeRestart))
 -&gt; ([(SlotNo, Map CoreNodeId NodeRestart)]
     -&gt; Map SlotNo (Map CoreNodeId NodeRestart))
 -&gt; [(SlotNo, Map CoreNodeId NodeRestart)]
 -&gt; Map SlotNo (Map CoreNodeId NodeRestart)
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[(SlotNo, Map CoreNodeId NodeRestart)]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">[(SlotNo, Map CoreNodeId NodeRestart)]
 -&gt; Map SlotNo (Map CoreNodeId NodeRestart)
 forall k a. Ord k =&gt; [(k, a)] -&gt; Map k a
-</span><span class="hs-identifier hs-var">Map.fromList</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Gen [(SlotNo, Map CoreNodeId NodeRestart)] -&gt; Gen NodeRestarts)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.fromList</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Gen [(SlotNo, Map CoreNodeId NodeRestart)] -&gt; Gen NodeRestarts)
 -&gt; Gen [(SlotNo, Map CoreNodeId NodeRestart)] -&gt; Gen NodeRestarts
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-67"></span><span>    </span><span id="local-6989586621679258743"><span class="annot"><span class="annottext">[SlotNo]
-</span><a href="#local-6989586621679258743"><span class="hs-identifier hs-var">ss</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[SlotNo] -&gt; Gen [SlotNo]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-67"></span><span>    </span><span id="local-6989586621679261392"><span class="annot"><span class="annottext">[SlotNo]
+</span><a href="#local-6989586621679261392"><span class="hs-identifier hs-var">ss</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[SlotNo] -&gt; Gen [SlotNo]
 forall a. [a] -&gt; Gen [a]
 </span><span class="hs-identifier hs-var">sublistOf</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SlotNo
 </span><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">..</span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; SlotNo
 </span><span class="hs-identifier hs-var">SlotNo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word64
-</span><a href="#local-6989586621679258750"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; Word64 -&gt; Word64
+</span><a href="#local-6989586621679261399"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; Word64 -&gt; Word64
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-glyph hs-var">-</span></a></span><span> </span><span class="annot"><span class="annottext">Word64
 </span><span class="hs-number">1</span></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
 </span><span id="line-68"></span><span>    </span><span class="annot"><span class="annottext">[SlotNo]
 -&gt; (SlotNo -&gt; Gen (SlotNo, Map CoreNodeId NodeRestart))
@@ -239,175 +239,175 @@ forall a. Num a =&gt; a -&gt; a -&gt; a
 forall (t :: * -&gt; *) (m :: * -&gt; *) a b.
 (Traversable t, Monad m) =&gt;
 t a -&gt; (a -&gt; m b) -&gt; m (t b)
-</span><span class="hs-identifier hs-var">forM</span></span><span> </span><span class="annot"><span class="annottext">[SlotNo]
-</span><a href="#local-6989586621679258743"><span class="hs-identifier hs-var">ss</span></a></span><span> </span><span class="annot"><span class="annottext">((SlotNo -&gt; Gen (SlotNo, Map CoreNodeId NodeRestart))
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">forM</span></a></span><span> </span><span class="annot"><span class="annottext">[SlotNo]
+</span><a href="#local-6989586621679261392"><span class="hs-identifier hs-var">ss</span></a></span><span> </span><span class="annot"><span class="annottext">((SlotNo -&gt; Gen (SlotNo, Map CoreNodeId NodeRestart))
  -&gt; Gen [(SlotNo, Map CoreNodeId NodeRestart)])
 -&gt; (SlotNo -&gt; Gen (SlotNo, Map CoreNodeId NodeRestart))
 -&gt; Gen [(SlotNo, Map CoreNodeId NodeRestart)]
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679258740"><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679258740"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679261389"><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679261389"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
 </span><span id="line-69"></span><span>      </span><span class="annot"><span class="annottext">(Map CoreNodeId NodeRestart
  -&gt; (SlotNo, Map CoreNodeId NodeRestart))
 -&gt; Gen (Map CoreNodeId NodeRestart)
 -&gt; Gen (SlotNo, Map CoreNodeId NodeRestart)
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679258740"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Gen (Map CoreNodeId NodeRestart)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fmap</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679261389"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Gen (Map CoreNodeId NodeRestart)
  -&gt; Gen (SlotNo, Map CoreNodeId NodeRestart))
 -&gt; Gen (Map CoreNodeId NodeRestart)
 -&gt; Gen (SlotNo, Map CoreNodeId NodeRestart)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span>
-</span><span id="line-70"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679258739"><span class="annot"><span class="annottext">alreadyJoined :: Set CoreNodeId
-</span><a href="#local-6989586621679258739"><span class="hs-identifier hs-var hs-var">alreadyJoined</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId SlotNo -&gt; Set CoreNodeId
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-70"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679261388"><span class="annot"><span class="annottext">alreadyJoined :: Set CoreNodeId
+</span><a href="#local-6989586621679261388"><span class="hs-identifier hs-var hs-var">alreadyJoined</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId SlotNo -&gt; Set CoreNodeId
 forall k a. Map k a -&gt; Set k
-</span><span class="hs-identifier hs-var">Map.keysSet</span></span><span> </span><span class="annot"><span class="annottext">(Map CoreNodeId SlotNo -&gt; Set CoreNodeId)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.keysSet</span></a></span><span> </span><span class="annot"><span class="annottext">(Map CoreNodeId SlotNo -&gt; Set CoreNodeId)
 -&gt; Map CoreNodeId SlotNo -&gt; Set CoreNodeId
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(SlotNo -&gt; Bool) -&gt; Map CoreNodeId SlotNo -&gt; Map CoreNodeId SlotNo
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">(SlotNo -&gt; Bool) -&gt; Map CoreNodeId SlotNo -&gt; Map CoreNodeId SlotNo
 forall a k. (a -&gt; Bool) -&gt; Map k a -&gt; Map k a
-</span><span class="hs-identifier hs-var">Map.filter</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SlotNo -&gt; SlotNo -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.filter</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SlotNo -&gt; SlotNo -&gt; Bool
 forall a. Ord a =&gt; a -&gt; a -&gt; Bool
-</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679258740"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId SlotNo
-</span><a href="#local-6989586621679258752"><span class="hs-identifier hs-var">m</span></a></span><span>
-</span><span id="line-71"></span><span>          </span><span id="local-6989586621679258737"><span class="annot"><span class="annottext">keepSome :: Gen (Map CoreNodeId a) -&gt; Gen (Map CoreNodeId a)
-</span><a href="#local-6989586621679258737"><span class="hs-identifier hs-var hs-var">keepSome</span></a></span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&lt;</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679261389"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId SlotNo
+</span><a href="#local-6989586621679261401"><span class="hs-identifier hs-var">m</span></a></span><span>
+</span><span id="line-71"></span><span>          </span><span id="local-6989586621679261386"><span class="annot"><span class="annottext">keepSome :: Gen (Map CoreNodeId a) -&gt; Gen (Map CoreNodeId a)
+</span><a href="#local-6989586621679261386"><span class="hs-identifier hs-var hs-var">keepSome</span></a></span></span><span>
 </span><span id="line-72"></span><span>            </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Set CoreNodeId -&gt; Bool
 forall a. Set a -&gt; Bool
-</span><span class="hs-identifier hs-var">Set.null</span></span><span> </span><span class="annot"><span class="annottext">Set CoreNodeId
-</span><a href="#local-6989586621679258739"><span class="hs-identifier hs-var">alreadyJoined</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen (Map CoreNodeId a) -&gt; Gen (Map CoreNodeId a)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.null</span></a></span><span> </span><span class="annot"><span class="annottext">Set CoreNodeId
+</span><a href="#local-6989586621679261388"><span class="hs-identifier hs-var">alreadyJoined</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen (Map CoreNodeId a) -&gt; Gen (Map CoreNodeId a)
 forall a. a -&gt; a
-</span><span class="hs-identifier hs-var">id</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">id</span></a></span><span>
 </span><span id="line-73"></span><span>            </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><span class="hs-identifier hs-var">otherwise</span></span><span>              </span><span class="hs-glyph">=</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>              </span><span class="hs-glyph">=</span><span>
 </span><span id="line-74"></span><span>              </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Gen (Map CoreNodeId a)
 -&gt; (Map CoreNodeId a -&gt; Bool) -&gt; Gen (Map CoreNodeId a)
 forall a. Gen a -&gt; (a -&gt; Bool) -&gt; Gen a
-</span><span class="hs-operator hs-var">`suchThat`</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679258733"><span class="annot"><span class="annottext">Map CoreNodeId a
-</span><a href="#local-6989586621679258733"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
-</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">`suchThat`</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679261382"><span class="annot"><span class="annottext">Map CoreNodeId a
+</span><a href="#local-6989586621679261382"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">not</span></a></span><span> </span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; Bool -&gt; Bool
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Set CoreNodeId
-</span><a href="#local-6989586621679258739"><span class="hs-identifier hs-var">alreadyJoined</span></a></span><span> </span><span class="annot"><span class="annottext">Set CoreNodeId -&gt; Set CoreNodeId -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Set CoreNodeId
+</span><a href="#local-6989586621679261388"><span class="hs-identifier hs-var">alreadyJoined</span></a></span><span> </span><span class="annot"><span class="annottext">Set CoreNodeId -&gt; Set CoreNodeId -&gt; Bool
 forall a. Ord a =&gt; Set a -&gt; Set a -&gt; Bool
-</span><span class="hs-operator hs-var">`Set.isSubsetOf`</span></span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId a -&gt; Set CoreNodeId
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-operator hs-var">`Set.isSubsetOf`</span></a></span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId a -&gt; Set CoreNodeId
 forall k a. Map k a -&gt; Set k
-</span><span class="hs-identifier hs-var">Map.keysSet</span></span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId a
-</span><a href="#local-6989586621679258733"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-75"></span><span>          </span><span id="local-6989586621679258731"><span class="annot"><span class="annottext">candidates :: Map CoreNodeId SlotNo
-</span><a href="#local-6989586621679258731"><span class="hs-identifier hs-var hs-var">candidates</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(CoreNodeId -&gt; SlotNo -&gt; Bool)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.keysSet</span></a></span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId a
+</span><a href="#local-6989586621679261382"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-75"></span><span>          </span><span id="local-6989586621679261380"><span class="annot"><span class="annottext">candidates :: Map CoreNodeId SlotNo
+</span><a href="#local-6989586621679261380"><span class="hs-identifier hs-var hs-var">candidates</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(CoreNodeId -&gt; SlotNo -&gt; Bool)
 -&gt; Map CoreNodeId SlotNo -&gt; Map CoreNodeId SlotNo
 forall k a. (k -&gt; a -&gt; Bool) -&gt; Map k a -&gt; Map k a
-</span><span class="hs-identifier hs-var">Map.filterWithKey</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SlotNo -&gt; CoreNodeId -&gt; SlotNo -&gt; Bool
-</span><a href="#local-6989586621679258729"><span class="hs-identifier hs-var">canRestartIn</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679258740"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId SlotNo
-</span><a href="#local-6989586621679258752"><span class="hs-identifier hs-var">m</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.filterWithKey</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SlotNo -&gt; CoreNodeId -&gt; SlotNo -&gt; Bool
+</span><a href="#local-6989586621679261378"><span class="hs-identifier hs-var">canRestartIn</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679261389"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId SlotNo
+</span><a href="#local-6989586621679261401"><span class="hs-identifier hs-var">m</span></a></span><span>
 </span><span id="line-76"></span><span>      </span><span class="hs-keyword">in</span><span>
 </span><span id="line-77"></span><span>      </span><span class="annot"><span class="annottext">Gen (Map CoreNodeId NodeRestart)
 -&gt; Gen (Map CoreNodeId NodeRestart)
 forall a. Gen (Map CoreNodeId a) -&gt; Gen (Map CoreNodeId a)
-</span><a href="#local-6989586621679258737"><span class="hs-identifier hs-var">keepSome</span></a></span><span> </span><span class="annot"><span class="annottext">(Gen (Map CoreNodeId NodeRestart)
+</span><a href="#local-6989586621679261386"><span class="hs-identifier hs-var">keepSome</span></a></span><span> </span><span class="annot"><span class="annottext">(Gen (Map CoreNodeId NodeRestart)
  -&gt; Gen (Map CoreNodeId NodeRestart))
 -&gt; Gen (Map CoreNodeId NodeRestart)
 -&gt; Gen (Map CoreNodeId NodeRestart)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
 </span><span id="line-78"></span><span>      </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId SlotNo -&gt; Bool
 forall k a. Map k a -&gt; Bool
-</span><span class="hs-identifier hs-var">Map.null</span></span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId SlotNo
-</span><a href="#local-6989586621679258731"><span class="hs-identifier hs-var">candidates</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.null</span></a></span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId SlotNo
+</span><a href="#local-6989586621679261380"><span class="hs-identifier hs-var">candidates</span></a></span><span>
 </span><span id="line-79"></span><span>      </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId NodeRestart -&gt; Gen (Map CoreNodeId NodeRestart)
 forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
-</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId NodeRestart
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId NodeRestart
 forall k a. Map k a
-</span><span class="hs-identifier hs-var">Map.empty</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.empty</span></a></span><span>
 </span><span id="line-80"></span><span>      </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">([CoreNodeId] -&gt; Map CoreNodeId NodeRestart)
 -&gt; Gen [CoreNodeId] -&gt; Gen (Map CoreNodeId NodeRestart)
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[(CoreNodeId, NodeRestart)] -&gt; Map CoreNodeId NodeRestart
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fmap</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[(CoreNodeId, NodeRestart)] -&gt; Map CoreNodeId NodeRestart
 forall k a. Ord k =&gt; [(k, a)] -&gt; Map k a
-</span><span class="hs-identifier hs-var">Map.fromList</span></span><span> </span><span class="annot"><span class="annottext">([(CoreNodeId, NodeRestart)] -&gt; Map CoreNodeId NodeRestart)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.fromList</span></a></span><span> </span><span class="annot"><span class="annottext">([(CoreNodeId, NodeRestart)] -&gt; Map CoreNodeId NodeRestart)
 -&gt; ([CoreNodeId] -&gt; [(CoreNodeId, NodeRestart)])
 -&gt; [CoreNodeId]
 -&gt; Map CoreNodeId NodeRestart
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(CoreNodeId -&gt; (CoreNodeId, NodeRestart))
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">(CoreNodeId -&gt; (CoreNodeId, NodeRestart))
 -&gt; [CoreNodeId] -&gt; [(CoreNodeId, NodeRestart)]
 forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
-</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(CoreNodeId -&gt; NodeRestart -&gt; (CoreNodeId, NodeRestart))
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">map</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(CoreNodeId -&gt; NodeRestart -&gt; (CoreNodeId, NodeRestart))
 -&gt; NodeRestart -&gt; CoreNodeId -&gt; (CoreNodeId, NodeRestart)
 forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
-</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">NodeRestart
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">flip</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">NodeRestart
 </span><a href="Test.ThreadNet.Util.NodeRestarts.html#NodeRestart"><span class="hs-identifier hs-var">NodeRestart</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Gen [CoreNodeId] -&gt; Gen (Map CoreNodeId NodeRestart))
 -&gt; Gen [CoreNodeId] -&gt; Gen (Map CoreNodeId NodeRestart)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
 </span><span id="line-81"></span><span>           </span><span class="annot"><span class="annottext">[CoreNodeId] -&gt; Gen [CoreNodeId]
 forall a. [a] -&gt; Gen [a]
 </span><span class="hs-identifier hs-var">sublistOf</span></span><span> </span><span class="annot"><span class="annottext">([CoreNodeId] -&gt; Gen [CoreNodeId])
 -&gt; [CoreNodeId] -&gt; Gen [CoreNodeId]
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId SlotNo -&gt; [CoreNodeId]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId SlotNo -&gt; [CoreNodeId]
 forall k a. Map k a -&gt; [k]
-</span><span class="hs-identifier hs-var">Map.keys</span></span><span> </span><span class="annot"><span class="annottext">(Map CoreNodeId SlotNo -&gt; [CoreNodeId])
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.keys</span></a></span><span> </span><span class="annot"><span class="annottext">(Map CoreNodeId SlotNo -&gt; [CoreNodeId])
 -&gt; Map CoreNodeId SlotNo -&gt; [CoreNodeId]
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId SlotNo
-</span><a href="#local-6989586621679258731"><span class="hs-identifier hs-var">candidates</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId SlotNo
+</span><a href="#local-6989586621679261380"><span class="hs-identifier hs-var">candidates</span></a></span><span>
 </span><span id="line-82"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-83"></span><span>    </span><span id="local-6989586621679258726"><span class="annot"><span class="annottext">isLeading :: CoreNodeId -&gt; SlotNo -&gt; Bool
-</span><a href="#local-6989586621679258726"><span class="hs-identifier hs-var hs-var">isLeading</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">CoreNodeId</span></a></span><span> </span><span id="local-6989586621679258724"><span class="annot"><span class="annottext">Word64
-</span><a href="#local-6989586621679258724"><span class="hs-identifier hs-var">i</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679258723"><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679258723"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word64
-</span><a href="#local-6989586621679258724"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; Word64 -&gt; Bool
+</span><span id="line-83"></span><span>    </span><span id="local-6989586621679261375"><span class="annot"><span class="annottext">isLeading :: CoreNodeId -&gt; SlotNo -&gt; Bool
+</span><a href="#local-6989586621679261375"><span class="hs-identifier hs-var hs-var">isLeading</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">CoreNodeId</span></a></span><span> </span><span id="local-6989586621679261373"><span class="annot"><span class="annottext">Word64
+</span><a href="#local-6989586621679261373"><span class="hs-identifier hs-var">i</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679261372"><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679261372"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word64
+</span><a href="#local-6989586621679261373"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; Word64 -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
-</span><span class="hs-operator hs-var">/=</span></span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; Word64
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">/=</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; Word64
 </span><span class="hs-identifier hs-var hs-var">unSlotNo</span></span><span> </span><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679258723"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; Word64 -&gt; Word64
+</span><a href="#local-6989586621679261372"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; Word64 -&gt; Word64
 forall a. Integral a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">`mod`</span></span><span> </span><span class="annot"><span class="annottext">Word64
-</span><a href="#local-6989586621679258719"><span class="hs-identifier hs-var">n</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">`mod`</span></a></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><a href="#local-6989586621679261368"><span class="hs-identifier hs-var">n</span></a></span><span>
 </span><span id="line-84"></span><span>      </span><span class="hs-keyword">where</span><span>
-</span><span id="line-85"></span><span>        </span><span id="local-6989586621679258719"><span class="annot"><span class="annottext">n :: Word64
-</span><a href="#local-6989586621679258719"><span class="hs-identifier hs-var hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Word64
+</span><span id="line-85"></span><span>        </span><span id="local-6989586621679261368"><span class="annot"><span class="annottext">n :: Word64
+</span><a href="#local-6989586621679261368"><span class="hs-identifier hs-var hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Word64
 forall a b. (Integral a, Num b) =&gt; a -&gt; b
-</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Word64) -&gt; Int -&gt; Word64
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Word64) -&gt; Int -&gt; Word64
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId SlotNo -&gt; Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId SlotNo -&gt; Int
 forall k a. Map k a -&gt; Int
-</span><span class="hs-identifier hs-var">Map.size</span></span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId SlotNo
-</span><a href="#local-6989586621679258752"><span class="hs-identifier hs-var">m</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.size</span></a></span><span> </span><span class="annot"><span class="annottext">Map CoreNodeId SlotNo
+</span><a href="#local-6989586621679261401"><span class="hs-identifier hs-var">m</span></a></span><span>
 </span><span id="line-86"></span><span>
-</span><span id="line-87"></span><span>    </span><span id="local-6989586621679258729"><span class="annot"><span class="annottext">canRestartIn :: SlotNo -&gt; CoreNodeId -&gt; SlotNo -&gt; Bool
-</span><a href="#local-6989586621679258729"><span class="hs-identifier hs-var hs-var">canRestartIn</span></a></span></span><span> </span><span id="local-6989586621679258717"><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679258717"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span id="local-6989586621679258716"><span class="annot"><span class="annottext">CoreNodeId
-</span><a href="#local-6989586621679258716"><span class="hs-identifier hs-var">nid</span></a></span></span><span> </span><span id="local-6989586621679258715"><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679258715"><span class="hs-identifier hs-var">joinSlot</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-87"></span><span>    </span><span id="local-6989586621679261378"><span class="annot"><span class="annottext">canRestartIn :: SlotNo -&gt; CoreNodeId -&gt; SlotNo -&gt; Bool
+</span><a href="#local-6989586621679261378"><span class="hs-identifier hs-var hs-var">canRestartIn</span></a></span></span><span> </span><span id="local-6989586621679261366"><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679261366"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span id="local-6989586621679261365"><span class="annot"><span class="annottext">CoreNodeId
+</span><a href="#local-6989586621679261365"><span class="hs-identifier hs-var">nid</span></a></span></span><span> </span><span id="local-6989586621679261364"><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679261364"><span class="hs-identifier hs-var">joinSlot</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-88"></span><span>        </span><span class="hs-comment">-- must be present</span><span>
 </span><span id="line-89"></span><span>        </span><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679258715"><span class="hs-identifier hs-var">joinSlot</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; SlotNo -&gt; Bool
+</span><a href="#local-6989586621679261364"><span class="hs-identifier hs-var">joinSlot</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; SlotNo -&gt; Bool
 forall a. Ord a =&gt; a -&gt; a -&gt; Bool
-</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679258717"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
-</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&lt;=</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679261366"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&amp;&amp;</span></a></span><span>
 </span><span id="line-90"></span><span>        </span><span class="hs-comment">-- must not be leading (TODO relax this somehow?)</span><span>
 </span><span id="line-91"></span><span>        </span><span class="annot"><span class="annottext">Bool -&gt; Bool
-</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CoreNodeId -&gt; SlotNo -&gt; Bool
-</span><a href="#local-6989586621679258726"><span class="hs-identifier hs-var">isLeading</span></a></span><span> </span><span class="annot"><span class="annottext">CoreNodeId
-</span><a href="#local-6989586621679258716"><span class="hs-identifier hs-var">nid</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679258717"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">not</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CoreNodeId -&gt; SlotNo -&gt; Bool
+</span><a href="#local-6989586621679261375"><span class="hs-identifier hs-var">isLeading</span></a></span><span> </span><span class="annot"><span class="annottext">CoreNodeId
+</span><a href="#local-6989586621679261365"><span class="hs-identifier hs-var">nid</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679261366"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-92"></span><span>
 </span><span id="line-93"></span><span class="annot"><a href="Test.ThreadNet.Util.NodeRestarts.html#shrinkNodeRestarts"><span class="hs-identifier hs-type">shrinkNodeRestarts</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Test.ThreadNet.Util.NodeRestarts.html#NodeRestarts"><span class="hs-identifier hs-type">NodeRestarts</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Test.ThreadNet.Util.NodeRestarts.html#NodeRestarts"><span class="hs-identifier hs-type">NodeRestarts</span></a></span><span class="hs-special">]</span><span>
 </span><span id="line-94"></span><span id="shrinkNodeRestarts"><span class="annot"><span class="annottext">shrinkNodeRestarts :: NodeRestarts -&gt; [NodeRestarts]
-</span><a href="Test.ThreadNet.Util.NodeRestarts.html#shrinkNodeRestarts"><span class="hs-identifier hs-var hs-var">shrinkNodeRestarts</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.ThreadNet.Util.NodeRestarts.html#NodeRestarts"><span class="hs-identifier hs-type">NodeRestarts</span></a></span><span> </span><span id="local-6989586621679258712"><span class="annot"><span class="annottext">Map SlotNo (Map CoreNodeId NodeRestart)
-</span><a href="#local-6989586621679258712"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">)</span><span>
+</span><a href="Test.ThreadNet.Util.NodeRestarts.html#shrinkNodeRestarts"><span class="hs-identifier hs-var hs-var">shrinkNodeRestarts</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.ThreadNet.Util.NodeRestarts.html#NodeRestarts"><span class="hs-identifier hs-type">NodeRestarts</span></a></span><span> </span><span id="local-6989586621679261361"><span class="annot"><span class="annottext">Map SlotNo (Map CoreNodeId NodeRestart)
+</span><a href="#local-6989586621679261361"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">)</span><span>
 </span><span id="line-95"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Map SlotNo (Map CoreNodeId NodeRestart) -&gt; Bool
 forall k a. Map k a -&gt; Bool
-</span><span class="hs-identifier hs-var">Map.null</span></span><span> </span><span class="annot"><span class="annottext">Map SlotNo (Map CoreNodeId NodeRestart)
-</span><a href="#local-6989586621679258712"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>  </span><span class="hs-comment">-- TODO better shrink</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.null</span></a></span><span> </span><span class="annot"><span class="annottext">Map SlotNo (Map CoreNodeId NodeRestart)
+</span><a href="#local-6989586621679261361"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>  </span><span class="hs-comment">-- TODO better shrink</span><span>
 </span><span id="line-96"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><span class="hs-identifier hs-var">otherwise</span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">NodeRestarts
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">NodeRestarts
 </span><a href="Test.ThreadNet.Util.NodeRestarts.html#noRestarts"><span class="hs-identifier hs-var">noRestarts</span></a></span><span class="hs-special">]</span><span>
 </span><span id="line-97"></span></pre></body></html>

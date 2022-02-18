@@ -4,11 +4,11 @@
 </span><span id="line-4"></span><span>
 </span><span id="line-5"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Consensus.Node.ErrorPolicy</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Node.ErrorPolicy.html#consensusErrorPolicy"><span class="hs-identifier">consensusErrorPolicy</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-6"></span><span>
-</span><span id="line-7"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Proxy</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Proxy</span></span><span class="hs-special">)</span><span>
-</span><span id="line-8"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Time.Clock</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">DiffTime</span></span><span class="hs-special">)</span><span>
-</span><span id="line-9"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Typeable</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Typeable</span></span><span class="hs-special">)</span><span>
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Proxy</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Proxy</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier">Data.Time.Clock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier">DiffTime</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Typeable</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Typeable</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-10"></span><span>
-</span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier">Control.Monad.Class.MonadAsync</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier">ExceptionInLinkedThread</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier">Control.Monad.Class.MonadAsync</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier">ExceptionInLinkedThread</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-12"></span><span>
 </span><span id="line-13"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier">Ouroboros.Network.ErrorPolicy</span></a></span><span>
 </span><span id="line-14"></span><span>
@@ -34,12 +34,12 @@
 </span><span id="line-34"></span><span>                     </span><span class="annot"><a href="Ouroboros.Consensus.Util.ResourceRegistry.html#TempRegistryException"><span class="hs-identifier">TempRegistryException</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-35"></span><span>
 </span><span id="line-36"></span><span class="annot"><a href="Ouroboros.Consensus.Node.ErrorPolicy.html#consensusErrorPolicy"><span class="hs-identifier hs-type">consensusErrorPolicy</span></a></span><span> </span><span class="hs-glyph">::</span><span>
-</span><span id="line-37"></span><span>     </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621680042533"><span class="annot"><a href="#local-6989586621680042533"><span class="hs-identifier hs-type">blk</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Typeable</span></span><span> </span><span class="annot"><a href="#local-6989586621680042533"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">StandardHash</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680042533"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-38"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Proxy</span></span><span> </span><span class="annot"><a href="#local-6989586621680042533"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-37"></span><span>     </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621680028514"><span class="annot"><a href="#local-6989586621680028514"><span class="hs-identifier hs-type">blk</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Typeable</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680028514"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">StandardHash</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680028514"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Proxy</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680028514"><span class="hs-identifier hs-type">blk</span></a></span><span>
 </span><span id="line-39"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-type">ErrorPolicies</span></a></span><span>
 </span><span id="line-40"></span><span id="consensusErrorPolicy"><span class="annot"><span class="annottext">consensusErrorPolicy :: Proxy blk -&gt; ErrorPolicies
-</span><a href="Ouroboros.Consensus.Node.ErrorPolicy.html#consensusErrorPolicy"><span class="hs-identifier hs-var hs-var">consensusErrorPolicy</span></a></span></span><span> </span><span id="local-6989586621680042529"><span class="annot"><span class="annottext">Proxy blk
-</span><a href="#local-6989586621680042529"><span class="hs-identifier hs-var">pb</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ErrorPolicies :: [ErrorPolicy] -&gt; [ErrorPolicy] -&gt; ErrorPolicies
+</span><a href="Ouroboros.Consensus.Node.ErrorPolicy.html#consensusErrorPolicy"><span class="hs-identifier hs-var hs-var">consensusErrorPolicy</span></a></span></span><span> </span><span id="local-6989586621680028510"><span class="annot"><span class="annottext">Proxy blk
+</span><a href="#local-6989586621680028510"><span class="hs-identifier hs-var">pb</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ErrorPolicies :: [ErrorPolicy] -&gt; [ErrorPolicy] -&gt; ErrorPolicies
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-type">ErrorPolicies</span></a></span><span> </span><span class="hs-special">{</span><span>
 </span><span id="line-41"></span><span>      </span><span class="hs-comment">-- Exception raised during connect</span><span>
 </span><span id="line-42"></span><span>      </span><span class="hs-comment">--</span><span>
@@ -79,11 +79,11 @@ Exception e =&gt;
 -&gt; (DbMarkerError -&gt; Maybe (SuspendDecision DiffTime))
 -&gt; ErrorPolicy
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="annottext">DbMarkerError
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="annottext">DbMarkerError
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Node.DbMarker.html#DbMarkerError"><span class="hs-identifier hs-type">DbMarkerError</span></a></span><span class="hs-special">)</span><span>        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime -&gt; Maybe (SuspendDecision DiffTime)
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
-</span><a href="#local-6989586621680042524"><span class="hs-identifier hs-var">shutdownNode</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
+</span><a href="#local-6989586621680028505"><span class="hs-identifier hs-var">shutdownNode</span></a></span><span>
 </span><span id="line-69"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(DbLocked -&gt; Maybe (SuspendDecision DiffTime)) -&gt; ErrorPolicy
 forall e.
 Exception e =&gt;
@@ -91,11 +91,11 @@ Exception e =&gt;
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var">ErrorPolicy</span></a></span><span> </span><span class="annot"><span class="annottext">((DbLocked -&gt; Maybe (SuspendDecision DiffTime)) -&gt; ErrorPolicy)
 -&gt; (DbLocked -&gt; Maybe (SuspendDecision DiffTime)) -&gt; ErrorPolicy
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="annottext">DbLocked
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="annottext">DbLocked
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Node.DbLock.html#DbLocked"><span class="hs-identifier hs-type">DbLocked</span></a></span><span class="hs-special">)</span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime -&gt; Maybe (SuspendDecision DiffTime)
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
-</span><a href="#local-6989586621680042524"><span class="hs-identifier hs-var">shutdownNode</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
+</span><a href="#local-6989586621680028505"><span class="hs-identifier hs-var">shutdownNode</span></a></span><span>
 </span><span id="line-70"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(ChainDbFailure blk -&gt; Maybe (SuspendDecision DiffTime))
 -&gt; ErrorPolicy
 forall e.
@@ -106,11 +106,11 @@ Exception e =&gt;
 -&gt; (ChainDbFailure blk -&gt; Maybe (SuspendDecision DiffTime))
 -&gt; ErrorPolicy
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="annottext">ChainDbFailure blk
-</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.html#ChainDbFailure"><span class="hs-identifier hs-type">ChainDbFailure</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680042533"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime -&gt; Maybe (SuspendDecision DiffTime)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="annottext">ChainDbFailure blk
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.html#ChainDbFailure"><span class="hs-identifier hs-type">ChainDbFailure</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680028514"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime -&gt; Maybe (SuspendDecision DiffTime)
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
-</span><a href="#local-6989586621680042524"><span class="hs-identifier hs-var">shutdownNode</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
+</span><a href="#local-6989586621680028505"><span class="hs-identifier hs-var">shutdownNode</span></a></span><span>
 </span><span id="line-71"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(VolatileDBError blk -&gt; Maybe (SuspendDecision DiffTime))
 -&gt; ErrorPolicy
 forall e.
@@ -121,18 +121,18 @@ Exception e =&gt;
 -&gt; (VolatileDBError blk -&gt; Maybe (SuspendDecision DiffTime))
 -&gt; ErrorPolicy
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621680042523"><span class="annot"><span class="annottext">VolatileDBError blk
-</span><a href="#local-6989586621680042523"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.VolatileDB.API.html#VolatileDBError"><span class="hs-identifier hs-type">VolatileDBError</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680042533"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>  </span><span class="hs-glyph">-&gt;</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621680028504"><span class="annot"><span class="annottext">VolatileDBError blk
+</span><a href="#local-6989586621680028504"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.VolatileDB.API.html#VolatileDBError"><span class="hs-identifier hs-type">VolatileDBError</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680028514"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>  </span><span class="hs-glyph">-&gt;</span><span>
 </span><span id="line-72"></span><span>            </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">VolatileDBError blk
-</span><a href="#local-6989586621680042523"><span class="hs-identifier hs-var">e</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><a href="#local-6989586621680028504"><span class="hs-identifier hs-var">e</span></a></span><span> </span><span class="hs-keyword">of</span><span>
 </span><span id="line-73"></span><span>              </span><span class="annot"><a href="Ouroboros.Consensus.Storage.VolatileDB.API.html#ApiMisuse"><span class="hs-identifier hs-type">VolatileDB.ApiMisuse</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime -&gt; Maybe (SuspendDecision DiffTime)
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
-</span><a href="#local-6989586621680042521"><span class="hs-identifier hs-var">ourBug</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
+</span><a href="#local-6989586621680028502"><span class="hs-identifier hs-var">ourBug</span></a></span><span>
 </span><span id="line-74"></span><span>              </span><span class="annot"><a href="Ouroboros.Consensus.Storage.VolatileDB.API.html#UnexpectedFailure"><span class="hs-identifier hs-type">VolatileDB.UnexpectedFailure</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime -&gt; Maybe (SuspendDecision DiffTime)
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
-</span><a href="#local-6989586621680042524"><span class="hs-identifier hs-var">shutdownNode</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
+</span><a href="#local-6989586621680028505"><span class="hs-identifier hs-var">shutdownNode</span></a></span><span>
 </span><span id="line-75"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(ImmutableDBError blk -&gt; Maybe (SuspendDecision DiffTime))
 -&gt; ErrorPolicy
 forall e.
@@ -143,18 +143,18 @@ Exception e =&gt;
 -&gt; (ImmutableDBError blk -&gt; Maybe (SuspendDecision DiffTime))
 -&gt; ErrorPolicy
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621680042519"><span class="annot"><span class="annottext">ImmutableDBError blk
-</span><a href="#local-6989586621680042519"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ImmutableDB.API.html#ImmutableDBError"><span class="hs-identifier hs-type">ImmutableDBError</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680042533"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621680028500"><span class="annot"><span class="annottext">ImmutableDBError blk
+</span><a href="#local-6989586621680028500"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ImmutableDB.API.html#ImmutableDBError"><span class="hs-identifier hs-type">ImmutableDBError</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680028514"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
 </span><span id="line-76"></span><span>            </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">ImmutableDBError blk
-</span><a href="#local-6989586621680042519"><span class="hs-identifier hs-var">e</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><a href="#local-6989586621680028500"><span class="hs-identifier hs-var">e</span></a></span><span> </span><span class="hs-keyword">of</span><span>
 </span><span id="line-77"></span><span>              </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ImmutableDB.API.html#ApiMisuse"><span class="hs-identifier hs-type">ImmutableDB.ApiMisuse</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime -&gt; Maybe (SuspendDecision DiffTime)
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
-</span><a href="#local-6989586621680042521"><span class="hs-identifier hs-var">ourBug</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
+</span><a href="#local-6989586621680028502"><span class="hs-identifier hs-var">ourBug</span></a></span><span>
 </span><span id="line-78"></span><span>              </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ImmutableDB.API.html#UnexpectedFailure"><span class="hs-identifier hs-type">ImmutableDB.UnexpectedFailure</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime -&gt; Maybe (SuspendDecision DiffTime)
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
-</span><a href="#local-6989586621680042524"><span class="hs-identifier hs-var">shutdownNode</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
+</span><a href="#local-6989586621680028505"><span class="hs-identifier hs-var">shutdownNode</span></a></span><span>
 </span><span id="line-79"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(FsError -&gt; Maybe (SuspendDecision DiffTime)) -&gt; ErrorPolicy
 forall e.
 Exception e =&gt;
@@ -162,11 +162,11 @@ Exception e =&gt;
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var">ErrorPolicy</span></a></span><span> </span><span class="annot"><span class="annottext">((FsError -&gt; Maybe (SuspendDecision DiffTime)) -&gt; ErrorPolicy)
 -&gt; (FsError -&gt; Maybe (SuspendDecision DiffTime)) -&gt; ErrorPolicy
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="annottext">FsError
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="annottext">FsError
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.FS.API.Types.html#FsError"><span class="hs-identifier hs-type">FsError</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime -&gt; Maybe (SuspendDecision DiffTime)
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
-</span><a href="#local-6989586621680042524"><span class="hs-identifier hs-var">shutdownNode</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
+</span><a href="#local-6989586621680028505"><span class="hs-identifier hs-var">shutdownNode</span></a></span><span>
 </span><span id="line-80"></span><span>
 </span><span id="line-81"></span><span>          </span><span class="hs-comment">-- When the system clock moved back, we have to restart the node,</span><span>
 </span><span id="line-82"></span><span>          </span><span class="hs-comment">-- because the ImmutableDB validation might have to truncate some</span><span>
@@ -186,11 +186,11 @@ Exception e =&gt;
     -&gt; Maybe (SuspendDecision DiffTime))
 -&gt; ErrorPolicy
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="annottext">SystemClockMovedBackException
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="annottext">SystemClockMovedBackException
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.BlockchainTime.WallClock.Util.html#SystemClockMovedBackException"><span class="hs-identifier hs-type">SystemClockMovedBackException</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime -&gt; Maybe (SuspendDecision DiffTime)
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
-</span><a href="#local-6989586621680042524"><span class="hs-identifier hs-var">shutdownNode</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
+</span><a href="#local-6989586621680028505"><span class="hs-identifier hs-var">shutdownNode</span></a></span><span>
 </span><span id="line-88"></span><span>
 </span><span id="line-89"></span><span>          </span><span class="hs-comment">-- Some chain DB errors are indicative of a bug in our code, others</span><span>
 </span><span id="line-90"></span><span>          </span><span class="hs-comment">-- indicate an invalid request from the peer. If the DB is closed</span><span>
@@ -205,22 +205,22 @@ Exception e =&gt;
 -&gt; (ChainDbError blk -&gt; Maybe (SuspendDecision DiffTime))
 -&gt; ErrorPolicy
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621680042516"><span class="annot"><span class="annottext">ChainDbError blk
-</span><a href="#local-6989586621680042516"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.html#ChainDbError"><span class="hs-identifier hs-type">ChainDbError</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680042533"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621680028497"><span class="annot"><span class="annottext">ChainDbError blk
+</span><a href="#local-6989586621680028497"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.html#ChainDbError"><span class="hs-identifier hs-type">ChainDbError</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680028514"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
 </span><span id="line-93"></span><span>            </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">ChainDbError blk
-</span><a href="#local-6989586621680042516"><span class="hs-identifier hs-var">e</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><a href="#local-6989586621680028497"><span class="hs-identifier hs-var">e</span></a></span><span> </span><span class="hs-keyword">of</span><span>
 </span><span id="line-94"></span><span>              </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.html#ClosedDBError"><span class="hs-identifier hs-type">ClosedDBError</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span>        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime -&gt; Maybe (SuspendDecision DiffTime)
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
-</span><a href="#local-6989586621680042524"><span class="hs-identifier hs-var">shutdownNode</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
+</span><a href="#local-6989586621680028505"><span class="hs-identifier hs-var">shutdownNode</span></a></span><span>
 </span><span id="line-95"></span><span>              </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.html#ClosedFollowerError"><span class="hs-identifier hs-type">ClosedFollowerError</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime -&gt; Maybe (SuspendDecision DiffTime)
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
-</span><a href="#local-6989586621680042521"><span class="hs-identifier hs-var">ourBug</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
+</span><a href="#local-6989586621680028502"><span class="hs-identifier hs-var">ourBug</span></a></span><span>
 </span><span id="line-96"></span><span>              </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.html#InvalidIteratorRange"><span class="hs-identifier hs-type">InvalidIteratorRange</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime -&gt; Maybe (SuspendDecision DiffTime)
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
-</span><a href="#local-6989586621680042512"><span class="hs-identifier hs-var">theyBuggyOrEvil</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
+</span><a href="#local-6989586621680028493"><span class="hs-identifier hs-var">theyBuggyOrEvil</span></a></span><span>
 </span><span id="line-97"></span><span>
 </span><span id="line-98"></span><span>          </span><span class="hs-comment">-- We have some resource registries that are used per-connection,</span><span>
 </span><span id="line-99"></span><span>          </span><span class="hs-comment">-- and so if we have ResourceRegistry related exception, we close</span><span>
@@ -235,11 +235,11 @@ Exception e =&gt;
 -&gt; (RegistryClosedException -&gt; Maybe (SuspendDecision DiffTime))
 -&gt; ErrorPolicy
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="annottext">RegistryClosedException
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="annottext">RegistryClosedException
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Util.ResourceRegistry.html#RegistryClosedException"><span class="hs-identifier hs-type">RegistryClosedException</span></a></span><span class="hs-special">)</span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime -&gt; Maybe (SuspendDecision DiffTime)
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
-</span><a href="#local-6989586621680042521"><span class="hs-identifier hs-var">ourBug</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
+</span><a href="#local-6989586621680028502"><span class="hs-identifier hs-var">ourBug</span></a></span><span>
 </span><span id="line-102"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(ResourceRegistryThreadException
  -&gt; Maybe (SuspendDecision DiffTime))
 -&gt; ErrorPolicy
@@ -253,11 +253,11 @@ Exception e =&gt;
     -&gt; Maybe (SuspendDecision DiffTime))
 -&gt; ErrorPolicy
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="annottext">ResourceRegistryThreadException
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="annottext">ResourceRegistryThreadException
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Util.ResourceRegistry.html#ResourceRegistryThreadException"><span class="hs-identifier hs-type">ResourceRegistryThreadException</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime -&gt; Maybe (SuspendDecision DiffTime)
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
-</span><a href="#local-6989586621680042521"><span class="hs-identifier hs-var">ourBug</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
+</span><a href="#local-6989586621680028502"><span class="hs-identifier hs-var">ourBug</span></a></span><span>
 </span><span id="line-103"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(TempRegistryException -&gt; Maybe (SuspendDecision DiffTime))
 -&gt; ErrorPolicy
 forall e.
@@ -268,11 +268,11 @@ Exception e =&gt;
 -&gt; (TempRegistryException -&gt; Maybe (SuspendDecision DiffTime))
 -&gt; ErrorPolicy
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="annottext">TempRegistryException
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="annottext">TempRegistryException
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Util.ResourceRegistry.html#TempRegistryException"><span class="hs-identifier hs-type">TempRegistryException</span></a></span><span class="hs-special">)</span><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime -&gt; Maybe (SuspendDecision DiffTime)
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
-</span><a href="#local-6989586621680042521"><span class="hs-identifier hs-var">ourBug</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
+</span><a href="#local-6989586621680028502"><span class="hs-identifier hs-var">ourBug</span></a></span><span>
 </span><span id="line-104"></span><span>
 </span><span id="line-105"></span><span>          </span><span class="hs-comment">-- An exception in the block fetch server meant the client asked</span><span>
 </span><span id="line-106"></span><span>          </span><span class="hs-comment">-- for some blocks we used to have but got GCed. This means the</span><span>
@@ -287,11 +287,11 @@ Exception e =&gt;
 -&gt; (BlockFetchServerException -&gt; Maybe (SuspendDecision DiffTime))
 -&gt; ErrorPolicy
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="annottext">BlockFetchServerException
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="annottext">BlockFetchServerException
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.MiniProtocol.BlockFetch.Server.html#BlockFetchServerException"><span class="hs-identifier hs-type">BlockFetchServerException</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime -&gt; Maybe (SuspendDecision DiffTime)
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
-</span><a href="#local-6989586621680042511"><span class="hs-identifier hs-var">distantPeer</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
+</span><a href="#local-6989586621680028492"><span class="hs-identifier hs-var">distantPeer</span></a></span><span>
 </span><span id="line-109"></span><span>
 </span><span id="line-110"></span><span>          </span><span class="hs-comment">-- Chain sync client exceptions indicate malicious behaviour. When we</span><span>
 </span><span id="line-111"></span><span>          </span><span class="hs-comment">-- have diverged too much from a client, making it no longer</span><span>
@@ -306,11 +306,11 @@ Exception e =&gt;
 -&gt; (ChainSyncClientException -&gt; Maybe (SuspendDecision DiffTime))
 -&gt; ErrorPolicy
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="annottext">ChainSyncClientException
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="annottext">ChainSyncClientException
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.MiniProtocol.ChainSync.Client.html#ChainSyncClientException"><span class="hs-identifier hs-type">ChainSyncClientException</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime -&gt; Maybe (SuspendDecision DiffTime)
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
-</span><a href="#local-6989586621680042512"><span class="hs-identifier hs-var">theyBuggyOrEvil</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
+</span><a href="#local-6989586621680028493"><span class="hs-identifier hs-var">theyBuggyOrEvil</span></a></span><span>
 </span><span id="line-114"></span><span>
 </span><span id="line-115"></span><span>          </span><span class="hs-comment">-- Dispatch on nested exception</span><span>
 </span><span id="line-116"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(ExceptionInLinkedThread -&gt; Maybe (SuspendDecision DiffTime))
@@ -323,29 +323,29 @@ Exception e =&gt;
 -&gt; (ExceptionInLinkedThread -&gt; Maybe (SuspendDecision DiffTime))
 -&gt; ErrorPolicy
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier hs-type">ExceptionInLinkedThread</span></a></span><span> </span><span class="annot"><span class="annottext">String
-</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621680042509"><span class="annot"><span class="annottext">SomeException
-</span><a href="#local-6989586621680042509"><span class="hs-identifier hs-var">e</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">ExceptionInLinkedThread</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621680028490"><span class="annot"><span class="annottext">SomeException
+</span><a href="#local-6989586621680028490"><span class="hs-identifier hs-var">e</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
 </span><span id="line-117"></span><span>            </span><span class="annot"><span class="annottext">SomeException -&gt; [ErrorPolicy] -&gt; Maybe (SuspendDecision DiffTime)
 forall e.
 Exception e =&gt;
 e -&gt; [ErrorPolicy] -&gt; Maybe (SuspendDecision DiffTime)
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var">evalErrorPolicies</span></a></span><span> </span><span class="annot"><span class="annottext">SomeException
-</span><a href="#local-6989586621680042509"><span class="hs-identifier hs-var">e</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ErrorPolicies -&gt; [ErrorPolicy]
+</span><a href="#local-6989586621680028490"><span class="hs-identifier hs-var">e</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ErrorPolicies -&gt; [ErrorPolicy]
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var hs-var">epAppErrorPolicies</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Proxy blk -&gt; ErrorPolicies
 forall blk.
 (Typeable blk, StandardHash blk) =&gt;
 Proxy blk -&gt; ErrorPolicies
 </span><a href="Ouroboros.Consensus.Node.ErrorPolicy.html#consensusErrorPolicy"><span class="hs-identifier hs-var">consensusErrorPolicy</span></a></span><span> </span><span class="annot"><span class="annottext">Proxy blk
-</span><a href="#local-6989586621680042529"><span class="hs-identifier hs-var">pb</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621680028510"><span class="hs-identifier hs-var">pb</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-118"></span><span>        </span><span class="hs-special">]</span><span>
 </span><span id="line-119"></span><span>    </span><span class="hs-special">}</span><span>
 </span><span id="line-120"></span><span>  </span><span class="hs-keyword">where</span><span>
 </span><span id="line-121"></span><span>    </span><span class="hs-comment">-- Shutdown the node. If we have a storage layer failure, the node /must/</span><span>
 </span><span id="line-122"></span><span>    </span><span class="hs-comment">-- be restarted (triggering recovery).</span><span>
-</span><span id="line-123"></span><span>    </span><span class="annot"><a href="#local-6989586621680042524"><span class="hs-identifier hs-type">shutdownNode</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-type">SuspendDecision</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">DiffTime</span></span><span>
-</span><span id="line-124"></span><span>    </span><span id="local-6989586621680042524"><span class="annot"><span class="annottext">shutdownNode :: SuspendDecision DiffTime
-</span><a href="#local-6989586621680042524"><span class="hs-identifier hs-var hs-var">shutdownNode</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
+</span><span id="line-123"></span><span>    </span><span class="annot"><a href="#local-6989586621680028505"><span class="hs-identifier hs-type">shutdownNode</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-type">SuspendDecision</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span>
+</span><span id="line-124"></span><span>    </span><span id="local-6989586621680028505"><span class="annot"><span class="annottext">shutdownNode :: SuspendDecision DiffTime
+</span><a href="#local-6989586621680028505"><span class="hs-identifier hs-var hs-var">shutdownNode</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SuspendDecision DiffTime
 forall t. SuspendDecision t
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var">Throw</span></a></span><span>
 </span><span id="line-125"></span><span>
@@ -353,40 +353,40 @@ forall t. SuspendDecision t
 </span><span id="line-127"></span><span>    </span><span class="hs-comment">-- or else is just too far behind; the chain sync client doesn't really have</span><span>
 </span><span id="line-128"></span><span>    </span><span class="hs-comment">-- any way of distinguishing between these two cases. If they are merely</span><span>
 </span><span id="line-129"></span><span>    </span><span class="hs-comment">-- far behind, we might want to reconnect to them later.</span><span>
-</span><span id="line-130"></span><span>    </span><span class="annot"><a href="#local-6989586621680042511"><span class="hs-identifier hs-type">distantPeer</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-type">SuspendDecision</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">DiffTime</span></span><span>
-</span><span id="line-131"></span><span>    </span><span id="local-6989586621680042511"><span class="annot"><span class="annottext">distantPeer :: SuspendDecision DiffTime
-</span><a href="#local-6989586621680042511"><span class="hs-identifier hs-var hs-var">distantPeer</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; SuspendDecision DiffTime
+</span><span id="line-130"></span><span>    </span><span class="annot"><a href="#local-6989586621680028492"><span class="hs-identifier hs-type">distantPeer</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-type">SuspendDecision</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span>
+</span><span id="line-131"></span><span>    </span><span id="local-6989586621680028492"><span class="annot"><span class="annottext">distantPeer :: SuspendDecision DiffTime
+</span><a href="#local-6989586621680028492"><span class="hs-identifier hs-var hs-var">distantPeer</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; SuspendDecision DiffTime
 forall t. t -&gt; SuspendDecision t
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var">SuspendConsumer</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621680042505"><span class="hs-identifier hs-var">defaultDelay</span></a></span><span>
+</span><a href="#local-6989586621680028486"><span class="hs-identifier hs-var">defaultDelay</span></a></span><span>
 </span><span id="line-132"></span><span>
 </span><span id="line-133"></span><span>    </span><span class="hs-comment">-- The peer sent us some data that they could have known was invalid.</span><span>
 </span><span id="line-134"></span><span>    </span><span class="hs-comment">-- This can only be due to a bug or malice.</span><span>
-</span><span id="line-135"></span><span>    </span><span class="annot"><a href="#local-6989586621680042512"><span class="hs-identifier hs-type">theyBuggyOrEvil</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-type">SuspendDecision</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">DiffTime</span></span><span>
-</span><span id="line-136"></span><span>    </span><span id="local-6989586621680042512"><span class="annot"><span class="annottext">theyBuggyOrEvil :: SuspendDecision DiffTime
-</span><a href="#local-6989586621680042512"><span class="hs-identifier hs-var hs-var">theyBuggyOrEvil</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; SuspendDecision DiffTime
+</span><span id="line-135"></span><span>    </span><span class="annot"><a href="#local-6989586621680028493"><span class="hs-identifier hs-type">theyBuggyOrEvil</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-type">SuspendDecision</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span>
+</span><span id="line-136"></span><span>    </span><span id="local-6989586621680028493"><span class="annot"><span class="annottext">theyBuggyOrEvil :: SuspendDecision DiffTime
+</span><a href="#local-6989586621680028493"><span class="hs-identifier hs-var hs-var">theyBuggyOrEvil</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; SuspendDecision DiffTime
 forall t. t -&gt; t -&gt; SuspendDecision t
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var">SuspendPeer</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621680042505"><span class="hs-identifier hs-var">defaultDelay</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621680042505"><span class="hs-identifier hs-var">defaultDelay</span></a></span><span>
+</span><a href="#local-6989586621680028486"><span class="hs-identifier hs-var">defaultDelay</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621680028486"><span class="hs-identifier hs-var">defaultDelay</span></a></span><span>
 </span><span id="line-137"></span><span>
 </span><span id="line-138"></span><span>    </span><span class="hs-comment">-- Something went wrong due to a bug in our code. We disconnect from the</span><span>
 </span><span id="line-139"></span><span>    </span><span class="hs-comment">-- peer, but allow to try again later in the hope the bug was transient.</span><span>
 </span><span id="line-140"></span><span>    </span><span class="hs-comment">-- We do not close the connection in the other direction; if the bug was</span><span>
 </span><span id="line-141"></span><span>    </span><span class="hs-comment">-- indeed local, it might not affect communication in the other direction.</span><span>
-</span><span id="line-142"></span><span>    </span><span class="annot"><a href="#local-6989586621680042521"><span class="hs-identifier hs-type">ourBug</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-type">SuspendDecision</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">DiffTime</span></span><span>
-</span><span id="line-143"></span><span>    </span><span id="local-6989586621680042521"><span class="annot"><span class="annottext">ourBug :: SuspendDecision DiffTime
-</span><a href="#local-6989586621680042521"><span class="hs-identifier hs-var hs-var">ourBug</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; SuspendDecision DiffTime
+</span><span id="line-142"></span><span>    </span><span class="annot"><a href="#local-6989586621680028502"><span class="hs-identifier hs-type">ourBug</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-type">SuspendDecision</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span>
+</span><span id="line-143"></span><span>    </span><span id="local-6989586621680028502"><span class="annot"><span class="annottext">ourBug :: SuspendDecision DiffTime
+</span><a href="#local-6989586621680028502"><span class="hs-identifier hs-var hs-var">ourBug</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; SuspendDecision DiffTime
 forall t. t -&gt; SuspendDecision t
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-framework-0.1.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var">SuspendConsumer</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621680042505"><span class="hs-identifier hs-var">defaultDelay</span></a></span><span>
+</span><a href="#local-6989586621680028486"><span class="hs-identifier hs-var">defaultDelay</span></a></span><span>
 </span><span id="line-144"></span><span>
 </span><span id="line-145"></span><span>    </span><span class="hs-comment">-- Default delay</span><span>
 </span><span id="line-146"></span><span>    </span><span class="hs-comment">--</span><span>
 </span><span id="line-147"></span><span>    </span><span class="hs-comment">-- We might want to tweak the delays for the various different kinds of</span><span>
 </span><span id="line-148"></span><span>    </span><span class="hs-comment">-- problems, but we'd need to establish a policy on how to set them.</span><span>
-</span><span id="line-149"></span><span>    </span><span class="annot"><a href="#local-6989586621680042505"><span class="hs-identifier hs-type">defaultDelay</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">DiffTime</span></span><span>
-</span><span id="line-150"></span><span>    </span><span id="local-6989586621680042505"><span class="annot"><span class="annottext">defaultDelay :: DiffTime
-</span><a href="#local-6989586621680042505"><span class="hs-identifier hs-var hs-var">defaultDelay</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span id="line-149"></span><span>    </span><span class="annot"><a href="#local-6989586621680028486"><span class="hs-identifier hs-type">defaultDelay</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span>
+</span><span id="line-150"></span><span>    </span><span id="local-6989586621680028486"><span class="annot"><span class="annottext">defaultDelay :: DiffTime
+</span><a href="#local-6989586621680028486"><span class="hs-identifier hs-var hs-var">defaultDelay</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
 </span><span class="hs-number">200</span></span><span> </span><span class="hs-comment">-- seconds</span><span>
 </span><span id="line-151"></span></pre></body></html>

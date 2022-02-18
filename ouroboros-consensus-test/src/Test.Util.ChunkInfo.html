@@ -11,7 +11,7 @@
 -------------------------------------------------------------------------------}</span><span>
 </span><span id="line-12"></span><span>
 </span><span id="line-13"></span><span class="hs-keyword">data</span><span> </span><span id="SmallChunkInfo"><span class="annot"><a href="Test.Util.ChunkInfo.html#SmallChunkInfo"><span class="hs-identifier hs-var">SmallChunkInfo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="SmallChunkInfo"><span class="annot"><a href="Test.Util.ChunkInfo.html#SmallChunkInfo"><span class="hs-identifier hs-var">SmallChunkInfo</span></a></span></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">ChunkInfo</span></a></span><span>
-</span><span id="line-14"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679253455"><span id="local-6989586621679253457"><span id="local-6989586621679253459"><span class="annot"><span class="annottext">Int -&gt; SmallChunkInfo -&gt; ShowS
+</span><span id="line-14"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679257128"><span id="local-6989586621679257130"><span id="local-6989586621679257132"><span class="annot"><span class="annottext">Int -&gt; SmallChunkInfo -&gt; ShowS
 [SmallChunkInfo] -&gt; ShowS
 SmallChunkInfo -&gt; String
 (Int -&gt; SmallChunkInfo -&gt; ShowS)
@@ -26,40 +26,40 @@ show :: SmallChunkInfo -&gt; String
 $cshow :: SmallChunkInfo -&gt; String
 showsPrec :: Int -&gt; SmallChunkInfo -&gt; ShowS
 $cshowsPrec :: Int -&gt; SmallChunkInfo -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-15"></span><span>
-</span><span id="line-16"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679253451"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Test.Util.ChunkInfo.html#SmallChunkInfo"><span class="hs-identifier hs-type">SmallChunkInfo</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-17"></span><span>  </span><span id="local-6989586621679253449"><span class="annot"><span class="annottext">arbitrary :: Gen SmallChunkInfo
+</span><span id="line-16"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679257124"><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Test.Util.ChunkInfo.html#SmallChunkInfo"><span class="hs-identifier hs-type">SmallChunkInfo</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-17"></span><span>  </span><span id="local-6989586621679257122"><span class="annot"><span class="annottext">arbitrary :: Gen SmallChunkInfo
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-18"></span><span>      </span><span id="local-6989586621679253447"><span class="annot"><span class="annottext">Word64
-</span><a href="#local-6989586621679253447"><span class="hs-identifier hs-var">numRegularBlocks</span></a></span></span><span>   </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Word64, Word64) -&gt; Gen Word64
+</span><span id="line-18"></span><span>      </span><span id="local-6989586621679257120"><span class="annot"><span class="annottext">Word64
+</span><a href="#local-6989586621679257120"><span class="hs-identifier hs-var">numRegularBlocks</span></a></span></span><span>   </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Word64, Word64) -&gt; Gen Word64
 forall a. Random a =&gt; (a, a) -&gt; Gen a
 </span><span class="hs-identifier hs-var">choose</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word64
 </span><span class="hs-number">5</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Word64
 </span><span class="hs-number">15</span></span><span class="hs-special">)</span><span>
-</span><span id="line-19"></span><span>      </span><span id="local-6989586621679253445"><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679253445"><span class="hs-identifier hs-var">chunkCanContainEBB</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Gen Bool
+</span><span id="line-19"></span><span>      </span><span id="local-6989586621679257118"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679257118"><span class="hs-identifier hs-var">chunkCanContainEBB</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Gen Bool
 forall a. Arbitrary a =&gt; Gen a
 </span><span class="hs-identifier hs-var">arbitrary</span></span><span>
 </span><span id="line-20"></span><span>      </span><span class="annot"><span class="annottext">SmallChunkInfo -&gt; Gen SmallChunkInfo
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
-</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(SmallChunkInfo -&gt; Gen SmallChunkInfo)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">(SmallChunkInfo -&gt; Gen SmallChunkInfo)
 -&gt; SmallChunkInfo -&gt; Gen SmallChunkInfo
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">ChunkInfo -&gt; SmallChunkInfo
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ChunkInfo -&gt; SmallChunkInfo
 </span><a href="Test.Util.ChunkInfo.html#SmallChunkInfo"><span class="hs-identifier hs-var">SmallChunkInfo</span></a></span><span> </span><span class="annot"><span class="annottext">(ChunkInfo -&gt; SmallChunkInfo) -&gt; ChunkInfo -&gt; SmallChunkInfo
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">ChunkSize -&gt; ChunkInfo
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ChunkSize -&gt; ChunkInfo
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">singleChunkInfo</span></a></span><span> </span><span class="annot"><span class="annottext">(ChunkSize -&gt; ChunkInfo) -&gt; ChunkSize -&gt; ChunkInfo
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">ChunkSize :: Bool -&gt; Word64 -&gt; ChunkSize
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ChunkSize :: Bool -&gt; Word64 -&gt; ChunkSize
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">ChunkSize</span></a></span><span class="hs-special">{</span><span class="annot"><span class="annottext">Bool
 Word64
 chunkCanContainEBB :: Bool
 numRegularBlocks :: Word64
 chunkCanContainEBB :: Bool
 numRegularBlocks :: Word64
-</span><a href="#local-6989586621679253441"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span><span class="hs-special">}</span><span>
+</span><a href="#local-6989586621679257114"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span><span class="hs-special">}</span><span>
 </span><span id="line-21"></span><span>
 </span><span id="line-22"></span><span>  </span><span class="hs-comment">-- Intentionally no shrinker, as shrinking the epoch size independent from</span><span>
 </span><span id="line-23"></span><span>  </span><span class="hs-comment">-- the rest of the commands may lead to a non-sensical test</span><span>

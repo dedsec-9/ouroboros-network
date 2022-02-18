@@ -1,0 +1,214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DeriveGeneric #-}</span><span>
+</span><span id="line-2"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Consensus.Storage.LedgerDB.Types</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-3"></span><span>    </span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Types.html#PushGoal"><span class="hs-identifier">PushGoal</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-4"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Types.html#PushStart"><span class="hs-identifier">PushStart</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-5"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Types.html#Pushing"><span class="hs-identifier">Pushing</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-6"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Types.html#UpdateLedgerDbTraceEvent"><span class="hs-identifier">UpdateLedgerDbTraceEvent</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-7"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">GHC.Generics</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Generic</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Block.RealPoint.html"><span class="hs-identifier">Ouroboros.Consensus.Block.RealPoint</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Block.RealPoint.html#RealPoint"><span class="hs-identifier">RealPoint</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+  Trace events
+-------------------------------------------------------------------------------}</span><span>
+</span><span id="line-16"></span><span class="hs-keyword">newtype</span><span> </span><span id="PushStart"><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Types.html#PushStart"><span class="hs-identifier hs-var">PushStart</span></a></span></span><span> </span><span id="local-6989586621679979291"><span class="annot"><a href="#local-6989586621679979291"><span class="hs-identifier hs-type">blk</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="PushStart"><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Types.html#PushStart"><span class="hs-identifier hs-var">PushStart</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="unPushStart"><span class="annot"><span class="annottext">PushStart blk -&gt; RealPoint blk
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.Types.html#unPushStart"><span class="hs-identifier hs-var hs-var">unPushStart</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Block.RealPoint.html#RealPoint"><span class="hs-identifier hs-type">RealPoint</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679979291"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679979283"><span id="local-6989586621679979285"><span id="local-6989586621679979287"><span class="annot"><span class="annottext">Int -&gt; PushStart blk -&gt; ShowS
+[PushStart blk] -&gt; ShowS
+PushStart blk -&gt; String
+(Int -&gt; PushStart blk -&gt; ShowS)
+-&gt; (PushStart blk -&gt; String)
+-&gt; ([PushStart blk] -&gt; ShowS)
+-&gt; Show (PushStart blk)
+forall blk. StandardHash blk =&gt; Int -&gt; PushStart blk -&gt; ShowS
+forall blk. StandardHash blk =&gt; [PushStart blk] -&gt; ShowS
+forall blk. StandardHash blk =&gt; PushStart blk -&gt; String
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [PushStart blk] -&gt; ShowS
+$cshowList :: forall blk. StandardHash blk =&gt; [PushStart blk] -&gt; ShowS
+show :: PushStart blk -&gt; String
+$cshow :: forall blk. StandardHash blk =&gt; PushStart blk -&gt; String
+showsPrec :: Int -&gt; PushStart blk -&gt; ShowS
+$cshowsPrec :: forall blk. StandardHash blk =&gt; Int -&gt; PushStart blk -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679979278"><span id="local-6989586621679979280"><span class="annot"><span class="annottext">PushStart blk -&gt; PushStart blk -&gt; Bool
+(PushStart blk -&gt; PushStart blk -&gt; Bool)
+-&gt; (PushStart blk -&gt; PushStart blk -&gt; Bool) -&gt; Eq (PushStart blk)
+forall blk.
+StandardHash blk =&gt;
+PushStart blk -&gt; PushStart blk -&gt; Bool
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: PushStart blk -&gt; PushStart blk -&gt; Bool
+$c/= :: forall blk.
+StandardHash blk =&gt;
+PushStart blk -&gt; PushStart blk -&gt; Bool
+== :: PushStart blk -&gt; PushStart blk -&gt; Bool
+$c== :: forall blk.
+StandardHash blk =&gt;
+PushStart blk -&gt; PushStart blk -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">newtype</span><span> </span><span id="PushGoal"><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Types.html#PushGoal"><span class="hs-identifier hs-var">PushGoal</span></a></span></span><span> </span><span id="local-6989586621679979276"><span class="annot"><a href="#local-6989586621679979276"><span class="hs-identifier hs-type">blk</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="PushGoal"><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Types.html#PushGoal"><span class="hs-identifier hs-var">PushGoal</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="unPushGoal"><span class="annot"><span class="annottext">PushGoal blk -&gt; RealPoint blk
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.Types.html#unPushGoal"><span class="hs-identifier hs-var hs-var">unPushGoal</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Block.RealPoint.html#RealPoint"><span class="hs-identifier hs-type">RealPoint</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679979276"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679979268"><span id="local-6989586621679979270"><span id="local-6989586621679979272"><span class="annot"><span class="annottext">Int -&gt; PushGoal blk -&gt; ShowS
+[PushGoal blk] -&gt; ShowS
+PushGoal blk -&gt; String
+(Int -&gt; PushGoal blk -&gt; ShowS)
+-&gt; (PushGoal blk -&gt; String)
+-&gt; ([PushGoal blk] -&gt; ShowS)
+-&gt; Show (PushGoal blk)
+forall blk. StandardHash blk =&gt; Int -&gt; PushGoal blk -&gt; ShowS
+forall blk. StandardHash blk =&gt; [PushGoal blk] -&gt; ShowS
+forall blk. StandardHash blk =&gt; PushGoal blk -&gt; String
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [PushGoal blk] -&gt; ShowS
+$cshowList :: forall blk. StandardHash blk =&gt; [PushGoal blk] -&gt; ShowS
+show :: PushGoal blk -&gt; String
+$cshow :: forall blk. StandardHash blk =&gt; PushGoal blk -&gt; String
+showsPrec :: Int -&gt; PushGoal blk -&gt; ShowS
+$cshowsPrec :: forall blk. StandardHash blk =&gt; Int -&gt; PushGoal blk -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679979264"><span id="local-6989586621679979266"><span class="annot"><span class="annottext">PushGoal blk -&gt; PushGoal blk -&gt; Bool
+(PushGoal blk -&gt; PushGoal blk -&gt; Bool)
+-&gt; (PushGoal blk -&gt; PushGoal blk -&gt; Bool) -&gt; Eq (PushGoal blk)
+forall blk.
+StandardHash blk =&gt;
+PushGoal blk -&gt; PushGoal blk -&gt; Bool
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: PushGoal blk -&gt; PushGoal blk -&gt; Bool
+$c/= :: forall blk.
+StandardHash blk =&gt;
+PushGoal blk -&gt; PushGoal blk -&gt; Bool
+== :: PushGoal blk -&gt; PushGoal blk -&gt; Bool
+$c== :: forall blk.
+StandardHash blk =&gt;
+PushGoal blk -&gt; PushGoal blk -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">newtype</span><span> </span><span id="Pushing"><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Types.html#Pushing"><span class="hs-identifier hs-var">Pushing</span></a></span></span><span> </span><span id="local-6989586621679979263"><span class="annot"><a href="#local-6989586621679979263"><span class="hs-identifier hs-type">blk</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Pushing"><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Types.html#Pushing"><span class="hs-identifier hs-var">Pushing</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="unPushing"><span class="annot"><span class="annottext">Pushing blk -&gt; RealPoint blk
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.Types.html#unPushing"><span class="hs-identifier hs-var hs-var">unPushing</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Block.RealPoint.html#RealPoint"><span class="hs-identifier hs-type">RealPoint</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679979263"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679979255"><span id="local-6989586621679979257"><span id="local-6989586621679979259"><span class="annot"><span class="annottext">Int -&gt; Pushing blk -&gt; ShowS
+[Pushing blk] -&gt; ShowS
+Pushing blk -&gt; String
+(Int -&gt; Pushing blk -&gt; ShowS)
+-&gt; (Pushing blk -&gt; String)
+-&gt; ([Pushing blk] -&gt; ShowS)
+-&gt; Show (Pushing blk)
+forall blk. StandardHash blk =&gt; Int -&gt; Pushing blk -&gt; ShowS
+forall blk. StandardHash blk =&gt; [Pushing blk] -&gt; ShowS
+forall blk. StandardHash blk =&gt; Pushing blk -&gt; String
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Pushing blk] -&gt; ShowS
+$cshowList :: forall blk. StandardHash blk =&gt; [Pushing blk] -&gt; ShowS
+show :: Pushing blk -&gt; String
+$cshow :: forall blk. StandardHash blk =&gt; Pushing blk -&gt; String
+showsPrec :: Int -&gt; Pushing blk -&gt; ShowS
+$cshowsPrec :: forall blk. StandardHash blk =&gt; Int -&gt; Pushing blk -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679979251"><span id="local-6989586621679979253"><span class="annot"><span class="annottext">Pushing blk -&gt; Pushing blk -&gt; Bool
+(Pushing blk -&gt; Pushing blk -&gt; Bool)
+-&gt; (Pushing blk -&gt; Pushing blk -&gt; Bool) -&gt; Eq (Pushing blk)
+forall blk. StandardHash blk =&gt; Pushing blk -&gt; Pushing blk -&gt; Bool
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Pushing blk -&gt; Pushing blk -&gt; Bool
+$c/= :: forall blk. StandardHash blk =&gt; Pushing blk -&gt; Pushing blk -&gt; Bool
+== :: Pushing blk -&gt; Pushing blk -&gt; Bool
+$c== :: forall blk. StandardHash blk =&gt; Pushing blk -&gt; Pushing blk -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span id="local-6989586621679979249"><span id="local-6989586621679979250"></span></span><span class="hs-keyword">data</span><span> </span><span id="UpdateLedgerDbTraceEvent"><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Types.html#UpdateLedgerDbTraceEvent"><span class="hs-identifier hs-var">UpdateLedgerDbTraceEvent</span></a></span></span><span> </span><span id="local-6989586621679979248"><span class="annot"><a href="#local-6989586621679979248"><span class="hs-identifier hs-type">blk</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-26"></span><span>    </span><span class="hs-comment">-- | Event fired when we are about to push a block to the LedgerDB</span><span>
+</span><span id="line-27"></span><span>      </span><span id="StartedPushingBlockToTheLedgerDb"><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Types.html#StartedPushingBlockToTheLedgerDb"><span class="hs-identifier hs-var">StartedPushingBlockToTheLedgerDb</span></a></span></span><span>
+</span><span id="line-28"></span><span>        </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Types.html#PushStart"><span class="hs-identifier hs-type">PushStart</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679979248"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span>        </span><span class="hs-comment">-- ^ Point from which we started pushing new blocks</span><span>
+</span><span id="line-30"></span><span>        </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Types.html#PushGoal"><span class="hs-identifier hs-type">PushGoal</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679979248"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span>        </span><span class="hs-comment">-- ^ Point to which we are updating the ledger, the last event</span><span>
+</span><span id="line-32"></span><span>        </span><span class="hs-comment">-- StartedPushingBlockToTheLedgerDb will have Pushing and PushGoal</span><span>
+</span><span id="line-33"></span><span>        </span><span class="hs-comment">-- wrapping over the same RealPoint</span><span>
+</span><span id="line-34"></span><span>        </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Types.html#Pushing"><span class="hs-identifier hs-type">Pushing</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679979248"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span>        </span><span class="hs-comment">-- ^ Point which block we are about to push</span><span>
+</span><span id="line-36"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679979241"><span id="local-6989586621679979243"><span id="local-6989586621679979245"><span class="annot"><span class="annottext">Int -&gt; UpdateLedgerDbTraceEvent blk -&gt; ShowS
+[UpdateLedgerDbTraceEvent blk] -&gt; ShowS
+UpdateLedgerDbTraceEvent blk -&gt; String
+(Int -&gt; UpdateLedgerDbTraceEvent blk -&gt; ShowS)
+-&gt; (UpdateLedgerDbTraceEvent blk -&gt; String)
+-&gt; ([UpdateLedgerDbTraceEvent blk] -&gt; ShowS)
+-&gt; Show (UpdateLedgerDbTraceEvent blk)
+forall blk.
+StandardHash blk =&gt;
+Int -&gt; UpdateLedgerDbTraceEvent blk -&gt; ShowS
+forall blk.
+StandardHash blk =&gt;
+[UpdateLedgerDbTraceEvent blk] -&gt; ShowS
+forall blk.
+StandardHash blk =&gt;
+UpdateLedgerDbTraceEvent blk -&gt; String
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [UpdateLedgerDbTraceEvent blk] -&gt; ShowS
+$cshowList :: forall blk.
+StandardHash blk =&gt;
+[UpdateLedgerDbTraceEvent blk] -&gt; ShowS
+show :: UpdateLedgerDbTraceEvent blk -&gt; String
+$cshow :: forall blk.
+StandardHash blk =&gt;
+UpdateLedgerDbTraceEvent blk -&gt; String
+showsPrec :: Int -&gt; UpdateLedgerDbTraceEvent blk -&gt; ShowS
+$cshowsPrec :: forall blk.
+StandardHash blk =&gt;
+Int -&gt; UpdateLedgerDbTraceEvent blk -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679979237"><span id="local-6989586621679979239"><span class="annot"><span class="annottext">UpdateLedgerDbTraceEvent blk
+-&gt; UpdateLedgerDbTraceEvent blk -&gt; Bool
+(UpdateLedgerDbTraceEvent blk
+ -&gt; UpdateLedgerDbTraceEvent blk -&gt; Bool)
+-&gt; (UpdateLedgerDbTraceEvent blk
+    -&gt; UpdateLedgerDbTraceEvent blk -&gt; Bool)
+-&gt; Eq (UpdateLedgerDbTraceEvent blk)
+forall blk.
+StandardHash blk =&gt;
+UpdateLedgerDbTraceEvent blk
+-&gt; UpdateLedgerDbTraceEvent blk -&gt; Bool
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: UpdateLedgerDbTraceEvent blk
+-&gt; UpdateLedgerDbTraceEvent blk -&gt; Bool
+$c/= :: forall blk.
+StandardHash blk =&gt;
+UpdateLedgerDbTraceEvent blk
+-&gt; UpdateLedgerDbTraceEvent blk -&gt; Bool
+== :: UpdateLedgerDbTraceEvent blk
+-&gt; UpdateLedgerDbTraceEvent blk -&gt; Bool
+$c== :: forall blk.
+StandardHash blk =&gt;
+UpdateLedgerDbTraceEvent blk
+-&gt; UpdateLedgerDbTraceEvent blk -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x.
+ UpdateLedgerDbTraceEvent blk
+ -&gt; Rep (UpdateLedgerDbTraceEvent blk) x)
+-&gt; (forall x.
+    Rep (UpdateLedgerDbTraceEvent blk) x
+    -&gt; UpdateLedgerDbTraceEvent blk)
+-&gt; Generic (UpdateLedgerDbTraceEvent blk)
+forall x.
+Rep (UpdateLedgerDbTraceEvent blk) x
+-&gt; UpdateLedgerDbTraceEvent blk
+forall x.
+UpdateLedgerDbTraceEvent blk
+-&gt; Rep (UpdateLedgerDbTraceEvent blk) x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+forall blk x.
+Rep (UpdateLedgerDbTraceEvent blk) x
+-&gt; UpdateLedgerDbTraceEvent blk
+forall blk x.
+UpdateLedgerDbTraceEvent blk
+-&gt; Rep (UpdateLedgerDbTraceEvent blk) x
+$cto :: forall blk x.
+Rep (UpdateLedgerDbTraceEvent blk) x
+-&gt; UpdateLedgerDbTraceEvent blk
+$cfrom :: forall blk x.
+UpdateLedgerDbTraceEvent blk
+-&gt; Rep (UpdateLedgerDbTraceEvent blk) x
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span></pre></body></html>

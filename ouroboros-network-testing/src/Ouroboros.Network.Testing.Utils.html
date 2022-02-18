@@ -1,19 +1,25 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables #-}</span><span>
-</span><span id="line-2"></span><span>
-</span><span id="line-3"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.Testing.Utils</span><span> </span><span class="hs-keyword">where</span><span>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DerivingStrategies         #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE GeneralizedNewtypeDeriving #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables        #-}</span><span>
 </span><span id="line-4"></span><span>
-</span><span id="line-5"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier">Control.Monad.Class.MonadTime</span></a></span><span>
-</span><span id="line-6"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier">Control.Monad.Class.MonadSay</span></a></span><span>
-</span><span id="line-7"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Tracer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Tracer</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-8"></span><span>
-</span><span id="line-9"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Test.QuickCheck</span></span><span>
+</span><span id="line-5"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.Testing.Utils</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-6"></span><span>
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier">Control.Monad.Class.MonadSay</span></a></span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier">Control.Monad.Class.MonadTime</span></a></span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Tracer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Tracer</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-10"></span><span>
-</span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Debug.Trace</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">traceShowM</span></span><span class="hs-special">)</span><span>
-</span><span id="line-12"></span><span>
-</span><span id="line-13"></span><span>
-</span><span id="line-14"></span><span class="hs-keyword">newtype</span><span> </span><span id="Delay"><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#Delay"><span class="hs-identifier hs-var">Delay</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Delay"><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#Delay"><span class="hs-identifier hs-var">Delay</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="getDelay"><span class="annot"><span class="annottext">Delay -&gt; DiffTime
-</span><a href="Ouroboros.Network.Testing.Utils.html#getDelay"><span class="hs-identifier hs-var hs-var">getDelay</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">DiffTime</span></span><span> </span><span class="hs-special">}</span><span>
-</span><span id="line-15"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679068344"><span id="local-6989586621679068346"><span id="local-6989586621679068348"><span class="annot"><span class="annottext">Int -&gt; Delay -&gt; ShowS
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Ratio</span></a></span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Data.Set</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Set</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-13"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Data.Set</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Set</span></span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Test.QuickCheck</span></span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Debug.Trace</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">traceShowM</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span>
+</span><span id="line-20"></span><span class="hs-keyword">newtype</span><span> </span><span id="Delay"><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#Delay"><span class="hs-identifier hs-var">Delay</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Delay"><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#Delay"><span class="hs-identifier hs-var">Delay</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="getDelay"><span class="annot"><span class="annottext">Delay -&gt; DiffTime
+</span><a href="Ouroboros.Network.Testing.Utils.html#getDelay"><span class="hs-identifier hs-var hs-var">getDelay</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679087594"><span id="local-6989586621679087596"><span id="local-6989586621679087598"><span class="annot"><span class="annottext">Int -&gt; Delay -&gt; ShowS
 [Delay] -&gt; ShowS
 Delay -&gt; String
 (Int -&gt; Delay -&gt; ShowS)
@@ -26,67 +32,518 @@ show :: Delay -&gt; String
 $cshow :: Delay -&gt; String
 showsPrec :: Int -&gt; Delay -&gt; ShowS
 $cshowsPrec :: Int -&gt; Delay -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span>
-</span><span id="line-16"></span><span>
-</span><span id="line-17"></span><span>
-</span><span id="line-18"></span><span class="hs-comment">-- | This needs to be small, as we are using real time limits in block-fetch</span><span>
-</span><span id="line-19"></span><span class="hs-comment">-- examples.</span><span>
-</span><span id="line-20"></span><span class="hs-comment">--</span><span>
-</span><span id="line-21"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#Delay"><span class="hs-identifier hs-type">Delay</span></a></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-22"></span><span>    </span><span id="local-6989586621679068339"><span class="annot"><span class="annottext">arbitrary :: Gen Delay
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-23"></span><span>      </span><span class="annot"><span class="hs-identifier hs-type">Positive</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679068336"><span class="annot"><span class="annottext">Float
-</span><a href="#local-6989586621679068336"><span class="hs-identifier hs-var">delay</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Float</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Gen (Positive Float) -&gt; Gen (Positive Float)
-forall a. Int -&gt; Gen a -&gt; Gen a
-</span><span class="hs-identifier hs-var">resize</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><span class="hs-number">5</span></span><span> </span><span class="annot"><span class="annottext">Gen (Positive Float)
-forall a. Arbitrary a =&gt; Gen a
-</span><span class="hs-identifier hs-var">arbitrary</span></span><span>
-</span><span id="line-24"></span><span>      </span><span class="annot"><span class="annottext">Delay -&gt; Gen Delay
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679087589"><span id="local-6989586621679087591"><span class="annot"><span class="annottext">Delay -&gt; Delay -&gt; Bool
+(Delay -&gt; Delay -&gt; Bool) -&gt; (Delay -&gt; Delay -&gt; Bool) -&gt; Eq Delay
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Delay -&gt; Delay -&gt; Bool
+$c/= :: Delay -&gt; Delay -&gt; Bool
+== :: Delay -&gt; Delay -&gt; Bool
+$c== :: Delay -&gt; Delay -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679087573"><span id="local-6989586621679087575"><span id="local-6989586621679087577"><span id="local-6989586621679087579"><span id="local-6989586621679087581"><span id="local-6989586621679087583"><span id="local-6989586621679087585"><span class="annot"><span class="annottext">Eq Delay
+Eq Delay
+-&gt; (Delay -&gt; Delay -&gt; Ordering)
+-&gt; (Delay -&gt; Delay -&gt; Bool)
+-&gt; (Delay -&gt; Delay -&gt; Bool)
+-&gt; (Delay -&gt; Delay -&gt; Bool)
+-&gt; (Delay -&gt; Delay -&gt; Bool)
+-&gt; (Delay -&gt; Delay -&gt; Delay)
+-&gt; (Delay -&gt; Delay -&gt; Delay)
+-&gt; Ord Delay
+Delay -&gt; Delay -&gt; Bool
+Delay -&gt; Delay -&gt; Ordering
+Delay -&gt; Delay -&gt; Delay
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: Delay -&gt; Delay -&gt; Delay
+$cmin :: Delay -&gt; Delay -&gt; Delay
+max :: Delay -&gt; Delay -&gt; Delay
+$cmax :: Delay -&gt; Delay -&gt; Delay
+&gt;= :: Delay -&gt; Delay -&gt; Bool
+$c&gt;= :: Delay -&gt; Delay -&gt; Bool
+&gt; :: Delay -&gt; Delay -&gt; Bool
+$c&gt; :: Delay -&gt; Delay -&gt; Bool
+&lt;= :: Delay -&gt; Delay -&gt; Bool
+$c&lt;= :: Delay -&gt; Delay -&gt; Bool
+&lt; :: Delay -&gt; Delay -&gt; Bool
+$c&lt; :: Delay -&gt; Delay -&gt; Bool
+compare :: Delay -&gt; Delay -&gt; Ordering
+$ccompare :: Delay -&gt; Delay -&gt; Ordering
+$cp1Ord :: Eq Delay
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></a></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679087558"><span id="local-6989586621679087560"><span id="local-6989586621679087562"><span id="local-6989586621679087564"><span id="local-6989586621679087566"><span id="local-6989586621679087568"><span id="local-6989586621679087570"><span class="annot"><span class="annottext">Integer -&gt; Delay
+Delay -&gt; Delay
+Delay -&gt; Delay -&gt; Delay
+(Delay -&gt; Delay -&gt; Delay)
+-&gt; (Delay -&gt; Delay -&gt; Delay)
+-&gt; (Delay -&gt; Delay -&gt; Delay)
+-&gt; (Delay -&gt; Delay)
+-&gt; (Delay -&gt; Delay)
+-&gt; (Delay -&gt; Delay)
+-&gt; (Integer -&gt; Delay)
+-&gt; Num Delay
+forall a.
+(a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Integer -&gt; a)
+-&gt; Num a
+fromInteger :: Integer -&gt; Delay
+$cfromInteger :: Integer -&gt; Delay
+signum :: Delay -&gt; Delay
+$csignum :: Delay -&gt; Delay
+abs :: Delay -&gt; Delay
+$cabs :: Delay -&gt; Delay
+negate :: Delay -&gt; Delay
+$cnegate :: Delay -&gt; Delay
+* :: Delay -&gt; Delay -&gt; Delay
+$c* :: Delay -&gt; Delay -&gt; Delay
+- :: Delay -&gt; Delay -&gt; Delay
+$c- :: Delay -&gt; Delay -&gt; Delay
++ :: Delay -&gt; Delay -&gt; Delay
+$c+ :: Delay -&gt; Delay -&gt; Delay
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Num</span></a></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#genDelayWithPrecision"><span class="hs-identifier hs-type">genDelayWithPrecision</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/integer-gmp-1.0.3.0/src"><span class="hs-identifier hs-type">Integer</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span>
+</span><span id="line-26"></span><span id="genDelayWithPrecision"><span class="annot"><span class="annottext">genDelayWithPrecision :: Integer -&gt; Gen DiffTime
+</span><a href="Ouroboros.Network.Testing.Utils.html#genDelayWithPrecision"><span class="hs-identifier hs-var hs-var">genDelayWithPrecision</span></a></span></span><span> </span><span id="local-6989586621679087555"><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679087555"><span class="hs-identifier hs-var">precision</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-27"></span><span>    </span><span class="annot"><span class="annottext">(Int -&gt; Gen DiffTime) -&gt; Gen DiffTime
+forall a. (Int -&gt; Gen a) -&gt; Gen a
+</span><span class="hs-identifier hs-var">sized</span></span><span> </span><span class="annot"><span class="annottext">((Int -&gt; Gen DiffTime) -&gt; Gen DiffTime)
+-&gt; (Int -&gt; Gen DiffTime) -&gt; Gen DiffTime
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679087553"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087553"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-28"></span><span>      </span><span id="local-6989586621679087552"><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679087552"><span class="hs-identifier hs-var">b</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Integer, Integer) -&gt; Gen Integer
+</span><span class="hs-identifier hs-var">chooseInteger</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679087555"><span class="hs-identifier hs-var">precision</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span>      </span><span id="local-6989586621679087550"><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679087550"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Integer, Integer) -&gt; Gen Integer
+</span><span class="hs-identifier hs-var">chooseInteger</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">0</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Integer
+forall a. Integral a =&gt; a -&gt; Integer
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">toInteger</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087553"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">*</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679087552"><span class="hs-identifier hs-var">b</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span>      </span><span class="annot"><span class="annottext">DiffTime -&gt; Gen DiffTime
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
-</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">DiffTime -&gt; Delay
-</span><a href="Ouroboros.Network.Testing.Utils.html#Delay"><span class="hs-identifier hs-var">Delay</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Float -&gt; DiffTime
-forall a b. (Real a, Fractional b) =&gt; a -&gt; b
-</span><span class="hs-identifier hs-var">realToFrac</span></span><span> </span><span class="annot"><span class="annottext">Float
-</span><a href="#local-6989586621679068336"><span class="hs-identifier hs-var">delay</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-25"></span><span>    </span><span id="local-6989586621679068334"><span class="annot"><span class="annottext">shrink :: Delay -&gt; [Delay]
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#Delay"><span class="hs-identifier hs-type">Delay</span></a></span><span> </span><span id="local-6989586621679068332"><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679068332"><span class="hs-identifier hs-var">delay</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679068332"><span class="hs-identifier hs-var">delay</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Rational -&gt; DiffTime
+forall a. Fractional a =&gt; Rational -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fromRational</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679087550"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Rational
+forall a. Integral a =&gt; a -&gt; a -&gt; Ratio a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">%</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679087552"><span class="hs-identifier hs-var">b</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="hs-comment">-- | This needs to be small, as we are using real time limits in block-fetch</span><span>
+</span><span id="line-33"></span><span class="hs-comment">-- examples.</span><span>
+</span><span id="line-34"></span><span class="hs-comment">--</span><span>
+</span><span id="line-35"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#Delay"><span class="hs-identifier hs-type">Delay</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-36"></span><span>    </span><span id="local-6989586621679087544"><span class="annot"><span class="annottext">arbitrary :: Gen Delay
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; Delay
+</span><a href="Ouroboros.Network.Testing.Utils.html#Delay"><span class="hs-identifier hs-var">Delay</span></a></span><span> </span><span class="annot"><span class="annottext">(DiffTime -&gt; Delay) -&gt; Gen DiffTime -&gt; Gen Delay
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Gen DiffTime
+</span><a href="Ouroboros.Network.Testing.Utils.html#genDelayWithPrecision"><span class="hs-identifier hs-var">genDelayWithPrecision</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">10</span></span><span>
+</span><span id="line-37"></span><span>    </span><span id="local-6989586621679087541"><span class="annot"><span class="annottext">shrink :: Delay -&gt; [Delay]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#Delay"><span class="hs-identifier hs-type">Delay</span></a></span><span> </span><span id="local-6989586621679087539"><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679087539"><span class="hs-identifier hs-var">delay</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679087539"><span class="hs-identifier hs-var">delay</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; Bool
 forall a. Ord a =&gt; a -&gt; a -&gt; Bool
-</span><span class="hs-operator hs-var">&gt;=</span></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;=</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
 </span><span class="hs-number">0.1</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; Delay
 </span><a href="Ouroboros.Network.Testing.Utils.html#Delay"><span class="hs-identifier hs-var">Delay</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679068332"><span class="hs-identifier hs-var">delay</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; DiffTime
+</span><a href="#local-6989586621679087539"><span class="hs-identifier hs-var">delay</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; DiffTime
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-glyph hs-var">-</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
 </span><span class="hs-number">0.1</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">]</span><span>
-</span><span id="line-26"></span><span>                         </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><span class="hs-identifier hs-var">otherwise</span></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
-</span><span id="line-27"></span><span>
-</span><span id="line-28"></span><span>
-</span><span id="line-29"></span><span class="hs-comment">--</span><span>
-</span><span id="line-30"></span><span class="hs-comment">-- Debugging tools</span><span>
-</span><span id="line-31"></span><span class="hs-comment">--</span><span>
-</span><span id="line-32"></span><span>
-</span><span id="line-33"></span><span id="local-6989586621679068330"><span id="local-6989586621679068331"><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#debugTracer"><span class="hs-identifier hs-type">debugTracer</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="#local-6989586621679068331"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Applicative</span></span><span> </span><span class="annot"><a href="#local-6989586621679068330"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Tracer</span></span><span> </span><span class="annot"><a href="#local-6989586621679068330"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679068331"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
-</span><span id="line-34"></span><span id="debugTracer"><span class="annot"><span class="annottext">debugTracer :: Tracer m a
+</span><span id="line-38"></span><span>                         </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-39"></span><span>
+</span><span id="line-40"></span><span>
+</span><span id="line-41"></span><span class="hs-keyword">newtype</span><span> </span><span id="SmallDelay"><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#SmallDelay"><span class="hs-identifier hs-var">SmallDelay</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="SmallDelay"><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#SmallDelay"><span class="hs-identifier hs-var">SmallDelay</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="getSmallDelay"><span class="annot"><span class="annottext">SmallDelay -&gt; DiffTime
+</span><a href="Ouroboros.Network.Testing.Utils.html#getSmallDelay"><span class="hs-identifier hs-var hs-var">getSmallDelay</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-42"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679087531"><span id="local-6989586621679087533"><span id="local-6989586621679087535"><span class="annot"><span class="annottext">Int -&gt; SmallDelay -&gt; ShowS
+[SmallDelay] -&gt; ShowS
+SmallDelay -&gt; String
+(Int -&gt; SmallDelay -&gt; ShowS)
+-&gt; (SmallDelay -&gt; String)
+-&gt; ([SmallDelay] -&gt; ShowS)
+-&gt; Show SmallDelay
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [SmallDelay] -&gt; ShowS
+$cshowList :: [SmallDelay] -&gt; ShowS
+show :: SmallDelay -&gt; String
+$cshow :: SmallDelay -&gt; String
+showsPrec :: Int -&gt; SmallDelay -&gt; ShowS
+$cshowsPrec :: Int -&gt; SmallDelay -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span>
+</span><span id="line-43"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679087527"><span id="local-6989586621679087529"><span class="annot"><span class="annottext">SmallDelay -&gt; SmallDelay -&gt; Bool
+(SmallDelay -&gt; SmallDelay -&gt; Bool)
+-&gt; (SmallDelay -&gt; SmallDelay -&gt; Bool) -&gt; Eq SmallDelay
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: SmallDelay -&gt; SmallDelay -&gt; Bool
+$c/= :: SmallDelay -&gt; SmallDelay -&gt; Bool
+== :: SmallDelay -&gt; SmallDelay -&gt; Bool
+$c== :: SmallDelay -&gt; SmallDelay -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679087512"><span id="local-6989586621679087514"><span id="local-6989586621679087516"><span id="local-6989586621679087518"><span id="local-6989586621679087520"><span id="local-6989586621679087522"><span id="local-6989586621679087524"><span class="annot"><span class="annottext">Eq SmallDelay
+Eq SmallDelay
+-&gt; (SmallDelay -&gt; SmallDelay -&gt; Ordering)
+-&gt; (SmallDelay -&gt; SmallDelay -&gt; Bool)
+-&gt; (SmallDelay -&gt; SmallDelay -&gt; Bool)
+-&gt; (SmallDelay -&gt; SmallDelay -&gt; Bool)
+-&gt; (SmallDelay -&gt; SmallDelay -&gt; Bool)
+-&gt; (SmallDelay -&gt; SmallDelay -&gt; SmallDelay)
+-&gt; (SmallDelay -&gt; SmallDelay -&gt; SmallDelay)
+-&gt; Ord SmallDelay
+SmallDelay -&gt; SmallDelay -&gt; Bool
+SmallDelay -&gt; SmallDelay -&gt; Ordering
+SmallDelay -&gt; SmallDelay -&gt; SmallDelay
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: SmallDelay -&gt; SmallDelay -&gt; SmallDelay
+$cmin :: SmallDelay -&gt; SmallDelay -&gt; SmallDelay
+max :: SmallDelay -&gt; SmallDelay -&gt; SmallDelay
+$cmax :: SmallDelay -&gt; SmallDelay -&gt; SmallDelay
+&gt;= :: SmallDelay -&gt; SmallDelay -&gt; Bool
+$c&gt;= :: SmallDelay -&gt; SmallDelay -&gt; Bool
+&gt; :: SmallDelay -&gt; SmallDelay -&gt; Bool
+$c&gt; :: SmallDelay -&gt; SmallDelay -&gt; Bool
+&lt;= :: SmallDelay -&gt; SmallDelay -&gt; Bool
+$c&lt;= :: SmallDelay -&gt; SmallDelay -&gt; Bool
+&lt; :: SmallDelay -&gt; SmallDelay -&gt; Bool
+$c&lt; :: SmallDelay -&gt; SmallDelay -&gt; Bool
+compare :: SmallDelay -&gt; SmallDelay -&gt; Ordering
+$ccompare :: SmallDelay -&gt; SmallDelay -&gt; Ordering
+$cp1Ord :: Eq SmallDelay
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></a></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679087498"><span id="local-6989586621679087500"><span id="local-6989586621679087502"><span id="local-6989586621679087504"><span id="local-6989586621679087506"><span id="local-6989586621679087508"><span id="local-6989586621679087510"><span class="annot"><span class="annottext">Integer -&gt; SmallDelay
+SmallDelay -&gt; SmallDelay
+SmallDelay -&gt; SmallDelay -&gt; SmallDelay
+(SmallDelay -&gt; SmallDelay -&gt; SmallDelay)
+-&gt; (SmallDelay -&gt; SmallDelay -&gt; SmallDelay)
+-&gt; (SmallDelay -&gt; SmallDelay -&gt; SmallDelay)
+-&gt; (SmallDelay -&gt; SmallDelay)
+-&gt; (SmallDelay -&gt; SmallDelay)
+-&gt; (SmallDelay -&gt; SmallDelay)
+-&gt; (Integer -&gt; SmallDelay)
+-&gt; Num SmallDelay
+forall a.
+(a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Integer -&gt; a)
+-&gt; Num a
+fromInteger :: Integer -&gt; SmallDelay
+$cfromInteger :: Integer -&gt; SmallDelay
+signum :: SmallDelay -&gt; SmallDelay
+$csignum :: SmallDelay -&gt; SmallDelay
+abs :: SmallDelay -&gt; SmallDelay
+$cabs :: SmallDelay -&gt; SmallDelay
+negate :: SmallDelay -&gt; SmallDelay
+$cnegate :: SmallDelay -&gt; SmallDelay
+* :: SmallDelay -&gt; SmallDelay -&gt; SmallDelay
+$c* :: SmallDelay -&gt; SmallDelay -&gt; SmallDelay
+- :: SmallDelay -&gt; SmallDelay -&gt; SmallDelay
+$c- :: SmallDelay -&gt; SmallDelay -&gt; SmallDelay
++ :: SmallDelay -&gt; SmallDelay -&gt; SmallDelay
+$c+ :: SmallDelay -&gt; SmallDelay -&gt; SmallDelay
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Num</span></a></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#SmallDelay"><span class="hs-identifier hs-type">SmallDelay</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-46"></span><span>    </span><span id="local-6989586621679087495"><span class="annot"><span class="annottext">arbitrary :: Gen SmallDelay
+</span><a href="#local-6989586621679087495"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Gen SmallDelay -&gt; Gen SmallDelay
+forall a. Int -&gt; Gen a -&gt; Gen a
+</span><span class="hs-identifier hs-var">resize</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">5</span></span><span> </span><span class="annot"><span class="annottext">(Gen SmallDelay -&gt; Gen SmallDelay)
+-&gt; Gen SmallDelay -&gt; Gen SmallDelay
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; SmallDelay
+</span><a href="Ouroboros.Network.Testing.Utils.html#SmallDelay"><span class="hs-identifier hs-var">SmallDelay</span></a></span><span> </span><span class="annot"><span class="annottext">(DiffTime -&gt; SmallDelay)
+-&gt; (Delay -&gt; DiffTime) -&gt; Delay -&gt; SmallDelay
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Delay -&gt; DiffTime
+</span><a href="Ouroboros.Network.Testing.Utils.html#getDelay"><span class="hs-identifier hs-var hs-var">getDelay</span></a></span><span> </span><span class="annot"><span class="annottext">(Delay -&gt; SmallDelay) -&gt; Gen Delay -&gt; Gen SmallDelay
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Gen Delay -&gt; (Delay -&gt; Bool) -&gt; Gen Delay
+forall a. Gen a -&gt; (a -&gt; Bool) -&gt; Gen a
+</span><span class="hs-identifier hs-var">suchThat</span></span><span> </span><span class="annot"><span class="annottext">Gen Delay
+forall a. Arbitrary a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#Delay"><span class="hs-identifier hs-type">Delay</span></a></span><span> </span><span id="local-6989586621679087491"><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679087491"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679087491"><span class="hs-identifier hs-var">d</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&lt;</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-number">5</span></span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span>    </span><span id="local-6989586621679087489"><span class="annot"><span class="annottext">shrink :: SmallDelay -&gt; [SmallDelay]
+</span><a href="#local-6989586621679087489"><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#SmallDelay"><span class="hs-identifier hs-type">SmallDelay</span></a></span><span> </span><span id="local-6989586621679087488"><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679087488"><span class="hs-identifier hs-var">delay</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679087488"><span class="hs-identifier hs-var">delay</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;=</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-number">0.1</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; SmallDelay
+</span><a href="Ouroboros.Network.Testing.Utils.html#SmallDelay"><span class="hs-identifier hs-var">SmallDelay</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679087488"><span class="hs-identifier hs-var">delay</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; DiffTime
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-glyph hs-var">-</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-number">0.1</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-48"></span><span>                              </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span class="hs-comment">-- | Pick a subset of a set, using a 50:50 chance for each set element.</span><span>
+</span><span id="line-51"></span><span class="hs-comment">--</span><span>
+</span><span id="line-52"></span><span id="local-6989586621679087487"><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#arbitrarySubset"><span class="hs-identifier hs-type">arbitrarySubset</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Ord</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087487"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-type">Set</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087487"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-type">Set</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087487"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-53"></span><span id="arbitrarySubset"><span class="annot"><span class="annottext">arbitrarySubset :: Set a -&gt; Gen (Set a)
+</span><a href="Ouroboros.Network.Testing.Utils.html#arbitrarySubset"><span class="hs-identifier hs-var hs-var">arbitrarySubset</span></a></span></span><span> </span><span id="local-6989586621679087485"><span class="annot"><span class="annottext">Set a
+</span><a href="#local-6989586621679087485"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-54"></span><span>    </span><span id="local-6989586621679087484"><span class="annot"><span class="annottext">[Bool]
+</span><a href="#local-6989586621679087484"><span class="hs-identifier hs-var">picks</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Gen Bool -&gt; Gen [Bool]
+forall a. Int -&gt; Gen a -&gt; Gen [a]
+</span><span class="hs-identifier hs-var">vectorOf</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set a -&gt; Int
+forall a. Set a -&gt; Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.size</span></a></span><span> </span><span class="annot"><span class="annottext">Set a
+</span><a href="#local-6989586621679087485"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Gen Bool
+forall a. Arbitrary a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrary</span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Bool</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-55"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679087481"><span class="annot"><span class="annottext">s' :: Set a
+</span><a href="#local-6989586621679087481"><span class="hs-identifier hs-var hs-var">s'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[a] -&gt; Set a
+forall a. Ord a =&gt; [a] -&gt; Set a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.fromList</span></a></span><span>
+</span><span id="line-56"></span><span>           </span><span class="annot"><span class="annottext">([a] -&gt; Set a) -&gt; (Set a -&gt; [a]) -&gt; Set a -&gt; Set a
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">((Bool, a) -&gt; a) -&gt; [(Bool, a)] -&gt; [a]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">map</span></a></span><span> </span><span class="annot"><span class="annottext">(Bool, a) -&gt; a
+forall a b. (a, b) -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">snd</span></a></span><span>
+</span><span id="line-57"></span><span>           </span><span class="annot"><span class="annottext">([(Bool, a)] -&gt; [a]) -&gt; (Set a -&gt; [(Bool, a)]) -&gt; Set a -&gt; [a]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">((Bool, a) -&gt; Bool) -&gt; [(Bool, a)] -&gt; [(Bool, a)]
+forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">filter</span></a></span><span> </span><span class="annot"><span class="annottext">(Bool, a) -&gt; Bool
+forall a b. (a, b) -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fst</span></a></span><span>
+</span><span id="line-58"></span><span>           </span><span class="annot"><span class="annottext">([(Bool, a)] -&gt; [(Bool, a)])
+-&gt; (Set a -&gt; [(Bool, a)]) -&gt; Set a -&gt; [(Bool, a)]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">[Bool] -&gt; [a] -&gt; [(Bool, a)]
+forall a b. [a] -&gt; [b] -&gt; [(a, b)]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">zip</span></a></span><span> </span><span class="annot"><span class="annottext">[Bool]
+</span><a href="#local-6989586621679087484"><span class="hs-identifier hs-var">picks</span></a></span><span>
+</span><span id="line-59"></span><span>           </span><span class="annot"><span class="annottext">([a] -&gt; [(Bool, a)]) -&gt; (Set a -&gt; [a]) -&gt; Set a -&gt; [(Bool, a)]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Set a -&gt; [a]
+forall a. Set a -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.toList</span></a></span><span>
+</span><span id="line-60"></span><span>           </span><span class="annot"><span class="annottext">(Set a -&gt; Set a) -&gt; Set a -&gt; Set a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Set a
+</span><a href="#local-6989586621679087485"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-61"></span><span>    </span><span class="annot"><span class="annottext">Set a -&gt; Gen (Set a)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">Set a
+</span><a href="#local-6989586621679087481"><span class="hs-identifier hs-var">s'</span></a></span><span>
+</span><span id="line-62"></span><span>
+</span><span id="line-63"></span><span>
+</span><span id="line-64"></span><span class="hs-comment">-- | Like 'shrinkList' but only shrink the elems, don't drop elements.</span><span>
+</span><span id="line-65"></span><span class="hs-comment">--</span><span>
+</span><span id="line-66"></span><span class="hs-comment">-- Useful when you want a custom strategy for dropping elements.</span><span>
+</span><span id="line-67"></span><span class="hs-comment">--</span><span>
+</span><span id="line-68"></span><span id="local-6989586621679087623"><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#shrinkVector"><span class="hs-identifier hs-type">shrinkVector</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679087623"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679087623"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679087623"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679087623"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span class="hs-special">]</span></span><span>
+</span><span id="line-69"></span><span id="shrinkVector"><span class="annot"><span class="annottext">shrinkVector :: (a -&gt; [a]) -&gt; [a] -&gt; [[a]]
+</span><a href="Ouroboros.Network.Testing.Utils.html#shrinkVector"><span class="hs-identifier hs-var hs-var">shrinkVector</span></a></span></span><span> </span><span class="annot"><span class="annottext">a -&gt; [a]
+</span><span class="hs-identifier">_</span></span><span>   </span><span class="hs-special">[</span><span class="hs-special">]</span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-70"></span><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#shrinkVector"><span class="hs-identifier hs-var">shrinkVector</span></a></span><span> </span><span id="local-6989586621679087477"><span class="annot"><span class="annottext">a -&gt; [a]
+</span><a href="#local-6989586621679087477"><span class="hs-identifier hs-var">shr</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679087476"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087476"><span class="hs-identifier hs-var">x</span></a></span></span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">:</span></a></span><span id="local-6989586621679087475"><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679087475"><span class="hs-identifier hs-var">xs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087474"><span class="hs-identifier hs-var">x'</span></a></span><span class="annot"><span class="annottext">a -&gt; [a] -&gt; [a]
+forall a. a -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-var">:</span></a></span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679087475"><span class="hs-identifier hs-var">xs</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679087474"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087474"><span class="hs-identifier hs-var">x'</span></a></span></span><span>  </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">a -&gt; [a]
+</span><a href="#local-6989586621679087477"><span class="hs-identifier hs-var">shr</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087476"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-71"></span><span>                          </span><span class="annot"><span class="annottext">[[a]] -&gt; [[a]] -&gt; [[a]]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">++</span></a></span><span> </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087476"><span class="hs-identifier hs-var">x</span></a></span><span class="annot"><span class="annottext">a -&gt; [a] -&gt; [a]
+forall a. a -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-var">:</span></a></span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679087473"><span class="hs-identifier hs-var">xs'</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679087473"><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679087473"><span class="hs-identifier hs-var">xs'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(a -&gt; [a]) -&gt; [a] -&gt; [[a]]
+forall a. (a -&gt; [a]) -&gt; [a] -&gt; [[a]]
+</span><a href="Ouroboros.Network.Testing.Utils.html#shrinkVector"><span class="hs-identifier hs-var">shrinkVector</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; [a]
+</span><a href="#local-6989586621679087477"><span class="hs-identifier hs-var">shr</span></a></span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679087475"><span class="hs-identifier hs-var">xs</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-72"></span><span>
+</span><span id="line-73"></span><span>
+</span><span id="line-74"></span><span class="hs-comment">-- | Check that each shrink satisfies some invariant or validity condition.</span><span>
+</span><span id="line-75"></span><span class="hs-comment">--</span><span>
+</span><span id="line-76"></span><span id="local-6989586621679087472"><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#prop_shrink_valid"><span class="hs-identifier hs-type">prop_shrink_valid</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="#local-6989586621679087472"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087472"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-77"></span><span>                  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679087472"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Bool</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Fixed</span></span><span> </span><span class="annot"><a href="#local-6989586621679087472"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Property</span></span></span><span>
+</span><span id="line-78"></span><span id="prop_shrink_valid"><span class="annot"><span class="annottext">prop_shrink_valid :: (a -&gt; Bool) -&gt; Fixed a -&gt; Property
+</span><a href="Ouroboros.Network.Testing.Utils.html#prop_shrink_valid"><span class="hs-identifier hs-var hs-var">prop_shrink_valid</span></a></span></span><span> </span><span id="local-6989586621679087470"><span class="annot"><span class="annottext">a -&gt; Bool
+</span><a href="#local-6989586621679087470"><span class="hs-identifier hs-var">valid</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Fixed</span></span><span> </span><span id="local-6989586621679087468"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087468"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-79"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679087467"><span class="annot"><span class="annottext">invalid :: [a]
+</span><a href="#local-6989586621679087467"><span class="hs-identifier hs-var hs-var">invalid</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087466"><span class="hs-identifier hs-var">x'</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679087466"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087466"><span class="hs-identifier hs-var">x'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">a -&gt; [a]
+forall a. Arbitrary a =&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087468"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">not</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; Bool
+</span><a href="#local-6989586621679087470"><span class="hs-identifier hs-var">valid</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087466"><span class="hs-identifier hs-var">x'</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-80"></span><span>     </span><span class="hs-keyword">in</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679087467"><span class="hs-identifier hs-var">invalid</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-81"></span><span>          </span><span class="hs-special">[</span><span class="hs-special">]</span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Property
+forall prop. Testable prop =&gt; prop -&gt; Property
+</span><span class="hs-identifier hs-var">property</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">True</span></a></span><span>
+</span><span id="line-82"></span><span>          </span><span class="hs-special">(</span><span id="local-6989586621679087463"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087463"><span class="hs-identifier hs-var">x'</span></a></span></span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">:</span></a></span><span class="annot"><span class="annottext">[a]
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; Property -&gt; Property
+forall prop. Testable prop =&gt; String -&gt; prop -&gt; Property
+</span><span class="hs-identifier hs-var">counterexample</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;shrink result invalid:\n&quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">++</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087463"><span class="hs-identifier hs-var">x'</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Property -&gt; Property) -&gt; Property -&gt; Property
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-83"></span><span>                    </span><span class="annot"><span class="annottext">Bool -&gt; Property
+forall prop. Testable prop =&gt; prop -&gt; Property
+</span><span class="hs-identifier hs-var">property</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">False</span></a></span><span>
+</span><span id="line-84"></span><span>
+</span><span id="line-85"></span><span>
+</span><span id="line-86"></span><span class="hs-comment">-- | The 'shrink' function needs to give a valid value that is /smaller/ than</span><span>
+</span><span id="line-87"></span><span class="hs-comment">-- the original, otherwise the shrinking procedure is not well-founded and can</span><span>
+</span><span id="line-88"></span><span class="hs-comment">-- cycle.</span><span>
+</span><span id="line-89"></span><span class="hs-comment">--</span><span>
+</span><span id="line-90"></span><span class="hs-comment">-- This property does not check size, as that would need significant extra</span><span>
+</span><span id="line-91"></span><span class="hs-comment">-- infrastructure to define an appropriate measure. Instead this property</span><span>
+</span><span id="line-92"></span><span class="hs-comment">-- simply checks each shrink is not the same as the original. This catches</span><span>
+</span><span id="line-93"></span><span class="hs-comment">-- simple 1-cycles, but not bigger cycles. These are fortunately the most</span><span>
+</span><span id="line-94"></span><span class="hs-comment">-- common case, so it is still a useful property in practice.</span><span>
+</span><span id="line-95"></span><span class="hs-comment">--</span><span>
+</span><span id="line-96"></span><span id="local-6989586621679087460"><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#prop_shrink_nonequal"><span class="hs-identifier hs-type">prop_shrink_nonequal</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="#local-6989586621679087460"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Eq</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087460"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Fixed</span></span><span> </span><span class="annot"><a href="#local-6989586621679087460"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Property</span></span></span><span>
+</span><span id="line-97"></span><span id="prop_shrink_nonequal"><span class="annot"><span class="annottext">prop_shrink_nonequal :: Fixed a -&gt; Property
+</span><a href="Ouroboros.Network.Testing.Utils.html#prop_shrink_nonequal"><span class="hs-identifier hs-var hs-var">prop_shrink_nonequal</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Fixed</span></span><span> </span><span id="local-6989586621679087458"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087458"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-98"></span><span>    </span><span class="annot"><span class="annottext">String -&gt; Property -&gt; Property
+forall prop. Testable prop =&gt; String -&gt; prop -&gt; Property
+</span><span class="hs-identifier hs-var">counterexample</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;A shrink result equals as the original.\n&quot;</span></span><span> </span><span class="annot"><span class="annottext">(Property -&gt; Property) -&gt; Property -&gt; Property
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-99"></span><span>    </span><span class="annot"><span class="annottext">String -&gt; Bool -&gt; Property
+forall prop. Testable prop =&gt; String -&gt; prop -&gt; Property
+</span><span class="hs-identifier hs-var">counterexample</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;This will cause non-termination for shrinking.&quot;</span></span><span> </span><span class="annot"><span class="annottext">(Bool -&gt; Property) -&gt; Bool -&gt; Property
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-100"></span><span>    </span><span class="annot"><span class="annottext">a -&gt; [a] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">notElem</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087458"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; [a]
+forall a. Arbitrary a =&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679087458"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-101"></span><span>
+</span><span id="line-102"></span><span>
+</span><span id="line-103"></span><span class="hs-comment">-- | Use in 'tabulate' to help summarise data into buckets.</span><span>
+</span><span id="line-104"></span><span class="hs-comment">--</span><span>
+</span><span id="line-105"></span><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#renderRanges"><span class="hs-identifier hs-type">renderRanges</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">String</span></a></span><span>
+</span><span id="line-106"></span><span id="renderRanges"><span class="annot"><span class="annottext">renderRanges :: Int -&gt; Int -&gt; String
+</span><a href="Ouroboros.Network.Testing.Utils.html#renderRanges"><span class="hs-identifier hs-var hs-var">renderRanges</span></a></span></span><span> </span><span id="local-6989586621679087455"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087455"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span id="local-6989586621679087454"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087454"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087453"><span class="hs-identifier hs-var">lower</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">++</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot; -- &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">++</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087452"><span class="hs-identifier hs-var">upper</span></a></span><span>
+</span><span id="line-107"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-108"></span><span>    </span><span id="local-6989586621679087453"><span class="annot"><span class="annottext">lower :: Int
+</span><a href="#local-6989586621679087453"><span class="hs-identifier hs-var hs-var">lower</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087454"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-glyph hs-var">-</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087454"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Integral a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">`mod`</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087455"><span class="hs-identifier hs-var">r</span></a></span><span>
+</span><span id="line-109"></span><span>    </span><span id="local-6989586621679087452"><span class="annot"><span class="annottext">upper :: Int
+</span><a href="#local-6989586621679087452"><span class="hs-identifier hs-var hs-var">upper</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087453"><span class="hs-identifier hs-var">lower</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679087455"><span class="hs-identifier hs-var">r</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-glyph hs-var">-</span></a></span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span>
+</span><span id="line-110"></span><span>
+</span><span id="line-111"></span><span class="hs-comment">--</span><span>
+</span><span id="line-112"></span><span class="hs-comment">-- Debugging tools</span><span>
+</span><span id="line-113"></span><span class="hs-comment">--</span><span>
+</span><span id="line-114"></span><span>
+</span><span id="line-115"></span><span id="local-6989586621679087448"><span id="local-6989586621679087449"><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#debugTracer"><span class="hs-identifier hs-type">debugTracer</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087449"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Applicative</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087448"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Tracer</span></span><span> </span><span class="annot"><a href="#local-6989586621679087448"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087449"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-116"></span><span id="debugTracer"><span class="annot"><span class="annottext">debugTracer :: Tracer m a
 </span><a href="Ouroboros.Network.Testing.Utils.html#debugTracer"><span class="hs-identifier hs-var hs-var">debugTracer</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(a -&gt; m ()) -&gt; Tracer m a
 forall (m :: * -&gt; *) a. (a -&gt; m ()) -&gt; Tracer m a
 </span><span class="hs-identifier hs-var">Tracer</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; m ()
 forall a (f :: * -&gt; *). (Show a, Applicative f) =&gt; a -&gt; f ()
-</span><span class="hs-identifier hs-var">traceShowM</span></span><span>
-</span><span id="line-35"></span><span>
-</span><span id="line-36"></span><span id="local-6989586621679068326"><span id="local-6989586621679068327"><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#sayTracer"><span class="hs-identifier hs-type">sayTracer</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="#local-6989586621679068327"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier hs-type">MonadSay</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679068326"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Tracer</span></span><span> </span><span class="annot"><a href="#local-6989586621679068326"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679068327"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
-</span><span id="line-37"></span><span id="sayTracer"><span class="annot"><span class="annottext">sayTracer :: Tracer m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">traceShowM</span></a></span><span>
+</span><span id="line-117"></span><span>
+</span><span id="line-118"></span><span id="local-6989586621679087444"><span id="local-6989586621679087445"><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#sayTracer"><span class="hs-identifier hs-type">sayTracer</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087445"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">MonadSay</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087444"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Tracer</span></span><span> </span><span class="annot"><a href="#local-6989586621679087444"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679087445"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-119"></span><span id="sayTracer"><span class="annot"><span class="annottext">sayTracer :: Tracer m a
 </span><a href="Ouroboros.Network.Testing.Utils.html#sayTracer"><span class="hs-identifier hs-var hs-var">sayTracer</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(a -&gt; m ()) -&gt; Tracer m a
 forall (m :: * -&gt; *) a. (a -&gt; m ()) -&gt; Tracer m a
 </span><span class="hs-identifier hs-var">Tracer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; m ()
 forall (m :: * -&gt; *). MonadSay m =&gt; String -&gt; m ()
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier hs-var">say</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; m ()) -&gt; (a -&gt; String) -&gt; a -&gt; m ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">say</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; m ()) -&gt; (a -&gt; String) -&gt; a -&gt; m ()
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; String
 forall a. Show a =&gt; a -&gt; String
-</span><span class="hs-identifier hs-var">show</span></span><span class="hs-special">)</span><span>
-</span><span id="line-38"></span><span>
-</span><span id="line-39"></span></pre></body></html>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">show</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-120"></span><span>
+</span><span id="line-121"></span></pre></body></html>

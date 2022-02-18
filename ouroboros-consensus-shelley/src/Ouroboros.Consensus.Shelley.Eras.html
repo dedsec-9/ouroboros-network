@@ -1,183 +1,661 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DataKinds               #-}</span><span>
-</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE FlexibleContexts        #-}</span><span>
-</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE FlexibleInstances       #-}</span><span>
-</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE MultiParamTypeClasses   #-}</span><span>
-</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings       #-}</span><span>
-</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE TypeFamilies            #-}</span><span>
-</span><span id="line-7"></span><span class="hs-pragma">{-# LANGUAGE UndecidableInstances    #-}</span><span>
-</span><span id="line-8"></span><span class="hs-pragma">{-# LANGUAGE UndecidableSuperClasses #-}</span><span>
-</span><span id="line-9"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Consensus.Shelley.Eras</span><span> </span><span class="hs-special">(</span><span>
-</span><span id="line-10"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Eras based on the Shelley ledger</span></span><span>
-</span><span id="line-11"></span><span>    </span><span class="annot"><span class="hs-identifier">AllegraEra</span></span><span>
-</span><span id="line-12"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">MaryEra</span></span><span>
-</span><span id="line-13"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">ShelleyEra</span></span><span>
-</span><span id="line-14"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Eras instantiated with standard crypto</span></span><span>
-</span><span id="line-15"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#StandardAllegra"><span class="hs-identifier">StandardAllegra</span></a></span><span>
-</span><span id="line-16"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#StandardMary"><span class="hs-identifier">StandardMary</span></a></span><span>
-</span><span id="line-17"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#StandardShelley"><span class="hs-identifier">StandardShelley</span></a></span><span>
-</span><span id="line-18"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Shelley-based era</span></span><span>
-</span><span id="line-19"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier">ShelleyBasedEra</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
-</span><span id="line-20"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#WrapTxInBlock"><span class="hs-identifier">WrapTxInBlock</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
-</span><span id="line-21"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Type synonyms for convenience</span></span><span>
-</span><span id="line-22"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier">EraCrypto</span></a></span><span>
-</span><span id="line-23"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Re-exports</span></span><span>
-</span><span id="line-24"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Protocol.Crypto.html#StandardCrypto"><span class="hs-identifier">StandardCrypto</span></a></span><span>
-</span><span id="line-25"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-26"></span><span>
-</span><span id="line-27"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Default.Class</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Default</span></span><span class="hs-special">)</span><span>
-</span><span id="line-28"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">)</span><span>
-</span><span id="line-29"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">GHC.Records</span></span><span>
-</span><span id="line-30"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">NoThunks.Class</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NoThunks</span></span><span class="hs-special">)</span><span>
-</span><span id="line-31"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Numeric.Natural</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Natural</span></span><span class="hs-special">)</span><span>
-</span><span id="line-32"></span><span>
-</span><span id="line-33"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Binary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">FromCBOR</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">ToCBOR</span></span><span class="hs-special">)</span><span>
-</span><span id="line-34"></span><span>
-</span><span id="line-35"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Allegra</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">AllegraEra</span></span><span class="hs-special">)</span><span>
-</span><span id="line-36"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Allegra.Translation</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
-</span><span id="line-37"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Core</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Core</span></span><span>
-</span><span id="line-38"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Era</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Crypto</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">SupportsSegWit</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-39"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Era</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Core</span></span><span>
-</span><span id="line-40"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Mary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">MaryEra</span></span><span class="hs-special">)</span><span>
-</span><span id="line-41"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Mary.Translation</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
-</span><span id="line-42"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Shelley</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">ShelleyEra</span></span><span class="hs-special">)</span><span>
-</span><span id="line-43"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.ShelleyMA</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
-</span><span id="line-44"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.State.Transition</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">State</span></span><span class="hs-special">)</span><span>
-</span><span id="line-45"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Shelley.Spec.Ledger.API</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
-</span><span id="line-46"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Shelley.Spec.Ledger.BaseTypes</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
-</span><span id="line-47"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Shelley.Spec.Ledger.Serialization</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
-</span><span id="line-48"></span><span>
-</span><span id="line-49"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Protocol.Crypto.html"><span class="hs-identifier">Ouroboros.Consensus.Shelley.Protocol.Crypto</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Protocol.Crypto.html#StandardCrypto"><span class="hs-identifier">StandardCrypto</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-50"></span><span>
-</span><span id="line-51"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DeriveAnyClass          #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE FlexibleContexts        #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE FlexibleInstances       #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE MultiParamTypeClasses   #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings       #-}</span><span>
+</span><span id="line-7"></span><span class="hs-pragma">{-# LANGUAGE PatternSynonyms         #-}</span><span>
+</span><span id="line-8"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables     #-}</span><span>
+</span><span id="line-9"></span><span class="hs-pragma">{-# LANGUAGE TypeApplications        #-}</span><span>
+</span><span id="line-10"></span><span class="hs-pragma">{-# LANGUAGE TypeFamilies            #-}</span><span>
+</span><span id="line-11"></span><span class="hs-pragma">{-# LANGUAGE UndecidableInstances    #-}</span><span>
+</span><span id="line-12"></span><span class="hs-pragma">{-# LANGUAGE UndecidableSuperClasses #-}</span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Consensus.Shelley.Eras</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-15"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Eras based on the Shelley ledger</span></span><span>
+</span><span id="line-16"></span><span>    </span><span class="annot"><span class="hs-identifier">AllegraEra</span></span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">AlonzoEra</span></span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">MaryEra</span></span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">ShelleyEra</span></span><span>
+</span><span id="line-20"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Eras instantiated with standard crypto</span></span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#StandardAllegra"><span class="hs-identifier">StandardAllegra</span></a></span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#StandardAlonzo"><span class="hs-identifier">StandardAlonzo</span></a></span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#StandardMary"><span class="hs-identifier">StandardMary</span></a></span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#StandardShelley"><span class="hs-identifier">StandardShelley</span></a></span><span>
+</span><span id="line-25"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Shelley-based era</span></span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier">ShelleyBasedEra</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#WrapTx"><span class="hs-identifier">WrapTx</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Type synonyms for convenience</span></span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier">EraCrypto</span></a></span><span>
+</span><span id="line-30"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Re-exports</span></span><span>
+</span><span id="line-31"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">StandardCrypto</span></span><span>
+</span><span id="line-32"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Exceptions</span></span><span>
+</span><span id="line-33"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#UnexpectedAlonzoLedgerErrors"><span class="hs-identifier">UnexpectedAlonzoLedgerErrors</span></a></span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Control.Exception</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Exception</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">throw</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/mtl-2.2.2/src"><span class="hs-identifier">Control.Monad.Except</span></a></span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Default.Class</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Default</span></span><span class="hs-special">)</span><span>
+</span><span id="line-39"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Data.Set</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Set</span></span><span>
+</span><span id="line-40"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier">Data.Text</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier">Text</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-41"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">GHC.Records</span></a></span><span>
+</span><span id="line-42"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">NoThunks.Class</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NoThunks</span></span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Numeric.Natural</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Natural</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Binary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Annotator</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">FromCBOR</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">ToCBOR</span></span><span class="hs-special">)</span><span>
+</span><span id="line-46"></span><span>
+</span><span id="line-47"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Allegra</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">AllegraEra</span></span><span class="hs-special">)</span><span>
+</span><span id="line-48"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Allegra.Translation</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-49"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Alonzo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">AlonzoEra</span></span><span class="hs-special">)</span><span>
+</span><span id="line-50"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Alonzo.PParams</span></span><span>
+</span><span id="line-51"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Alonzo.Rules.Utxo</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Alonzo</span></span><span>
+</span><span id="line-52"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Alonzo.Rules.Utxos</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Alonzo</span></span><span>
+</span><span id="line-53"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Alonzo.Rules.Utxow</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Alonzo</span></span><span>
+</span><span id="line-54"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Alonzo.Translation</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Alonzo</span></span><span>
+</span><span id="line-55"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Alonzo.Tx</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Alonzo</span></span><span>
+</span><span id="line-56"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.BaseTypes</span></span><span>
+</span><span id="line-57"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Core</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Core</span></span><span>
+</span><span id="line-58"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Crypto</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">StandardCrypto</span></span><span class="hs-special">)</span><span>
+</span><span id="line-59"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Era</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Crypto</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">SupportsSegWit</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-60"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Era</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Core</span></span><span>
+</span><span id="line-61"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Mary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">MaryEra</span></span><span class="hs-special">)</span><span>
+</span><span id="line-62"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Mary.Translation</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-63"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Serialization</span></span><span>
+</span><span id="line-64"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Shelley</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">ShelleyEra</span></span><span class="hs-special">)</span><span>
+</span><span id="line-65"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Shelley.API</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
+</span><span id="line-66"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Shelley.Rules.Ledger</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
+</span><span id="line-67"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Shelley.Rules.Utxow</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
+</span><span id="line-68"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.ShelleyMA</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-69"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.State.Transition</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">State</span></span><span class="hs-special">)</span><span>
+</span><span id="line-70"></span><span>
+</span><span id="line-71"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Hashes</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">EraIndependentTxBody</span></span><span class="hs-special">)</span><span>
+</span><span id="line-72"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Keys</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">DSignable</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Hash</span></span><span class="hs-special">)</span><span>
+</span><span id="line-73"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Protocol.TPraos.API</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
+</span><span id="line-74"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Ledger.SupportsMempool</span></a></span><span>
+</span><span id="line-75"></span><span>                     </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">WhetherToIntervene</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-76"></span><span>
+</span><span id="line-77"></span><span class="hs-comment">{-------------------------------------------------------------------------------
   Eras instantiated with standard crypto
 -------------------------------------------------------------------------------}</span><span>
-</span><span id="line-54"></span><span>
-</span><span id="line-55"></span><span class="hs-comment">-- | The Shelley era with standard crypto</span><span>
-</span><span id="line-56"></span><span class="hs-keyword">type</span><span> </span><span id="StandardShelley"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#StandardShelley"><span class="hs-identifier hs-var">StandardShelley</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ShelleyEra</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Protocol.Crypto.html#StandardCrypto"><span class="hs-identifier hs-type">StandardCrypto</span></a></span><span>
-</span><span id="line-57"></span><span>
-</span><span id="line-58"></span><span class="hs-comment">-- | The Allegra era with standard crypto</span><span>
-</span><span id="line-59"></span><span class="hs-keyword">type</span><span> </span><span id="StandardAllegra"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#StandardAllegra"><span class="hs-identifier hs-var">StandardAllegra</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AllegraEra</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Protocol.Crypto.html#StandardCrypto"><span class="hs-identifier hs-type">StandardCrypto</span></a></span><span>
-</span><span id="line-60"></span><span>
-</span><span id="line-61"></span><span class="hs-comment">-- | The Mary era with standard crypto</span><span>
-</span><span id="line-62"></span><span class="hs-keyword">type</span><span> </span><span id="StandardMary"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#StandardMary"><span class="hs-identifier hs-var">StandardMary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MaryEra</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Protocol.Crypto.html#StandardCrypto"><span class="hs-identifier hs-type">StandardCrypto</span></a></span><span>
-</span><span id="line-63"></span><span>
-</span><span id="line-64"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+</span><span id="line-80"></span><span>
+</span><span id="line-81"></span><span class="hs-comment">-- | The Shelley era with standard crypto</span><span>
+</span><span id="line-82"></span><span class="hs-keyword">type</span><span> </span><span id="StandardShelley"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#StandardShelley"><span class="hs-identifier hs-var">StandardShelley</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ShelleyEra</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">StandardCrypto</span></span><span>
+</span><span id="line-83"></span><span>
+</span><span id="line-84"></span><span class="hs-comment">-- | The Allegra era with standard crypto</span><span>
+</span><span id="line-85"></span><span class="hs-keyword">type</span><span> </span><span id="StandardAllegra"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#StandardAllegra"><span class="hs-identifier hs-var">StandardAllegra</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AllegraEra</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">StandardCrypto</span></span><span>
+</span><span id="line-86"></span><span>
+</span><span id="line-87"></span><span class="hs-comment">-- | The Mary era with standard crypto</span><span>
+</span><span id="line-88"></span><span class="hs-keyword">type</span><span> </span><span id="StandardMary"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#StandardMary"><span class="hs-identifier hs-var">StandardMary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MaryEra</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">StandardCrypto</span></span><span>
+</span><span id="line-89"></span><span>
+</span><span id="line-90"></span><span class="hs-comment">-- | The Alonzo era with standard crypto</span><span>
+</span><span id="line-91"></span><span class="hs-keyword">type</span><span> </span><span id="StandardAlonzo"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#StandardAlonzo"><span class="hs-identifier hs-var">StandardAlonzo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AlonzoEra</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">StandardCrypto</span></span><span>
+</span><span id="line-92"></span><span>
+</span><span id="line-93"></span><span class="hs-comment">{-------------------------------------------------------------------------------
   Type synonyms for convenience
 -------------------------------------------------------------------------------}</span><span>
-</span><span id="line-67"></span><span>
-</span><span id="line-68"></span><span class="hs-comment">-- | The 'Cardano.Ledger.Era.Crypto' type family conflicts with the</span><span>
-</span><span id="line-69"></span><span class="hs-comment">-- 'Cardano.Ledger.Crypto.Crypto' class. To avoid having to import one or both</span><span>
-</span><span id="line-70"></span><span class="hs-comment">-- of them qualified, define 'EraCrypto' as an alias of the former: /return the</span><span>
-</span><span id="line-71"></span><span class="hs-comment">-- crypto used by this era/.</span><span>
-</span><span id="line-72"></span><span class="hs-keyword">type</span><span> </span><span id="EraCrypto"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier hs-var">EraCrypto</span></a></span></span><span> </span><span id="local-6989586621679577925"><span class="annot"><a href="#local-6989586621679577925"><span class="hs-identifier hs-type">era</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Crypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679577925"><span class="hs-identifier hs-type">era</span></a></span><span>
-</span><span id="line-73"></span><span>
-</span><span id="line-74"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+</span><span id="line-96"></span><span>
+</span><span id="line-97"></span><span class="hs-comment">-- | The 'Cardano.Ledger.Era.Crypto' type family conflicts with the</span><span>
+</span><span id="line-98"></span><span class="hs-comment">-- 'Cardano.Ledger.Crypto.Crypto' class. To avoid having to import one or both</span><span>
+</span><span id="line-99"></span><span class="hs-comment">-- of them qualified, define 'EraCrypto' as an alias of the former: /return the</span><span>
+</span><span id="line-100"></span><span class="hs-comment">-- crypto used by this era/.</span><span>
+</span><span id="line-101"></span><span class="hs-keyword">type</span><span> </span><span id="EraCrypto"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier hs-var">EraCrypto</span></a></span></span><span> </span><span id="local-6989586621679727018"><span class="annot"><a href="#local-6989586621679727018"><span class="hs-identifier hs-type">era</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Crypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679727018"><span class="hs-identifier hs-type">era</span></a></span><span>
+</span><span id="line-102"></span><span>
+</span><span id="line-103"></span><span class="hs-comment">{-------------------------------------------------------------------------------
   Era polymorphism
 -------------------------------------------------------------------------------}</span><span>
-</span><span id="line-77"></span><span>
-</span><span id="line-78"></span><span class="hs-comment">-- | The ledger already defines 'SL.ShelleyBasedEra' as /the/ top-level</span><span>
-</span><span id="line-79"></span><span class="hs-comment">-- constraint on an era, however, consensus often needs some more functionality</span><span>
-</span><span id="line-80"></span><span class="hs-comment">-- than the ledger currently provides.</span><span>
-</span><span id="line-81"></span><span class="hs-comment">--</span><span>
-</span><span id="line-82"></span><span class="hs-comment">-- Either the functionality shouldn't or can't live in the ledger, in which case</span><span>
-</span><span id="line-83"></span><span class="hs-comment">-- it can be part and remain part of 'ShelleyBasedEra'. Or, the functionality</span><span>
-</span><span id="line-84"></span><span class="hs-comment">-- /should/ live in the ledger, but hasn't yet been added to the ledger, or it</span><span>
-</span><span id="line-85"></span><span class="hs-comment">-- hasn't yet been propagated to this repository, in which case it can be added</span><span>
-</span><span id="line-86"></span><span class="hs-comment">-- to this class until that is the case.</span><span>
-</span><span id="line-87"></span><span class="hs-comment">--</span><span>
-</span><span id="line-88"></span><span class="hs-comment">-- By having the same name as the class defined in ledger, we can, if this class</span><span>
-</span><span id="line-89"></span><span class="hs-comment">-- becomes redundant, switch to the ledger-defined one without having to update</span><span>
-</span><span id="line-90"></span><span class="hs-comment">-- all the code using it. We can just export the right one from this module.</span><span>
-</span><span id="line-91"></span><span class="hs-comment">--</span><span>
-</span><span id="line-92"></span><span class="hs-comment">-- TODO Currently we include some constraints on the update state which are</span><span>
-</span><span id="line-93"></span><span class="hs-comment">-- needed to determine the hard fork point. In the future this should be</span><span>
-</span><span id="line-94"></span><span class="hs-comment">-- replaced with an appropriate API - see</span><span>
-</span><span id="line-95"></span><span class="hs-comment">-- https://github.com/input-output-hk/ouroboros-network/issues/2890</span><span>
-</span><span id="line-96"></span><span class="hs-keyword">class</span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.ShelleyBasedEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span><span>
-</span><span id="line-97"></span><span>
-</span><span id="line-98"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.EraRule</span></span><span> </span><span class="annot"><span class="hs-string">&quot;PPUP&quot;</span></span><span> </span><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-glyph hs-type">~</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.PPUPState</span></span><span> </span><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span><span>
-</span><span id="line-99"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Default</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.EraRule</span></span><span> </span><span class="annot"><span class="hs-string">&quot;PPUP&quot;</span></span><span> </span><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-100"></span><span>
-</span><span id="line-101"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HasField</span></span><span> </span><span class="annot"><span class="hs-string">&quot;_maxBHSize&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.PParams</span></span><span> </span><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Natural</span></span><span>
-</span><span id="line-102"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HasField</span></span><span> </span><span class="annot"><span class="hs-string">&quot;_maxTxSize&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.PParams</span></span><span> </span><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Natural</span></span><span>
-</span><span id="line-103"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HasField</span></span><span> </span><span class="annot"><span class="hs-string">&quot;_a0&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.PParams</span></span><span> </span><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Rational</span></span><span>
-</span><span id="line-104"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HasField</span></span><span> </span><span class="annot"><span class="hs-string">&quot;_nOpt&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.PParams</span></span><span> </span><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Natural</span></span><span>
-</span><span id="line-105"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HasField</span></span><span> </span><span class="annot"><span class="hs-string">&quot;_rho&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.PParams</span></span><span> </span><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.UnitInterval</span></span><span>
-</span><span id="line-106"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HasField</span></span><span> </span><span class="annot"><span class="hs-string">&quot;_tau&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.PParams</span></span><span> </span><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.UnitInterval</span></span><span>
-</span><span id="line-107"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FromCBOR</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.PParams</span></span><span> </span><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-108"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ToCBOR</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.PParams</span></span><span> </span><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-109"></span><span>
-</span><span id="line-110"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HasField</span></span><span> </span><span class="annot"><span class="hs-string">&quot;_protocolVersion&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.PParamsDelta</span></span><span> </span><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.StrictMaybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.ProtVer</span></span><span class="hs-special">)</span><span>
-</span><span id="line-111"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FromCBOR</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.PParamsDelta</span></span><span> </span><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-112"></span><span>
-</span><span id="line-113"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.AdditionalGenesisConfig</span></span><span> </span><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span><span> </span><span class="annot"><span class="hs-glyph hs-type">~</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
-</span><span id="line-114"></span><span>
-</span><span id="line-115"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.ToCBORGroup</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">TxSeq</span></span><span> </span><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-116"></span><span>
-</span><span id="line-117"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.TxInBlock</span></span><span> </span><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-118"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NoThunks</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.TxInBlock</span></span><span> </span><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-119"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.TxInBlock</span></span><span> </span><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-120"></span><span>
-</span><span id="line-121"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NoThunks</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.TranslationContext</span></span><span> </span><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-122"></span><span>
-</span><span id="line-123"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ToCBOR</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.Witnesses</span></span><span> </span><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-124"></span><span>
-</span><span id="line-125"></span><span>      </span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span id="ShelleyBasedEra"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-var">ShelleyBasedEra</span></a></span></span><span> </span><span id="local-6989586621679577963"><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-126"></span><span>  </span><span class="hs-comment">-- | Return the name of the Shelley-based era, e.g., @&quot;Shelley&quot;@, @&quot;Allegra&quot;@,</span><span>
-</span><span id="line-127"></span><span>  </span><span class="hs-comment">-- etc.</span><span>
-</span><span id="line-128"></span><span>  </span><span id="local-6989586621679577966"><span id="shelleyBasedEraName"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#shelleyBasedEraName"><span class="hs-identifier hs-type">shelleyBasedEraName</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679577966"><span class="hs-identifier hs-type">proxy</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679577963"><span class="hs-identifier hs-type">era</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
-</span><span id="line-129"></span><span>
-</span><span id="line-130"></span><span id="local-6989586621679577923"><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.PraosCrypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679577923"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">ShelleyEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679577923"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-131"></span><span>  </span><span id="local-6989586621679577900"><span class="annot"><span class="annottext">shelleyBasedEraName :: proxy (ShelleyEra c) -&gt; Text
-</span><a href="#local-6989586621679577900"><span class="hs-identifier hs-var hs-var hs-var hs-var">shelleyBasedEraName</span></a></span></span><span> </span><span class="annot"><span class="annottext">proxy (ShelleyEra c)
+</span><span id="line-106"></span><span>
+</span><span id="line-107"></span><span class="hs-comment">-- | The ledger already defines 'SL.ShelleyBasedEra' as /the/ top-level</span><span>
+</span><span id="line-108"></span><span class="hs-comment">-- constraint on an era, however, consensus often needs some more functionality</span><span>
+</span><span id="line-109"></span><span class="hs-comment">-- than the ledger currently provides.</span><span>
+</span><span id="line-110"></span><span class="hs-comment">--</span><span>
+</span><span id="line-111"></span><span class="hs-comment">-- Either the functionality shouldn't or can't live in the ledger, in which case</span><span>
+</span><span id="line-112"></span><span class="hs-comment">-- it can be part and remain part of 'ShelleyBasedEra'. Or, the functionality</span><span>
+</span><span id="line-113"></span><span class="hs-comment">-- /should/ live in the ledger, but hasn't yet been added to the ledger, or it</span><span>
+</span><span id="line-114"></span><span class="hs-comment">-- hasn't yet been propagated to this repository, in which case it can be added</span><span>
+</span><span id="line-115"></span><span class="hs-comment">-- to this class until that is the case.</span><span>
+</span><span id="line-116"></span><span class="hs-comment">--</span><span>
+</span><span id="line-117"></span><span class="hs-comment">-- By having the same name as the class defined in ledger, we can, if this class</span><span>
+</span><span id="line-118"></span><span class="hs-comment">-- becomes redundant, switch to the ledger-defined one without having to update</span><span>
+</span><span id="line-119"></span><span class="hs-comment">-- all the code using it. We can just export the right one from this module.</span><span>
+</span><span id="line-120"></span><span class="hs-comment">--</span><span>
+</span><span id="line-121"></span><span class="hs-comment">-- TODO Currently we include some constraints on the update state which are</span><span>
+</span><span id="line-122"></span><span class="hs-comment">-- needed to determine the hard fork point. In the future this should be</span><span>
+</span><span id="line-123"></span><span class="hs-comment">-- replaced with an appropriate API - see</span><span>
+</span><span id="line-124"></span><span class="hs-comment">-- https://github.com/input-output-hk/ouroboros-network/issues/2890</span><span>
+</span><span id="line-125"></span><span class="hs-keyword">class</span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.ShelleyBasedEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span>
+</span><span id="line-126"></span><span>
+</span><span id="line-127"></span><span>        </span><span class="hs-comment">-- Constraints that relate to the protocol. These should be dropped once</span><span>
+</span><span id="line-128"></span><span>        </span><span class="hs-comment">-- the protocol is independent of the ledger.</span><span>
+</span><span id="line-129"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.PraosCrypto</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier hs-type">EraCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-130"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.GetLedgerView</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span>
+</span><span id="line-131"></span><span>
+</span><span id="line-132"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.EraRule</span></span><span> </span><span class="annot"><span class="hs-string">&quot;PPUP&quot;</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">~</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.PPUPState</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span>
+</span><span id="line-133"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Default</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.EraRule</span></span><span> </span><span class="annot"><span class="hs-string">&quot;PPUP&quot;</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-134"></span><span>
+</span><span id="line-135"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">HasField</span></a></span><span> </span><span class="annot"><span class="hs-string">&quot;_maxBHSize&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.PParams</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Natural</span></a></span><span>
+</span><span id="line-136"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">HasField</span></a></span><span> </span><span class="annot"><span class="hs-string">&quot;_maxTxSize&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.PParams</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Natural</span></a></span><span>
+</span><span id="line-137"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">HasField</span></a></span><span> </span><span class="annot"><span class="hs-string">&quot;_a0&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.PParams</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NonNegativeInterval</span></span><span>
+</span><span id="line-138"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">HasField</span></a></span><span> </span><span class="annot"><span class="hs-string">&quot;_nOpt&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.PParams</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Natural</span></a></span><span>
+</span><span id="line-139"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">HasField</span></a></span><span> </span><span class="annot"><span class="hs-string">&quot;_rho&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.PParams</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">UnitInterval</span></span><span>
+</span><span id="line-140"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">HasField</span></a></span><span> </span><span class="annot"><span class="hs-string">&quot;_tau&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.PParams</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">UnitInterval</span></span><span>
+</span><span id="line-141"></span><span>
+</span><span id="line-142"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Core.ValidateScript</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span>
+</span><span id="line-143"></span><span>
+</span><span id="line-144"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FromCBOR</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.PParams</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-145"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ToCBOR</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.PParams</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-146"></span><span>
+</span><span id="line-147"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">HasField</span></a></span><span> </span><span class="annot"><span class="hs-string">&quot;_protocolVersion&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.PParamsDelta</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.StrictMaybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.ProtVer</span></span><span class="hs-special">)</span><span>
+</span><span id="line-148"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FromCBOR</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.PParamsDelta</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-149"></span><span>
+</span><span id="line-150"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.AdditionalGenesisConfig</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">~</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Core.TranslationContext</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span>
+</span><span id="line-151"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ToCBORGroup</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">TxSeq</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-152"></span><span>
+</span><span id="line-153"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NoThunks</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.TranslationContext</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-154"></span><span>
+</span><span id="line-155"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FromCBOR</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Annotator</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.Witnesses</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-156"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ToCBOR</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.Witnesses</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-157"></span><span>
+</span><span id="line-158"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Eq</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">TxSeq</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-159"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">TxSeq</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-160"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FromCBOR</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Annotator</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">TxSeq</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-161"></span><span>
+</span><span id="line-162"></span><span>      </span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span id="ShelleyBasedEra"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-var">ShelleyBasedEra</span></a></span></span><span> </span><span id="local-6989586621679727100"><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-163"></span><span>
+</span><span id="line-164"></span><span>  </span><span class="hs-comment">-- | Return the name of the Shelley-based era, e.g., @&quot;Shelley&quot;@, @&quot;Allegra&quot;@,</span><span>
+</span><span id="line-165"></span><span>  </span><span class="hs-comment">-- etc.</span><span>
+</span><span id="line-166"></span><span>  </span><span id="local-6989586621679727106"><span id="shelleyBasedEraName"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#shelleyBasedEraName"><span class="hs-identifier hs-type">shelleyBasedEraName</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679727106"><span class="hs-identifier hs-type">proxy</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-type">Text</span></a></span></span><span>
+</span><span id="line-167"></span><span>
+</span><span id="line-168"></span><span>  </span><span id="applyShelleyBasedTx"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#applyShelleyBasedTx"><span class="hs-identifier hs-type">applyShelleyBasedTx</span></a></span></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-169"></span><span>       </span><span class="annot"><span class="hs-identifier hs-type">SL.Globals</span></span><span>
+</span><span id="line-170"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.LedgerEnv</span></span><span>    </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span>
+</span><span id="line-171"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.MempoolState</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span>
+</span><span id="line-172"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">WhetherToIntervene</span></a></span><span>
+</span><span id="line-173"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Core.Tx</span></span><span>           </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span>
+</span><span id="line-174"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-type">Except</span></a></span><span>
+</span><span id="line-175"></span><span>         </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.ApplyTxError</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-176"></span><span>         </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.MempoolState</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span>
+</span><span id="line-177"></span><span>         </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.Validated</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.Tx</span></span><span> </span><span class="annot"><a href="#local-6989586621679727100"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-178"></span><span>         </span><span class="hs-special">)</span><span>
+</span><span id="line-179"></span><span>
+</span><span id="line-180"></span><span class="hs-comment">-- | The default implementation of 'applyShelleyBasedTx', a thin wrapper around</span><span>
+</span><span id="line-181"></span><span class="hs-comment">-- 'SL.applyTx'</span><span>
+</span><span id="line-182"></span><span id="local-6989586621679727098"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#defaultApplyShelleyBasedTx"><span class="hs-identifier hs-type">defaultApplyShelleyBasedTx</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-183"></span><span>     </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679727098"><span class="hs-identifier hs-type">era</span></a></span><span>
+</span><span id="line-184"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.Globals</span></span><span>
+</span><span id="line-185"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.LedgerEnv</span></span><span>    </span><span class="annot"><a href="#local-6989586621679727098"><span class="hs-identifier hs-type">era</span></a></span><span>
+</span><span id="line-186"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.MempoolState</span></span><span> </span><span class="annot"><a href="#local-6989586621679727098"><span class="hs-identifier hs-type">era</span></a></span><span>
+</span><span id="line-187"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">WhetherToIntervene</span></a></span><span>
+</span><span id="line-188"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Core.Tx</span></span><span>         </span><span class="annot"><a href="#local-6989586621679727098"><span class="hs-identifier hs-type">era</span></a></span><span>
+</span><span id="line-189"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-type">Except</span></a></span><span>
+</span><span id="line-190"></span><span>       </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.ApplyTxError</span></span><span> </span><span class="annot"><a href="#local-6989586621679727098"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-191"></span><span>       </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.MempoolState</span></span><span> </span><span class="annot"><a href="#local-6989586621679727098"><span class="hs-identifier hs-type">era</span></a></span><span>
+</span><span id="line-192"></span><span>       </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.Validated</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.Tx</span></span><span> </span><span class="annot"><a href="#local-6989586621679727098"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-193"></span><span>       </span><span class="hs-special">)</span></span><span>
+</span><span id="line-194"></span><span id="defaultApplyShelleyBasedTx"><span class="annot"><span class="annottext">defaultApplyShelleyBasedTx :: Globals
+-&gt; LedgerEnv era
+-&gt; MempoolState era
+-&gt; WhetherToIntervene
+-&gt; Tx era
+-&gt; Except (ApplyTxError era) (MempoolState era, Validated (Tx era))
+</span><a href="Ouroboros.Consensus.Shelley.Eras.html#defaultApplyShelleyBasedTx"><span class="hs-identifier hs-var hs-var">defaultApplyShelleyBasedTx</span></a></span></span><span> </span><span id="local-6989586621679727014"><span class="annot"><span class="annottext">Globals
+</span><a href="#local-6989586621679727014"><span class="hs-identifier hs-var">globals</span></a></span></span><span> </span><span id="local-6989586621679727013"><span class="annot"><span class="annottext">LedgerEnv era
+</span><a href="#local-6989586621679727013"><span class="hs-identifier hs-var">ledgerEnv</span></a></span></span><span> </span><span id="local-6989586621679727012"><span class="annot"><span class="annottext">MempoolState era
+</span><a href="#local-6989586621679727012"><span class="hs-identifier hs-var">mempoolState</span></a></span></span><span> </span><span id="local-6989586621679727011"><span class="annot"><span class="annottext">WhetherToIntervene
+</span><a href="#local-6989586621679727011"><span class="hs-identifier hs-var">_wti</span></a></span></span><span> </span><span id="local-6989586621679727010"><span class="annot"><span class="annottext">Tx era
+</span><a href="#local-6989586621679727010"><span class="hs-identifier hs-var">tx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-195"></span><span>    </span><span class="annot"><span class="annottext">Globals
+-&gt; LedgerEnv era
+-&gt; MempoolState era
+-&gt; Tx era
+-&gt; Except (ApplyTxError era) (MempoolState era, Validated (Tx era))
+forall era (m :: * -&gt; *).
+(ApplyTx era, MonadError (ApplyTxError era) m) =&gt;
+Globals
+-&gt; MempoolEnv era
+-&gt; MempoolState era
+-&gt; Tx era
+-&gt; m (MempoolState era, Validated (Tx era))
+</span><span class="hs-identifier hs-var">SL.applyTx</span></span><span>
+</span><span id="line-196"></span><span>      </span><span class="annot"><span class="annottext">Globals
+</span><a href="#local-6989586621679727014"><span class="hs-identifier hs-var">globals</span></a></span><span>
+</span><span id="line-197"></span><span>      </span><span class="annot"><span class="annottext">LedgerEnv era
+</span><a href="#local-6989586621679727013"><span class="hs-identifier hs-var">ledgerEnv</span></a></span><span>
+</span><span id="line-198"></span><span>      </span><span class="annot"><span class="annottext">MempoolState era
+</span><a href="#local-6989586621679727012"><span class="hs-identifier hs-var">mempoolState</span></a></span><span>
+</span><span id="line-199"></span><span>      </span><span class="annot"><span class="annottext">Tx era
+</span><a href="#local-6989586621679727010"><span class="hs-identifier hs-var">tx</span></a></span><span>
+</span><span id="line-200"></span><span>
+</span><span id="line-201"></span><span id="local-6989586621679727008"><span class="hs-keyword">instance</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.PraosCrypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679727008"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">DSignable</span></span><span> </span><span class="annot"><a href="#local-6989586621679727008"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Hash</span></span><span> </span><span class="annot"><a href="#local-6989586621679727008"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">EraIndependentTxBody</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-202"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">ShelleyEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679727008"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-203"></span><span>  </span><span id="local-6989586621679726980"><span class="annot"><span class="annottext">shelleyBasedEraName :: proxy (ShelleyEra c) -&gt; Text
+</span><a href="#local-6989586621679726980"><span class="hs-identifier hs-var hs-var hs-var hs-var">shelleyBasedEraName</span></a></span></span><span> </span><span class="annot"><span class="annottext">proxy (ShelleyEra c)
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
-</span><span class="hs-string">&quot;Shelley&quot;</span></span></span><span>
-</span><span id="line-132"></span><span>
-</span><span id="line-133"></span><span id="local-6989586621679577899"><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.PraosCrypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679577899"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">AllegraEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679577899"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-134"></span><span>  </span><span id="local-6989586621679577877"><span class="annot"><span class="annottext">shelleyBasedEraName :: proxy (AllegraEra c) -&gt; Text
-</span><a href="#local-6989586621679577877"><span class="hs-identifier hs-var hs-var hs-var hs-var">shelleyBasedEraName</span></a></span></span><span> </span><span class="annot"><span class="annottext">proxy (AllegraEra c)
-</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
-</span><span class="hs-string">&quot;Allegra&quot;</span></span></span><span>
-</span><span id="line-135"></span><span>
-</span><span id="line-136"></span><span id="local-6989586621679577876"><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.PraosCrypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679577876"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MaryEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679577876"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-137"></span><span>  </span><span id="local-6989586621679577854"><span class="annot"><span class="annottext">shelleyBasedEraName :: proxy (MaryEra c) -&gt; Text
-</span><a href="#local-6989586621679577854"><span class="hs-identifier hs-var hs-var hs-var hs-var">shelleyBasedEraName</span></a></span></span><span> </span><span class="annot"><span class="annottext">proxy (MaryEra c)
-</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
-</span><span class="hs-string">&quot;Mary&quot;</span></span></span><span>
-</span><span id="line-138"></span><span>
-</span><span id="line-139"></span><span class="hs-comment">{-------------------------------------------------------------------------------
-  TxInBlock wrapper
--------------------------------------------------------------------------------}</span><span>
-</span><span id="line-142"></span><span>
-</span><span id="line-143"></span><span class="hs-comment">-- | Wrapper for partially applying 'Core.TxInBlock'</span><span>
-</span><span id="line-144"></span><span class="hs-comment">--</span><span>
-</span><span id="line-145"></span><span class="hs-comment">-- For generality, Consensus uses that type family as eg the index of</span><span>
-</span><span id="line-146"></span><span class="hs-comment">-- 'Core.TranslateEra'. We thus need to partially apply it.</span><span>
-</span><span id="line-147"></span><span class="hs-keyword">newtype</span><span> </span><span id="WrapTxInBlock"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#WrapTxInBlock"><span class="hs-identifier hs-var">WrapTxInBlock</span></a></span></span><span> </span><span id="local-6989586621679577937"><span class="annot"><a href="#local-6989586621679577937"><span class="hs-identifier hs-type">era</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="WrapTxInBlock"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#WrapTxInBlock"><span class="hs-identifier hs-var">WrapTxInBlock</span></a></span></span><span> </span><span class="hs-special">{</span><span id="unwrapTxInBlock"><span class="annot"><span class="annottext">WrapTxInBlock era -&gt; TxInBlock era
-</span><a href="Ouroboros.Consensus.Shelley.Eras.html#unwrapTxInBlock"><span class="hs-identifier hs-var hs-var">unwrapTxInBlock</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Core.TxInBlock</span></span><span> </span><span class="annot"><a href="#local-6989586621679577937"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">}</span><span>
-</span><span id="line-148"></span><span>
-</span><span id="line-149"></span><span id="local-6989586621679577851"><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">AllegraEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679577851"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Core.TranslateEra</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">AllegraEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679577851"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#WrapTxInBlock"><span class="hs-identifier hs-type">WrapTxInBlock</span></a></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-150"></span><span>  </span><span class="hs-keyword">type</span><span> </span><span id="TranslationError"><span class="annot"><span class="hs-identifier hs-var">TranslationError</span></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">AllegraEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679577851"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#WrapTxInBlock"><span class="hs-identifier hs-type">WrapTxInBlock</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Core.TranslationError</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">AllegraEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679577851"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.Tx</span></span><span>
-</span><span id="line-151"></span><span>  </span><span id="local-6989586621679577846"><span class="annot"><span class="annottext">translateEra :: TranslationContext (AllegraEra c)
--&gt; WrapTxInBlock (PreviousEra (AllegraEra c))
+</span><span class="hs-string">&quot;Shelley&quot;</span></span><span>
+</span><span id="line-204"></span><span>
+</span><span id="line-205"></span><span>  </span><span id="local-6989586621679726979"><span class="annot"><span class="annottext">applyShelleyBasedTx :: Globals
+-&gt; LedgerEnv (ShelleyEra c)
+-&gt; MempoolState (ShelleyEra c)
+-&gt; WhetherToIntervene
+-&gt; Tx (ShelleyEra c)
 -&gt; Except
-     (TranslationError (AllegraEra c) WrapTxInBlock)
-     (WrapTxInBlock (AllegraEra c))
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">translateEra</span></span></span><span> </span><span id="local-6989586621679577844"><span class="annot"><span class="annottext">TranslationContext (AllegraEra c)
-</span><a href="#local-6989586621679577844"><span class="hs-identifier hs-var">ctxt</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Tx (AllegraEra c) -&gt; WrapTxInBlock (AllegraEra c))
--&gt; ExceptT DecoderError Identity (Tx (AllegraEra c))
--&gt; ExceptT DecoderError Identity (WrapTxInBlock (AllegraEra c))
-forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">Tx (AllegraEra c) -&gt; WrapTxInBlock (AllegraEra c)
-forall era. TxInBlock era -&gt; WrapTxInBlock era
-</span><a href="Ouroboros.Consensus.Shelley.Eras.html#WrapTxInBlock"><span class="hs-identifier hs-var">WrapTxInBlock</span></a></span><span> </span><span class="annot"><span class="annottext">(ExceptT DecoderError Identity (Tx (AllegraEra c))
- -&gt; ExceptT DecoderError Identity (WrapTxInBlock (AllegraEra c)))
--&gt; (WrapTxInBlock (ShelleyEra c)
-    -&gt; ExceptT DecoderError Identity (Tx (AllegraEra c)))
--&gt; WrapTxInBlock (ShelleyEra c)
--&gt; ExceptT DecoderError Identity (WrapTxInBlock (AllegraEra c))
+     (ApplyTxError (ShelleyEra c))
+     (MempoolState (ShelleyEra c), Validated (Tx (ShelleyEra c)))
+</span><a href="#local-6989586621679726979"><span class="hs-identifier hs-var hs-var hs-var hs-var">applyShelleyBasedTx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Globals
+-&gt; LedgerEnv (ShelleyEra c)
+-&gt; MempoolState (ShelleyEra c)
+-&gt; WhetherToIntervene
+-&gt; Tx (ShelleyEra c)
+-&gt; Except
+     (ApplyTxError (ShelleyEra c))
+     (MempoolState (ShelleyEra c), Validated (Tx (ShelleyEra c)))
+forall era.
+ShelleyBasedEra era =&gt;
+Globals
+-&gt; LedgerEnv era
+-&gt; MempoolState era
+-&gt; WhetherToIntervene
+-&gt; Tx era
+-&gt; Except (ApplyTxError era) (MempoolState era, Validated (Tx era))
+</span><a href="Ouroboros.Consensus.Shelley.Eras.html#defaultApplyShelleyBasedTx"><span class="hs-identifier hs-var">defaultApplyShelleyBasedTx</span></a></span></span><span>
+</span><span id="line-206"></span><span>
+</span><span id="line-207"></span><span id="local-6989586621679726978"><span class="hs-keyword">instance</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.PraosCrypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679726978"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">DSignable</span></span><span> </span><span class="annot"><a href="#local-6989586621679726978"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Hash</span></span><span> </span><span class="annot"><a href="#local-6989586621679726978"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">EraIndependentTxBody</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-208"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">AllegraEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679726978"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-209"></span><span>  </span><span id="local-6989586621679726951"><span class="annot"><span class="annottext">shelleyBasedEraName :: proxy (AllegraEra c) -&gt; Text
+</span><a href="#local-6989586621679726951"><span class="hs-identifier hs-var hs-var hs-var hs-var">shelleyBasedEraName</span></a></span></span><span> </span><span class="annot"><span class="annottext">proxy (AllegraEra c)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;Allegra&quot;</span></span><span>
+</span><span id="line-210"></span><span>
+</span><span id="line-211"></span><span>  </span><span id="local-6989586621679726950"><span class="annot"><span class="annottext">applyShelleyBasedTx :: Globals
+-&gt; LedgerEnv (AllegraEra c)
+-&gt; MempoolState (AllegraEra c)
+-&gt; WhetherToIntervene
+-&gt; Tx (AllegraEra c)
+-&gt; Except
+     (ApplyTxError (AllegraEra c))
+     (MempoolState (AllegraEra c), Validated (Tx (AllegraEra c)))
+</span><a href="#local-6989586621679726950"><span class="hs-identifier hs-var hs-var hs-var hs-var">applyShelleyBasedTx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Globals
+-&gt; LedgerEnv (AllegraEra c)
+-&gt; MempoolState (AllegraEra c)
+-&gt; WhetherToIntervene
+-&gt; Tx (AllegraEra c)
+-&gt; Except
+     (ApplyTxError (AllegraEra c))
+     (MempoolState (AllegraEra c), Validated (Tx (AllegraEra c)))
+forall era.
+ShelleyBasedEra era =&gt;
+Globals
+-&gt; LedgerEnv era
+-&gt; MempoolState era
+-&gt; WhetherToIntervene
+-&gt; Tx era
+-&gt; Except (ApplyTxError era) (MempoolState era, Validated (Tx era))
+</span><a href="Ouroboros.Consensus.Shelley.Eras.html#defaultApplyShelleyBasedTx"><span class="hs-identifier hs-var">defaultApplyShelleyBasedTx</span></a></span></span><span>
+</span><span id="line-212"></span><span>
+</span><span id="line-213"></span><span id="local-6989586621679726949"><span class="hs-keyword">instance</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.PraosCrypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679726949"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">DSignable</span></span><span> </span><span class="annot"><a href="#local-6989586621679726949"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Hash</span></span><span> </span><span class="annot"><a href="#local-6989586621679726949"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">EraIndependentTxBody</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-214"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MaryEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679726949"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-215"></span><span>  </span><span id="local-6989586621679726922"><span class="annot"><span class="annottext">shelleyBasedEraName :: proxy (MaryEra c) -&gt; Text
+</span><a href="#local-6989586621679726922"><span class="hs-identifier hs-var hs-var hs-var hs-var">shelleyBasedEraName</span></a></span></span><span> </span><span class="annot"><span class="annottext">proxy (MaryEra c)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;Mary&quot;</span></span><span>
+</span><span id="line-216"></span><span>
+</span><span id="line-217"></span><span>  </span><span id="local-6989586621679726921"><span class="annot"><span class="annottext">applyShelleyBasedTx :: Globals
+-&gt; LedgerEnv (MaryEra c)
+-&gt; MempoolState (MaryEra c)
+-&gt; WhetherToIntervene
+-&gt; Tx (MaryEra c)
+-&gt; Except
+     (ApplyTxError (MaryEra c))
+     (MempoolState (MaryEra c), Validated (Tx (MaryEra c)))
+</span><a href="#local-6989586621679726921"><span class="hs-identifier hs-var hs-var hs-var hs-var">applyShelleyBasedTx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Globals
+-&gt; LedgerEnv (MaryEra c)
+-&gt; MempoolState (MaryEra c)
+-&gt; WhetherToIntervene
+-&gt; Tx (MaryEra c)
+-&gt; Except
+     (ApplyTxError (MaryEra c))
+     (MempoolState (MaryEra c), Validated (Tx (MaryEra c)))
+forall era.
+ShelleyBasedEra era =&gt;
+Globals
+-&gt; LedgerEnv era
+-&gt; MempoolState era
+-&gt; WhetherToIntervene
+-&gt; Tx era
+-&gt; Except (ApplyTxError era) (MempoolState era, Validated (Tx era))
+</span><a href="Ouroboros.Consensus.Shelley.Eras.html#defaultApplyShelleyBasedTx"><span class="hs-identifier hs-var">defaultApplyShelleyBasedTx</span></a></span></span><span>
+</span><span id="line-218"></span><span>
+</span><span id="line-219"></span><span id="local-6989586621679726920"><span class="hs-keyword">instance</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.PraosCrypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679726920"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">DSignable</span></span><span> </span><span class="annot"><a href="#local-6989586621679726920"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Hash</span></span><span> </span><span class="annot"><a href="#local-6989586621679726920"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">EraIndependentTxBody</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-220"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">AlonzoEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679726920"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-221"></span><span>  </span><span id="local-6989586621679726893"><span class="annot"><span class="annottext">shelleyBasedEraName :: proxy (AlonzoEra c) -&gt; Text
+</span><a href="#local-6989586621679726893"><span class="hs-identifier hs-var hs-var hs-var hs-var">shelleyBasedEraName</span></a></span></span><span> </span><span class="annot"><span class="annottext">proxy (AlonzoEra c)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;Alonzo&quot;</span></span><span>
+</span><span id="line-222"></span><span>
+</span><span id="line-223"></span><span>  </span><span id="local-6989586621679726892"><span class="annot"><span class="annottext">applyShelleyBasedTx :: Globals
+-&gt; LedgerEnv (AlonzoEra c)
+-&gt; MempoolState (AlonzoEra c)
+-&gt; WhetherToIntervene
+-&gt; Tx (AlonzoEra c)
+-&gt; Except
+     (ApplyTxError (AlonzoEra c))
+     (MempoolState (AlonzoEra c), Validated (Tx (AlonzoEra c)))
+</span><a href="#local-6989586621679726892"><span class="hs-identifier hs-var hs-var hs-var hs-var">applyShelleyBasedTx</span></a></span></span><span> </span><span id="local-6989586621679726891"><span class="annot"><span class="annottext">Globals
+</span><a href="#local-6989586621679726891"><span class="hs-identifier hs-var">globals</span></a></span></span><span> </span><span id="local-6989586621679726890"><span class="annot"><span class="annottext">LedgerEnv (AlonzoEra c)
+</span><a href="#local-6989586621679726890"><span class="hs-identifier hs-var">ledgerEnv</span></a></span></span><span> </span><span id="local-6989586621679726889"><span class="annot"><span class="annottext">MempoolState (AlonzoEra c)
+</span><a href="#local-6989586621679726889"><span class="hs-identifier hs-var">mempoolState</span></a></span></span><span> </span><span id="local-6989586621679726888"><span class="annot"><span class="annottext">WhetherToIntervene
+</span><a href="#local-6989586621679726888"><span class="hs-identifier hs-var">wti</span></a></span></span><span> </span><span id="local-6989586621679726887"><span class="annot"><span class="annottext">Tx (AlonzoEra c)
+</span><a href="#local-6989586621679726887"><span class="hs-identifier hs-var">tx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-224"></span><span>      </span><span class="hs-special">(</span><span id="local-6989586621679726886"><span class="annot"><span class="annottext">(UTxOState (AlonzoEra c), DPState c)
+</span><a href="#local-6989586621679726886"><span class="hs-identifier hs-var">mempoolState'</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679726885"><span class="annot"><span class="annottext">Validated (ValidatedTx (AlonzoEra c))
+</span><a href="#local-6989586621679726885"><span class="hs-identifier hs-var">vtx</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-225"></span><span>          </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ExceptT
+  (ApplyTxError (AlonzoEra c))
+  Identity
+  ((UTxOState (AlonzoEra c), DPState c),
+   Validated (ValidatedTx (AlonzoEra c)))
+-&gt; (ApplyTxError (AlonzoEra c)
+    -&gt; ExceptT
+         (ApplyTxError (AlonzoEra c))
+         Identity
+         ((UTxOState (AlonzoEra c), DPState c),
+          Validated (ValidatedTx (AlonzoEra c))))
+-&gt; ExceptT
+     (ApplyTxError (AlonzoEra c))
+     Identity
+     ((UTxOState (AlonzoEra c), DPState c),
+      Validated (ValidatedTx (AlonzoEra c)))
+forall e (m :: * -&gt; *) a.
+MonadError e m =&gt;
+m a -&gt; (e -&gt; m a) -&gt; m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/mtl-2.2.2/src"><span class="hs-operator hs-var">`catchError`</span></a></span><span> </span><span class="annot"><span class="annottext">ApplyTxError (AlonzoEra c)
+-&gt; ExceptT
+     (ApplyTxError (AlonzoEra c))
+     Identity
+     ((UTxOState (AlonzoEra c), DPState c),
+      Validated (ValidatedTx (AlonzoEra c)))
+</span><a href="#local-6989586621679726883"><span class="hs-identifier hs-var">handler</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-226"></span><span>        </span><span class="annot"><span class="annottext">(ExceptT
+   (ApplyTxError (AlonzoEra c))
+   Identity
+   ((UTxOState (AlonzoEra c), DPState c),
+    Validated (ValidatedTx (AlonzoEra c)))
+ -&gt; ExceptT
+      (ApplyTxError (AlonzoEra c))
+      Identity
+      ((UTxOState (AlonzoEra c), DPState c),
+       Validated (ValidatedTx (AlonzoEra c))))
+-&gt; ExceptT
+     (ApplyTxError (AlonzoEra c))
+     Identity
+     ((UTxOState (AlonzoEra c), DPState c),
+      Validated (ValidatedTx (AlonzoEra c)))
+-&gt; ExceptT
+     (ApplyTxError (AlonzoEra c))
+     Identity
+     ((UTxOState (AlonzoEra c), DPState c),
+      Validated (ValidatedTx (AlonzoEra c)))
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Globals
+-&gt; LedgerEnv (AlonzoEra c)
+-&gt; MempoolState (AlonzoEra c)
+-&gt; WhetherToIntervene
+-&gt; Tx (AlonzoEra c)
+-&gt; Except
+     (ApplyTxError (AlonzoEra c))
+     (MempoolState (AlonzoEra c), Validated (Tx (AlonzoEra c)))
+forall era.
+ShelleyBasedEra era =&gt;
+Globals
+-&gt; LedgerEnv era
+-&gt; MempoolState era
+-&gt; WhetherToIntervene
+-&gt; Tx era
+-&gt; Except (ApplyTxError era) (MempoolState era, Validated (Tx era))
+</span><a href="Ouroboros.Consensus.Shelley.Eras.html#defaultApplyShelleyBasedTx"><span class="hs-identifier hs-var">defaultApplyShelleyBasedTx</span></a></span><span>
+</span><span id="line-227"></span><span>            </span><span class="annot"><span class="annottext">Globals
+</span><a href="#local-6989586621679726891"><span class="hs-identifier hs-var">globals</span></a></span><span>
+</span><span id="line-228"></span><span>            </span><span class="annot"><span class="annottext">LedgerEnv (AlonzoEra c)
+</span><a href="#local-6989586621679726890"><span class="hs-identifier hs-var">ledgerEnv</span></a></span><span>
+</span><span id="line-229"></span><span>            </span><span class="annot"><span class="annottext">MempoolState (AlonzoEra c)
+</span><a href="#local-6989586621679726889"><span class="hs-identifier hs-var">mempoolState</span></a></span><span>
+</span><span id="line-230"></span><span>            </span><span class="annot"><span class="annottext">WhetherToIntervene
+</span><a href="#local-6989586621679726888"><span class="hs-identifier hs-var">wti</span></a></span><span>
+</span><span id="line-231"></span><span>            </span><span class="annot"><span class="annottext">Tx (AlonzoEra c)
+</span><a href="#local-6989586621679726887"><span class="hs-identifier hs-var">tx</span></a></span><span>
+</span><span id="line-232"></span><span>
+</span><span id="line-233"></span><span>      </span><span class="annot"><span class="annottext">((UTxOState (AlonzoEra c), DPState c),
+ Validated (ValidatedTx (AlonzoEra c)))
+-&gt; ExceptT
+     (ApplyTxError (AlonzoEra c))
+     Identity
+     ((UTxOState (AlonzoEra c), DPState c),
+      Validated (ValidatedTx (AlonzoEra c)))
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(UTxOState (AlonzoEra c), DPState c)
+</span><a href="#local-6989586621679726886"><span class="hs-identifier hs-var">mempoolState'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Validated (ValidatedTx (AlonzoEra c))
+</span><a href="#local-6989586621679726885"><span class="hs-identifier hs-var">vtx</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-234"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-235"></span><span>      </span><span id="local-6989586621679726882"><span class="annot"><span class="annottext">nubOrd :: [Bool] -&gt; [Bool]
+</span><a href="#local-6989586621679726882"><span class="hs-identifier hs-var hs-var">nubOrd</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set Bool -&gt; [Bool]
+forall a. Set a -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.toList</span></a></span><span> </span><span class="annot"><span class="annottext">(Set Bool -&gt; [Bool]) -&gt; ([Bool] -&gt; Set Bool) -&gt; [Bool] -&gt; [Bool]
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">TranslationContext (AllegraEra c)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">[Bool] -&gt; Set Bool
+forall a. Ord a =&gt; [a] -&gt; Set a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.fromList</span></a></span><span>
+</span><span id="line-236"></span><span>
+</span><span id="line-237"></span><span>      </span><span id="local-6989586621679726883"><span class="annot"><span class="annottext">handler :: ApplyTxError (AlonzoEra c)
+-&gt; ExceptT
+     (ApplyTxError (AlonzoEra c))
+     Identity
+     ((UTxOState (AlonzoEra c), DPState c),
+      Validated (ValidatedTx (AlonzoEra c)))
+</span><a href="#local-6989586621679726883"><span class="hs-identifier hs-var hs-var">handler</span></a></span></span><span> </span><span id="local-6989586621679726878"><span class="annot"><span class="annottext">ApplyTxError (AlonzoEra c)
+</span><a href="#local-6989586621679726878"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">WhetherToIntervene
+</span><a href="#local-6989586621679726888"><span class="hs-identifier hs-var">wti</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ApplyTxError (AlonzoEra c)
+</span><a href="#local-6989586621679726878"><span class="hs-identifier hs-var">e</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-238"></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">WhetherToIntervene
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">DoNotIntervene</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.ApplyTxError</span></span><span> </span><span id="local-6989586621679726875"><span class="annot"><span class="annottext">[PredicateFailure (EraRule &quot;LEDGER&quot; (AlonzoEra c))]
+</span><a href="#local-6989586621679726875"><span class="hs-identifier hs-var">errs</span></a></span></span><span class="hs-special">)</span><span>
+</span><span id="line-239"></span><span>          </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679726874"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679726874"><span class="hs-identifier hs-var">flag</span></a></span></span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">:</span></a></span><span id="local-6989586621679726873"><span class="annot"><span class="annottext">[Bool]
+</span><a href="#local-6989586621679726873"><span class="hs-identifier hs-var">flags</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[Bool] -&gt; [Bool]
+</span><a href="#local-6989586621679726882"><span class="hs-identifier hs-var">nubOrd</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679726872"><span class="hs-identifier hs-var">b</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#IncorrectClaimedFlag"><span class="hs-identifier hs-type">IncorrectClaimedFlag</span></a></span><span> </span><span id="local-6989586621679726872"><span class="annot"><a href="#local-6989586621679726872"><span class="hs-identifier hs-var">b</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[PredicateFailure (EraRule &quot;LEDGER&quot; (AlonzoEra c))]
+[LedgerPredicateFailure (AlonzoEra c)]
+</span><a href="#local-6989586621679726875"><span class="hs-identifier hs-var">errs</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-240"></span><span>            </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">not</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Bool] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">null</span></a></span><span> </span><span class="annot"><span class="annottext">[Bool]
+</span><a href="#local-6989586621679726873"><span class="hs-identifier hs-var">flags</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-241"></span><span>            </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">UnexpectedAlonzoLedgerErrors
+-&gt; ExceptT
+     (ApplyTxError (AlonzoEra c))
+     Identity
+     ((UTxOState (AlonzoEra c), DPState c),
+      Validated (ValidatedTx (AlonzoEra c)))
+forall a e. Exception e =&gt; e -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">throw</span></a></span><span> </span><span class="annot"><span class="annottext">(UnexpectedAlonzoLedgerErrors
+ -&gt; ExceptT
+      (ApplyTxError (AlonzoEra c))
+      Identity
+      ((UTxOState (AlonzoEra c), DPState c),
+       Validated (ValidatedTx (AlonzoEra c))))
+-&gt; UnexpectedAlonzoLedgerErrors
+-&gt; ExceptT
+     (ApplyTxError (AlonzoEra c))
+     Identity
+     ((UTxOState (AlonzoEra c), DPState c),
+      Validated (ValidatedTx (AlonzoEra c)))
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">[Bool] -&gt; UnexpectedAlonzoLedgerErrors
+</span><a href="Ouroboros.Consensus.Shelley.Eras.html#UnexpectedAlonzoLedgerErrors"><span class="hs-identifier hs-var">UnexpectedAlonzoLedgerErrors</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679726874"><span class="hs-identifier hs-var">flag</span></a></span><span class="annot"><span class="annottext">Bool -&gt; [Bool] -&gt; [Bool]
+forall a. a -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-var">:</span></a></span><span class="annot"><span class="annottext">[Bool]
+</span><a href="#local-6989586621679726873"><span class="hs-identifier hs-var">flags</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-242"></span><span>            </span><span class="hs-keyword">else</span><span>
+</span><span id="line-243"></span><span>            </span><span class="hs-comment">-- rectify the flag and include the transaction</span><span>
+</span><span id="line-244"></span><span>            </span><span class="hs-comment">--</span><span>
+</span><span id="line-245"></span><span>            </span><span class="hs-comment">-- This either lets the ledger punish the script author for sending</span><span>
+</span><span id="line-246"></span><span>            </span><span class="hs-comment">-- a bad script or else prevents our peer's buggy script validator</span><span>
+</span><span id="line-247"></span><span>            </span><span class="hs-comment">-- from preventing inclusion of a valid script.</span><span>
+</span><span id="line-248"></span><span>            </span><span class="hs-comment">--</span><span>
+</span><span id="line-249"></span><span>            </span><span class="hs-comment">-- TODO 'applyTx' et al needs to include a return value indicating</span><span>
+</span><span id="line-250"></span><span>            </span><span class="hs-comment">-- whether we took this branch; it's a reason to disconnect from</span><span>
+</span><span id="line-251"></span><span>            </span><span class="hs-comment">-- the peer who sent us the incorrect flag (ie Issue #3276)</span><span>
+</span><span id="line-252"></span><span>            </span><span class="annot"><span class="annottext">Globals
+-&gt; LedgerEnv (AlonzoEra c)
+-&gt; MempoolState (AlonzoEra c)
+-&gt; WhetherToIntervene
+-&gt; Tx (AlonzoEra c)
+-&gt; Except
+     (ApplyTxError (AlonzoEra c))
+     (MempoolState (AlonzoEra c), Validated (Tx (AlonzoEra c)))
+forall era.
+ShelleyBasedEra era =&gt;
+Globals
+-&gt; LedgerEnv era
+-&gt; MempoolState era
+-&gt; WhetherToIntervene
+-&gt; Tx era
+-&gt; Except (ApplyTxError era) (MempoolState era, Validated (Tx era))
+</span><a href="Ouroboros.Consensus.Shelley.Eras.html#defaultApplyShelleyBasedTx"><span class="hs-identifier hs-var">defaultApplyShelleyBasedTx</span></a></span><span>
+</span><span id="line-253"></span><span>              </span><span class="annot"><span class="annottext">Globals
+</span><a href="#local-6989586621679726891"><span class="hs-identifier hs-var">globals</span></a></span><span>
+</span><span id="line-254"></span><span>              </span><span class="annot"><span class="annottext">LedgerEnv (AlonzoEra c)
+</span><a href="#local-6989586621679726890"><span class="hs-identifier hs-var">ledgerEnv</span></a></span><span>
+</span><span id="line-255"></span><span>              </span><span class="annot"><span class="annottext">MempoolState (AlonzoEra c)
+</span><a href="#local-6989586621679726889"><span class="hs-identifier hs-var">mempoolState</span></a></span><span>
+</span><span id="line-256"></span><span>              </span><span class="annot"><span class="annottext">WhetherToIntervene
+</span><a href="#local-6989586621679726888"><span class="hs-identifier hs-var">wti</span></a></span><span>
+</span><span id="line-257"></span><span>              </span><span class="annot"><span class="annottext">Tx (AlonzoEra c)
+ValidatedTx (AlonzoEra c)
+</span><a href="#local-6989586621679726887"><span class="hs-identifier hs-var">tx</span></a></span><span class="hs-special">{</span><span class="annot"><span class="annottext">isValid :: IsValid
+</span><a href="#local-6989586621679726867"><span class="hs-identifier hs-var">Alonzo.isValid</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; IsValid
+</span><span class="hs-identifier hs-var">Alonzo.IsValid</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">not</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679726874"><span class="hs-identifier hs-var">flag</span></a></span><span class="hs-special">)</span><span class="hs-special">}</span><span>
+</span><span id="line-258"></span><span>        </span><span class="annot"><span class="annottext">(WhetherToIntervene, ApplyTxError (AlonzoEra c))
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">ApplyTxError (AlonzoEra c)
+-&gt; ExceptT
+     (ApplyTxError (AlonzoEra c))
+     Identity
+     ((UTxOState (AlonzoEra c), DPState c),
+      Validated (ValidatedTx (AlonzoEra c)))
+forall e (m :: * -&gt; *) a. MonadError e m =&gt; e -&gt; m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/mtl-2.2.2/src"><span class="hs-identifier hs-var">throwError</span></a></span><span> </span><span class="annot"><span class="annottext">ApplyTxError (AlonzoEra c)
+</span><a href="#local-6989586621679726878"><span class="hs-identifier hs-var">e</span></a></span></span><span>
+</span><span id="line-259"></span><span>               </span><span class="hs-comment">-- reject the transaction, protecting the local wallet</span><span>
+</span><span id="line-260"></span><span>
+</span><span id="line-261"></span><span class="hs-comment">-- not exported</span><span>
+</span><span id="line-262"></span><span class="hs-comment">--</span><span>
+</span><span id="line-263"></span><span class="hs-comment">-- The ledger failure we see when the transaction's claimed 'IsValid'</span><span>
+</span><span id="line-264"></span><span class="hs-comment">-- flag was incorrect</span><span>
+</span><span id="line-265"></span><span id="local-6989586621679727056"><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#IncorrectClaimedFlag"><span class="hs-identifier hs-type">IncorrectClaimedFlag</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-266"></span><span>     </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Bool</span></a></span><span>
+</span><span id="line-267"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.PredicateFailure</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Core.EraRule</span></span><span> </span><span class="annot"><span class="hs-string">&quot;LEDGER&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">AlonzoEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679727056"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span></span><span>
+</span><span id="line-268"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24mIncorrectClaimedFlag"><span id="IncorrectClaimedFlag"><span class="annot"><span class="annottext">$mIncorrectClaimedFlag :: forall r c.
+PredicateFailure (EraRule &quot;LEDGER&quot; (AlonzoEra c))
+-&gt; (Bool -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="Ouroboros.Consensus.Shelley.Eras.html#%24mIncorrectClaimedFlag"><span class="hs-identifier hs-var hs-var">IncorrectClaimedFlag</span></a></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679726863"><span class="hs-identifier hs-type">claimedFlag</span></a></span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-269"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">SL.UtxowFailure</span></span><span>
+</span><span id="line-270"></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Alonzo.WrappedShelleyEraFailure</span></span><span>
+</span><span id="line-271"></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.UtxoFailure</span></span><span>
+</span><span id="line-272"></span><span>          </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Alonzo.UtxosFailure</span></span><span>
+</span><span id="line-273"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Alonzo.ValidationTagMismatch</span></span><span>
+</span><span id="line-274"></span><span>              </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Alonzo.IsValid</span></span><span> </span><span id="local-6989586621679726863"><span class="annot"><a href="#local-6989586621679726863"><span class="hs-identifier hs-var">claimedFlag</span></a></span></span><span class="hs-special">)</span><span>
+</span><span id="line-275"></span><span>              </span><span id="local-6989586621679726857"><span class="annot"><a href="#local-6989586621679726857"><span class="hs-identifier hs-var">_validationErrs</span></a></span></span><span>
+</span><span id="line-276"></span><span>      </span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-277"></span><span>
+</span><span id="line-278"></span><span class="hs-comment">-- | The ledger responded with Alonzo errors we were not expecting</span><span>
+</span><span id="line-279"></span><span class="hs-keyword">data</span><span> </span><span id="UnexpectedAlonzoLedgerErrors"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#UnexpectedAlonzoLedgerErrors"><span class="hs-identifier hs-var">UnexpectedAlonzoLedgerErrors</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-280"></span><span>    </span><span class="hs-comment">-- | We received more than one 'Alonzo.ValidationTagMismatch'</span><span>
+</span><span id="line-281"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-282"></span><span>    </span><span class="hs-comment">-- The exception lists the 'Alonzo.IsValid' flags we saw.</span><span>
+</span><span id="line-283"></span><span>    </span><span id="UnexpectedAlonzoLedgerErrors"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#UnexpectedAlonzoLedgerErrors"><span class="hs-identifier hs-var">UnexpectedAlonzoLedgerErrors</span></a></span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Bool</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-284"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679726851"><span id="local-6989586621679726853"><span id="local-6989586621679726855"><span class="annot"><span class="annottext">Int -&gt; UnexpectedAlonzoLedgerErrors -&gt; ShowS
+[UnexpectedAlonzoLedgerErrors] -&gt; ShowS
+UnexpectedAlonzoLedgerErrors -&gt; String
+(Int -&gt; UnexpectedAlonzoLedgerErrors -&gt; ShowS)
+-&gt; (UnexpectedAlonzoLedgerErrors -&gt; String)
+-&gt; ([UnexpectedAlonzoLedgerErrors] -&gt; ShowS)
+-&gt; Show UnexpectedAlonzoLedgerErrors
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [UnexpectedAlonzoLedgerErrors] -&gt; ShowS
+$cshowList :: [UnexpectedAlonzoLedgerErrors] -&gt; ShowS
+show :: UnexpectedAlonzoLedgerErrors -&gt; String
+$cshow :: UnexpectedAlonzoLedgerErrors -&gt; String
+showsPrec :: Int -&gt; UnexpectedAlonzoLedgerErrors -&gt; ShowS
+$cshowsPrec :: Int -&gt; UnexpectedAlonzoLedgerErrors -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679726842"><span id="local-6989586621679726844"><span id="local-6989586621679726846"><span class="annot"><span class="annottext">Show UnexpectedAlonzoLedgerErrors
+Typeable UnexpectedAlonzoLedgerErrors
+Typeable UnexpectedAlonzoLedgerErrors
+-&gt; Show UnexpectedAlonzoLedgerErrors
+-&gt; (UnexpectedAlonzoLedgerErrors -&gt; SomeException)
+-&gt; (SomeException -&gt; Maybe UnexpectedAlonzoLedgerErrors)
+-&gt; (UnexpectedAlonzoLedgerErrors -&gt; String)
+-&gt; Exception UnexpectedAlonzoLedgerErrors
+SomeException -&gt; Maybe UnexpectedAlonzoLedgerErrors
+UnexpectedAlonzoLedgerErrors -&gt; String
+UnexpectedAlonzoLedgerErrors -&gt; SomeException
+forall e.
+Typeable e
+-&gt; Show e
+-&gt; (e -&gt; SomeException)
+-&gt; (SomeException -&gt; Maybe e)
+-&gt; (e -&gt; String)
+-&gt; Exception e
+displayException :: UnexpectedAlonzoLedgerErrors -&gt; String
+$cdisplayException :: UnexpectedAlonzoLedgerErrors -&gt; String
+fromException :: SomeException -&gt; Maybe UnexpectedAlonzoLedgerErrors
+$cfromException :: SomeException -&gt; Maybe UnexpectedAlonzoLedgerErrors
+toException :: UnexpectedAlonzoLedgerErrors -&gt; SomeException
+$ctoException :: UnexpectedAlonzoLedgerErrors -&gt; SomeException
+$cp2Exception :: Show UnexpectedAlonzoLedgerErrors
+$cp1Exception :: Typeable UnexpectedAlonzoLedgerErrors
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Exception</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-285"></span><span>
+</span><span id="line-286"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+  Tx family wrapper
+-------------------------------------------------------------------------------}</span><span>
+</span><span id="line-289"></span><span>
+</span><span id="line-290"></span><span class="hs-comment">-- | Wrapper for partially applying the 'Tx' type family</span><span>
+</span><span id="line-291"></span><span class="hs-comment">--</span><span>
+</span><span id="line-292"></span><span class="hs-comment">-- For generality, Consensus uses that type family as eg the index of</span><span>
+</span><span id="line-293"></span><span class="hs-comment">-- 'Core.TranslateEra'. We thus need to partially apply it.</span><span>
+</span><span id="line-294"></span><span class="hs-comment">--</span><span>
+</span><span id="line-295"></span><span class="hs-comment">-- @cardano-ledger-specs@ also declares such a newtype, but currently it's only</span><span>
+</span><span id="line-296"></span><span class="hs-comment">-- defined in the Alonzo translation module, which seems somewhat inappropriate</span><span>
+</span><span id="line-297"></span><span class="hs-comment">-- to use for previous eras. Also, we use a @Wrap@ prefix in Consensus. Hence</span><span>
+</span><span id="line-298"></span><span class="hs-comment">-- this minor mediating definition. TODO I'm not even fully persuading myself</span><span>
+</span><span id="line-299"></span><span class="hs-comment">-- with this justification.</span><span>
+</span><span id="line-300"></span><span class="hs-keyword">newtype</span><span> </span><span id="WrapTx"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#WrapTx"><span class="hs-identifier hs-var">WrapTx</span></a></span></span><span> </span><span id="local-6989586621679727035"><span class="annot"><a href="#local-6989586621679727035"><span class="hs-identifier hs-type">era</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="WrapTx"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#WrapTx"><span class="hs-identifier hs-var">WrapTx</span></a></span></span><span> </span><span class="hs-special">{</span><span id="unwrapTx"><span class="annot"><span class="annottext">WrapTx era -&gt; Tx era
+</span><a href="Ouroboros.Consensus.Shelley.Eras.html#unwrapTx"><span class="hs-identifier hs-var hs-var">unwrapTx</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Core.Tx</span></span><span> </span><span class="annot"><a href="#local-6989586621679727035"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-301"></span><span>
+</span><span id="line-302"></span><span id="local-6989586621679726838"><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">AllegraEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679726838"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Core.TranslateEra</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">AllegraEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679726838"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#WrapTx"><span class="hs-identifier hs-type">WrapTx</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-303"></span><span>  </span><span class="hs-keyword">type</span><span> </span><span id="TranslationError"><span class="annot"><span class="hs-identifier hs-var">TranslationError</span></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">AllegraEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679726838"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#WrapTx"><span class="hs-identifier hs-type">WrapTx</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Core.TranslationError</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">AllegraEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679726838"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.Tx</span></span><span>
+</span><span id="line-304"></span><span>  </span><span id="local-6989586621679726833"><span class="annot"><span class="annottext">translateEra :: TranslationContext (AllegraEra c)
+-&gt; WrapTx (PreviousEra (AllegraEra c))
+-&gt; Except
+     (TranslationError (AllegraEra c) WrapTx) (WrapTx (AllegraEra c))
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">translateEra</span></span></span><span> </span><span id="local-6989586621679726831"><span class="annot"><span class="annottext">TranslationContext (AllegraEra c)
+</span><a href="#local-6989586621679726831"><span class="hs-identifier hs-var">ctxt</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Tx (AllegraEra c) -&gt; WrapTx (AllegraEra c))
+-&gt; ExceptT DecoderError Identity (Tx (AllegraEra c))
+-&gt; ExceptT DecoderError Identity (WrapTx (AllegraEra c))
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fmap</span></a></span><span> </span><span class="annot"><span class="annottext">Tx (AllegraEra c) -&gt; WrapTx (AllegraEra c)
+forall era. Tx era -&gt; WrapTx era
+</span><a href="Ouroboros.Consensus.Shelley.Eras.html#WrapTx"><span class="hs-identifier hs-var">WrapTx</span></a></span><span> </span><span class="annot"><span class="annottext">(ExceptT DecoderError Identity (Tx (AllegraEra c))
+ -&gt; ExceptT DecoderError Identity (WrapTx (AllegraEra c)))
+-&gt; (WrapTx (ShelleyEra c)
+    -&gt; ExceptT DecoderError Identity (Tx (AllegraEra c)))
+-&gt; WrapTx (ShelleyEra c)
+-&gt; ExceptT DecoderError Identity (WrapTx (AllegraEra c))
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">TranslationContext (AllegraEra c)
 -&gt; Tx (PreviousEra (AllegraEra c))
 -&gt; Except (TranslationError (AllegraEra c) Tx) (Tx (AllegraEra c))
 forall era (f :: * -&gt; *).
@@ -185,38 +663,37 @@ TranslateEra era f =&gt;
 TranslationContext era
 -&gt; f (PreviousEra era) -&gt; Except (TranslationError era f) (f era)
 </span><span class="hs-identifier hs-var">Core.translateEra</span></span><span> </span><span class="annot"><span class="annottext">TranslationContext (AllegraEra c)
-</span><a href="#local-6989586621679577844"><span class="hs-identifier hs-var">ctxt</span></a></span><span> </span><span class="annot"><span class="annottext">(Tx (ShelleyEra c)
+</span><a href="#local-6989586621679726831"><span class="hs-identifier hs-var">ctxt</span></a></span><span> </span><span class="annot"><span class="annottext">(Tx (ShelleyEra c)
  -&gt; ExceptT DecoderError Identity (Tx (AllegraEra c)))
--&gt; (WrapTxInBlock (ShelleyEra c) -&gt; Tx (ShelleyEra c))
--&gt; WrapTxInBlock (ShelleyEra c)
+-&gt; (WrapTx (ShelleyEra c) -&gt; Tx (ShelleyEra c))
+-&gt; WrapTx (ShelleyEra c)
 -&gt; ExceptT DecoderError Identity (Tx (AllegraEra c))
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">WrapTxInBlock (ShelleyEra c) -&gt; Tx (ShelleyEra c)
-forall era. WrapTxInBlock era -&gt; TxInBlock era
-</span><a href="Ouroboros.Consensus.Shelley.Eras.html#unwrapTxInBlock"><span class="hs-identifier hs-var hs-var">unwrapTxInBlock</span></a></span></span><span>
-</span><span id="line-152"></span><span>
-</span><span id="line-153"></span><span id="local-6989586621679577842"><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MaryEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679577842"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Core.TranslateEra</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MaryEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679577842"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#WrapTxInBlock"><span class="hs-identifier hs-type">WrapTxInBlock</span></a></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-154"></span><span>  </span><span class="hs-keyword">type</span><span> </span><span id="TranslationError"><span class="annot"><span class="hs-identifier hs-var">TranslationError</span></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MaryEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679577842"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#WrapTxInBlock"><span class="hs-identifier hs-type">WrapTxInBlock</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Core.TranslationError</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MaryEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679577842"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.Tx</span></span><span>
-</span><span id="line-155"></span><span>  </span><span id="local-6989586621679577838"><span class="annot"><span class="annottext">translateEra :: TranslationContext (MaryEra c)
--&gt; WrapTxInBlock (PreviousEra (MaryEra c))
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">WrapTx (ShelleyEra c) -&gt; Tx (ShelleyEra c)
+forall era. WrapTx era -&gt; Tx era
+</span><a href="Ouroboros.Consensus.Shelley.Eras.html#unwrapTx"><span class="hs-identifier hs-var hs-var">unwrapTx</span></a></span></span><span>
+</span><span id="line-305"></span><span>
+</span><span id="line-306"></span><span id="local-6989586621679726830"><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MaryEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679726830"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Core.TranslateEra</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MaryEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679726830"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#WrapTx"><span class="hs-identifier hs-type">WrapTx</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-307"></span><span>  </span><span class="hs-keyword">type</span><span> </span><span id="TranslationError"><span class="annot"><span class="hs-identifier hs-var">TranslationError</span></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MaryEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679726830"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#WrapTx"><span class="hs-identifier hs-type">WrapTx</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Core.TranslationError</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MaryEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679726830"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.Tx</span></span><span>
+</span><span id="line-308"></span><span>  </span><span id="local-6989586621679726826"><span class="annot"><span class="annottext">translateEra :: TranslationContext (MaryEra c)
+-&gt; WrapTx (PreviousEra (MaryEra c))
 -&gt; Except
-     (TranslationError (MaryEra c) WrapTxInBlock)
-     (WrapTxInBlock (MaryEra c))
-</span><a href="#local-6989586621679577838"><span class="hs-identifier hs-var hs-var hs-var hs-var">translateEra</span></a></span></span><span> </span><span id="local-6989586621679577837"><span class="annot"><span class="annottext">TranslationContext (MaryEra c)
-</span><a href="#local-6989586621679577837"><span class="hs-identifier hs-var">ctxt</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Tx (MaryEra c) -&gt; WrapTxInBlock (MaryEra c))
+     (TranslationError (MaryEra c) WrapTx) (WrapTx (MaryEra c))
+</span><a href="#local-6989586621679726826"><span class="hs-identifier hs-var hs-var hs-var hs-var">translateEra</span></a></span></span><span> </span><span id="local-6989586621679726825"><span class="annot"><span class="annottext">TranslationContext (MaryEra c)
+</span><a href="#local-6989586621679726825"><span class="hs-identifier hs-var">ctxt</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Tx (MaryEra c) -&gt; WrapTx (MaryEra c))
 -&gt; ExceptT DecoderError Identity (Tx (MaryEra c))
--&gt; ExceptT DecoderError Identity (WrapTxInBlock (MaryEra c))
+-&gt; ExceptT DecoderError Identity (WrapTx (MaryEra c))
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">Tx (MaryEra c) -&gt; WrapTxInBlock (MaryEra c)
-forall era. TxInBlock era -&gt; WrapTxInBlock era
-</span><a href="Ouroboros.Consensus.Shelley.Eras.html#WrapTxInBlock"><span class="hs-identifier hs-var">WrapTxInBlock</span></a></span><span> </span><span class="annot"><span class="annottext">(ExceptT DecoderError Identity (Tx (MaryEra c))
- -&gt; ExceptT DecoderError Identity (WrapTxInBlock (MaryEra c)))
--&gt; (WrapTxInBlock (AllegraEra c)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fmap</span></a></span><span> </span><span class="annot"><span class="annottext">Tx (MaryEra c) -&gt; WrapTx (MaryEra c)
+forall era. Tx era -&gt; WrapTx era
+</span><a href="Ouroboros.Consensus.Shelley.Eras.html#WrapTx"><span class="hs-identifier hs-var">WrapTx</span></a></span><span> </span><span class="annot"><span class="annottext">(ExceptT DecoderError Identity (Tx (MaryEra c))
+ -&gt; ExceptT DecoderError Identity (WrapTx (MaryEra c)))
+-&gt; (WrapTx (ShelleyMAEra 'Allegra c)
     -&gt; ExceptT DecoderError Identity (Tx (MaryEra c)))
--&gt; WrapTxInBlock (AllegraEra c)
--&gt; ExceptT DecoderError Identity (WrapTxInBlock (MaryEra c))
+-&gt; WrapTx (ShelleyMAEra 'Allegra c)
+-&gt; ExceptT DecoderError Identity (WrapTx (MaryEra c))
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">TranslationContext (MaryEra c)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">TranslationContext (MaryEra c)
 -&gt; Tx (PreviousEra (MaryEra c))
 -&gt; Except (TranslationError (MaryEra c) Tx) (Tx (MaryEra c))
 forall era (f :: * -&gt; *).
@@ -224,13 +701,69 @@ TranslateEra era f =&gt;
 TranslationContext era
 -&gt; f (PreviousEra era) -&gt; Except (TranslationError era f) (f era)
 </span><span class="hs-identifier hs-var">Core.translateEra</span></span><span> </span><span class="annot"><span class="annottext">TranslationContext (MaryEra c)
-</span><a href="#local-6989586621679577837"><span class="hs-identifier hs-var">ctxt</span></a></span><span> </span><span class="annot"><span class="annottext">(Tx (AllegraEra c)
+</span><a href="#local-6989586621679726825"><span class="hs-identifier hs-var">ctxt</span></a></span><span> </span><span class="annot"><span class="annottext">(Tx (ShelleyMAEra 'Allegra c)
  -&gt; ExceptT DecoderError Identity (Tx (MaryEra c)))
--&gt; (WrapTxInBlock (AllegraEra c) -&gt; Tx (AllegraEra c))
--&gt; WrapTxInBlock (AllegraEra c)
+-&gt; (WrapTx (ShelleyMAEra 'Allegra c)
+    -&gt; Tx (ShelleyMAEra 'Allegra c))
+-&gt; WrapTx (ShelleyMAEra 'Allegra c)
 -&gt; ExceptT DecoderError Identity (Tx (MaryEra c))
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">WrapTxInBlock (AllegraEra c) -&gt; Tx (AllegraEra c)
-forall era. WrapTxInBlock era -&gt; TxInBlock era
-</span><a href="Ouroboros.Consensus.Shelley.Eras.html#unwrapTxInBlock"><span class="hs-identifier hs-var hs-var">unwrapTxInBlock</span></a></span></span><span>
-</span><span id="line-156"></span></pre></body></html>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">WrapTx (ShelleyMAEra 'Allegra c) -&gt; Tx (ShelleyMAEra 'Allegra c)
+forall era. WrapTx era -&gt; Tx era
+</span><a href="Ouroboros.Consensus.Shelley.Eras.html#unwrapTx"><span class="hs-identifier hs-var hs-var">unwrapTx</span></a></span></span><span>
+</span><span id="line-309"></span><span>
+</span><span id="line-310"></span><span id="local-6989586621679726824"><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">AlonzoEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679726824"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Core.TranslateEra</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">AlonzoEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679726824"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#WrapTx"><span class="hs-identifier hs-type">WrapTx</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-311"></span><span>  </span><span class="hs-keyword">type</span><span> </span><span id="TranslationError"><span class="annot"><span class="hs-identifier hs-var">TranslationError</span></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">AlonzoEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679726824"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#WrapTx"><span class="hs-identifier hs-type">WrapTx</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Core.TranslationError</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">AlonzoEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679726824"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Alonzo.Tx</span></span><span>
+</span><span id="line-312"></span><span>  </span><span id="local-6989586621679726820"><span class="annot"><span class="annottext">translateEra :: TranslationContext (AlonzoEra c)
+-&gt; WrapTx (PreviousEra (AlonzoEra c))
+-&gt; Except
+     (TranslationError (AlonzoEra c) WrapTx) (WrapTx (AlonzoEra c))
+</span><a href="#local-6989586621679726820"><span class="hs-identifier hs-var hs-var hs-var hs-var">translateEra</span></a></span></span><span> </span><span id="local-6989586621679726819"><span class="annot"><span class="annottext">TranslationContext (AlonzoEra c)
+</span><a href="#local-6989586621679726819"><span class="hs-identifier hs-var">ctxt</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-313"></span><span>        </span><span class="annot"><span class="annottext">(Tx (AlonzoEra c) -&gt; WrapTx (AlonzoEra c))
+-&gt; ExceptT DecoderError Identity (Tx (AlonzoEra c))
+-&gt; ExceptT DecoderError Identity (WrapTx (AlonzoEra c))
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fmap</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ValidatedTx (AlonzoEra c) -&gt; WrapTx (AlonzoEra c)
+forall era. Tx era -&gt; WrapTx era
+</span><a href="Ouroboros.Consensus.Shelley.Eras.html#WrapTx"><span class="hs-identifier hs-var">WrapTx</span></a></span><span> </span><span class="annot"><span class="annottext">(ValidatedTx (AlonzoEra c) -&gt; WrapTx (AlonzoEra c))
+-&gt; (Tx (AlonzoEra c) -&gt; ValidatedTx (AlonzoEra c))
+-&gt; Tx (AlonzoEra c)
+-&gt; WrapTx (AlonzoEra c)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Tx (AlonzoEra c) -&gt; ValidatedTx (AlonzoEra c)
+forall era. Tx era -&gt; Tx era
+</span><span class="hs-identifier hs-var hs-var">Alonzo.unTx</span></span><span class="hs-special">)</span><span>
+</span><span id="line-314"></span><span>      </span><span class="annot"><span class="annottext">(ExceptT DecoderError Identity (Tx (AlonzoEra c))
+ -&gt; ExceptT DecoderError Identity (WrapTx (AlonzoEra c)))
+-&gt; (WrapTx (ShelleyMAEra 'Mary c)
+    -&gt; ExceptT DecoderError Identity (Tx (AlonzoEra c)))
+-&gt; WrapTx (ShelleyMAEra 'Mary c)
+-&gt; ExceptT DecoderError Identity (WrapTx (AlonzoEra c))
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">TranslationContext (AlonzoEra c)
+-&gt; Tx (PreviousEra (AlonzoEra c))
+-&gt; Except (TranslationError (AlonzoEra c) Tx) (Tx (AlonzoEra c))
+forall era (f :: * -&gt; *).
+TranslateEra era f =&gt;
+TranslationContext era
+-&gt; f (PreviousEra era) -&gt; Except (TranslationError era f) (f era)
+</span><span class="hs-identifier hs-var">Core.translateEra</span></span><span> </span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">AlonzoEra</span></span><span> </span><span class="annot"><a href="#local-6989586621679726824"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">TranslationContext (AlonzoEra c)
+</span><a href="#local-6989586621679726819"><span class="hs-identifier hs-var">ctxt</span></a></span><span>
+</span><span id="line-315"></span><span>      </span><span class="annot"><span class="annottext">(Tx (ShelleyMAEra 'Mary c)
+ -&gt; ExceptT DecoderError Identity (Tx (AlonzoEra c)))
+-&gt; (WrapTx (ShelleyMAEra 'Mary c) -&gt; Tx (ShelleyMAEra 'Mary c))
+-&gt; WrapTx (ShelleyMAEra 'Mary c)
+-&gt; ExceptT DecoderError Identity (Tx (AlonzoEra c))
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Tx (ShelleyMAEra 'Mary c) -&gt; Tx (ShelleyMAEra 'Mary c)
+forall era. Tx era -&gt; Tx era
+</span><span class="hs-identifier hs-var">Alonzo.Tx</span></span><span> </span><span class="annot"><span class="annottext">(Tx (ShelleyMAEra 'Mary c) -&gt; Tx (ShelleyMAEra 'Mary c))
+-&gt; (WrapTx (ShelleyMAEra 'Mary c) -&gt; Tx (ShelleyMAEra 'Mary c))
+-&gt; WrapTx (ShelleyMAEra 'Mary c)
+-&gt; Tx (ShelleyMAEra 'Mary c)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">WrapTx (ShelleyMAEra 'Mary c) -&gt; Tx (ShelleyMAEra 'Mary c)
+forall era. WrapTx era -&gt; Tx era
+</span><a href="Ouroboros.Consensus.Shelley.Eras.html#unwrapTx"><span class="hs-identifier hs-var hs-var">unwrapTx</span></a></span></span><span>
+</span><span id="line-316"></span></pre></body></html>

@@ -16,8 +16,8 @@
 </span><span id="line-16"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-17"></span><span>
 </span><span id="line-18"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Codec.Serialise</span></span><span>
-</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Monad.Trans.Except</span></span><span>
-</span><span id="line-20"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">GHC.Generics</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Generic</span></span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier">Control.Monad.Trans.Except</span></a></span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">GHC.Generics</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Generic</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-21"></span><span>
 </span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Byron.Spec.Chain.STS.Rule.Chain</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Spec</span></span><span>
 </span><span id="line-23"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Byron.Spec.Ledger.Delegation</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Spec</span></span><span>
@@ -28,7 +28,7 @@
 </span><span id="line-28"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Genesis.html"><span class="hs-identifier">Ouroboros.Consensus.ByronSpec.Ledger.Genesis</span></a></span><span>
 </span><span id="line-29"></span><span>                     </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Genesis.html#ByronSpecGenesis"><span class="hs-identifier">ByronSpecGenesis</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-30"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Orphans.html"><span class="hs-identifier">Ouroboros.Consensus.ByronSpec.Ledger.Orphans</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
-</span><span id="line-31"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Rules.html"><span class="hs-identifier">Ouroboros.Consensus.ByronSpec.Ledger.Rules</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Rules</span></span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Rules.html"><span class="hs-identifier">Ouroboros.Consensus.ByronSpec.Ledger.Rules</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-8.10.4/src"><span class="hs-identifier">Rules</span></a></span><span>
 </span><span id="line-32"></span><span>
 </span><span id="line-33"></span><span class="hs-comment">{-------------------------------------------------------------------------------
   Types
@@ -38,12 +38,12 @@
 </span><span id="line-38"></span><span class="hs-comment">--</span><span>
 </span><span id="line-39"></span><span class="hs-comment">-- The spec doesn't have a type for this, instead splitting the block body</span><span>
 </span><span id="line-40"></span><span class="hs-comment">-- into separate lists</span><span>
-</span><span id="line-41"></span><span id="local-6989586621679165628"><span id="local-6989586621679165629"></span></span><span class="hs-keyword">data</span><span> </span><span id="ByronSpecGenTx"><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTx"><span class="hs-identifier hs-var">ByronSpecGenTx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-41"></span><span id="local-6989586621679216409"><span id="local-6989586621679216410"></span></span><span class="hs-keyword">data</span><span> </span><span id="ByronSpecGenTx"><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTx"><span class="hs-identifier hs-var">ByronSpecGenTx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-42"></span><span>    </span><span id="ByronSpecGenTxDCert"><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxDCert"><span class="hs-identifier hs-var">ByronSpecGenTxDCert</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Spec.DCert</span></span><span>
 </span><span id="line-43"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="ByronSpecGenTxTx"><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxTx"><span class="hs-identifier hs-var">ByronSpecGenTxTx</span></a></span></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Spec.Tx</span></span><span>
 </span><span id="line-44"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="ByronSpecGenTxUProp"><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxUProp"><span class="hs-identifier hs-var">ByronSpecGenTxUProp</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Spec.UProp</span></span><span>
 </span><span id="line-45"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="ByronSpecGenTxVote"><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxVote"><span class="hs-identifier hs-var">ByronSpecGenTxVote</span></a></span></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Spec.Vote</span></span><span>
-</span><span id="line-46"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679165618"><span id="local-6989586621679165620"><span id="local-6989586621679165622"><span class="annot"><span class="annottext">Int -&gt; ByronSpecGenTx -&gt; ShowS
+</span><span id="line-46"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679216399"><span id="local-6989586621679216401"><span id="local-6989586621679216403"><span class="annot"><span class="annottext">Int -&gt; ByronSpecGenTx -&gt; ShowS
 [ByronSpecGenTx] -&gt; ShowS
 ByronSpecGenTx -&gt; String
 (Int -&gt; ByronSpecGenTx -&gt; ShowS)
@@ -58,7 +58,7 @@ show :: ByronSpecGenTx -&gt; String
 $cshow :: ByronSpecGenTx -&gt; String
 showsPrec :: Int -&gt; ByronSpecGenTx -&gt; ShowS
 $cshowsPrec :: Int -&gt; ByronSpecGenTx -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. ByronSpecGenTx -&gt; Rep ByronSpecGenTx x)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. ByronSpecGenTx -&gt; Rep ByronSpecGenTx x)
 -&gt; (forall x. Rep ByronSpecGenTx x -&gt; ByronSpecGenTx)
 -&gt; Generic ByronSpecGenTx
 forall x. Rep ByronSpecGenTx x -&gt; ByronSpecGenTx
@@ -67,7 +67,7 @@ forall a.
 (forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
 $cto :: forall x. Rep ByronSpecGenTx x -&gt; ByronSpecGenTx
 $cfrom :: forall x. ByronSpecGenTx -&gt; Rep ByronSpecGenTx x
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679165606"><span id="local-6989586621679165608"><span id="local-6989586621679165610"><span id="local-6989586621679165612"><span class="annot"><span class="annottext">[ByronSpecGenTx] -&gt; Encoding
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679216387"><span id="local-6989586621679216389"><span id="local-6989586621679216391"><span id="local-6989586621679216393"><span class="annot"><span class="annottext">[ByronSpecGenTx] -&gt; Encoding
 ByronSpecGenTx -&gt; Encoding
 (ByronSpecGenTx -&gt; Encoding)
 -&gt; (forall s. Decoder s ByronSpecGenTx)
@@ -95,11 +95,11 @@ $cencode :: ByronSpecGenTx -&gt; Encoding
 </span><span id="line-48"></span><span class="hs-comment">-- | Transaction errors</span><span>
 </span><span id="line-49"></span><span class="hs-comment">--</span><span>
 </span><span id="line-50"></span><span class="hs-comment">-- We don't distinguish these from any other kind of CHAIN failure.</span><span>
-</span><span id="line-51"></span><span id="local-6989586621679165603"><span id="local-6989586621679165604"></span></span><span class="hs-keyword">newtype</span><span> </span><span id="ByronSpecGenTxErr"><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxErr"><span class="hs-identifier hs-var">ByronSpecGenTxErr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ByronSpecGenTxErr"><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxErr"><span class="hs-identifier hs-var">ByronSpecGenTxErr</span></a></span></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-52"></span><span>      </span><span id="unByronSpecGenTxErr"><span class="annot"><span class="annottext">ByronSpecGenTxErr -&gt; [[PredicateFailure CHAIN]]
-</span><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#unByronSpecGenTxErr"><span class="hs-identifier hs-var hs-var">unByronSpecGenTxErr</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Spec.PredicateFailure</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Spec.CHAIN</span></span><span class="hs-special">]</span><span class="hs-special">]</span><span>
+</span><span id="line-51"></span><span id="local-6989586621679216384"><span id="local-6989586621679216385"></span></span><span class="hs-keyword">newtype</span><span> </span><span id="ByronSpecGenTxErr"><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxErr"><span class="hs-identifier hs-var">ByronSpecGenTxErr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ByronSpecGenTxErr"><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxErr"><span class="hs-identifier hs-var">ByronSpecGenTxErr</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-52"></span><span>      </span><span id="unByronSpecGenTxErr"><span class="annot"><span class="annottext">ByronSpecGenTxErr -&gt; [PredicateFailure CHAIN]
+</span><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#unByronSpecGenTxErr"><span class="hs-identifier hs-var hs-var">unByronSpecGenTxErr</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Spec.PredicateFailure</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Spec.CHAIN</span></span><span class="hs-special">]</span><span>
 </span><span id="line-53"></span><span>    </span><span class="hs-special">}</span><span>
-</span><span id="line-54"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679165595"><span id="local-6989586621679165597"><span id="local-6989586621679165599"><span class="annot"><span class="annottext">Int -&gt; ByronSpecGenTxErr -&gt; ShowS
+</span><span id="line-54"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679216376"><span id="local-6989586621679216378"><span id="local-6989586621679216380"><span class="annot"><span class="annottext">Int -&gt; ByronSpecGenTxErr -&gt; ShowS
 [ByronSpecGenTxErr] -&gt; ShowS
 ByronSpecGenTxErr -&gt; String
 (Int -&gt; ByronSpecGenTxErr -&gt; ShowS)
@@ -114,7 +114,7 @@ show :: ByronSpecGenTxErr -&gt; String
 $cshow :: ByronSpecGenTxErr -&gt; String
 showsPrec :: Int -&gt; ByronSpecGenTxErr -&gt; ShowS
 $cshowsPrec :: Int -&gt; ByronSpecGenTxErr -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. ByronSpecGenTxErr -&gt; Rep ByronSpecGenTxErr x)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. ByronSpecGenTxErr -&gt; Rep ByronSpecGenTxErr x)
 -&gt; (forall x. Rep ByronSpecGenTxErr x -&gt; ByronSpecGenTxErr)
 -&gt; Generic ByronSpecGenTxErr
 forall x. Rep ByronSpecGenTxErr x -&gt; ByronSpecGenTxErr
@@ -123,7 +123,7 @@ forall a.
 (forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
 $cto :: forall x. Rep ByronSpecGenTxErr x -&gt; ByronSpecGenTxErr
 $cfrom :: forall x. ByronSpecGenTxErr -&gt; Rep ByronSpecGenTxErr x
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679165585"><span id="local-6989586621679165587"><span id="local-6989586621679165589"><span id="local-6989586621679165591"><span class="annot"><span class="annottext">[ByronSpecGenTxErr] -&gt; Encoding
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679216366"><span id="local-6989586621679216368"><span id="local-6989586621679216370"><span id="local-6989586621679216372"><span class="annot"><span class="annottext">[ByronSpecGenTxErr] -&gt; Encoding
 ByronSpecGenTxErr -&gt; Encoding
 (ByronSpecGenTxErr -&gt; Encoding)
 -&gt; (forall s. Decoder s ByronSpecGenTxErr)
@@ -146,7 +146,7 @@ decode :: Decoder s ByronSpecGenTxErr
 $cdecode :: forall s. Decoder s ByronSpecGenTxErr
 encode :: ByronSpecGenTxErr -&gt; Encoding
 $cencode :: ByronSpecGenTxErr -&gt; Encoding
-</span><a href="#local-6989586621679165585"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Serialise</span></a></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679216366"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Serialise</span></a></span></span></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-55"></span><span>
 </span><span id="line-56"></span><span class="hs-comment">{-------------------------------------------------------------------------------
   Functions
@@ -155,75 +155,75 @@ $cencode :: ByronSpecGenTxErr -&gt; Encoding
 </span><span id="line-60"></span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#apply"><span class="hs-identifier hs-type">apply</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.Genesis.html#ByronSpecGenesis"><span class="hs-identifier hs-type">ByronSpecGenesis</span></a></span><span>
 </span><span id="line-61"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTx"><span class="hs-identifier hs-type">ByronSpecGenTx</span></a></span><span>
 </span><span id="line-62"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Spec.State</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Spec.CHAIN</span></span><span>
-</span><span id="line-63"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Except</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxErr"><span class="hs-identifier hs-type">ByronSpecGenTxErr</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Spec.State</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Spec.CHAIN</span></span><span class="hs-special">)</span><span>
+</span><span id="line-63"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-type">Except</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxErr"><span class="hs-identifier hs-type">ByronSpecGenTxErr</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Spec.State</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Spec.CHAIN</span></span><span class="hs-special">)</span><span>
 </span><span id="line-64"></span><span id="apply"><span class="annot"><span class="annottext">apply :: ByronSpecGenesis
 -&gt; ByronSpecGenTx
 -&gt; State CHAIN
 -&gt; Except ByronSpecGenTxErr (State CHAIN)
-</span><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#apply"><span class="hs-identifier hs-var hs-var">apply</span></a></span></span><span> </span><span id="local-6989586621679165584"><span class="annot"><span class="annottext">ByronSpecGenesis
-</span><a href="#local-6989586621679165584"><span class="hs-identifier hs-var">cfg</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679165583"><span class="annot"><span class="annottext">ByronSpecGenTx
-</span><a href="#local-6989586621679165583"><span class="hs-identifier hs-var">genTx</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">([[ChainPredicateFailure]] -&gt; ByronSpecGenTxErr)
+</span><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#apply"><span class="hs-identifier hs-var hs-var">apply</span></a></span></span><span> </span><span id="local-6989586621679216365"><span class="annot"><span class="annottext">ByronSpecGenesis
+</span><a href="#local-6989586621679216365"><span class="hs-identifier hs-var">cfg</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679216364"><span class="annot"><span class="annottext">ByronSpecGenTx
+</span><a href="#local-6989586621679216364"><span class="hs-identifier hs-var">genTx</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">([ChainPredicateFailure] -&gt; ByronSpecGenTxErr)
 -&gt; Except
-     [[ChainPredicateFailure]]
+     [ChainPredicateFailure]
      (Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState)
 -&gt; Except
      ByronSpecGenTxErr
      (Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState)
 forall e e' a. (e -&gt; e') -&gt; Except e a -&gt; Except e' a
-</span><span class="hs-identifier hs-var">withExcept</span></span><span> </span><span class="annot"><span class="annottext">[[ChainPredicateFailure]] -&gt; ByronSpecGenTxErr
-[[PredicateFailure CHAIN]] -&gt; ByronSpecGenTxErr
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-var">withExcept</span></a></span><span> </span><span class="annot"><span class="annottext">[ChainPredicateFailure] -&gt; ByronSpecGenTxErr
+[PredicateFailure CHAIN] -&gt; ByronSpecGenTxErr
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxErr"><span class="hs-identifier hs-var">ByronSpecGenTxErr</span></a></span><span> </span><span class="annot"><span class="annottext">(Except
-   [[ChainPredicateFailure]]
+   [ChainPredicateFailure]
    (Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState)
  -&gt; Except
       ByronSpecGenTxErr
       (Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState))
 -&gt; ((Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState)
     -&gt; Except
-         [[ChainPredicateFailure]]
+         [ChainPredicateFailure]
          (Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState))
 -&gt; (Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState)
 -&gt; Except
      ByronSpecGenTxErr
      (Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState)
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">ByronSpecGenTx
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">ByronSpecGenTx
 -&gt; (Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState)
 -&gt; Except
-     [[ChainPredicateFailure]]
+     [ChainPredicateFailure]
      (Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState)
-</span><a href="#local-6989586621679165580"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">ByronSpecGenTx
-</span><a href="#local-6989586621679165583"><span class="hs-identifier hs-var">genTx</span></a></span><span>
+</span><a href="#local-6989586621679216361"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">ByronSpecGenTx
+</span><a href="#local-6989586621679216364"><span class="hs-identifier hs-var">genTx</span></a></span><span>
 </span><span id="line-65"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-66"></span><span>    </span><span id="local-6989586621679165580"><span class="annot"><span class="annottext">go :: ByronSpecGenTx
+</span><span id="line-66"></span><span>    </span><span id="local-6989586621679216361"><span class="annot"><span class="annottext">go :: ByronSpecGenTx
 -&gt; (Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState)
 -&gt; Except
-     [[ChainPredicateFailure]]
+     [ChainPredicateFailure]
      (Slot, Seq VKeyGenesis, Hash, UTxOState, DIState, UPIState)
-</span><a href="#local-6989586621679165580"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxDCert"><span class="hs-identifier hs-type">ByronSpecGenTxDCert</span></a></span><span> </span><span id="local-6989586621679165579"><span class="annot"><span class="annottext">DCert
-</span><a href="#local-6989586621679165579"><span class="hs-identifier hs-var">dcert</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByronSpecGenesis -&gt; LiftedRule SDELEG
+</span><a href="#local-6989586621679216361"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxDCert"><span class="hs-identifier hs-type">ByronSpecGenTxDCert</span></a></span><span> </span><span id="local-6989586621679216360"><span class="annot"><span class="annottext">DCert
+</span><a href="#local-6989586621679216360"><span class="hs-identifier hs-var">dcert</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByronSpecGenesis -&gt; LiftedRule SDELEG
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Rules.html#liftSDELEG"><span class="hs-identifier hs-var">Rules.liftSDELEG</span></a></span><span>  </span><span class="annot"><span class="annottext">ByronSpecGenesis
-</span><a href="#local-6989586621679165584"><span class="hs-identifier hs-var">cfg</span></a></span><span> </span><span class="annot"><span class="annottext">Signal SDELEG
+</span><a href="#local-6989586621679216365"><span class="hs-identifier hs-var">cfg</span></a></span><span> </span><span class="annot"><span class="annottext">Signal SDELEG
 DCert
-</span><a href="#local-6989586621679165579"><span class="hs-identifier hs-var">dcert</span></a></span><span>
-</span><span id="line-67"></span><span>    </span><span class="annot"><a href="#local-6989586621679165580"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxTx"><span class="hs-identifier hs-type">ByronSpecGenTxTx</span></a></span><span>    </span><span id="local-6989586621679165577"><span class="annot"><span class="annottext">Tx
-</span><a href="#local-6989586621679165577"><span class="hs-identifier hs-var">tx</span></a></span></span><span>   </span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByronSpecGenesis -&gt; LiftedRule UTXOW
+</span><a href="#local-6989586621679216360"><span class="hs-identifier hs-var">dcert</span></a></span><span>
+</span><span id="line-67"></span><span>    </span><span class="annot"><a href="#local-6989586621679216361"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxTx"><span class="hs-identifier hs-type">ByronSpecGenTxTx</span></a></span><span>    </span><span id="local-6989586621679216358"><span class="annot"><span class="annottext">Tx
+</span><a href="#local-6989586621679216358"><span class="hs-identifier hs-var">tx</span></a></span></span><span>   </span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByronSpecGenesis -&gt; LiftedRule UTXOW
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Rules.html#liftUTXOW"><span class="hs-identifier hs-var">Rules.liftUTXOW</span></a></span><span>   </span><span class="annot"><span class="annottext">ByronSpecGenesis
-</span><a href="#local-6989586621679165584"><span class="hs-identifier hs-var">cfg</span></a></span><span> </span><span class="annot"><span class="annottext">Signal UTXOW
+</span><a href="#local-6989586621679216365"><span class="hs-identifier hs-var">cfg</span></a></span><span> </span><span class="annot"><span class="annottext">Signal UTXOW
 Tx
-</span><a href="#local-6989586621679165577"><span class="hs-identifier hs-var">tx</span></a></span><span>
-</span><span id="line-68"></span><span>    </span><span class="annot"><a href="#local-6989586621679165580"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxUProp"><span class="hs-identifier hs-type">ByronSpecGenTxUProp</span></a></span><span> </span><span id="local-6989586621679165575"><span class="annot"><span class="annottext">UProp
-</span><a href="#local-6989586621679165575"><span class="hs-identifier hs-var">prop</span></a></span></span><span> </span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByronSpecGenesis -&gt; LiftedRule UPIREG
+</span><a href="#local-6989586621679216358"><span class="hs-identifier hs-var">tx</span></a></span><span>
+</span><span id="line-68"></span><span>    </span><span class="annot"><a href="#local-6989586621679216361"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxUProp"><span class="hs-identifier hs-type">ByronSpecGenTxUProp</span></a></span><span> </span><span id="local-6989586621679216356"><span class="annot"><span class="annottext">UProp
+</span><a href="#local-6989586621679216356"><span class="hs-identifier hs-var">prop</span></a></span></span><span> </span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByronSpecGenesis -&gt; LiftedRule UPIREG
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Rules.html#liftUPIREG"><span class="hs-identifier hs-var">Rules.liftUPIREG</span></a></span><span>  </span><span class="annot"><span class="annottext">ByronSpecGenesis
-</span><a href="#local-6989586621679165584"><span class="hs-identifier hs-var">cfg</span></a></span><span> </span><span class="annot"><span class="annottext">Signal UPIREG
+</span><a href="#local-6989586621679216365"><span class="hs-identifier hs-var">cfg</span></a></span><span> </span><span class="annot"><span class="annottext">Signal UPIREG
 UProp
-</span><a href="#local-6989586621679165575"><span class="hs-identifier hs-var">prop</span></a></span><span>
-</span><span id="line-69"></span><span>    </span><span class="annot"><a href="#local-6989586621679165580"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxVote"><span class="hs-identifier hs-type">ByronSpecGenTxVote</span></a></span><span>  </span><span id="local-6989586621679165573"><span class="annot"><span class="annottext">Vote
-</span><a href="#local-6989586621679165573"><span class="hs-identifier hs-var">vote</span></a></span></span><span> </span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByronSpecGenesis -&gt; LiftedRule UPIVOTE
+</span><a href="#local-6989586621679216356"><span class="hs-identifier hs-var">prop</span></a></span><span>
+</span><span id="line-69"></span><span>    </span><span class="annot"><a href="#local-6989586621679216361"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxVote"><span class="hs-identifier hs-type">ByronSpecGenTxVote</span></a></span><span>  </span><span id="local-6989586621679216354"><span class="annot"><span class="annottext">Vote
+</span><a href="#local-6989586621679216354"><span class="hs-identifier hs-var">vote</span></a></span></span><span> </span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByronSpecGenesis -&gt; LiftedRule UPIVOTE
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.Rules.html#liftUPIVOTE"><span class="hs-identifier hs-var">Rules.liftUPIVOTE</span></a></span><span> </span><span class="annot"><span class="annottext">ByronSpecGenesis
-</span><a href="#local-6989586621679165584"><span class="hs-identifier hs-var">cfg</span></a></span><span> </span><span class="annot"><span class="annottext">Signal UPIVOTE
+</span><a href="#local-6989586621679216365"><span class="hs-identifier hs-var">cfg</span></a></span><span> </span><span class="annot"><span class="annottext">Signal UPIVOTE
 Vote
-</span><a href="#local-6989586621679165573"><span class="hs-identifier hs-var">vote</span></a></span><span>
+</span><a href="#local-6989586621679216354"><span class="hs-identifier hs-var">vote</span></a></span><span>
 </span><span id="line-70"></span><span>
 </span><span id="line-71"></span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#partition"><span class="hs-identifier hs-type">partition</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTx"><span class="hs-identifier hs-type">ByronSpecGenTx</span></a></span><span class="hs-special">]</span><span>
 </span><span id="line-72"></span><span>          </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Spec.DCert</span></span><span class="hs-special">]</span><span>
@@ -234,82 +234,82 @@ Vote
 </span><span id="line-77"></span><span id="partition"><span class="annot"><span class="annottext">partition :: [ByronSpecGenTx] -&gt; ([DCert], [Tx], [UProp], [Vote])
 </span><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#partition"><span class="hs-identifier hs-var hs-var">partition</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([DCert], [Tx], [UProp], [Vote])
 -&gt; [ByronSpecGenTx] -&gt; ([DCert], [Tx], [UProp], [Vote])
-</span><a href="#local-6989586621679165571"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">,</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">,</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">,</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679216352"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">,</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">,</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">,</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">)</span><span>
 </span><span id="line-78"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-79"></span><span>    </span><span id="local-6989586621679165571"><span class="annot"><span class="annottext">go :: ([DCert], [Tx], [UProp], [Vote])
+</span><span id="line-79"></span><span>    </span><span id="local-6989586621679216352"><span class="annot"><span class="annottext">go :: ([DCert], [Tx], [UProp], [Vote])
 -&gt; [ByronSpecGenTx] -&gt; ([DCert], [Tx], [UProp], [Vote])
-</span><a href="#local-6989586621679165571"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679165570"><span class="annot"><span class="annottext">[DCert]
-</span><a href="#local-6989586621679165570"><span class="hs-identifier hs-var">ds</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679165569"><span class="annot"><span class="annottext">[Tx]
-</span><a href="#local-6989586621679165569"><span class="hs-identifier hs-var">ts</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679165568"><span class="annot"><span class="annottext">[UProp]
-</span><a href="#local-6989586621679165568"><span class="hs-identifier hs-var">us</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679165567"><span class="annot"><span class="annottext">[Vote]
-</span><a href="#local-6989586621679165567"><span class="hs-identifier hs-var">vs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[DCert] -&gt; [DCert]
+</span><a href="#local-6989586621679216352"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679216351"><span class="annot"><span class="annottext">[DCert]
+</span><a href="#local-6989586621679216351"><span class="hs-identifier hs-var">ds</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679216350"><span class="annot"><span class="annottext">[Tx]
+</span><a href="#local-6989586621679216350"><span class="hs-identifier hs-var">ts</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679216349"><span class="annot"><span class="annottext">[UProp]
+</span><a href="#local-6989586621679216349"><span class="hs-identifier hs-var">us</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679216348"><span class="annot"><span class="annottext">[Vote]
+</span><a href="#local-6989586621679216348"><span class="hs-identifier hs-var">vs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[DCert] -&gt; [DCert]
 forall a. [a] -&gt; [a]
-</span><span class="hs-identifier hs-var">reverse</span></span><span> </span><span class="annot"><span class="annottext">[DCert]
-</span><a href="#local-6989586621679165570"><span class="hs-identifier hs-var">ds</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">[Tx] -&gt; [Tx]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">reverse</span></a></span><span> </span><span class="annot"><span class="annottext">[DCert]
+</span><a href="#local-6989586621679216351"><span class="hs-identifier hs-var">ds</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">[Tx] -&gt; [Tx]
 forall a. [a] -&gt; [a]
-</span><span class="hs-identifier hs-var">reverse</span></span><span> </span><span class="annot"><span class="annottext">[Tx]
-</span><a href="#local-6989586621679165569"><span class="hs-identifier hs-var">ts</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">[UProp] -&gt; [UProp]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">reverse</span></a></span><span> </span><span class="annot"><span class="annottext">[Tx]
+</span><a href="#local-6989586621679216350"><span class="hs-identifier hs-var">ts</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">[UProp] -&gt; [UProp]
 forall a. [a] -&gt; [a]
-</span><span class="hs-identifier hs-var">reverse</span></span><span> </span><span class="annot"><span class="annottext">[UProp]
-</span><a href="#local-6989586621679165568"><span class="hs-identifier hs-var">us</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">[Vote] -&gt; [Vote]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">reverse</span></a></span><span> </span><span class="annot"><span class="annottext">[UProp]
+</span><a href="#local-6989586621679216349"><span class="hs-identifier hs-var">us</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">[Vote] -&gt; [Vote]
 forall a. [a] -&gt; [a]
-</span><span class="hs-identifier hs-var">reverse</span></span><span> </span><span class="annot"><span class="annottext">[Vote]
-</span><a href="#local-6989586621679165567"><span class="hs-identifier hs-var">vs</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-80"></span><span>    </span><span class="annot"><a href="#local-6989586621679165571"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679165565"><span class="annot"><span class="annottext">[DCert]
-</span><a href="#local-6989586621679165565"><span class="hs-identifier hs-var">ds</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679165564"><span class="annot"><span class="annottext">[Tx]
-</span><a href="#local-6989586621679165564"><span class="hs-identifier hs-var">ts</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679165563"><span class="annot"><span class="annottext">[UProp]
-</span><a href="#local-6989586621679165563"><span class="hs-identifier hs-var">us</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679165562"><span class="annot"><span class="annottext">[Vote]
-</span><a href="#local-6989586621679165562"><span class="hs-identifier hs-var">vs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679165561"><span class="annot"><span class="annottext">ByronSpecGenTx
-</span><a href="#local-6989586621679165561"><span class="hs-identifier hs-var">g</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679165560"><span class="annot"><span class="annottext">[ByronSpecGenTx]
-</span><a href="#local-6989586621679165560"><span class="hs-identifier hs-var">gs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">reverse</span></a></span><span> </span><span class="annot"><span class="annottext">[Vote]
+</span><a href="#local-6989586621679216348"><span class="hs-identifier hs-var">vs</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-80"></span><span>    </span><span class="annot"><a href="#local-6989586621679216352"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679216346"><span class="annot"><span class="annottext">[DCert]
+</span><a href="#local-6989586621679216346"><span class="hs-identifier hs-var">ds</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679216345"><span class="annot"><span class="annottext">[Tx]
+</span><a href="#local-6989586621679216345"><span class="hs-identifier hs-var">ts</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679216344"><span class="annot"><span class="annottext">[UProp]
+</span><a href="#local-6989586621679216344"><span class="hs-identifier hs-var">us</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679216343"><span class="annot"><span class="annottext">[Vote]
+</span><a href="#local-6989586621679216343"><span class="hs-identifier hs-var">vs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679216342"><span class="annot"><span class="annottext">ByronSpecGenTx
+</span><a href="#local-6989586621679216342"><span class="hs-identifier hs-var">g</span></a></span></span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">:</span></a></span><span id="local-6989586621679216341"><span class="annot"><span class="annottext">[ByronSpecGenTx]
+</span><a href="#local-6989586621679216341"><span class="hs-identifier hs-var">gs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-81"></span><span>        </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">ByronSpecGenTx
-</span><a href="#local-6989586621679165561"><span class="hs-identifier hs-var">g</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-82"></span><span>          </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxDCert"><span class="hs-identifier hs-type">ByronSpecGenTxDCert</span></a></span><span> </span><span id="local-6989586621679165559"><span class="annot"><span class="annottext">DCert
-</span><a href="#local-6989586621679165559"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">([DCert], [Tx], [UProp], [Vote])
+</span><a href="#local-6989586621679216342"><span class="hs-identifier hs-var">g</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-82"></span><span>          </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxDCert"><span class="hs-identifier hs-type">ByronSpecGenTxDCert</span></a></span><span> </span><span id="local-6989586621679216340"><span class="annot"><span class="annottext">DCert
+</span><a href="#local-6989586621679216340"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">([DCert], [Tx], [UProp], [Vote])
 -&gt; [ByronSpecGenTx] -&gt; ([DCert], [Tx], [UProp], [Vote])
-</span><a href="#local-6989586621679165571"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">DCert
-</span><a href="#local-6989586621679165559"><span class="hs-identifier hs-var">d</span></a></span><span class="annot"><span class="annottext">DCert -&gt; [DCert] -&gt; [DCert]
+</span><a href="#local-6989586621679216352"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">DCert
+</span><a href="#local-6989586621679216340"><span class="hs-identifier hs-var">d</span></a></span><span class="annot"><span class="annottext">DCert -&gt; [DCert] -&gt; [DCert]
 forall a. a -&gt; [a] -&gt; [a]
-</span><span class="hs-glyph hs-var">:</span></span><span class="annot"><span class="annottext">[DCert]
-</span><a href="#local-6989586621679165565"><span class="hs-identifier hs-var">ds</span></a></span><span class="hs-special">,</span><span>   </span><span class="annot"><span class="annottext">[Tx]
-</span><a href="#local-6989586621679165564"><span class="hs-identifier hs-var">ts</span></a></span><span class="hs-special">,</span><span>   </span><span class="annot"><span class="annottext">[UProp]
-</span><a href="#local-6989586621679165563"><span class="hs-identifier hs-var">us</span></a></span><span class="hs-special">,</span><span>   </span><span class="annot"><span class="annottext">[Vote]
-</span><a href="#local-6989586621679165562"><span class="hs-identifier hs-var">vs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[ByronSpecGenTx]
-</span><a href="#local-6989586621679165560"><span class="hs-identifier hs-var">gs</span></a></span><span>
-</span><span id="line-83"></span><span>          </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxTx"><span class="hs-identifier hs-type">ByronSpecGenTxTx</span></a></span><span>    </span><span id="local-6989586621679165558"><span class="annot"><span class="annottext">Tx
-</span><a href="#local-6989586621679165558"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">([DCert], [Tx], [UProp], [Vote])
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-var">:</span></a></span><span class="annot"><span class="annottext">[DCert]
+</span><a href="#local-6989586621679216346"><span class="hs-identifier hs-var">ds</span></a></span><span class="hs-special">,</span><span>   </span><span class="annot"><span class="annottext">[Tx]
+</span><a href="#local-6989586621679216345"><span class="hs-identifier hs-var">ts</span></a></span><span class="hs-special">,</span><span>   </span><span class="annot"><span class="annottext">[UProp]
+</span><a href="#local-6989586621679216344"><span class="hs-identifier hs-var">us</span></a></span><span class="hs-special">,</span><span>   </span><span class="annot"><span class="annottext">[Vote]
+</span><a href="#local-6989586621679216343"><span class="hs-identifier hs-var">vs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[ByronSpecGenTx]
+</span><a href="#local-6989586621679216341"><span class="hs-identifier hs-var">gs</span></a></span><span>
+</span><span id="line-83"></span><span>          </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxTx"><span class="hs-identifier hs-type">ByronSpecGenTxTx</span></a></span><span>    </span><span id="local-6989586621679216339"><span class="annot"><span class="annottext">Tx
+</span><a href="#local-6989586621679216339"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">([DCert], [Tx], [UProp], [Vote])
 -&gt; [ByronSpecGenTx] -&gt; ([DCert], [Tx], [UProp], [Vote])
-</span><a href="#local-6989586621679165571"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span>  </span><span class="annot"><span class="annottext">[DCert]
-</span><a href="#local-6989586621679165565"><span class="hs-identifier hs-var">ds</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Tx
-</span><a href="#local-6989586621679165558"><span class="hs-identifier hs-var">t</span></a></span><span class="annot"><span class="annottext">Tx -&gt; [Tx] -&gt; [Tx]
+</span><a href="#local-6989586621679216352"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span>  </span><span class="annot"><span class="annottext">[DCert]
+</span><a href="#local-6989586621679216346"><span class="hs-identifier hs-var">ds</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Tx
+</span><a href="#local-6989586621679216339"><span class="hs-identifier hs-var">t</span></a></span><span class="annot"><span class="annottext">Tx -&gt; [Tx] -&gt; [Tx]
 forall a. a -&gt; [a] -&gt; [a]
-</span><span class="hs-glyph hs-var">:</span></span><span class="annot"><span class="annottext">[Tx]
-</span><a href="#local-6989586621679165564"><span class="hs-identifier hs-var">ts</span></a></span><span class="hs-special">,</span><span>   </span><span class="annot"><span class="annottext">[UProp]
-</span><a href="#local-6989586621679165563"><span class="hs-identifier hs-var">us</span></a></span><span class="hs-special">,</span><span>   </span><span class="annot"><span class="annottext">[Vote]
-</span><a href="#local-6989586621679165562"><span class="hs-identifier hs-var">vs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[ByronSpecGenTx]
-</span><a href="#local-6989586621679165560"><span class="hs-identifier hs-var">gs</span></a></span><span>
-</span><span id="line-84"></span><span>          </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxUProp"><span class="hs-identifier hs-type">ByronSpecGenTxUProp</span></a></span><span> </span><span id="local-6989586621679165557"><span class="annot"><span class="annottext">UProp
-</span><a href="#local-6989586621679165557"><span class="hs-identifier hs-var">u</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">([DCert], [Tx], [UProp], [Vote])
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-var">:</span></a></span><span class="annot"><span class="annottext">[Tx]
+</span><a href="#local-6989586621679216345"><span class="hs-identifier hs-var">ts</span></a></span><span class="hs-special">,</span><span>   </span><span class="annot"><span class="annottext">[UProp]
+</span><a href="#local-6989586621679216344"><span class="hs-identifier hs-var">us</span></a></span><span class="hs-special">,</span><span>   </span><span class="annot"><span class="annottext">[Vote]
+</span><a href="#local-6989586621679216343"><span class="hs-identifier hs-var">vs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[ByronSpecGenTx]
+</span><a href="#local-6989586621679216341"><span class="hs-identifier hs-var">gs</span></a></span><span>
+</span><span id="line-84"></span><span>          </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxUProp"><span class="hs-identifier hs-type">ByronSpecGenTxUProp</span></a></span><span> </span><span id="local-6989586621679216338"><span class="annot"><span class="annottext">UProp
+</span><a href="#local-6989586621679216338"><span class="hs-identifier hs-var">u</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">([DCert], [Tx], [UProp], [Vote])
 -&gt; [ByronSpecGenTx] -&gt; ([DCert], [Tx], [UProp], [Vote])
-</span><a href="#local-6989586621679165571"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span>  </span><span class="annot"><span class="annottext">[DCert]
-</span><a href="#local-6989586621679165565"><span class="hs-identifier hs-var">ds</span></a></span><span class="hs-special">,</span><span>   </span><span class="annot"><span class="annottext">[Tx]
-</span><a href="#local-6989586621679165564"><span class="hs-identifier hs-var">ts</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">UProp
-</span><a href="#local-6989586621679165557"><span class="hs-identifier hs-var">u</span></a></span><span class="annot"><span class="annottext">UProp -&gt; [UProp] -&gt; [UProp]
+</span><a href="#local-6989586621679216352"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span>  </span><span class="annot"><span class="annottext">[DCert]
+</span><a href="#local-6989586621679216346"><span class="hs-identifier hs-var">ds</span></a></span><span class="hs-special">,</span><span>   </span><span class="annot"><span class="annottext">[Tx]
+</span><a href="#local-6989586621679216345"><span class="hs-identifier hs-var">ts</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">UProp
+</span><a href="#local-6989586621679216338"><span class="hs-identifier hs-var">u</span></a></span><span class="annot"><span class="annottext">UProp -&gt; [UProp] -&gt; [UProp]
 forall a. a -&gt; [a] -&gt; [a]
-</span><span class="hs-glyph hs-var">:</span></span><span class="annot"><span class="annottext">[UProp]
-</span><a href="#local-6989586621679165563"><span class="hs-identifier hs-var">us</span></a></span><span class="hs-special">,</span><span>   </span><span class="annot"><span class="annottext">[Vote]
-</span><a href="#local-6989586621679165562"><span class="hs-identifier hs-var">vs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[ByronSpecGenTx]
-</span><a href="#local-6989586621679165560"><span class="hs-identifier hs-var">gs</span></a></span><span>
-</span><span id="line-85"></span><span>          </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxVote"><span class="hs-identifier hs-type">ByronSpecGenTxVote</span></a></span><span>  </span><span id="local-6989586621679165556"><span class="annot"><span class="annottext">Vote
-</span><a href="#local-6989586621679165556"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">([DCert], [Tx], [UProp], [Vote])
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-var">:</span></a></span><span class="annot"><span class="annottext">[UProp]
+</span><a href="#local-6989586621679216344"><span class="hs-identifier hs-var">us</span></a></span><span class="hs-special">,</span><span>   </span><span class="annot"><span class="annottext">[Vote]
+</span><a href="#local-6989586621679216343"><span class="hs-identifier hs-var">vs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[ByronSpecGenTx]
+</span><a href="#local-6989586621679216341"><span class="hs-identifier hs-var">gs</span></a></span><span>
+</span><span id="line-85"></span><span>          </span><span class="annot"><a href="Ouroboros.Consensus.ByronSpec.Ledger.GenTx.html#ByronSpecGenTxVote"><span class="hs-identifier hs-type">ByronSpecGenTxVote</span></a></span><span>  </span><span id="local-6989586621679216337"><span class="annot"><span class="annottext">Vote
+</span><a href="#local-6989586621679216337"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">([DCert], [Tx], [UProp], [Vote])
 -&gt; [ByronSpecGenTx] -&gt; ([DCert], [Tx], [UProp], [Vote])
-</span><a href="#local-6989586621679165571"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span>  </span><span class="annot"><span class="annottext">[DCert]
-</span><a href="#local-6989586621679165565"><span class="hs-identifier hs-var">ds</span></a></span><span class="hs-special">,</span><span>   </span><span class="annot"><span class="annottext">[Tx]
-</span><a href="#local-6989586621679165564"><span class="hs-identifier hs-var">ts</span></a></span><span class="hs-special">,</span><span>   </span><span class="annot"><span class="annottext">[UProp]
-</span><a href="#local-6989586621679165563"><span class="hs-identifier hs-var">us</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Vote
-</span><a href="#local-6989586621679165556"><span class="hs-identifier hs-var">v</span></a></span><span class="annot"><span class="annottext">Vote -&gt; [Vote] -&gt; [Vote]
+</span><a href="#local-6989586621679216352"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span>  </span><span class="annot"><span class="annottext">[DCert]
+</span><a href="#local-6989586621679216346"><span class="hs-identifier hs-var">ds</span></a></span><span class="hs-special">,</span><span>   </span><span class="annot"><span class="annottext">[Tx]
+</span><a href="#local-6989586621679216345"><span class="hs-identifier hs-var">ts</span></a></span><span class="hs-special">,</span><span>   </span><span class="annot"><span class="annottext">[UProp]
+</span><a href="#local-6989586621679216344"><span class="hs-identifier hs-var">us</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Vote
+</span><a href="#local-6989586621679216337"><span class="hs-identifier hs-var">v</span></a></span><span class="annot"><span class="annottext">Vote -&gt; [Vote] -&gt; [Vote]
 forall a. a -&gt; [a] -&gt; [a]
-</span><span class="hs-glyph hs-var">:</span></span><span class="annot"><span class="annottext">[Vote]
-</span><a href="#local-6989586621679165562"><span class="hs-identifier hs-var">vs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[ByronSpecGenTx]
-</span><a href="#local-6989586621679165560"><span class="hs-identifier hs-var">gs</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-var">:</span></a></span><span class="annot"><span class="annottext">[Vote]
+</span><a href="#local-6989586621679216343"><span class="hs-identifier hs-var">vs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[ByronSpecGenTx]
+</span><a href="#local-6989586621679216341"><span class="hs-identifier hs-var">gs</span></a></span><span>
 </span><span id="line-86"></span></pre></body></html>

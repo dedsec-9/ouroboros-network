@@ -1,130 +1,128 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE NamedFieldPuns      #-}</span><span>
 </span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables #-}</span><span>
 </span><span id="line-3"></span><span>
-</span><span id="line-4"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.PeerSelection.Governor.RootPeers</span><span> </span><span>
-</span><span id="line-5"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.RootPeers.html#belowTarget"><span class="hs-identifier">belowTarget</span></a></span><span>
-</span><span id="line-6"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-7"></span><span>
-</span><span id="line-8"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Semigroup</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Min</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-9"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Set</span></span><span>
-</span><span id="line-10"></span><span>
-</span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier">Control.Concurrent.JobPool</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier">Job</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-12"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier">Control.Monad.Class.MonadSTM</span></a></span><span>
-</span><span id="line-13"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier">Control.Monad.Class.MonadTime</span></a></span><span>
-</span><span id="line-14"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Exception</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">SomeException</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">assert</span></span><span class="hs-special">)</span><span>
-</span><span id="line-15"></span><span>
-</span><span id="line-16"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.KnownPeers.html"><span class="hs-identifier">Ouroboros.Network.PeerSelection.KnownPeers</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">KnownPeers</span></span><span>
-</span><span id="line-17"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.LocalRootPeers.html"><span class="hs-identifier">Ouroboros.Network.PeerSelection.LocalRootPeers</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">LocalRootPeers</span></span><span>
-</span><span id="line-18"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html"><span class="hs-identifier">Ouroboros.Network.PeerSelection.Governor.Types</span></a></span><span>
-</span><span id="line-19"></span><span>
-</span><span id="line-20"></span><span>
-</span><span id="line-21"></span><span class="hs-comment">--------------------------</span><span>
-</span><span id="line-22"></span><span class="hs-comment">-- Root peers below target</span><span>
-</span><span id="line-23"></span><span class="hs-comment">--</span><span>
-</span><span id="line-24"></span><span>
-</span><span id="line-25"></span><span id="local-6989586621679214759"><span id="local-6989586621679214760"><span id="local-6989586621679214761"><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.RootPeers.html#belowTarget"><span class="hs-identifier hs-type">belowTarget</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier hs-type">MonadSTM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214761"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="annot"><a href="#local-6989586621679214760"><span class="hs-identifier hs-type">peeraddr</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-26"></span><span>            </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#PeerSelectionActions"><span class="hs-identifier hs-type">PeerSelectionActions</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214760"><span class="hs-identifier hs-type">peeraddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214759"><span class="hs-identifier hs-type">peerconn</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214761"><span class="hs-identifier hs-type">m</span></a></span><span>
-</span><span id="line-27"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier hs-type">Time</span></a></span><span>
-</span><span id="line-28"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#PeerSelectionState"><span class="hs-identifier hs-type">PeerSelectionState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214760"><span class="hs-identifier hs-type">peeraddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214759"><span class="hs-identifier hs-type">peerconn</span></a></span><span>
-</span><span id="line-29"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#Guarded"><span class="hs-identifier hs-type">Guarded</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier hs-type">STM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214761"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#TimedDecision"><span class="hs-identifier hs-type">TimedDecision</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214761"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214760"><span class="hs-identifier hs-type">peeraddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214759"><span class="hs-identifier hs-type">peerconn</span></a></span><span class="hs-special">)</span></span></span></span><span>
-</span><span id="line-30"></span><span id="belowTarget"><span class="annot"><span class="annottext">belowTarget :: PeerSelectionActions peeraddr peerconn m
+</span><span id="line-4"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.PeerSelection.Governor.RootPeers</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.RootPeers.html#belowTarget"><span class="hs-identifier">belowTarget</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-5"></span><span>
+</span><span id="line-6"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Semigroup</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Min</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Data.Set</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Set</span></span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier">Control.Concurrent.JobPool</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier">Job</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Control.Exception</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">SomeException</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">assert</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier">Control.Monad.Class.MonadSTM</span></a></span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier">Control.Monad.Class.MonadTime</span></a></span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html"><span class="hs-identifier">Ouroboros.Network.PeerSelection.Governor.Types</span></a></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.KnownPeers.html"><span class="hs-identifier">Ouroboros.Network.PeerSelection.KnownPeers</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">KnownPeers</span></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.LocalRootPeers.html"><span class="hs-identifier">Ouroboros.Network.PeerSelection.LocalRootPeers</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">LocalRootPeers</span></span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="hs-comment">--------------------------</span><span>
+</span><span id="line-20"></span><span class="hs-comment">-- Root peers below target</span><span>
+</span><span id="line-21"></span><span class="hs-comment">--</span><span>
+</span><span id="line-22"></span><span>
+</span><span id="line-23"></span><span id="local-6989586621679248488"><span id="local-6989586621679248489"><span id="local-6989586621679248490"><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.RootPeers.html#belowTarget"><span class="hs-identifier hs-type">belowTarget</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">MonadSTM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248490"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Ord</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248489"><span class="hs-identifier hs-type">peeraddr</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span>            </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#PeerSelectionActions"><span class="hs-identifier hs-type">PeerSelectionActions</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248489"><span class="hs-identifier hs-type">peeraddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248488"><span class="hs-identifier hs-type">peerconn</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248490"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-25"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">Time</span></a></span><span>
+</span><span id="line-26"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#PeerSelectionState"><span class="hs-identifier hs-type">PeerSelectionState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248489"><span class="hs-identifier hs-type">peeraddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248488"><span class="hs-identifier hs-type">peerconn</span></a></span><span>
+</span><span id="line-27"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#Guarded"><span class="hs-identifier hs-type">Guarded</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">STM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248490"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#TimedDecision"><span class="hs-identifier hs-type">TimedDecision</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248490"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248489"><span class="hs-identifier hs-type">peeraddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248488"><span class="hs-identifier hs-type">peerconn</span></a></span><span class="hs-special">)</span></span></span></span><span>
+</span><span id="line-28"></span><span id="belowTarget"><span class="annot"><span class="annottext">belowTarget :: PeerSelectionActions peeraddr peerconn m
 -&gt; Time
 -&gt; PeerSelectionState peeraddr peerconn
 -&gt; Guarded (STM m) (TimedDecision m peeraddr peerconn)
-</span><a href="Ouroboros.Network.PeerSelection.Governor.RootPeers.html#belowTarget"><span class="hs-identifier hs-var hs-var">belowTarget</span></a></span></span><span> </span><span id="local-6989586621679214757"><span class="annot"><span class="annottext">PeerSelectionActions peeraddr peerconn m
-</span><a href="#local-6989586621679214757"><span class="hs-identifier hs-var">actions</span></a></span></span><span>
-</span><span id="line-31"></span><span>            </span><span id="local-6989586621679214756"><span class="annot"><span class="annottext">Time
-</span><a href="#local-6989586621679214756"><span class="hs-identifier hs-var">blockedAt</span></a></span></span><span>
-</span><span id="line-32"></span><span>            </span><span id="local-6989586621679214755"><span class="annot"><span class="annottext">st :: PeerSelectionState peeraddr peerconn
-</span><a href="#local-6989586621679214755"><span class="hs-identifier hs-var">st</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#PeerSelectionState"><span class="hs-identifier hs-type">PeerSelectionState</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-33"></span><span>              </span><span id="local-6989586621679214753"><span class="annot"><span class="annottext">LocalRootPeers peeraddr
+</span><a href="Ouroboros.Network.PeerSelection.Governor.RootPeers.html#belowTarget"><span class="hs-identifier hs-var hs-var">belowTarget</span></a></span></span><span> </span><span id="local-6989586621679248486"><span class="annot"><span class="annottext">PeerSelectionActions peeraddr peerconn m
+</span><a href="#local-6989586621679248486"><span class="hs-identifier hs-var">actions</span></a></span></span><span>
+</span><span id="line-29"></span><span>            </span><span id="local-6989586621679248485"><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679248485"><span class="hs-identifier hs-var">blockedAt</span></a></span></span><span>
+</span><span id="line-30"></span><span>            </span><span id="local-6989586621679248484"><span class="annot"><span class="annottext">st :: PeerSelectionState peeraddr peerconn
+</span><a href="#local-6989586621679248484"><span class="hs-identifier hs-var">st</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#PeerSelectionState"><span class="hs-identifier hs-type">PeerSelectionState</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-31"></span><span>              </span><span id="local-6989586621679248482"><span class="annot"><span class="annottext">LocalRootPeers peeraddr
 localRootPeers :: forall peeraddr peerconn.
 PeerSelectionState peeraddr peerconn -&gt; LocalRootPeers peeraddr
 localRootPeers :: LocalRootPeers peeraddr
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#localRootPeers"><span class="hs-identifier hs-var hs-var">localRootPeers</span></a></span></span><span class="hs-special">,</span><span>
-</span><span id="line-34"></span><span>              </span><span id="local-6989586621679214751"><span class="annot"><span class="annottext">Set peeraddr
+</span><span id="line-32"></span><span>              </span><span id="local-6989586621679248480"><span class="annot"><span class="annottext">Set peeraddr
 publicRootPeers :: forall peeraddr peerconn.
 PeerSelectionState peeraddr peerconn -&gt; Set peeraddr
 publicRootPeers :: Set peeraddr
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#publicRootPeers"><span class="hs-identifier hs-var hs-var">publicRootPeers</span></a></span></span><span class="hs-special">,</span><span>
-</span><span id="line-35"></span><span>              </span><span id="local-6989586621679214749"><span class="annot"><span class="annottext">Time
+</span><span id="line-33"></span><span>              </span><span id="local-6989586621679248478"><span class="annot"><span class="annottext">Time
 publicRootRetryTime :: forall peeraddr peerconn.
 PeerSelectionState peeraddr peerconn -&gt; Time
 publicRootRetryTime :: Time
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#publicRootRetryTime"><span class="hs-identifier hs-var hs-var">publicRootRetryTime</span></a></span></span><span class="hs-special">,</span><span>
-</span><span id="line-36"></span><span>              </span><span id="local-6989586621679214747"><span class="annot"><span class="annottext">Bool
+</span><span id="line-34"></span><span>              </span><span id="local-6989586621679248476"><span class="annot"><span class="annottext">Bool
 inProgressPublicRootsReq :: forall peeraddr peerconn.
 PeerSelectionState peeraddr peerconn -&gt; Bool
 inProgressPublicRootsReq :: Bool
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#inProgressPublicRootsReq"><span class="hs-identifier hs-var hs-var">inProgressPublicRootsReq</span></a></span></span><span class="hs-special">,</span><span>
-</span><span id="line-37"></span><span>              </span><span class="annot"><span class="annottext">targets :: forall peeraddr peerconn.
+</span><span id="line-35"></span><span>              </span><span class="annot"><span class="annottext">targets :: forall peeraddr peerconn.
 PeerSelectionState peeraddr peerconn -&gt; PeerSelectionTargets
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#targets"><span class="hs-identifier hs-var">targets</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#PeerSelectionTargets"><span class="hs-identifier hs-type">PeerSelectionTargets</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-38"></span><span>                          </span><span id="local-6989586621679214743"><span class="annot"><span class="annottext">Int
+</span><span id="line-36"></span><span>                          </span><span id="local-6989586621679248472"><span class="annot"><span class="annottext">Int
 targetNumberOfRootPeers :: PeerSelectionTargets -&gt; Int
 targetNumberOfRootPeers :: Int
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#targetNumberOfRootPeers"><span class="hs-identifier hs-var hs-var">targetNumberOfRootPeers</span></a></span></span><span>
-</span><span id="line-39"></span><span>                        </span><span class="hs-special">}</span><span>
-</span><span id="line-40"></span><span>            </span><span class="hs-special">}</span><span>
-</span><span id="line-41"></span><span>    </span><span class="hs-comment">-- Are we under target for number of root peers?</span><span>
-</span><span id="line-42"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679214741"><span class="hs-identifier hs-var">maxExtraRootPeers</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+</span><span id="line-37"></span><span>                        </span><span class="hs-special">}</span><span>
+</span><span id="line-38"></span><span>            </span><span class="hs-special">}</span><span>
+</span><span id="line-39"></span><span>    </span><span class="hs-comment">-- Are we under target for number of root peers?</span><span>
+</span><span id="line-40"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679248470"><span class="hs-identifier hs-var">maxExtraRootPeers</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
 forall a. Ord a =&gt; a -&gt; a -&gt; Bool
-</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">0</span></span><span>
-</span><span id="line-43"></span><span>
-</span><span id="line-44"></span><span>    </span><span class="hs-comment">-- Are we already requesting more root peers?</span><span>
-</span><span id="line-45"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
-</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679214747"><span class="hs-identifier hs-var">inProgressPublicRootsReq</span></a></span><span>
-</span><span id="line-46"></span><span>
-</span><span id="line-47"></span><span>    </span><span class="hs-comment">-- We limit how frequently we make requests, are we allowed to do it yet?</span><span>
-</span><span id="line-48"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Time
-</span><a href="#local-6989586621679214756"><span class="hs-identifier hs-var">blockedAt</span></a></span><span> </span><span class="annot"><span class="annottext">Time -&gt; Time -&gt; Bool
+</span><span id="line-41"></span><span>
+</span><span id="line-42"></span><span>    </span><span class="hs-comment">-- Are we already requesting more root peers?</span><span>
+</span><span id="line-43"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">not</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679248476"><span class="hs-identifier hs-var">inProgressPublicRootsReq</span></a></span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span>    </span><span class="hs-comment">-- We limit how frequently we make requests, are we allowed to do it yet?</span><span>
+</span><span id="line-46"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679248485"><span class="hs-identifier hs-var">blockedAt</span></a></span><span> </span><span class="annot"><span class="annottext">Time -&gt; Time -&gt; Bool
 forall a. Ord a =&gt; a -&gt; a -&gt; Bool
-</span><span class="hs-operator hs-var">&gt;=</span></span><span> </span><span class="annot"><span class="annottext">Time
-</span><a href="#local-6989586621679214749"><span class="hs-identifier hs-var">publicRootRetryTime</span></a></span><span>
-</span><span id="line-49"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe (Min Time)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;=</span></a></span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679248478"><span class="hs-identifier hs-var">publicRootRetryTime</span></a></span><span>
+</span><span id="line-47"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe (Min Time)
 -&gt; STM m (TimedDecision m peeraddr peerconn)
 -&gt; Guarded (STM m) (TimedDecision m peeraddr peerconn)
 forall (m :: * -&gt; *) a. Maybe (Min Time) -&gt; m a -&gt; Guarded m a
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#Guarded"><span class="hs-identifier hs-var">Guarded</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe (Min Time)
 forall a. Maybe a
-</span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="annot"><span class="annottext">(STM m (TimedDecision m peeraddr peerconn)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span> </span><span class="annot"><span class="annottext">(STM m (TimedDecision m peeraddr peerconn)
  -&gt; Guarded (STM m) (TimedDecision m peeraddr peerconn))
 -&gt; STM m (TimedDecision m peeraddr peerconn)
 -&gt; Guarded (STM m) (TimedDecision m peeraddr peerconn)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span>
-</span><span id="line-50"></span><span>      </span><span class="annot"><span class="annottext">TimedDecision m peeraddr peerconn
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-48"></span><span>      </span><span class="annot"><span class="annottext">TimedDecision m peeraddr peerconn
 -&gt; STM m (TimedDecision m peeraddr peerconn)
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
-</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(TimedDecision m peeraddr peerconn
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">(TimedDecision m peeraddr peerconn
  -&gt; STM m (TimedDecision m peeraddr peerconn))
 -&gt; TimedDecision m peeraddr peerconn
 -&gt; STM m (TimedDecision m peeraddr peerconn)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679214737"><span class="annot"><span class="annottext">Time
-</span><a href="#local-6989586621679214737"><span class="hs-identifier hs-var">_now</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Decision :: forall (m :: * -&gt; *) peeraddr peerconn.
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679248466"><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679248466"><span class="hs-identifier hs-var">_now</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Decision :: forall (m :: * -&gt; *) peeraddr peerconn.
 TracePeerSelection peeraddr
 -&gt; PeerSelectionState peeraddr peerconn
 -&gt; [Job () m (Completion m peeraddr peerconn)]
 -&gt; Decision m peeraddr peerconn
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#Decision"><span class="hs-identifier hs-type">Decision</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-51"></span><span>        </span><span class="annot"><span class="annottext">decisionTrace :: TracePeerSelection peeraddr
+</span><span id="line-49"></span><span>        </span><span class="annot"><span class="annottext">decisionTrace :: TracePeerSelection peeraddr
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#decisionTrace"><span class="hs-identifier hs-var">decisionTrace</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; TracePeerSelection peeraddr
 forall peeraddr. Int -&gt; Int -&gt; TracePeerSelection peeraddr
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#TracePublicRootsRequest"><span class="hs-identifier hs-var">TracePublicRootsRequest</span></a></span><span>
-</span><span id="line-52"></span><span>                          </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679214743"><span class="hs-identifier hs-var">targetNumberOfRootPeers</span></a></span><span>
-</span><span id="line-53"></span><span>                          </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679214733"><span class="hs-identifier hs-var">numRootPeers</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-54"></span><span>        </span><span class="annot"><span class="annottext">decisionState :: PeerSelectionState peeraddr peerconn
+</span><span id="line-50"></span><span>                          </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679248472"><span class="hs-identifier hs-var">targetNumberOfRootPeers</span></a></span><span>
+</span><span id="line-51"></span><span>                          </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679248462"><span class="hs-identifier hs-var">numRootPeers</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-52"></span><span>        </span><span class="annot"><span class="annottext">decisionState :: PeerSelectionState peeraddr peerconn
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#decisionState"><span class="hs-identifier hs-var">decisionState</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn
-</span><a href="#local-6989586621679214755"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">inProgressPublicRootsReq :: Bool
+</span><a href="#local-6989586621679248484"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">inProgressPublicRootsReq :: Bool
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#inProgressPublicRootsReq"><span class="hs-identifier hs-var">inProgressPublicRootsReq</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><span class="hs-identifier hs-var">True</span></span><span> </span><span class="hs-special">}</span><span class="hs-special">,</span><span>
-</span><span id="line-55"></span><span>        </span><span class="annot"><span class="annottext">decisionJobs :: [Job () m (Completion m peeraddr peerconn)]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">True</span></a></span><span> </span><span class="hs-special">}</span><span class="hs-special">,</span><span>
+</span><span id="line-53"></span><span>        </span><span class="annot"><span class="annottext">decisionJobs :: [Job () m (Completion m peeraddr peerconn)]
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#decisionJobs"><span class="hs-identifier hs-var">decisionJobs</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">PeerSelectionActions peeraddr peerconn m
 -&gt; Int -&gt; Job () m (Completion m peeraddr peerconn)
 forall (m :: * -&gt; *) peeraddr peerconn.
@@ -132,74 +130,74 @@ forall (m :: * -&gt; *) peeraddr peerconn.
 PeerSelectionActions peeraddr peerconn m
 -&gt; Int -&gt; Job () m (Completion m peeraddr peerconn)
 </span><a href="Ouroboros.Network.PeerSelection.Governor.RootPeers.html#jobReqPublicRootPeers"><span class="hs-identifier hs-var">jobReqPublicRootPeers</span></a></span><span> </span><span class="annot"><span class="annottext">PeerSelectionActions peeraddr peerconn m
-</span><a href="#local-6989586621679214757"><span class="hs-identifier hs-var">actions</span></a></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679214741"><span class="hs-identifier hs-var">maxExtraRootPeers</span></a></span><span class="hs-special">]</span><span>
-</span><span id="line-56"></span><span>      </span><span class="hs-special">}</span><span>
-</span><span id="line-57"></span><span>
-</span><span id="line-58"></span><span>    </span><span class="hs-comment">-- If we would be able to do the request except for the time, return the</span><span>
-</span><span id="line-59"></span><span>    </span><span class="hs-comment">-- next retry time.</span><span>
-</span><span id="line-60"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679214741"><span class="hs-identifier hs-var">maxExtraRootPeers</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+</span><a href="#local-6989586621679248486"><span class="hs-identifier hs-var">actions</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679248470"><span class="hs-identifier hs-var">maxExtraRootPeers</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-54"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span>    </span><span class="hs-comment">-- If we would be able to do the request except for the time, return the</span><span>
+</span><span id="line-57"></span><span>    </span><span class="hs-comment">-- next retry time.</span><span>
+</span><span id="line-58"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679248470"><span class="hs-identifier hs-var">maxExtraRootPeers</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
 forall a. Ord a =&gt; a -&gt; a -&gt; Bool
-</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">0</span></span><span>
-</span><span id="line-61"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
-</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679214747"><span class="hs-identifier hs-var">inProgressPublicRootsReq</span></a></span><span>
-</span><span id="line-62"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe (Min Time)
+</span><span id="line-59"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">not</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679248476"><span class="hs-identifier hs-var">inProgressPublicRootsReq</span></a></span><span>
+</span><span id="line-60"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe (Min Time)
 -&gt; Guarded (STM m) (TimedDecision m peeraddr peerconn)
 forall (m :: * -&gt; *) a. Maybe (Min Time) -&gt; Guarded m a
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#GuardedSkip"><span class="hs-identifier hs-var">GuardedSkip</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Min Time -&gt; Maybe (Min Time)
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Time -&gt; Min Time
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Time -&gt; Min Time
 forall a. a -&gt; Min a
-</span><span class="hs-identifier hs-var">Min</span></span><span> </span><span class="annot"><span class="annottext">Time
-</span><a href="#local-6989586621679214749"><span class="hs-identifier hs-var">publicRootRetryTime</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-63"></span><span>
-</span><span id="line-64"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><span class="hs-identifier hs-var">otherwise</span></span><span>
-</span><span id="line-65"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe (Min Time)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Min</span></a></span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679248478"><span class="hs-identifier hs-var">publicRootRetryTime</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-61"></span><span>
+</span><span id="line-62"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>
+</span><span id="line-63"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe (Min Time)
 -&gt; Guarded (STM m) (TimedDecision m peeraddr peerconn)
 forall (m :: * -&gt; *) a. Maybe (Min Time) -&gt; Guarded m a
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#GuardedSkip"><span class="hs-identifier hs-var">GuardedSkip</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe (Min Time)
 forall a. Maybe a
-</span><span class="hs-identifier hs-var">Nothing</span></span><span>
-</span><span id="line-66"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-67"></span><span>    </span><span id="local-6989586621679214733"><span class="annot"><span class="annottext">numRootPeers :: Int
-</span><a href="#local-6989586621679214733"><span class="hs-identifier hs-var hs-var">numRootPeers</span></a></span></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">LocalRootPeers peeraddr -&gt; Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span>
+</span><span id="line-64"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-65"></span><span>    </span><span id="local-6989586621679248462"><span class="annot"><span class="annottext">numRootPeers :: Int
+</span><a href="#local-6989586621679248462"><span class="hs-identifier hs-var hs-var">numRootPeers</span></a></span></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">LocalRootPeers peeraddr -&gt; Int
 forall peeraddr. LocalRootPeers peeraddr -&gt; Int
 </span><a href="Ouroboros.Network.PeerSelection.LocalRootPeers.html#size"><span class="hs-identifier hs-var">LocalRootPeers.size</span></a></span><span> </span><span class="annot"><span class="annottext">LocalRootPeers peeraddr
-</span><a href="#local-6989586621679214753"><span class="hs-identifier hs-var">localRootPeers</span></a></span><span>
-</span><span id="line-68"></span><span>                      </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+</span><a href="#local-6989586621679248482"><span class="hs-identifier hs-var">localRootPeers</span></a></span><span>
+</span><span id="line-66"></span><span>                      </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Set peeraddr -&gt; Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="annot"><span class="annottext">Set peeraddr -&gt; Int
 forall a. Set a -&gt; Int
-</span><span class="hs-identifier hs-var">Set.size</span></span><span> </span><span class="annot"><span class="annottext">Set peeraddr
-</span><a href="#local-6989586621679214751"><span class="hs-identifier hs-var">publicRootPeers</span></a></span><span>
-</span><span id="line-69"></span><span>    </span><span id="local-6989586621679214741"><span class="annot"><span class="annottext">maxExtraRootPeers :: Int
-</span><a href="#local-6989586621679214741"><span class="hs-identifier hs-var hs-var">maxExtraRootPeers</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679214743"><span class="hs-identifier hs-var">targetNumberOfRootPeers</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.size</span></a></span><span> </span><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679248480"><span class="hs-identifier hs-var">publicRootPeers</span></a></span><span>
+</span><span id="line-67"></span><span>    </span><span id="local-6989586621679248470"><span class="annot"><span class="annottext">maxExtraRootPeers :: Int
+</span><a href="#local-6989586621679248470"><span class="hs-identifier hs-var hs-var">maxExtraRootPeers</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679248472"><span class="hs-identifier hs-var">targetNumberOfRootPeers</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679214733"><span class="hs-identifier hs-var">numRootPeers</span></a></span><span>
-</span><span id="line-70"></span><span>
-</span><span id="line-71"></span><span>
-</span><span id="line-72"></span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.RootPeers.html#jobReqPublicRootPeers"><span class="hs-identifier hs-type">jobReqPublicRootPeers</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679214799"><span class="annot"><a href="#local-6989586621679214799"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679214798"><span class="annot"><a href="#local-6989586621679214798"><span class="hs-identifier hs-type">peeraddr</span></a></span></span><span> </span><span id="local-6989586621679214797"><span class="annot"><a href="#local-6989586621679214797"><span class="hs-identifier hs-type">peerconn</span></a></span></span><span class="hs-operator">.</span><span>
-</span><span id="line-73"></span><span>                         </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span> </span><span class="annot"><a href="#local-6989586621679214799"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="annot"><a href="#local-6989586621679214798"><span class="hs-identifier hs-type">peeraddr</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-74"></span><span>                      </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#PeerSelectionActions"><span class="hs-identifier hs-type">PeerSelectionActions</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214798"><span class="hs-identifier hs-type">peeraddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214797"><span class="hs-identifier hs-type">peerconn</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214799"><span class="hs-identifier hs-type">m</span></a></span><span>
-</span><span id="line-75"></span><span>                      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
-</span><span id="line-76"></span><span>                      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-type">Job</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="annot"><a href="#local-6989586621679214799"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#Completion"><span class="hs-identifier hs-type">Completion</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214799"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214798"><span class="hs-identifier hs-type">peeraddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214797"><span class="hs-identifier hs-type">peerconn</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-77"></span><span id="jobReqPublicRootPeers"><span class="annot"><span class="annottext">jobReqPublicRootPeers :: PeerSelectionActions peeraddr peerconn m
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-glyph hs-var">-</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679248462"><span class="hs-identifier hs-var">numRootPeers</span></a></span><span>
+</span><span id="line-68"></span><span>
+</span><span id="line-69"></span><span>
+</span><span id="line-70"></span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.RootPeers.html#jobReqPublicRootPeers"><span class="hs-identifier hs-type">jobReqPublicRootPeers</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679248530"><span class="annot"><a href="#local-6989586621679248530"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679248529"><span class="annot"><a href="#local-6989586621679248529"><span class="hs-identifier hs-type">peeraddr</span></a></span></span><span> </span><span id="local-6989586621679248528"><span class="annot"><a href="#local-6989586621679248528"><span class="hs-identifier hs-type">peerconn</span></a></span></span><span class="hs-operator">.</span><span>
+</span><span id="line-71"></span><span>                         </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Monad</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248530"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Ord</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248529"><span class="hs-identifier hs-type">peeraddr</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-72"></span><span>                      </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#PeerSelectionActions"><span class="hs-identifier hs-type">PeerSelectionActions</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248529"><span class="hs-identifier hs-type">peeraddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248528"><span class="hs-identifier hs-type">peerconn</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248530"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-73"></span><span>                      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span>
+</span><span id="line-74"></span><span>                      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-type">Job</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="annot"><a href="#local-6989586621679248530"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#Completion"><span class="hs-identifier hs-type">Completion</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248530"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248529"><span class="hs-identifier hs-type">peeraddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248528"><span class="hs-identifier hs-type">peerconn</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-75"></span><span id="jobReqPublicRootPeers"><span class="annot"><span class="annottext">jobReqPublicRootPeers :: PeerSelectionActions peeraddr peerconn m
 -&gt; Int -&gt; Job () m (Completion m peeraddr peerconn)
-</span><a href="Ouroboros.Network.PeerSelection.Governor.RootPeers.html#jobReqPublicRootPeers"><span class="hs-identifier hs-var hs-var">jobReqPublicRootPeers</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#PeerSelectionActions"><span class="hs-identifier hs-type">PeerSelectionActions</span></a></span><span class="hs-special">{</span><span id="local-6989586621679214723"><span class="annot"><span class="annottext">Int -&gt; m (Set peeraddr, DiffTime)
+</span><a href="Ouroboros.Network.PeerSelection.Governor.RootPeers.html#jobReqPublicRootPeers"><span class="hs-identifier hs-var hs-var">jobReqPublicRootPeers</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#PeerSelectionActions"><span class="hs-identifier hs-type">PeerSelectionActions</span></a></span><span class="hs-special">{</span><span id="local-6989586621679248452"><span class="annot"><span class="annottext">Int -&gt; m (Set peeraddr, DiffTime)
 requestPublicRootPeers :: forall peeraddr peerconn (m :: * -&gt; *).
 PeerSelectionActions peeraddr peerconn m
 -&gt; Int -&gt; m (Set peeraddr, DiffTime)
 requestPublicRootPeers :: Int -&gt; m (Set peeraddr, DiffTime)
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#requestPublicRootPeers"><span class="hs-identifier hs-var hs-var">requestPublicRootPeers</span></a></span></span><span class="hs-special">}</span><span>
-</span><span id="line-78"></span><span>                   </span><span id="local-6989586621679214721"><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679214721"><span class="hs-identifier hs-var">numExtraAllowed</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-79"></span><span>    </span><span class="annot"><span class="annottext">m (Completion m peeraddr peerconn)
+</span><span id="line-76"></span><span>                   </span><span id="local-6989586621679248450"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679248450"><span class="hs-identifier hs-var">numExtraAllowed</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-77"></span><span>    </span><span class="annot"><span class="annottext">m (Completion m peeraddr peerconn)
 -&gt; (SomeException -&gt; m (Completion m peeraddr peerconn))
 -&gt; ()
 -&gt; String
@@ -207,24 +205,24 @@ requestPublicRootPeers :: Int -&gt; m (Set peeraddr, DiffTime)
 forall group (m :: * -&gt; *) a.
 m a -&gt; (SomeException -&gt; m a) -&gt; group -&gt; String -&gt; Job group m a
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-var">Job</span></a></span><span> </span><span class="annot"><span class="annottext">m (Completion m peeraddr peerconn)
-</span><a href="#local-6989586621679214719"><span class="hs-identifier hs-var">job</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Completion m peeraddr peerconn
+</span><a href="#local-6989586621679248448"><span class="hs-identifier hs-var">job</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Completion m peeraddr peerconn
 -&gt; m (Completion m peeraddr peerconn)
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
-</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Completion m peeraddr peerconn
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">(Completion m peeraddr peerconn
  -&gt; m (Completion m peeraddr peerconn))
 -&gt; (SomeException -&gt; Completion m peeraddr peerconn)
 -&gt; SomeException
 -&gt; m (Completion m peeraddr peerconn)
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">SomeException -&gt; Completion m peeraddr peerconn
-</span><a href="#local-6989586621679214717"><span class="hs-identifier hs-var">handler</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">SomeException -&gt; Completion m peeraddr peerconn
+</span><a href="#local-6989586621679248446"><span class="hs-identifier hs-var">handler</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;reqPublicRootPeers&quot;</span></span><span>
-</span><span id="line-80"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-81"></span><span>    </span><span class="annot"><a href="#local-6989586621679214717"><span class="hs-identifier hs-type">handler</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SomeException</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#Completion"><span class="hs-identifier hs-type">Completion</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214799"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214798"><span class="hs-identifier hs-type">peeraddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214797"><span class="hs-identifier hs-type">peerconn</span></a></span><span>
-</span><span id="line-82"></span><span>    </span><span id="local-6989586621679214717"><span class="annot"><span class="annottext">handler :: SomeException -&gt; Completion m peeraddr peerconn
-</span><a href="#local-6989586621679214717"><span class="hs-identifier hs-var hs-var">handler</span></a></span></span><span> </span><span id="local-6989586621679214716"><span class="annot"><span class="annottext">SomeException
-</span><a href="#local-6989586621679214716"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-83"></span><span>      </span><span class="annot"><span class="annottext">(PeerSelectionState peeraddr peerconn
+</span><span id="line-78"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-79"></span><span>    </span><span class="annot"><a href="#local-6989586621679248446"><span class="hs-identifier hs-type">handler</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">SomeException</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#Completion"><span class="hs-identifier hs-type">Completion</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248530"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248529"><span class="hs-identifier hs-type">peeraddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248528"><span class="hs-identifier hs-type">peerconn</span></a></span><span>
+</span><span id="line-80"></span><span>    </span><span id="local-6989586621679248446"><span class="annot"><span class="annottext">handler :: SomeException -&gt; Completion m peeraddr peerconn
+</span><a href="#local-6989586621679248446"><span class="hs-identifier hs-var hs-var">handler</span></a></span></span><span> </span><span id="local-6989586621679248445"><span class="annot"><span class="annottext">SomeException
+</span><a href="#local-6989586621679248445"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-81"></span><span>      </span><span class="annot"><span class="annottext">(PeerSelectionState peeraddr peerconn
  -&gt; Time -&gt; Decision m peeraddr peerconn)
 -&gt; Completion m peeraddr peerconn
 forall (m :: * -&gt; *) peeraddr peerconn.
@@ -238,97 +236,97 @@ forall (m :: * -&gt; *) peeraddr peerconn.
     -&gt; Time -&gt; Decision m peeraddr peerconn)
 -&gt; Completion m peeraddr peerconn
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679214714"><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn
-</span><a href="#local-6989586621679214714"><span class="hs-identifier hs-var">st</span></a></span></span><span> </span><span id="local-6989586621679214713"><span class="annot"><span class="annottext">Time
-</span><a href="#local-6989586621679214713"><span class="hs-identifier hs-var">now</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
-</span><span id="line-84"></span><span>      </span><span class="hs-comment">-- This is a failure, so move the backoff counter one in the failure</span><span>
-</span><span id="line-85"></span><span>      </span><span class="hs-comment">-- direction (negative) and schedule the next retry time accordingly.</span><span>
-</span><span id="line-86"></span><span>      </span><span class="hs-comment">-- We use an exponential backoff strategy. The max retry time of 2^12</span><span>
-</span><span id="line-87"></span><span>      </span><span class="hs-comment">-- seconds is just over an hour.</span><span>
-</span><span id="line-88"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span class="annot"><a href="#local-6989586621679214712"><span class="hs-identifier hs-type">publicRootBackoffs'</span></a></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
-</span><span id="line-89"></span><span>          </span><span id="local-6989586621679214712"><span class="annot"><span class="annottext">publicRootBackoffs' :: Int
-</span><a href="#local-6989586621679214712"><span class="hs-identifier hs-var hs-var">publicRootBackoffs'</span></a></span></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn -&gt; Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679248443"><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn
+</span><a href="#local-6989586621679248443"><span class="hs-identifier hs-var">st</span></a></span></span><span> </span><span id="local-6989586621679248442"><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679248442"><span class="hs-identifier hs-var">now</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-82"></span><span>      </span><span class="hs-comment">-- This is a failure, so move the backoff counter one in the failure</span><span>
+</span><span id="line-83"></span><span>      </span><span class="hs-comment">-- direction (negative) and schedule the next retry time accordingly.</span><span>
+</span><span id="line-84"></span><span>      </span><span class="hs-comment">-- We use an exponential backoff strategy. The max retry time of 2^12</span><span>
+</span><span id="line-85"></span><span>      </span><span class="hs-comment">-- seconds is just over an hour.</span><span>
+</span><span id="line-86"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span class="annot"><a href="#local-6989586621679248441"><span class="hs-identifier hs-type">publicRootBackoffs'</span></a></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span>
+</span><span id="line-87"></span><span>          </span><span id="local-6989586621679248441"><span class="annot"><span class="annottext">publicRootBackoffs' :: Int
+</span><a href="#local-6989586621679248441"><span class="hs-identifier hs-var hs-var">publicRootBackoffs'</span></a></span></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn -&gt; Int
 forall peeraddr peerconn.
 PeerSelectionState peeraddr peerconn -&gt; Int
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#publicRootBackoffs"><span class="hs-identifier hs-var hs-var">publicRootBackoffs</span></a></span><span> </span><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn
-</span><a href="#local-6989586621679214714"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+</span><a href="#local-6989586621679248443"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
 forall a. Ord a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">`min`</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">`min`</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">0</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-glyph hs-var">-</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">1</span></span><span>
-</span><span id="line-90"></span><span>
-</span><span id="line-91"></span><span>          </span><span class="annot"><a href="#local-6989586621679214709"><span class="hs-identifier hs-type">publicRootRetryDiffTime'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">DiffTime</span></span><span>
-</span><span id="line-92"></span><span>          </span><span id="local-6989586621679214709"><span class="annot"><span class="annottext">publicRootRetryDiffTime' :: DiffTime
-</span><a href="#local-6989586621679214709"><span class="hs-identifier hs-var hs-var">publicRootRetryDiffTime'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span id="line-88"></span><span>
+</span><span id="line-89"></span><span>          </span><span class="annot"><a href="#local-6989586621679248438"><span class="hs-identifier hs-type">publicRootRetryDiffTime'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span>
+</span><span id="line-90"></span><span>          </span><span id="local-6989586621679248438"><span class="annot"><span class="annottext">publicRootRetryDiffTime' :: DiffTime
+</span><a href="#local-6989586621679248438"><span class="hs-identifier hs-var hs-var">publicRootRetryDiffTime'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
 </span><span class="hs-number">2</span></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; Int -&gt; DiffTime
 forall a b. (Num a, Integral b) =&gt; a -&gt; b -&gt; a
-</span><span class="hs-operator hs-var">^</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">^</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int
 forall a. Num a =&gt; a -&gt; a
-</span><span class="hs-identifier hs-var">abs</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679214712"><span class="hs-identifier hs-var">publicRootBackoffs'</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">abs</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679248441"><span class="hs-identifier hs-var">publicRootBackoffs'</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
 forall a. Ord a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">`min`</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">`min`</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">12</span></span><span class="hs-special">)</span><span>
-</span><span id="line-93"></span><span>
-</span><span id="line-94"></span><span>          </span><span class="annot"><a href="#local-6989586621679214706"><span class="hs-identifier hs-type">publicRootRetryTime'</span></a></span><span>     </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier hs-type">Time</span></a></span><span>
-</span><span id="line-95"></span><span>          </span><span id="local-6989586621679214706"><span class="annot"><span class="annottext">publicRootRetryTime' :: Time
-</span><a href="#local-6989586621679214706"><span class="hs-identifier hs-var hs-var">publicRootRetryTime'</span></a></span></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; Time -&gt; Time
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier hs-var">addTime</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679214709"><span class="hs-identifier hs-var">publicRootRetryDiffTime'</span></a></span><span> </span><span class="annot"><span class="annottext">Time
-</span><a href="#local-6989586621679214713"><span class="hs-identifier hs-var">now</span></a></span><span>
-</span><span id="line-96"></span><span>       </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">Decision :: forall (m :: * -&gt; *) peeraddr peerconn.
+</span><span id="line-91"></span><span>
+</span><span id="line-92"></span><span>          </span><span class="annot"><a href="#local-6989586621679248435"><span class="hs-identifier hs-type">publicRootRetryTime'</span></a></span><span>     </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">Time</span></a></span><span>
+</span><span id="line-93"></span><span>          </span><span id="local-6989586621679248435"><span class="annot"><span class="annottext">publicRootRetryTime' :: Time
+</span><a href="#local-6989586621679248435"><span class="hs-identifier hs-var hs-var">publicRootRetryTime'</span></a></span></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; Time -&gt; Time
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">addTime</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679248438"><span class="hs-identifier hs-var">publicRootRetryDiffTime'</span></a></span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679248442"><span class="hs-identifier hs-var">now</span></a></span><span>
+</span><span id="line-94"></span><span>       </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">Decision :: forall (m :: * -&gt; *) peeraddr peerconn.
 TracePeerSelection peeraddr
 -&gt; PeerSelectionState peeraddr peerconn
 -&gt; [Job () m (Completion m peeraddr peerconn)]
 -&gt; Decision m peeraddr peerconn
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#Decision"><span class="hs-identifier hs-type">Decision</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-97"></span><span>            </span><span class="annot"><span class="annottext">decisionTrace :: TracePeerSelection peeraddr
+</span><span id="line-95"></span><span>            </span><span class="annot"><span class="annottext">decisionTrace :: TracePeerSelection peeraddr
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#decisionTrace"><span class="hs-identifier hs-var">decisionTrace</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SomeException -&gt; Int -&gt; DiffTime -&gt; TracePeerSelection peeraddr
 forall peeraddr.
 SomeException -&gt; Int -&gt; DiffTime -&gt; TracePeerSelection peeraddr
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#TracePublicRootsFailure"><span class="hs-identifier hs-var">TracePublicRootsFailure</span></a></span><span>
-</span><span id="line-98"></span><span>                              </span><span class="annot"><span class="annottext">SomeException
-</span><a href="#local-6989586621679214716"><span class="hs-identifier hs-var">e</span></a></span><span>
-</span><span id="line-99"></span><span>                              </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679214712"><span class="hs-identifier hs-var">publicRootBackoffs'</span></a></span><span>
-</span><span id="line-100"></span><span>                              </span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679214709"><span class="hs-identifier hs-var">publicRootRetryDiffTime'</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-101"></span><span>            </span><span class="annot"><span class="annottext">decisionState :: PeerSelectionState peeraddr peerconn
+</span><span id="line-96"></span><span>                              </span><span class="annot"><span class="annottext">SomeException
+</span><a href="#local-6989586621679248445"><span class="hs-identifier hs-var">e</span></a></span><span>
+</span><span id="line-97"></span><span>                              </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679248441"><span class="hs-identifier hs-var">publicRootBackoffs'</span></a></span><span>
+</span><span id="line-98"></span><span>                              </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679248438"><span class="hs-identifier hs-var">publicRootRetryDiffTime'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-99"></span><span>            </span><span class="annot"><span class="annottext">decisionState :: PeerSelectionState peeraddr peerconn
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#decisionState"><span class="hs-identifier hs-var">decisionState</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn
-</span><a href="#local-6989586621679214714"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-102"></span><span>                              </span><span class="annot"><span class="annottext">inProgressPublicRootsReq :: Bool
+</span><a href="#local-6989586621679248443"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-100"></span><span>                              </span><span class="annot"><span class="annottext">inProgressPublicRootsReq :: Bool
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#inProgressPublicRootsReq"><span class="hs-identifier hs-var">inProgressPublicRootsReq</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">,</span><span>
-</span><span id="line-103"></span><span>                              </span><span class="annot"><span class="annottext">publicRootBackoffs :: Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">False</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-101"></span><span>                              </span><span class="annot"><span class="annottext">publicRootBackoffs :: Int
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#publicRootBackoffs"><span class="hs-identifier hs-var">publicRootBackoffs</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679214712"><span class="hs-identifier hs-var">publicRootBackoffs'</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-104"></span><span>                              </span><span class="annot"><span class="annottext">publicRootRetryTime :: Time
+</span><a href="#local-6989586621679248441"><span class="hs-identifier hs-var">publicRootBackoffs'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-102"></span><span>                              </span><span class="annot"><span class="annottext">publicRootRetryTime :: Time
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#publicRootRetryTime"><span class="hs-identifier hs-var">publicRootRetryTime</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Time
-</span><a href="#local-6989586621679214706"><span class="hs-identifier hs-var">publicRootRetryTime'</span></a></span><span>
-</span><span id="line-105"></span><span>                            </span><span class="hs-special">}</span><span class="hs-special">,</span><span>
-</span><span id="line-106"></span><span>            </span><span class="annot"><span class="annottext">decisionJobs :: [Job () m (Completion m peeraddr peerconn)]
+</span><a href="#local-6989586621679248435"><span class="hs-identifier hs-var">publicRootRetryTime'</span></a></span><span>
+</span><span id="line-103"></span><span>                            </span><span class="hs-special">}</span><span class="hs-special">,</span><span>
+</span><span id="line-104"></span><span>            </span><span class="annot"><span class="annottext">decisionJobs :: [Job () m (Completion m peeraddr peerconn)]
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#decisionJobs"><span class="hs-identifier hs-var">decisionJobs</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
-</span><span id="line-107"></span><span>          </span><span class="hs-special">}</span><span>
-</span><span id="line-108"></span><span>
-</span><span id="line-109"></span><span>    </span><span class="annot"><a href="#local-6989586621679214719"><span class="hs-identifier hs-type">job</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679214799"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#Completion"><span class="hs-identifier hs-type">Completion</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214799"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214798"><span class="hs-identifier hs-type">peeraddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214797"><span class="hs-identifier hs-type">peerconn</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-110"></span><span>    </span><span id="local-6989586621679214719"><span class="annot"><span class="annottext">job :: m (Completion m peeraddr peerconn)
-</span><a href="#local-6989586621679214719"><span class="hs-identifier hs-var hs-var">job</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-111"></span><span>      </span><span class="hs-special">(</span><span id="local-6989586621679214703"><span class="annot"><span class="annottext">Set peeraddr
-</span><a href="#local-6989586621679214703"><span class="hs-identifier hs-var">results</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679214702"><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679214702"><span class="hs-identifier hs-var">ttl</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Int -&gt; m (Set peeraddr, DiffTime)
-</span><a href="#local-6989586621679214723"><span class="hs-identifier hs-var">requestPublicRootPeers</span></a></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679214721"><span class="hs-identifier hs-var">numExtraAllowed</span></a></span><span>
-</span><span id="line-112"></span><span>      </span><span class="annot"><span class="annottext">Completion m peeraddr peerconn
+</span><span id="line-105"></span><span>          </span><span class="hs-special">}</span><span>
+</span><span id="line-106"></span><span>
+</span><span id="line-107"></span><span>    </span><span class="annot"><a href="#local-6989586621679248448"><span class="hs-identifier hs-type">job</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679248530"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#Completion"><span class="hs-identifier hs-type">Completion</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248530"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248529"><span class="hs-identifier hs-type">peeraddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679248528"><span class="hs-identifier hs-type">peerconn</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-108"></span><span>    </span><span id="local-6989586621679248448"><span class="annot"><span class="annottext">job :: m (Completion m peeraddr peerconn)
+</span><a href="#local-6989586621679248448"><span class="hs-identifier hs-var hs-var">job</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-109"></span><span>      </span><span class="hs-special">(</span><span id="local-6989586621679248432"><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679248432"><span class="hs-identifier hs-var">results</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679248431"><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679248431"><span class="hs-identifier hs-var">ttl</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Int -&gt; m (Set peeraddr, DiffTime)
+</span><a href="#local-6989586621679248452"><span class="hs-identifier hs-var">requestPublicRootPeers</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679248450"><span class="hs-identifier hs-var">numExtraAllowed</span></a></span><span>
+</span><span id="line-110"></span><span>      </span><span class="annot"><span class="annottext">Completion m peeraddr peerconn
 -&gt; m (Completion m peeraddr peerconn)
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
-</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Completion m peeraddr peerconn
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">(Completion m peeraddr peerconn
  -&gt; m (Completion m peeraddr peerconn))
 -&gt; Completion m peeraddr peerconn
 -&gt; m (Completion m peeraddr peerconn)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(PeerSelectionState peeraddr peerconn
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">(PeerSelectionState peeraddr peerconn
  -&gt; Time -&gt; Decision m peeraddr peerconn)
 -&gt; Completion m peeraddr peerconn
 forall (m :: * -&gt; *) peeraddr peerconn.
@@ -342,154 +340,154 @@ forall (m :: * -&gt; *) peeraddr peerconn.
     -&gt; Time -&gt; Decision m peeraddr peerconn)
 -&gt; Completion m peeraddr peerconn
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679214701"><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn
-</span><a href="#local-6989586621679214701"><span class="hs-identifier hs-var">st</span></a></span></span><span> </span><span id="local-6989586621679214700"><span class="annot"><span class="annottext">Time
-</span><a href="#local-6989586621679214700"><span class="hs-identifier hs-var">now</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
-</span><span id="line-113"></span><span>        </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679214699"><span class="annot"><span class="annottext">newPeers :: Set peeraddr
-</span><a href="#local-6989586621679214699"><span class="hs-identifier hs-var hs-var">newPeers</span></a></span></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set peeraddr
-</span><a href="#local-6989586621679214703"><span class="hs-identifier hs-var">results</span></a></span><span> </span><span class="annot"><span class="annottext">Set peeraddr -&gt; Set peeraddr -&gt; Set peeraddr
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679248430"><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn
+</span><a href="#local-6989586621679248430"><span class="hs-identifier hs-var">st</span></a></span></span><span> </span><span id="local-6989586621679248429"><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679248429"><span class="hs-identifier hs-var">now</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-111"></span><span>        </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679248428"><span class="annot"><span class="annottext">newPeers :: Set peeraddr
+</span><a href="#local-6989586621679248428"><span class="hs-identifier hs-var hs-var">newPeers</span></a></span></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679248432"><span class="hs-identifier hs-var">results</span></a></span><span> </span><span class="annot"><span class="annottext">Set peeraddr -&gt; Set peeraddr -&gt; Set peeraddr
 forall a. Ord a =&gt; Set a -&gt; Set a -&gt; Set a
-</span><span class="hs-operator hs-var">Set.\\</span></span><span> </span><span class="annot"><span class="annottext">LocalRootPeers peeraddr -&gt; Set peeraddr
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-operator hs-var">Set.\\</span></a></span><span> </span><span class="annot"><span class="annottext">LocalRootPeers peeraddr -&gt; Set peeraddr
 forall peeraddr. LocalRootPeers peeraddr -&gt; Set peeraddr
 </span><a href="Ouroboros.Network.PeerSelection.LocalRootPeers.html#keysSet"><span class="hs-identifier hs-var">LocalRootPeers.keysSet</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn -&gt; LocalRootPeers peeraddr
 forall peeraddr peerconn.
 PeerSelectionState peeraddr peerconn -&gt; LocalRootPeers peeraddr
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#localRootPeers"><span class="hs-identifier hs-var hs-var">localRootPeers</span></a></span><span> </span><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn
-</span><a href="#local-6989586621679214701"><span class="hs-identifier hs-var">st</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-114"></span><span>                                       </span><span class="annot"><span class="annottext">Set peeraddr -&gt; Set peeraddr -&gt; Set peeraddr
+</span><a href="#local-6989586621679248430"><span class="hs-identifier hs-var">st</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-112"></span><span>                                       </span><span class="annot"><span class="annottext">Set peeraddr -&gt; Set peeraddr -&gt; Set peeraddr
 forall a. Ord a =&gt; Set a -&gt; Set a -&gt; Set a
-</span><span class="hs-operator hs-var">Set.\\</span></span><span> </span><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn -&gt; Set peeraddr
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-operator hs-var">Set.\\</span></a></span><span> </span><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn -&gt; Set peeraddr
 forall peeraddr peerconn.
 PeerSelectionState peeraddr peerconn -&gt; Set peeraddr
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#publicRootPeers"><span class="hs-identifier hs-var hs-var">publicRootPeers</span></a></span><span> </span><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn
-</span><a href="#local-6989586621679214701"><span class="hs-identifier hs-var">st</span></a></span><span>
-</span><span id="line-115"></span><span>            </span><span id="local-6989586621679214696"><span class="annot"><span class="annottext">publicRootPeers' :: Set peeraddr
-</span><a href="#local-6989586621679214696"><span class="hs-identifier hs-var hs-var">publicRootPeers'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn -&gt; Set peeraddr
+</span><a href="#local-6989586621679248430"><span class="hs-identifier hs-var">st</span></a></span><span>
+</span><span id="line-113"></span><span>            </span><span id="local-6989586621679248425"><span class="annot"><span class="annottext">publicRootPeers' :: Set peeraddr
+</span><a href="#local-6989586621679248425"><span class="hs-identifier hs-var hs-var">publicRootPeers'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn -&gt; Set peeraddr
 forall peeraddr peerconn.
 PeerSelectionState peeraddr peerconn -&gt; Set peeraddr
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#publicRootPeers"><span class="hs-identifier hs-var hs-var">publicRootPeers</span></a></span><span> </span><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn
-</span><a href="#local-6989586621679214701"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="annot"><span class="annottext">Set peeraddr -&gt; Set peeraddr -&gt; Set peeraddr
+</span><a href="#local-6989586621679248430"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="annot"><span class="annottext">Set peeraddr -&gt; Set peeraddr -&gt; Set peeraddr
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Set peeraddr
-</span><a href="#local-6989586621679214699"><span class="hs-identifier hs-var">newPeers</span></a></span><span>
-</span><span id="line-116"></span><span>            </span><span id="local-6989586621679214695"><span class="annot"><span class="annottext">knownPeers' :: KnownPeers peeraddr
-</span><a href="#local-6989586621679214695"><span class="hs-identifier hs-var hs-var">knownPeers'</span></a></span></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set peeraddr -&gt; KnownPeers peeraddr -&gt; KnownPeers peeraddr
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679248428"><span class="hs-identifier hs-var">newPeers</span></a></span><span>
+</span><span id="line-114"></span><span>            </span><span id="local-6989586621679248424"><span class="annot"><span class="annottext">knownPeers' :: KnownPeers peeraddr
+</span><a href="#local-6989586621679248424"><span class="hs-identifier hs-var hs-var">knownPeers'</span></a></span></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set peeraddr -&gt; KnownPeers peeraddr -&gt; KnownPeers peeraddr
 forall peeraddr.
 Ord peeraddr =&gt;
 Set peeraddr -&gt; KnownPeers peeraddr -&gt; KnownPeers peeraddr
 </span><a href="Ouroboros.Network.PeerSelection.KnownPeers.html#insert"><span class="hs-identifier hs-var">KnownPeers.insert</span></a></span><span>
-</span><span id="line-117"></span><span>                                 </span><span class="annot"><span class="annottext">Set peeraddr
-</span><a href="#local-6989586621679214699"><span class="hs-identifier hs-var">newPeers</span></a></span><span>
-</span><span id="line-118"></span><span>                                 </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn -&gt; KnownPeers peeraddr
+</span><span id="line-115"></span><span>                                 </span><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679248428"><span class="hs-identifier hs-var">newPeers</span></a></span><span>
+</span><span id="line-116"></span><span>                                 </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn -&gt; KnownPeers peeraddr
 forall peeraddr peerconn.
 PeerSelectionState peeraddr peerconn -&gt; KnownPeers peeraddr
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#knownPeers"><span class="hs-identifier hs-var hs-var">knownPeers</span></a></span><span> </span><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn
-</span><a href="#local-6989586621679214701"><span class="hs-identifier hs-var">st</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-119"></span><span>
-</span><span id="line-120"></span><span>            </span><span class="hs-comment">-- We got a successful response to our request, but if we're still</span><span>
-</span><span id="line-121"></span><span>            </span><span class="hs-comment">-- below target we're going to want to try again at some point.</span><span>
-</span><span id="line-122"></span><span>            </span><span class="hs-comment">-- If we made progress towards our target then we will retry at the</span><span>
-</span><span id="line-123"></span><span>            </span><span class="hs-comment">-- suggested ttl. But if we did not make progress then we want to</span><span>
-</span><span id="line-124"></span><span>            </span><span class="hs-comment">-- follow an exponential backoff strategy. The max retry time of 2^12</span><span>
-</span><span id="line-125"></span><span>            </span><span class="hs-comment">-- seconds is just over an hour.</span><span>
-</span><span id="line-126"></span><span>            </span><span class="annot"><a href="#local-6989586621679214692"><span class="hs-identifier hs-type">publicRootBackoffs'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
-</span><span id="line-127"></span><span>            </span><span id="local-6989586621679214692"><span class="annot"><span class="annottext">publicRootBackoffs' :: Int
-</span><a href="#local-6989586621679214692"><span class="hs-identifier hs-var hs-var">publicRootBackoffs'</span></a></span></span><span>
-</span><span id="line-128"></span><span>              </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Set peeraddr -&gt; Bool
+</span><a href="#local-6989586621679248430"><span class="hs-identifier hs-var">st</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-117"></span><span>
+</span><span id="line-118"></span><span>            </span><span class="hs-comment">-- We got a successful response to our request, but if we're still</span><span>
+</span><span id="line-119"></span><span>            </span><span class="hs-comment">-- below target we're going to want to try again at some point.</span><span>
+</span><span id="line-120"></span><span>            </span><span class="hs-comment">-- If we made progress towards our target then we will retry at the</span><span>
+</span><span id="line-121"></span><span>            </span><span class="hs-comment">-- suggested ttl. But if we did not make progress then we want to</span><span>
+</span><span id="line-122"></span><span>            </span><span class="hs-comment">-- follow an exponential backoff strategy. The max retry time of 2^12</span><span>
+</span><span id="line-123"></span><span>            </span><span class="hs-comment">-- seconds is just over an hour.</span><span>
+</span><span id="line-124"></span><span>            </span><span class="annot"><a href="#local-6989586621679248421"><span class="hs-identifier hs-type">publicRootBackoffs'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span>
+</span><span id="line-125"></span><span>            </span><span id="local-6989586621679248421"><span class="annot"><span class="annottext">publicRootBackoffs' :: Int
+</span><a href="#local-6989586621679248421"><span class="hs-identifier hs-var hs-var">publicRootBackoffs'</span></a></span></span><span>
+</span><span id="line-126"></span><span>              </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Set peeraddr -&gt; Bool
 forall a. Set a -&gt; Bool
-</span><span class="hs-identifier hs-var">Set.null</span></span><span> </span><span class="annot"><span class="annottext">Set peeraddr
-</span><a href="#local-6989586621679214699"><span class="hs-identifier hs-var">newPeers</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn -&gt; Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.null</span></a></span><span> </span><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679248428"><span class="hs-identifier hs-var">newPeers</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn -&gt; Int
 forall peeraddr peerconn.
 PeerSelectionState peeraddr peerconn -&gt; Int
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#publicRootBackoffs"><span class="hs-identifier hs-var hs-var">publicRootBackoffs</span></a></span><span> </span><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn
-</span><a href="#local-6989586621679214701"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+</span><a href="#local-6989586621679248430"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
 forall a. Ord a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">`max`</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">`max`</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">0</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">1</span></span><span>
-</span><span id="line-129"></span><span>              </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><span class="hs-identifier hs-var">otherwise</span></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span id="line-127"></span><span>              </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">0</span></span><span>
-</span><span id="line-130"></span><span>
-</span><span id="line-131"></span><span>            </span><span class="annot"><a href="#local-6989586621679214689"><span class="hs-identifier hs-type">publicRootRetryDiffTime</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">DiffTime</span></span><span>
-</span><span id="line-132"></span><span>            </span><span id="local-6989586621679214689"><span class="annot"><span class="annottext">publicRootRetryDiffTime :: DiffTime
-</span><a href="#local-6989586621679214689"><span class="hs-identifier hs-var hs-var">publicRootRetryDiffTime</span></a></span></span><span>
-</span><span id="line-133"></span><span>              </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679214692"><span class="hs-identifier hs-var">publicRootBackoffs'</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+</span><span id="line-128"></span><span>
+</span><span id="line-129"></span><span>            </span><span class="annot"><a href="#local-6989586621679248418"><span class="hs-identifier hs-type">publicRootRetryDiffTime</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span>
+</span><span id="line-130"></span><span>            </span><span id="local-6989586621679248418"><span class="annot"><span class="annottext">publicRootRetryDiffTime :: DiffTime
+</span><a href="#local-6989586621679248418"><span class="hs-identifier hs-var hs-var">publicRootRetryDiffTime</span></a></span></span><span>
+</span><span id="line-131"></span><span>              </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679248421"><span class="hs-identifier hs-var">publicRootBackoffs'</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
-</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">==</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">0</span></span><span>
-</span><span id="line-134"></span><span>                          </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679214702"><span class="hs-identifier hs-var">ttl</span></a></span><span>
-</span><span id="line-135"></span><span>              </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span id="line-132"></span><span>                          </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679248431"><span class="hs-identifier hs-var">ttl</span></a></span><span>
+</span><span id="line-133"></span><span>              </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
 </span><span class="hs-number">2</span></span><span class="annot"><span class="annottext">DiffTime -&gt; Int -&gt; DiffTime
 forall a b. (Num a, Integral b) =&gt; a -&gt; b -&gt; a
-</span><span class="hs-operator hs-var">^</span></span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679214692"><span class="hs-identifier hs-var">publicRootBackoffs'</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">^</span></a></span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679248421"><span class="hs-identifier hs-var">publicRootBackoffs'</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
 forall a. Ord a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">`min`</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">`min`</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">12</span></span><span class="hs-special">)</span><span>
-</span><span id="line-136"></span><span>
-</span><span id="line-137"></span><span>            </span><span class="annot"><a href="#local-6989586621679214688"><span class="hs-identifier hs-type">publicRootRetryTime</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier hs-type">Time</span></a></span><span>
-</span><span id="line-138"></span><span>            </span><span id="local-6989586621679214688"><span class="annot"><span class="annottext">publicRootRetryTime :: Time
-</span><a href="#local-6989586621679214688"><span class="hs-identifier hs-var hs-var">publicRootRetryTime</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; Time -&gt; Time
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-sim-classes-0.2.0.0/noopt/doc/html/io-sim-classes/src"><span class="hs-identifier hs-var">addTime</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679214689"><span class="hs-identifier hs-var">publicRootRetryDiffTime</span></a></span><span> </span><span class="annot"><span class="annottext">Time
-</span><a href="#local-6989586621679214700"><span class="hs-identifier hs-var">now</span></a></span><span>
-</span><span id="line-139"></span><span>
-</span><span id="line-140"></span><span>         </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span id="line-134"></span><span>
+</span><span id="line-135"></span><span>            </span><span class="annot"><a href="#local-6989586621679248417"><span class="hs-identifier hs-type">publicRootRetryTime</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">Time</span></a></span><span>
+</span><span id="line-136"></span><span>            </span><span id="local-6989586621679248417"><span class="annot"><span class="annottext">publicRootRetryTime :: Time
+</span><a href="#local-6989586621679248417"><span class="hs-identifier hs-var hs-var">publicRootRetryTime</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; Time -&gt; Time
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">addTime</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679248418"><span class="hs-identifier hs-var">publicRootRetryDiffTime</span></a></span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679248429"><span class="hs-identifier hs-var">now</span></a></span><span>
+</span><span id="line-137"></span><span>
+</span><span id="line-138"></span><span>         </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">Bool
 -&gt; Decision m peeraddr peerconn -&gt; Decision m peeraddr peerconn
 forall a. (?callStack::CallStack) =&gt; Bool -&gt; a -&gt; a
-</span><span class="hs-identifier hs-var hs-var">assert</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set peeraddr -&gt; Set peeraddr -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var">assert</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set peeraddr -&gt; Set peeraddr -&gt; Bool
 forall a. Ord a =&gt; Set a -&gt; Set a -&gt; Bool
-</span><span class="hs-identifier hs-var">Set.isSubsetOf</span></span><span>
-</span><span id="line-141"></span><span>                      </span><span class="annot"><span class="annottext">Set peeraddr
-</span><a href="#local-6989586621679214696"><span class="hs-identifier hs-var">publicRootPeers'</span></a></span><span>
-</span><span id="line-142"></span><span>                     </span><span class="hs-special">(</span><span class="annot"><span class="annottext">KnownPeers peeraddr -&gt; Set peeraddr
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Set.isSubsetOf</span></a></span><span>
+</span><span id="line-139"></span><span>                      </span><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679248425"><span class="hs-identifier hs-var">publicRootPeers'</span></a></span><span>
+</span><span id="line-140"></span><span>                     </span><span class="hs-special">(</span><span class="annot"><span class="annottext">KnownPeers peeraddr -&gt; Set peeraddr
 forall peeraddr. KnownPeers peeraddr -&gt; Set peeraddr
 </span><a href="Ouroboros.Network.PeerSelection.KnownPeers.html#toSet"><span class="hs-identifier hs-var">KnownPeers.toSet</span></a></span><span> </span><span class="annot"><span class="annottext">KnownPeers peeraddr
-</span><a href="#local-6989586621679214695"><span class="hs-identifier hs-var">knownPeers'</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-143"></span><span>
-</span><span id="line-144"></span><span>             </span><span class="annot"><span class="annottext">Decision :: forall (m :: * -&gt; *) peeraddr peerconn.
+</span><a href="#local-6989586621679248424"><span class="hs-identifier hs-var">knownPeers'</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-141"></span><span>
+</span><span id="line-142"></span><span>             </span><span class="annot"><span class="annottext">Decision :: forall (m :: * -&gt; *) peeraddr peerconn.
 TracePeerSelection peeraddr
 -&gt; PeerSelectionState peeraddr peerconn
 -&gt; [Job () m (Completion m peeraddr peerconn)]
 -&gt; Decision m peeraddr peerconn
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#Decision"><span class="hs-identifier hs-type">Decision</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-145"></span><span>                </span><span class="annot"><span class="annottext">decisionTrace :: TracePeerSelection peeraddr
+</span><span id="line-143"></span><span>                </span><span class="annot"><span class="annottext">decisionTrace :: TracePeerSelection peeraddr
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#decisionTrace"><span class="hs-identifier hs-var">decisionTrace</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set peeraddr -&gt; Int -&gt; DiffTime -&gt; TracePeerSelection peeraddr
 forall peeraddr.
 Set peeraddr -&gt; Int -&gt; DiffTime -&gt; TracePeerSelection peeraddr
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#TracePublicRootsResults"><span class="hs-identifier hs-var">TracePublicRootsResults</span></a></span><span>
-</span><span id="line-146"></span><span>                                  </span><span class="annot"><span class="annottext">Set peeraddr
-</span><a href="#local-6989586621679214699"><span class="hs-identifier hs-var">newPeers</span></a></span><span>
-</span><span id="line-147"></span><span>                                  </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679214692"><span class="hs-identifier hs-var">publicRootBackoffs'</span></a></span><span>
-</span><span id="line-148"></span><span>                                  </span><span class="annot"><span class="annottext">DiffTime
-</span><a href="#local-6989586621679214689"><span class="hs-identifier hs-var">publicRootRetryDiffTime</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-149"></span><span>                </span><span class="annot"><span class="annottext">decisionState :: PeerSelectionState peeraddr peerconn
+</span><span id="line-144"></span><span>                                  </span><span class="annot"><span class="annottext">Set peeraddr
+</span><a href="#local-6989586621679248428"><span class="hs-identifier hs-var">newPeers</span></a></span><span>
+</span><span id="line-145"></span><span>                                  </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679248421"><span class="hs-identifier hs-var">publicRootBackoffs'</span></a></span><span>
+</span><span id="line-146"></span><span>                                  </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679248418"><span class="hs-identifier hs-var">publicRootRetryDiffTime</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-147"></span><span>                </span><span class="annot"><span class="annottext">decisionState :: PeerSelectionState peeraddr peerconn
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#decisionState"><span class="hs-identifier hs-var">decisionState</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PeerSelectionState peeraddr peerconn
-</span><a href="#local-6989586621679214701"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-150"></span><span>                                  </span><span class="annot"><span class="annottext">publicRootPeers :: Set peeraddr
+</span><a href="#local-6989586621679248430"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-148"></span><span>                                  </span><span class="annot"><span class="annottext">publicRootPeers :: Set peeraddr
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#publicRootPeers"><span class="hs-identifier hs-var">publicRootPeers</span></a></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set peeraddr
-</span><a href="#local-6989586621679214696"><span class="hs-identifier hs-var">publicRootPeers'</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-151"></span><span>                                  </span><span class="annot"><span class="annottext">knownPeers :: KnownPeers peeraddr
+</span><a href="#local-6989586621679248425"><span class="hs-identifier hs-var">publicRootPeers'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-149"></span><span>                                  </span><span class="annot"><span class="annottext">knownPeers :: KnownPeers peeraddr
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#knownPeers"><span class="hs-identifier hs-var">knownPeers</span></a></span><span>          </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">KnownPeers peeraddr
-</span><a href="#local-6989586621679214695"><span class="hs-identifier hs-var">knownPeers'</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-152"></span><span>                                  </span><span class="annot"><span class="annottext">publicRootBackoffs :: Int
+</span><a href="#local-6989586621679248424"><span class="hs-identifier hs-var">knownPeers'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-150"></span><span>                                  </span><span class="annot"><span class="annottext">publicRootBackoffs :: Int
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#publicRootBackoffs"><span class="hs-identifier hs-var">publicRootBackoffs</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679214692"><span class="hs-identifier hs-var">publicRootBackoffs'</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-153"></span><span>                                  </span><span class="annot"><span class="annottext">publicRootRetryTime :: Time
+</span><a href="#local-6989586621679248421"><span class="hs-identifier hs-var">publicRootBackoffs'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-151"></span><span>                                  </span><span class="annot"><span class="annottext">publicRootRetryTime :: Time
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#publicRootRetryTime"><span class="hs-identifier hs-var">publicRootRetryTime</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Time
-</span><a href="#local-6989586621679214688"><span class="hs-identifier hs-var">publicRootRetryTime</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-154"></span><span>                                  </span><span class="annot"><span class="annottext">inProgressPublicRootsReq :: Bool
+</span><a href="#local-6989586621679248417"><span class="hs-identifier hs-var">publicRootRetryTime</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-152"></span><span>                                  </span><span class="annot"><span class="annottext">inProgressPublicRootsReq :: Bool
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#inProgressPublicRootsReq"><span class="hs-identifier hs-var">inProgressPublicRootsReq</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><span class="hs-identifier hs-var">False</span></span><span>
-</span><span id="line-155"></span><span>                                </span><span class="hs-special">}</span><span class="hs-special">,</span><span>
-</span><span id="line-156"></span><span>                </span><span class="annot"><span class="annottext">decisionJobs :: [Job () m (Completion m peeraddr peerconn)]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">False</span></a></span><span>
+</span><span id="line-153"></span><span>                                </span><span class="hs-special">}</span><span class="hs-special">,</span><span>
+</span><span id="line-154"></span><span>                </span><span class="annot"><span class="annottext">decisionJobs :: [Job () m (Completion m peeraddr peerconn)]
 </span><a href="Ouroboros.Network.PeerSelection.Governor.Types.html#decisionJobs"><span class="hs-identifier hs-var">decisionJobs</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
-</span><span id="line-157"></span><span>              </span><span class="hs-special">}</span><span>
-</span><span id="line-158"></span></pre></body></html>
+</span><span id="line-155"></span><span>              </span><span class="hs-special">}</span><span>
+</span><span id="line-156"></span></pre></body></html>

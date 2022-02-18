@@ -1,0 +1,1763 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DeriveFunctor              #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DeriveGeneric              #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE DerivingStrategies         #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE DerivingVia                #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE GeneralizedNewtypeDeriving #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE DeriveTraversable          #-}</span><span>
+</span><span id="line-7"></span><span class="hs-pragma">{-# LANGUAGE FlexibleContexts           #-}</span><span>
+</span><span id="line-8"></span><span class="hs-pragma">{-# LANGUAGE StandaloneDeriving         #-}</span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Monoid.Synchronisation</span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Data.Monoid.Synchronisation.html#FirstToFinish"><span class="hs-identifier">FirstToFinish</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Monoid.Synchronisation.html#LastToFinish"><span class="hs-identifier">LastToFinish</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Monoid.Synchronisation.html#firstToLast"><span class="hs-identifier">firstToLast</span></a></span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Monoid.Synchronisation.html#lastToFirst"><span class="hs-identifier">lastToFirst</span></a></span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Monoid.Synchronisation.html#LastToFinishM"><span class="hs-identifier">LastToFinishM</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Monoid.Synchronisation.html#firstToLastM"><span class="hs-identifier">firstToLastM</span></a></span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Data.Monoid.Synchronisation.html#lastToFirstM"><span class="hs-identifier">lastToFirstM</span></a></span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-19"></span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Coerce</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier">coerce</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Functor.Contravariant</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Contravariant</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Monoid</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Alt</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Ap</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">GHC.Generics</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Generic</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Generic1</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Control.Applicative</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Alternative</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Control.Monad</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">MonadPlus</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span>
+</span><span id="line-28"></span><span>
+</span><span id="line-29"></span><span class="hs-comment">-- | First-to-finish synchronisation.  Like 'Alt' it is a monoid under '&lt;|&gt;'.</span><span>
+</span><span id="line-30"></span><span class="hs-comment">-- First-to-finish is the additive monoid of</span><span>
+</span><span id="line-31"></span><span class="hs-comment">-- [near-semiring](https://www.wikiwand.com/en/Near-semiring) for which</span><span>
+</span><span id="line-32"></span><span class="hs-comment">-- multiplication is given by 'LastToFinish'.</span><span>
+</span><span id="line-33"></span><span class="hs-comment">--</span><span>
+</span><span id="line-34"></span><span class="hs-comment">-- &gt; -- | Return first available value.</span><span>
+</span><span id="line-35"></span><span class="hs-comment">-- &gt; --</span><span>
+</span><span id="line-36"></span><span class="hs-comment">-- &gt; readFirstMVar :: [TMVar a] -&gt; STM a</span><span>
+</span><span id="line-37"></span><span class="hs-comment">-- &gt; readFirstMVar = runFirstToFinish</span><span>
+</span><span id="line-38"></span><span class="hs-comment">-- &gt;               . foldMap (FirstToFinish . readTMVar)</span><span>
+</span><span id="line-39"></span><span class="hs-comment">--</span><span>
+</span><span id="line-40"></span><span class="hs-comment">--</span><span>
+</span><span id="line-41"></span><span id="local-6989586621679042577"><span id="local-6989586621679042578"><span id="local-6989586621679042579"><span id="local-6989586621679042580"></span></span></span></span><span class="hs-keyword">newtype</span><span> </span><span id="FirstToFinish"><span class="annot"><a href="Data.Monoid.Synchronisation.html#FirstToFinish"><span class="hs-identifier hs-var">FirstToFinish</span></a></span></span><span> </span><span id="local-6989586621679042576"><span class="annot"><a href="#local-6989586621679042576"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679042575"><span class="annot"><a href="#local-6989586621679042575"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="FirstToFinish"><span class="annot"><a href="Data.Monoid.Synchronisation.html#FirstToFinish"><span class="hs-identifier hs-var">FirstToFinish</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="runFirstToFinish"><span class="annot"><span class="annottext">FirstToFinish m a -&gt; m a
+</span><a href="Data.Monoid.Synchronisation.html#runFirstToFinish"><span class="hs-identifier hs-var hs-var">runFirstToFinish</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679042576"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042575"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-42"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span id="local-6989586621679042569"><span id="local-6989586621679042571"><span class="annot"><span class="annottext">a -&gt; FirstToFinish m b -&gt; FirstToFinish m a
+(a -&gt; b) -&gt; FirstToFinish m a -&gt; FirstToFinish m b
+(forall a b. (a -&gt; b) -&gt; FirstToFinish m a -&gt; FirstToFinish m b)
+-&gt; (forall a b. a -&gt; FirstToFinish m b -&gt; FirstToFinish m a)
+-&gt; Functor (FirstToFinish m)
+forall a b. a -&gt; FirstToFinish m b -&gt; FirstToFinish m a
+forall a b. (a -&gt; b) -&gt; FirstToFinish m a -&gt; FirstToFinish m b
+forall (m :: * -&gt; *) a b.
+Functor m =&gt;
+a -&gt; FirstToFinish m b -&gt; FirstToFinish m a
+forall (m :: * -&gt; *) a b.
+Functor m =&gt;
+(a -&gt; b) -&gt; FirstToFinish m a -&gt; FirstToFinish m b
+forall (f :: * -&gt; *).
+(forall a b. (a -&gt; b) -&gt; f a -&gt; f b)
+-&gt; (forall a b. a -&gt; f b -&gt; f a) -&gt; Functor f
+&lt;$ :: a -&gt; FirstToFinish m b -&gt; FirstToFinish m a
+$c&lt;$ :: forall (m :: * -&gt; *) a b.
+Functor m =&gt;
+a -&gt; FirstToFinish m b -&gt; FirstToFinish m a
+fmap :: (a -&gt; b) -&gt; FirstToFinish m a -&gt; FirstToFinish m b
+$cfmap :: forall (m :: * -&gt; *) a b.
+Functor m =&gt;
+(a -&gt; b) -&gt; FirstToFinish m a -&gt; FirstToFinish m b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Functor</span></a></span></span></span><span>
+</span><span id="line-43"></span><span>  </span><span class="hs-keyword">deriving</span><span>         </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">(forall x. FirstToFinish m a -&gt; Rep (FirstToFinish m a) x)
+-&gt; (forall x. Rep (FirstToFinish m a) x -&gt; FirstToFinish m a)
+-&gt; Generic (FirstToFinish m a)
+forall x. Rep (FirstToFinish m a) x -&gt; FirstToFinish m a
+forall x. FirstToFinish m a -&gt; Rep (FirstToFinish m a) x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+forall (m :: * -&gt; *) a x.
+Rep (FirstToFinish m a) x -&gt; FirstToFinish m a
+forall (m :: * -&gt; *) a x.
+FirstToFinish m a -&gt; Rep (FirstToFinish m a) x
+$cto :: forall (m :: * -&gt; *) a x.
+Rep (FirstToFinish m a) x -&gt; FirstToFinish m a
+$cfrom :: forall (m :: * -&gt; *) a x.
+FirstToFinish m a -&gt; Rep (FirstToFinish m a) x
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span>
+</span><span id="line-44"></span><span>                   </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall a. FirstToFinish m a -&gt; Rep1 (FirstToFinish m) a)
+-&gt; (forall a. Rep1 (FirstToFinish m) a -&gt; FirstToFinish m a)
+-&gt; Generic1 (FirstToFinish m)
+forall a. Rep1 (FirstToFinish m) a -&gt; FirstToFinish m a
+forall a. FirstToFinish m a -&gt; Rep1 (FirstToFinish m) a
+forall k (f :: k -&gt; *).
+(forall (a :: k). f a -&gt; Rep1 f a)
+-&gt; (forall (a :: k). Rep1 f a -&gt; f a) -&gt; Generic1 f
+forall (m :: * -&gt; *) a.
+Rep1 (FirstToFinish m) a -&gt; FirstToFinish m a
+forall (m :: * -&gt; *) a.
+FirstToFinish m a -&gt; Rep1 (FirstToFinish m) a
+$cto1 :: forall (m :: * -&gt; *) a.
+Rep1 (FirstToFinish m) a -&gt; FirstToFinish m a
+$cfrom1 :: forall (m :: * -&gt; *) a.
+FirstToFinish m a -&gt; Rep1 (FirstToFinish m) a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic1</span></a></span><span>
+</span><span id="line-45"></span><span>                   </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679042551"><span id="local-6989586621679042553"><span id="local-6989586621679042555"><span id="local-6989586621679042557"><span id="local-6989586621679042559"><span class="annot"><span class="annottext">Functor (FirstToFinish m)
+a -&gt; FirstToFinish m a
+Functor (FirstToFinish m)
+-&gt; (forall a. a -&gt; FirstToFinish m a)
+-&gt; (forall a b.
+    FirstToFinish m (a -&gt; b) -&gt; FirstToFinish m a -&gt; FirstToFinish m b)
+-&gt; (forall a b c.
+    (a -&gt; b -&gt; c)
+    -&gt; FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m c)
+-&gt; (forall a b.
+    FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m b)
+-&gt; (forall a b.
+    FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m a)
+-&gt; Applicative (FirstToFinish m)
+FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m b
+FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m a
+FirstToFinish m (a -&gt; b) -&gt; FirstToFinish m a -&gt; FirstToFinish m b
+(a -&gt; b -&gt; c)
+-&gt; FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m c
+forall a. a -&gt; FirstToFinish m a
+forall a b.
+FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m a
+forall a b.
+FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m b
+forall a b.
+FirstToFinish m (a -&gt; b) -&gt; FirstToFinish m a -&gt; FirstToFinish m b
+forall a b c.
+(a -&gt; b -&gt; c)
+-&gt; FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m c
+forall (f :: * -&gt; *).
+Functor f
+-&gt; (forall a. a -&gt; f a)
+-&gt; (forall a b. f (a -&gt; b) -&gt; f a -&gt; f b)
+-&gt; (forall a b c. (a -&gt; b -&gt; c) -&gt; f a -&gt; f b -&gt; f c)
+-&gt; (forall a b. f a -&gt; f b -&gt; f b)
+-&gt; (forall a b. f a -&gt; f b -&gt; f a)
+-&gt; Applicative f
+forall (m :: * -&gt; *). Applicative m =&gt; Functor (FirstToFinish m)
+forall (m :: * -&gt; *) a. Applicative m =&gt; a -&gt; FirstToFinish m a
+forall (m :: * -&gt; *) a b.
+Applicative m =&gt;
+FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m a
+forall (m :: * -&gt; *) a b.
+Applicative m =&gt;
+FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m b
+forall (m :: * -&gt; *) a b.
+Applicative m =&gt;
+FirstToFinish m (a -&gt; b) -&gt; FirstToFinish m a -&gt; FirstToFinish m b
+forall (m :: * -&gt; *) a b c.
+Applicative m =&gt;
+(a -&gt; b -&gt; c)
+-&gt; FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m c
+&lt;* :: FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m a
+$c&lt;* :: forall (m :: * -&gt; *) a b.
+Applicative m =&gt;
+FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m a
+*&gt; :: FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m b
+$c*&gt; :: forall (m :: * -&gt; *) a b.
+Applicative m =&gt;
+FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m b
+liftA2 :: (a -&gt; b -&gt; c)
+-&gt; FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m c
+$cliftA2 :: forall (m :: * -&gt; *) a b c.
+Applicative m =&gt;
+(a -&gt; b -&gt; c)
+-&gt; FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m c
+&lt;*&gt; :: FirstToFinish m (a -&gt; b) -&gt; FirstToFinish m a -&gt; FirstToFinish m b
+$c&lt;*&gt; :: forall (m :: * -&gt; *) a b.
+Applicative m =&gt;
+FirstToFinish m (a -&gt; b) -&gt; FirstToFinish m a -&gt; FirstToFinish m b
+pure :: a -&gt; FirstToFinish m a
+$cpure :: forall (m :: * -&gt; *) a. Applicative m =&gt; a -&gt; FirstToFinish m a
+$cp1Applicative :: forall (m :: * -&gt; *). Applicative m =&gt; Functor (FirstToFinish m)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Applicative</span></a></span></span></span></span></span></span><span>
+</span><span id="line-46"></span><span>                   </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679042541"><span id="local-6989586621679042543"><span id="local-6989586621679042545"><span id="local-6989586621679042547"><span class="annot"><span class="annottext">Applicative (FirstToFinish m)
+FirstToFinish m a
+Applicative (FirstToFinish m)
+-&gt; (forall a. FirstToFinish m a)
+-&gt; (forall a.
+    FirstToFinish m a -&gt; FirstToFinish m a -&gt; FirstToFinish m a)
+-&gt; (forall a. FirstToFinish m a -&gt; FirstToFinish m [a])
+-&gt; (forall a. FirstToFinish m a -&gt; FirstToFinish m [a])
+-&gt; Alternative (FirstToFinish m)
+FirstToFinish m a -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+FirstToFinish m a -&gt; FirstToFinish m [a]
+FirstToFinish m a -&gt; FirstToFinish m [a]
+forall a. FirstToFinish m a
+forall a. FirstToFinish m a -&gt; FirstToFinish m [a]
+forall a.
+FirstToFinish m a -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+forall (f :: * -&gt; *).
+Applicative f
+-&gt; (forall a. f a)
+-&gt; (forall a. f a -&gt; f a -&gt; f a)
+-&gt; (forall a. f a -&gt; f [a])
+-&gt; (forall a. f a -&gt; f [a])
+-&gt; Alternative f
+forall (m :: * -&gt; *).
+Alternative m =&gt;
+Applicative (FirstToFinish m)
+forall (m :: * -&gt; *) a. Alternative m =&gt; FirstToFinish m a
+forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+FirstToFinish m a -&gt; FirstToFinish m [a]
+forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+FirstToFinish m a -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+many :: FirstToFinish m a -&gt; FirstToFinish m [a]
+$cmany :: forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+FirstToFinish m a -&gt; FirstToFinish m [a]
+some :: FirstToFinish m a -&gt; FirstToFinish m [a]
+$csome :: forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+FirstToFinish m a -&gt; FirstToFinish m [a]
+&lt;|&gt; :: FirstToFinish m a -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+$c&lt;|&gt; :: forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+FirstToFinish m a -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+empty :: FirstToFinish m a
+$cempty :: forall (m :: * -&gt; *) a. Alternative m =&gt; FirstToFinish m a
+$cp1Alternative :: forall (m :: * -&gt; *).
+Alternative m =&gt;
+Applicative (FirstToFinish m)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Alternative</span></a></span></span></span></span></span><span>
+</span><span id="line-47"></span><span>                   </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679042533"><span id="local-6989586621679042535"><span id="local-6989586621679042537"><span class="annot"><span class="annottext">Applicative (FirstToFinish m)
+a -&gt; FirstToFinish m a
+Applicative (FirstToFinish m)
+-&gt; (forall a b.
+    FirstToFinish m a -&gt; (a -&gt; FirstToFinish m b) -&gt; FirstToFinish m b)
+-&gt; (forall a b.
+    FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m b)
+-&gt; (forall a. a -&gt; FirstToFinish m a)
+-&gt; Monad (FirstToFinish m)
+FirstToFinish m a -&gt; (a -&gt; FirstToFinish m b) -&gt; FirstToFinish m b
+FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m b
+forall a. a -&gt; FirstToFinish m a
+forall a b.
+FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m b
+forall a b.
+FirstToFinish m a -&gt; (a -&gt; FirstToFinish m b) -&gt; FirstToFinish m b
+forall (m :: * -&gt; *). Monad m =&gt; Applicative (FirstToFinish m)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; FirstToFinish m a
+forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m b
+forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+FirstToFinish m a -&gt; (a -&gt; FirstToFinish m b) -&gt; FirstToFinish m b
+forall (m :: * -&gt; *).
+Applicative m
+-&gt; (forall a b. m a -&gt; (a -&gt; m b) -&gt; m b)
+-&gt; (forall a b. m a -&gt; m b -&gt; m b)
+-&gt; (forall a. a -&gt; m a)
+-&gt; Monad m
+return :: a -&gt; FirstToFinish m a
+$creturn :: forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; FirstToFinish m a
+&gt;&gt; :: FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m b
+$c&gt;&gt; :: forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+FirstToFinish m a -&gt; FirstToFinish m b -&gt; FirstToFinish m b
+&gt;&gt;= :: FirstToFinish m a -&gt; (a -&gt; FirstToFinish m b) -&gt; FirstToFinish m b
+$c&gt;&gt;= :: forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+FirstToFinish m a -&gt; (a -&gt; FirstToFinish m b) -&gt; FirstToFinish m b
+$cp1Monad :: forall (m :: * -&gt; *). Monad m =&gt; Applicative (FirstToFinish m)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Monad</span></a></span></span></span></span><span>
+</span><span id="line-48"></span><span>                   </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679042526"><span id="local-6989586621679042528"><span class="annot"><span class="annottext">Monad (FirstToFinish m)
+Alternative (FirstToFinish m)
+FirstToFinish m a
+Alternative (FirstToFinish m)
+-&gt; Monad (FirstToFinish m)
+-&gt; (forall a. FirstToFinish m a)
+-&gt; (forall a.
+    FirstToFinish m a -&gt; FirstToFinish m a -&gt; FirstToFinish m a)
+-&gt; MonadPlus (FirstToFinish m)
+FirstToFinish m a -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+forall a. FirstToFinish m a
+forall a.
+FirstToFinish m a -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+forall (m :: * -&gt; *).
+Alternative m
+-&gt; Monad m
+-&gt; (forall a. m a)
+-&gt; (forall a. m a -&gt; m a -&gt; m a)
+-&gt; MonadPlus m
+forall (m :: * -&gt; *). MonadPlus m =&gt; Monad (FirstToFinish m)
+forall (m :: * -&gt; *). MonadPlus m =&gt; Alternative (FirstToFinish m)
+forall (m :: * -&gt; *) a. MonadPlus m =&gt; FirstToFinish m a
+forall (m :: * -&gt; *) a.
+MonadPlus m =&gt;
+FirstToFinish m a -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+mplus :: FirstToFinish m a -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+$cmplus :: forall (m :: * -&gt; *) a.
+MonadPlus m =&gt;
+FirstToFinish m a -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+mzero :: FirstToFinish m a
+$cmzero :: forall (m :: * -&gt; *) a. MonadPlus m =&gt; FirstToFinish m a
+$cp2MonadPlus :: forall (m :: * -&gt; *). MonadPlus m =&gt; Monad (FirstToFinish m)
+$cp1MonadPlus :: forall (m :: * -&gt; *). MonadPlus m =&gt; Alternative (FirstToFinish m)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">MonadPlus</span></a></span></span></span><span>
+</span><span id="line-49"></span><span>                   </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679042515"><span id="local-6989586621679042517"><span id="local-6989586621679042519"><span id="local-6989586621679042521"><span class="annot"><span class="annottext">Functor (FirstToFinish m)
+Foldable (FirstToFinish m)
+Functor (FirstToFinish m)
+-&gt; Foldable (FirstToFinish m)
+-&gt; (forall (f :: * -&gt; *) a b.
+    Applicative f =&gt;
+    (a -&gt; f b) -&gt; FirstToFinish m a -&gt; f (FirstToFinish m b))
+-&gt; (forall (f :: * -&gt; *) a.
+    Applicative f =&gt;
+    FirstToFinish m (f a) -&gt; f (FirstToFinish m a))
+-&gt; (forall (m :: * -&gt; *) a b.
+    Monad m =&gt;
+    (a -&gt; m b) -&gt; FirstToFinish m a -&gt; m (FirstToFinish m b))
+-&gt; (forall (m :: * -&gt; *) a.
+    Monad m =&gt;
+    FirstToFinish m (m a) -&gt; m (FirstToFinish m a))
+-&gt; Traversable (FirstToFinish m)
+(a -&gt; f b) -&gt; FirstToFinish m a -&gt; f (FirstToFinish m b)
+forall (t :: * -&gt; *).
+Functor t
+-&gt; Foldable t
+-&gt; (forall (f :: * -&gt; *) a b.
+    Applicative f =&gt;
+    (a -&gt; f b) -&gt; t a -&gt; f (t b))
+-&gt; (forall (f :: * -&gt; *) a. Applicative f =&gt; t (f a) -&gt; f (t a))
+-&gt; (forall (m :: * -&gt; *) a b.
+    Monad m =&gt;
+    (a -&gt; m b) -&gt; t a -&gt; m (t b))
+-&gt; (forall (m :: * -&gt; *) a. Monad m =&gt; t (m a) -&gt; m (t a))
+-&gt; Traversable t
+forall (m :: * -&gt; *). Traversable m =&gt; Functor (FirstToFinish m)
+forall (m :: * -&gt; *). Traversable m =&gt; Foldable (FirstToFinish m)
+forall (m :: * -&gt; *) (m :: * -&gt; *) a.
+(Traversable m, Monad m) =&gt;
+FirstToFinish m (m a) -&gt; m (FirstToFinish m a)
+forall (m :: * -&gt; *) (f :: * -&gt; *) a.
+(Traversable m, Applicative f) =&gt;
+FirstToFinish m (f a) -&gt; f (FirstToFinish m a)
+forall (m :: * -&gt; *) (m :: * -&gt; *) a b.
+(Traversable m, Monad m) =&gt;
+(a -&gt; m b) -&gt; FirstToFinish m a -&gt; m (FirstToFinish m b)
+forall (m :: * -&gt; *) (f :: * -&gt; *) a b.
+(Traversable m, Applicative f) =&gt;
+(a -&gt; f b) -&gt; FirstToFinish m a -&gt; f (FirstToFinish m b)
+forall (m :: * -&gt; *) a.
+Monad m =&gt;
+FirstToFinish m (m a) -&gt; m (FirstToFinish m a)
+forall (f :: * -&gt; *) a.
+Applicative f =&gt;
+FirstToFinish m (f a) -&gt; f (FirstToFinish m a)
+forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+(a -&gt; m b) -&gt; FirstToFinish m a -&gt; m (FirstToFinish m b)
+forall (f :: * -&gt; *) a b.
+Applicative f =&gt;
+(a -&gt; f b) -&gt; FirstToFinish m a -&gt; f (FirstToFinish m b)
+sequence :: FirstToFinish m (m a) -&gt; m (FirstToFinish m a)
+$csequence :: forall (m :: * -&gt; *) (m :: * -&gt; *) a.
+(Traversable m, Monad m) =&gt;
+FirstToFinish m (m a) -&gt; m (FirstToFinish m a)
+mapM :: (a -&gt; m b) -&gt; FirstToFinish m a -&gt; m (FirstToFinish m b)
+$cmapM :: forall (m :: * -&gt; *) (m :: * -&gt; *) a b.
+(Traversable m, Monad m) =&gt;
+(a -&gt; m b) -&gt; FirstToFinish m a -&gt; m (FirstToFinish m b)
+sequenceA :: FirstToFinish m (f a) -&gt; f (FirstToFinish m a)
+$csequenceA :: forall (m :: * -&gt; *) (f :: * -&gt; *) a.
+(Traversable m, Applicative f) =&gt;
+FirstToFinish m (f a) -&gt; f (FirstToFinish m a)
+traverse :: (a -&gt; f b) -&gt; FirstToFinish m a -&gt; f (FirstToFinish m b)
+$ctraverse :: forall (m :: * -&gt; *) (f :: * -&gt; *) a b.
+(Traversable m, Applicative f) =&gt;
+(a -&gt; f b) -&gt; FirstToFinish m a -&gt; f (FirstToFinish m b)
+$cp2Traversable :: forall (m :: * -&gt; *). Traversable m =&gt; Foldable (FirstToFinish m)
+$cp1Traversable :: forall (m :: * -&gt; *). Traversable m =&gt; Functor (FirstToFinish m)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Traversable</span></a></span></span></span></span></span><span>
+</span><span id="line-50"></span><span>                   </span><span class="hs-special">)</span><span>
+</span><span id="line-51"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679042508"><span id="local-6989586621679042510"><span id="local-6989586621679042512"><span class="annot"><span class="annottext">b -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+NonEmpty (FirstToFinish m a) -&gt; FirstToFinish m a
+FirstToFinish m a -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+(FirstToFinish m a -&gt; FirstToFinish m a -&gt; FirstToFinish m a)
+-&gt; (NonEmpty (FirstToFinish m a) -&gt; FirstToFinish m a)
+-&gt; (forall b.
+    Integral b =&gt;
+    b -&gt; FirstToFinish m a -&gt; FirstToFinish m a)
+-&gt; Semigroup (FirstToFinish m a)
+forall b. Integral b =&gt; b -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+forall a.
+(a -&gt; a -&gt; a)
+-&gt; (NonEmpty a -&gt; a)
+-&gt; (forall b. Integral b =&gt; b -&gt; a -&gt; a)
+-&gt; Semigroup a
+forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+NonEmpty (FirstToFinish m a) -&gt; FirstToFinish m a
+forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+FirstToFinish m a -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+forall (m :: * -&gt; *) a b.
+(Alternative m, Integral b) =&gt;
+b -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+stimes :: b -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+$cstimes :: forall (m :: * -&gt; *) a b.
+(Alternative m, Integral b) =&gt;
+b -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+sconcat :: NonEmpty (FirstToFinish m a) -&gt; FirstToFinish m a
+$csconcat :: forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+NonEmpty (FirstToFinish m a) -&gt; FirstToFinish m a
+&lt;&gt; :: FirstToFinish m a -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+$c&lt;&gt; :: forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+FirstToFinish m a -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Semigroup</span></a></span></span></span></span><span>     </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Alt</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042576"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042575"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-52"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679042500"><span id="local-6989586621679042502"><span id="local-6989586621679042504"><span class="annot"><span class="annottext">Semigroup (FirstToFinish m a)
+FirstToFinish m a
+Semigroup (FirstToFinish m a)
+-&gt; FirstToFinish m a
+-&gt; (FirstToFinish m a -&gt; FirstToFinish m a -&gt; FirstToFinish m a)
+-&gt; ([FirstToFinish m a] -&gt; FirstToFinish m a)
+-&gt; Monoid (FirstToFinish m a)
+[FirstToFinish m a] -&gt; FirstToFinish m a
+FirstToFinish m a -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+forall a.
+Semigroup a -&gt; a -&gt; (a -&gt; a -&gt; a) -&gt; ([a] -&gt; a) -&gt; Monoid a
+forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+Semigroup (FirstToFinish m a)
+forall (m :: * -&gt; *) a. Alternative m =&gt; FirstToFinish m a
+forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+[FirstToFinish m a] -&gt; FirstToFinish m a
+forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+FirstToFinish m a -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+mconcat :: [FirstToFinish m a] -&gt; FirstToFinish m a
+$cmconcat :: forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+[FirstToFinish m a] -&gt; FirstToFinish m a
+mappend :: FirstToFinish m a -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+$cmappend :: forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+FirstToFinish m a -&gt; FirstToFinish m a -&gt; FirstToFinish m a
+mempty :: FirstToFinish m a
+$cmempty :: forall (m :: * -&gt; *) a. Alternative m =&gt; FirstToFinish m a
+$cp1Monoid :: forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+Semigroup (FirstToFinish m a)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Monoid</span></a></span></span></span></span><span>        </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Alt</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042576"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042575"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-53"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679042465"><span id="local-6989586621679042467"><span id="local-6989586621679042469"><span id="local-6989586621679042471"><span id="local-6989586621679042473"><span id="local-6989586621679042475"><span id="local-6989586621679042477"><span id="local-6989586621679042479"><span id="local-6989586621679042481"><span id="local-6989586621679042483"><span id="local-6989586621679042485"><span id="local-6989586621679042487"><span id="local-6989586621679042489"><span id="local-6989586621679042491"><span id="local-6989586621679042493"><span id="local-6989586621679042495"><span id="local-6989586621679042497"><span class="annot"><span class="annottext">a -&gt; FirstToFinish m a -&gt; Bool
+FirstToFinish m m -&gt; m
+FirstToFinish m a -&gt; [a]
+FirstToFinish m a -&gt; Bool
+FirstToFinish m a -&gt; Int
+FirstToFinish m a -&gt; a
+FirstToFinish m a -&gt; a
+FirstToFinish m a -&gt; a
+FirstToFinish m a -&gt; a
+(a -&gt; m) -&gt; FirstToFinish m a -&gt; m
+(a -&gt; m) -&gt; FirstToFinish m a -&gt; m
+(a -&gt; b -&gt; b) -&gt; b -&gt; FirstToFinish m a -&gt; b
+(a -&gt; b -&gt; b) -&gt; b -&gt; FirstToFinish m a -&gt; b
+(b -&gt; a -&gt; b) -&gt; b -&gt; FirstToFinish m a -&gt; b
+(b -&gt; a -&gt; b) -&gt; b -&gt; FirstToFinish m a -&gt; b
+(a -&gt; a -&gt; a) -&gt; FirstToFinish m a -&gt; a
+(a -&gt; a -&gt; a) -&gt; FirstToFinish m a -&gt; a
+(forall m. Monoid m =&gt; FirstToFinish m m -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; FirstToFinish m a -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; FirstToFinish m a -&gt; m)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; FirstToFinish m a -&gt; b)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; FirstToFinish m a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; FirstToFinish m a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; FirstToFinish m a -&gt; b)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; FirstToFinish m a -&gt; a)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; FirstToFinish m a -&gt; a)
+-&gt; (forall a. FirstToFinish m a -&gt; [a])
+-&gt; (forall a. FirstToFinish m a -&gt; Bool)
+-&gt; (forall a. FirstToFinish m a -&gt; Int)
+-&gt; (forall a. Eq a =&gt; a -&gt; FirstToFinish m a -&gt; Bool)
+-&gt; (forall a. Ord a =&gt; FirstToFinish m a -&gt; a)
+-&gt; (forall a. Ord a =&gt; FirstToFinish m a -&gt; a)
+-&gt; (forall a. Num a =&gt; FirstToFinish m a -&gt; a)
+-&gt; (forall a. Num a =&gt; FirstToFinish m a -&gt; a)
+-&gt; Foldable (FirstToFinish m)
+forall a. Eq a =&gt; a -&gt; FirstToFinish m a -&gt; Bool
+forall a. Num a =&gt; FirstToFinish m a -&gt; a
+forall a. Ord a =&gt; FirstToFinish m a -&gt; a
+forall m. Monoid m =&gt; FirstToFinish m m -&gt; m
+forall a. FirstToFinish m a -&gt; Bool
+forall a. FirstToFinish m a -&gt; Int
+forall a. FirstToFinish m a -&gt; [a]
+forall a. (a -&gt; a -&gt; a) -&gt; FirstToFinish m a -&gt; a
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; FirstToFinish m a -&gt; m
+forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; FirstToFinish m a -&gt; b
+forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; FirstToFinish m a -&gt; b
+forall (m :: * -&gt; *) a.
+(Foldable m, Eq a) =&gt;
+a -&gt; FirstToFinish m a -&gt; Bool
+forall (m :: * -&gt; *) a.
+(Foldable m, Num a) =&gt;
+FirstToFinish m a -&gt; a
+forall (m :: * -&gt; *) a.
+(Foldable m, Ord a) =&gt;
+FirstToFinish m a -&gt; a
+forall (m :: * -&gt; *) m.
+(Foldable m, Monoid m) =&gt;
+FirstToFinish m m -&gt; m
+forall (m :: * -&gt; *) a. Foldable m =&gt; FirstToFinish m a -&gt; Bool
+forall (m :: * -&gt; *) a. Foldable m =&gt; FirstToFinish m a -&gt; Int
+forall (m :: * -&gt; *) a. Foldable m =&gt; FirstToFinish m a -&gt; [a]
+forall (m :: * -&gt; *) a.
+Foldable m =&gt;
+(a -&gt; a -&gt; a) -&gt; FirstToFinish m a -&gt; a
+forall (m :: * -&gt; *) m a.
+(Foldable m, Monoid m) =&gt;
+(a -&gt; m) -&gt; FirstToFinish m a -&gt; m
+forall (m :: * -&gt; *) b a.
+Foldable m =&gt;
+(b -&gt; a -&gt; b) -&gt; b -&gt; FirstToFinish m a -&gt; b
+forall (m :: * -&gt; *) a b.
+Foldable m =&gt;
+(a -&gt; b -&gt; b) -&gt; b -&gt; FirstToFinish m a -&gt; b
+forall (t :: * -&gt; *).
+(forall m. Monoid m =&gt; t m -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; t a -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; t a -&gt; m)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; t a -&gt; a)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; t a -&gt; a)
+-&gt; (forall a. t a -&gt; [a])
+-&gt; (forall a. t a -&gt; Bool)
+-&gt; (forall a. t a -&gt; Int)
+-&gt; (forall a. Eq a =&gt; a -&gt; t a -&gt; Bool)
+-&gt; (forall a. Ord a =&gt; t a -&gt; a)
+-&gt; (forall a. Ord a =&gt; t a -&gt; a)
+-&gt; (forall a. Num a =&gt; t a -&gt; a)
+-&gt; (forall a. Num a =&gt; t a -&gt; a)
+-&gt; Foldable t
+product :: FirstToFinish m a -&gt; a
+$cproduct :: forall (m :: * -&gt; *) a.
+(Foldable m, Num a) =&gt;
+FirstToFinish m a -&gt; a
+sum :: FirstToFinish m a -&gt; a
+$csum :: forall (m :: * -&gt; *) a.
+(Foldable m, Num a) =&gt;
+FirstToFinish m a -&gt; a
+minimum :: FirstToFinish m a -&gt; a
+$cminimum :: forall (m :: * -&gt; *) a.
+(Foldable m, Ord a) =&gt;
+FirstToFinish m a -&gt; a
+maximum :: FirstToFinish m a -&gt; a
+$cmaximum :: forall (m :: * -&gt; *) a.
+(Foldable m, Ord a) =&gt;
+FirstToFinish m a -&gt; a
+elem :: a -&gt; FirstToFinish m a -&gt; Bool
+$celem :: forall (m :: * -&gt; *) a.
+(Foldable m, Eq a) =&gt;
+a -&gt; FirstToFinish m a -&gt; Bool
+length :: FirstToFinish m a -&gt; Int
+$clength :: forall (m :: * -&gt; *) a. Foldable m =&gt; FirstToFinish m a -&gt; Int
+null :: FirstToFinish m a -&gt; Bool
+$cnull :: forall (m :: * -&gt; *) a. Foldable m =&gt; FirstToFinish m a -&gt; Bool
+toList :: FirstToFinish m a -&gt; [a]
+$ctoList :: forall (m :: * -&gt; *) a. Foldable m =&gt; FirstToFinish m a -&gt; [a]
+foldl1 :: (a -&gt; a -&gt; a) -&gt; FirstToFinish m a -&gt; a
+$cfoldl1 :: forall (m :: * -&gt; *) a.
+Foldable m =&gt;
+(a -&gt; a -&gt; a) -&gt; FirstToFinish m a -&gt; a
+foldr1 :: (a -&gt; a -&gt; a) -&gt; FirstToFinish m a -&gt; a
+$cfoldr1 :: forall (m :: * -&gt; *) a.
+Foldable m =&gt;
+(a -&gt; a -&gt; a) -&gt; FirstToFinish m a -&gt; a
+foldl' :: (b -&gt; a -&gt; b) -&gt; b -&gt; FirstToFinish m a -&gt; b
+$cfoldl' :: forall (m :: * -&gt; *) b a.
+Foldable m =&gt;
+(b -&gt; a -&gt; b) -&gt; b -&gt; FirstToFinish m a -&gt; b
+foldl :: (b -&gt; a -&gt; b) -&gt; b -&gt; FirstToFinish m a -&gt; b
+$cfoldl :: forall (m :: * -&gt; *) b a.
+Foldable m =&gt;
+(b -&gt; a -&gt; b) -&gt; b -&gt; FirstToFinish m a -&gt; b
+foldr' :: (a -&gt; b -&gt; b) -&gt; b -&gt; FirstToFinish m a -&gt; b
+$cfoldr' :: forall (m :: * -&gt; *) a b.
+Foldable m =&gt;
+(a -&gt; b -&gt; b) -&gt; b -&gt; FirstToFinish m a -&gt; b
+foldr :: (a -&gt; b -&gt; b) -&gt; b -&gt; FirstToFinish m a -&gt; b
+$cfoldr :: forall (m :: * -&gt; *) a b.
+Foldable m =&gt;
+(a -&gt; b -&gt; b) -&gt; b -&gt; FirstToFinish m a -&gt; b
+foldMap' :: (a -&gt; m) -&gt; FirstToFinish m a -&gt; m
+$cfoldMap' :: forall (m :: * -&gt; *) m a.
+(Foldable m, Monoid m) =&gt;
+(a -&gt; m) -&gt; FirstToFinish m a -&gt; m
+foldMap :: (a -&gt; m) -&gt; FirstToFinish m a -&gt; m
+$cfoldMap :: forall (m :: * -&gt; *) m a.
+(Foldable m, Monoid m) =&gt;
+(a -&gt; m) -&gt; FirstToFinish m a -&gt; m
+fold :: FirstToFinish m m -&gt; m
+$cfold :: forall (m :: * -&gt; *) m.
+(Foldable m, Monoid m) =&gt;
+FirstToFinish m m -&gt; m
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Foldable</span></a></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span>      </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Alt</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042576"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-54"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679042460"><span id="local-6989586621679042462"><span class="annot"><span class="annottext">b -&gt; FirstToFinish m b -&gt; FirstToFinish m a
+(a -&gt; b) -&gt; FirstToFinish m b -&gt; FirstToFinish m a
+(forall a b. (a -&gt; b) -&gt; FirstToFinish m b -&gt; FirstToFinish m a)
+-&gt; (forall b a. b -&gt; FirstToFinish m b -&gt; FirstToFinish m a)
+-&gt; Contravariant (FirstToFinish m)
+forall b a. b -&gt; FirstToFinish m b -&gt; FirstToFinish m a
+forall a b. (a -&gt; b) -&gt; FirstToFinish m b -&gt; FirstToFinish m a
+forall (m :: * -&gt; *) b a.
+Contravariant m =&gt;
+b -&gt; FirstToFinish m b -&gt; FirstToFinish m a
+forall (m :: * -&gt; *) a b.
+Contravariant m =&gt;
+(a -&gt; b) -&gt; FirstToFinish m b -&gt; FirstToFinish m a
+forall (f :: * -&gt; *).
+(forall a b. (a -&gt; b) -&gt; f b -&gt; f a)
+-&gt; (forall b a. b -&gt; f b -&gt; f a) -&gt; Contravariant f
+&gt;$ :: b -&gt; FirstToFinish m b -&gt; FirstToFinish m a
+$c&gt;$ :: forall (m :: * -&gt; *) b a.
+Contravariant m =&gt;
+b -&gt; FirstToFinish m b -&gt; FirstToFinish m a
+contramap :: (a -&gt; b) -&gt; FirstToFinish m b -&gt; FirstToFinish m a
+$ccontramap :: forall (m :: * -&gt; *) a b.
+Contravariant m =&gt;
+(a -&gt; b) -&gt; FirstToFinish m b -&gt; FirstToFinish m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Contravariant</span></a></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Alt</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042576"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span>
+</span><span id="line-57"></span><span class="hs-comment">-- | Last-to-finish synchronisation.  It is the multiplicative semigroup of</span><span>
+</span><span id="line-58"></span><span class="hs-comment">-- the [near-semiring](https://www.wikiwand.com/en/Near-semiring) for which addition is</span><span>
+</span><span id="line-59"></span><span class="hs-comment">-- given by 'FirstToFinish'.</span><span>
+</span><span id="line-60"></span><span class="hs-comment">--</span><span>
+</span><span id="line-61"></span><span class="hs-comment">-- This is similar to 'Ap' (see 'LastToFinishM') in the sense that it will wait</span><span>
+</span><span id="line-62"></span><span class="hs-comment">-- for all monadic effects, but unlike 'Ap' it will not combine all results</span><span>
+</span><span id="line-63"></span><span class="hs-comment">-- using a monoid instance, but rather it will return the last one.  Also unlike</span><span>
+</span><span id="line-64"></span><span class="hs-comment">-- 'Ap' it does not have a monoidal unit.</span><span>
+</span><span id="line-65"></span><span class="hs-comment">--</span><span>
+</span><span id="line-66"></span><span class="hs-comment">-- &gt; -- | Read all 'TMVar's and return the one that was filled last.</span><span>
+</span><span id="line-67"></span><span class="hs-comment">-- &gt; --</span><span>
+</span><span id="line-68"></span><span class="hs-comment">-- &gt; readAllTMVars :: Monoid a =&gt; NonEmpty (TMVar a) -&gt; STM a</span><span>
+</span><span id="line-69"></span><span class="hs-comment">-- &gt; readAllTMVars = runLastToFinish</span><span>
+</span><span id="line-70"></span><span class="hs-comment">-- &gt;               . foldMap1 (LastToFinish . readTMVar)</span><span>
+</span><span id="line-71"></span><span class="hs-comment">-- &gt;                 -- from 'semigroupoids' package or use 'foldr1' and 'fmap'</span><span>
+</span><span id="line-72"></span><span class="hs-comment">-- &gt;                 -- from 'base'</span><span>
+</span><span id="line-73"></span><span class="hs-comment">--</span><span>
+</span><span id="line-74"></span><span id="local-6989586621679042455"><span id="local-6989586621679042456"><span id="local-6989586621679042457"><span id="local-6989586621679042458"></span></span></span></span><span class="hs-keyword">newtype</span><span> </span><span id="LastToFinish"><span class="annot"><a href="Data.Monoid.Synchronisation.html#LastToFinish"><span class="hs-identifier hs-var">LastToFinish</span></a></span></span><span> </span><span id="local-6989586621679042687"><span class="annot"><a href="#local-6989586621679042687"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679042686"><span class="annot"><a href="#local-6989586621679042686"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="LastToFinish"><span class="annot"><a href="Data.Monoid.Synchronisation.html#LastToFinish"><span class="hs-identifier hs-var">LastToFinish</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="runLastToFinish"><span class="annot"><span class="annottext">LastToFinish m a -&gt; m a
+</span><a href="Data.Monoid.Synchronisation.html#runLastToFinish"><span class="hs-identifier hs-var hs-var">runLastToFinish</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679042687"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042686"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-75"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span id="local-6989586621679042449"><span id="local-6989586621679042451"><span class="annot"><span class="annottext">a -&gt; LastToFinish m b -&gt; LastToFinish m a
+(a -&gt; b) -&gt; LastToFinish m a -&gt; LastToFinish m b
+(forall a b. (a -&gt; b) -&gt; LastToFinish m a -&gt; LastToFinish m b)
+-&gt; (forall a b. a -&gt; LastToFinish m b -&gt; LastToFinish m a)
+-&gt; Functor (LastToFinish m)
+forall a b. a -&gt; LastToFinish m b -&gt; LastToFinish m a
+forall a b. (a -&gt; b) -&gt; LastToFinish m a -&gt; LastToFinish m b
+forall (m :: * -&gt; *) a b.
+Functor m =&gt;
+a -&gt; LastToFinish m b -&gt; LastToFinish m a
+forall (m :: * -&gt; *) a b.
+Functor m =&gt;
+(a -&gt; b) -&gt; LastToFinish m a -&gt; LastToFinish m b
+forall (f :: * -&gt; *).
+(forall a b. (a -&gt; b) -&gt; f a -&gt; f b)
+-&gt; (forall a b. a -&gt; f b -&gt; f a) -&gt; Functor f
+&lt;$ :: a -&gt; LastToFinish m b -&gt; LastToFinish m a
+$c&lt;$ :: forall (m :: * -&gt; *) a b.
+Functor m =&gt;
+a -&gt; LastToFinish m b -&gt; LastToFinish m a
+fmap :: (a -&gt; b) -&gt; LastToFinish m a -&gt; LastToFinish m b
+$cfmap :: forall (m :: * -&gt; *) a b.
+Functor m =&gt;
+(a -&gt; b) -&gt; LastToFinish m a -&gt; LastToFinish m b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Functor</span></a></span></span></span><span>
+</span><span id="line-76"></span><span>  </span><span class="hs-keyword">deriving</span><span>         </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">(forall x. LastToFinish m a -&gt; Rep (LastToFinish m a) x)
+-&gt; (forall x. Rep (LastToFinish m a) x -&gt; LastToFinish m a)
+-&gt; Generic (LastToFinish m a)
+forall x. Rep (LastToFinish m a) x -&gt; LastToFinish m a
+forall x. LastToFinish m a -&gt; Rep (LastToFinish m a) x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+forall (m :: * -&gt; *) a x.
+Rep (LastToFinish m a) x -&gt; LastToFinish m a
+forall (m :: * -&gt; *) a x.
+LastToFinish m a -&gt; Rep (LastToFinish m a) x
+$cto :: forall (m :: * -&gt; *) a x.
+Rep (LastToFinish m a) x -&gt; LastToFinish m a
+$cfrom :: forall (m :: * -&gt; *) a x.
+LastToFinish m a -&gt; Rep (LastToFinish m a) x
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span>
+</span><span id="line-77"></span><span>                   </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall a. LastToFinish m a -&gt; Rep1 (LastToFinish m) a)
+-&gt; (forall a. Rep1 (LastToFinish m) a -&gt; LastToFinish m a)
+-&gt; Generic1 (LastToFinish m)
+forall a. Rep1 (LastToFinish m) a -&gt; LastToFinish m a
+forall a. LastToFinish m a -&gt; Rep1 (LastToFinish m) a
+forall k (f :: k -&gt; *).
+(forall (a :: k). f a -&gt; Rep1 f a)
+-&gt; (forall (a :: k). Rep1 f a -&gt; f a) -&gt; Generic1 f
+forall (m :: * -&gt; *) a. Rep1 (LastToFinish m) a -&gt; LastToFinish m a
+forall (m :: * -&gt; *) a. LastToFinish m a -&gt; Rep1 (LastToFinish m) a
+$cto1 :: forall (m :: * -&gt; *) a. Rep1 (LastToFinish m) a -&gt; LastToFinish m a
+$cfrom1 :: forall (m :: * -&gt; *) a. LastToFinish m a -&gt; Rep1 (LastToFinish m) a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic1</span></a></span><span>
+</span><span id="line-78"></span><span>                   </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679042434"><span id="local-6989586621679042436"><span id="local-6989586621679042438"><span id="local-6989586621679042440"><span id="local-6989586621679042442"><span class="annot"><span class="annottext">Functor (LastToFinish m)
+a -&gt; LastToFinish m a
+Functor (LastToFinish m)
+-&gt; (forall a. a -&gt; LastToFinish m a)
+-&gt; (forall a b.
+    LastToFinish m (a -&gt; b) -&gt; LastToFinish m a -&gt; LastToFinish m b)
+-&gt; (forall a b c.
+    (a -&gt; b -&gt; c)
+    -&gt; LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m c)
+-&gt; (forall a b.
+    LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m b)
+-&gt; (forall a b.
+    LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m a)
+-&gt; Applicative (LastToFinish m)
+LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m b
+LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m a
+LastToFinish m (a -&gt; b) -&gt; LastToFinish m a -&gt; LastToFinish m b
+(a -&gt; b -&gt; c)
+-&gt; LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m c
+forall a. a -&gt; LastToFinish m a
+forall a b.
+LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m a
+forall a b.
+LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m b
+forall a b.
+LastToFinish m (a -&gt; b) -&gt; LastToFinish m a -&gt; LastToFinish m b
+forall a b c.
+(a -&gt; b -&gt; c)
+-&gt; LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m c
+forall (f :: * -&gt; *).
+Functor f
+-&gt; (forall a. a -&gt; f a)
+-&gt; (forall a b. f (a -&gt; b) -&gt; f a -&gt; f b)
+-&gt; (forall a b c. (a -&gt; b -&gt; c) -&gt; f a -&gt; f b -&gt; f c)
+-&gt; (forall a b. f a -&gt; f b -&gt; f b)
+-&gt; (forall a b. f a -&gt; f b -&gt; f a)
+-&gt; Applicative f
+forall (m :: * -&gt; *). Applicative m =&gt; Functor (LastToFinish m)
+forall (m :: * -&gt; *) a. Applicative m =&gt; a -&gt; LastToFinish m a
+forall (m :: * -&gt; *) a b.
+Applicative m =&gt;
+LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m a
+forall (m :: * -&gt; *) a b.
+Applicative m =&gt;
+LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m b
+forall (m :: * -&gt; *) a b.
+Applicative m =&gt;
+LastToFinish m (a -&gt; b) -&gt; LastToFinish m a -&gt; LastToFinish m b
+forall (m :: * -&gt; *) a b c.
+Applicative m =&gt;
+(a -&gt; b -&gt; c)
+-&gt; LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m c
+&lt;* :: LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m a
+$c&lt;* :: forall (m :: * -&gt; *) a b.
+Applicative m =&gt;
+LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m a
+*&gt; :: LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m b
+$c*&gt; :: forall (m :: * -&gt; *) a b.
+Applicative m =&gt;
+LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m b
+liftA2 :: (a -&gt; b -&gt; c)
+-&gt; LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m c
+$cliftA2 :: forall (m :: * -&gt; *) a b c.
+Applicative m =&gt;
+(a -&gt; b -&gt; c)
+-&gt; LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m c
+&lt;*&gt; :: LastToFinish m (a -&gt; b) -&gt; LastToFinish m a -&gt; LastToFinish m b
+$c&lt;*&gt; :: forall (m :: * -&gt; *) a b.
+Applicative m =&gt;
+LastToFinish m (a -&gt; b) -&gt; LastToFinish m a -&gt; LastToFinish m b
+pure :: a -&gt; LastToFinish m a
+$cpure :: forall (m :: * -&gt; *) a. Applicative m =&gt; a -&gt; LastToFinish m a
+$cp1Applicative :: forall (m :: * -&gt; *). Applicative m =&gt; Functor (LastToFinish m)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Applicative</span></a></span></span></span></span></span></span><span>
+</span><span id="line-79"></span><span>                   </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679042425"><span id="local-6989586621679042427"><span id="local-6989586621679042429"><span id="local-6989586621679042431"><span class="annot"><span class="annottext">Applicative (LastToFinish m)
+LastToFinish m a
+Applicative (LastToFinish m)
+-&gt; (forall a. LastToFinish m a)
+-&gt; (forall a.
+    LastToFinish m a -&gt; LastToFinish m a -&gt; LastToFinish m a)
+-&gt; (forall a. LastToFinish m a -&gt; LastToFinish m [a])
+-&gt; (forall a. LastToFinish m a -&gt; LastToFinish m [a])
+-&gt; Alternative (LastToFinish m)
+LastToFinish m a -&gt; LastToFinish m a -&gt; LastToFinish m a
+LastToFinish m a -&gt; LastToFinish m [a]
+LastToFinish m a -&gt; LastToFinish m [a]
+forall a. LastToFinish m a
+forall a. LastToFinish m a -&gt; LastToFinish m [a]
+forall a. LastToFinish m a -&gt; LastToFinish m a -&gt; LastToFinish m a
+forall (f :: * -&gt; *).
+Applicative f
+-&gt; (forall a. f a)
+-&gt; (forall a. f a -&gt; f a -&gt; f a)
+-&gt; (forall a. f a -&gt; f [a])
+-&gt; (forall a. f a -&gt; f [a])
+-&gt; Alternative f
+forall (m :: * -&gt; *). Alternative m =&gt; Applicative (LastToFinish m)
+forall (m :: * -&gt; *) a. Alternative m =&gt; LastToFinish m a
+forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+LastToFinish m a -&gt; LastToFinish m [a]
+forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+LastToFinish m a -&gt; LastToFinish m a -&gt; LastToFinish m a
+many :: LastToFinish m a -&gt; LastToFinish m [a]
+$cmany :: forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+LastToFinish m a -&gt; LastToFinish m [a]
+some :: LastToFinish m a -&gt; LastToFinish m [a]
+$csome :: forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+LastToFinish m a -&gt; LastToFinish m [a]
+&lt;|&gt; :: LastToFinish m a -&gt; LastToFinish m a -&gt; LastToFinish m a
+$c&lt;|&gt; :: forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+LastToFinish m a -&gt; LastToFinish m a -&gt; LastToFinish m a
+empty :: LastToFinish m a
+$cempty :: forall (m :: * -&gt; *) a. Alternative m =&gt; LastToFinish m a
+$cp1Alternative :: forall (m :: * -&gt; *). Alternative m =&gt; Applicative (LastToFinish m)
+</span><a href="#local-6989586621679042425"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Alternative</span></a></span></span></span></span></span><span>
+</span><span id="line-80"></span><span>                   </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679042418"><span id="local-6989586621679042420"><span id="local-6989586621679042422"><span class="annot"><span class="annottext">Applicative (LastToFinish m)
+a -&gt; LastToFinish m a
+Applicative (LastToFinish m)
+-&gt; (forall a b.
+    LastToFinish m a -&gt; (a -&gt; LastToFinish m b) -&gt; LastToFinish m b)
+-&gt; (forall a b.
+    LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m b)
+-&gt; (forall a. a -&gt; LastToFinish m a)
+-&gt; Monad (LastToFinish m)
+LastToFinish m a -&gt; (a -&gt; LastToFinish m b) -&gt; LastToFinish m b
+LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m b
+forall a. a -&gt; LastToFinish m a
+forall a b.
+LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m b
+forall a b.
+LastToFinish m a -&gt; (a -&gt; LastToFinish m b) -&gt; LastToFinish m b
+forall (m :: * -&gt; *). Monad m =&gt; Applicative (LastToFinish m)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; LastToFinish m a
+forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m b
+forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+LastToFinish m a -&gt; (a -&gt; LastToFinish m b) -&gt; LastToFinish m b
+forall (m :: * -&gt; *).
+Applicative m
+-&gt; (forall a b. m a -&gt; (a -&gt; m b) -&gt; m b)
+-&gt; (forall a b. m a -&gt; m b -&gt; m b)
+-&gt; (forall a. a -&gt; m a)
+-&gt; Monad m
+return :: a -&gt; LastToFinish m a
+$creturn :: forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; LastToFinish m a
+&gt;&gt; :: LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m b
+$c&gt;&gt; :: forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+LastToFinish m a -&gt; LastToFinish m b -&gt; LastToFinish m b
+&gt;&gt;= :: LastToFinish m a -&gt; (a -&gt; LastToFinish m b) -&gt; LastToFinish m b
+$c&gt;&gt;= :: forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+LastToFinish m a -&gt; (a -&gt; LastToFinish m b) -&gt; LastToFinish m b
+$cp1Monad :: forall (m :: * -&gt; *). Monad m =&gt; Applicative (LastToFinish m)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Monad</span></a></span></span></span></span><span>
+</span><span id="line-81"></span><span>                   </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679042412"><span id="local-6989586621679042414"><span class="annot"><span class="annottext">Monad (LastToFinish m)
+Alternative (LastToFinish m)
+LastToFinish m a
+Alternative (LastToFinish m)
+-&gt; Monad (LastToFinish m)
+-&gt; (forall a. LastToFinish m a)
+-&gt; (forall a.
+    LastToFinish m a -&gt; LastToFinish m a -&gt; LastToFinish m a)
+-&gt; MonadPlus (LastToFinish m)
+LastToFinish m a -&gt; LastToFinish m a -&gt; LastToFinish m a
+forall a. LastToFinish m a
+forall a. LastToFinish m a -&gt; LastToFinish m a -&gt; LastToFinish m a
+forall (m :: * -&gt; *).
+Alternative m
+-&gt; Monad m
+-&gt; (forall a. m a)
+-&gt; (forall a. m a -&gt; m a -&gt; m a)
+-&gt; MonadPlus m
+forall (m :: * -&gt; *). MonadPlus m =&gt; Monad (LastToFinish m)
+forall (m :: * -&gt; *). MonadPlus m =&gt; Alternative (LastToFinish m)
+forall (m :: * -&gt; *) a. MonadPlus m =&gt; LastToFinish m a
+forall (m :: * -&gt; *) a.
+MonadPlus m =&gt;
+LastToFinish m a -&gt; LastToFinish m a -&gt; LastToFinish m a
+mplus :: LastToFinish m a -&gt; LastToFinish m a -&gt; LastToFinish m a
+$cmplus :: forall (m :: * -&gt; *) a.
+MonadPlus m =&gt;
+LastToFinish m a -&gt; LastToFinish m a -&gt; LastToFinish m a
+mzero :: LastToFinish m a
+$cmzero :: forall (m :: * -&gt; *) a. MonadPlus m =&gt; LastToFinish m a
+$cp2MonadPlus :: forall (m :: * -&gt; *). MonadPlus m =&gt; Monad (LastToFinish m)
+$cp1MonadPlus :: forall (m :: * -&gt; *). MonadPlus m =&gt; Alternative (LastToFinish m)
+</span><a href="#local-6989586621679042412"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">MonadPlus</span></a></span></span></span><span>
+</span><span id="line-82"></span><span>                   </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679042402"><span id="local-6989586621679042404"><span id="local-6989586621679042406"><span id="local-6989586621679042408"><span class="annot"><span class="annottext">Functor (LastToFinish m)
+Foldable (LastToFinish m)
+Functor (LastToFinish m)
+-&gt; Foldable (LastToFinish m)
+-&gt; (forall (f :: * -&gt; *) a b.
+    Applicative f =&gt;
+    (a -&gt; f b) -&gt; LastToFinish m a -&gt; f (LastToFinish m b))
+-&gt; (forall (f :: * -&gt; *) a.
+    Applicative f =&gt;
+    LastToFinish m (f a) -&gt; f (LastToFinish m a))
+-&gt; (forall (m :: * -&gt; *) a b.
+    Monad m =&gt;
+    (a -&gt; m b) -&gt; LastToFinish m a -&gt; m (LastToFinish m b))
+-&gt; (forall (m :: * -&gt; *) a.
+    Monad m =&gt;
+    LastToFinish m (m a) -&gt; m (LastToFinish m a))
+-&gt; Traversable (LastToFinish m)
+(a -&gt; f b) -&gt; LastToFinish m a -&gt; f (LastToFinish m b)
+forall (t :: * -&gt; *).
+Functor t
+-&gt; Foldable t
+-&gt; (forall (f :: * -&gt; *) a b.
+    Applicative f =&gt;
+    (a -&gt; f b) -&gt; t a -&gt; f (t b))
+-&gt; (forall (f :: * -&gt; *) a. Applicative f =&gt; t (f a) -&gt; f (t a))
+-&gt; (forall (m :: * -&gt; *) a b.
+    Monad m =&gt;
+    (a -&gt; m b) -&gt; t a -&gt; m (t b))
+-&gt; (forall (m :: * -&gt; *) a. Monad m =&gt; t (m a) -&gt; m (t a))
+-&gt; Traversable t
+forall (m :: * -&gt; *). Traversable m =&gt; Functor (LastToFinish m)
+forall (m :: * -&gt; *). Traversable m =&gt; Foldable (LastToFinish m)
+forall (m :: * -&gt; *) (m :: * -&gt; *) a.
+(Traversable m, Monad m) =&gt;
+LastToFinish m (m a) -&gt; m (LastToFinish m a)
+forall (m :: * -&gt; *) (f :: * -&gt; *) a.
+(Traversable m, Applicative f) =&gt;
+LastToFinish m (f a) -&gt; f (LastToFinish m a)
+forall (m :: * -&gt; *) (m :: * -&gt; *) a b.
+(Traversable m, Monad m) =&gt;
+(a -&gt; m b) -&gt; LastToFinish m a -&gt; m (LastToFinish m b)
+forall (m :: * -&gt; *) (f :: * -&gt; *) a b.
+(Traversable m, Applicative f) =&gt;
+(a -&gt; f b) -&gt; LastToFinish m a -&gt; f (LastToFinish m b)
+forall (m :: * -&gt; *) a.
+Monad m =&gt;
+LastToFinish m (m a) -&gt; m (LastToFinish m a)
+forall (f :: * -&gt; *) a.
+Applicative f =&gt;
+LastToFinish m (f a) -&gt; f (LastToFinish m a)
+forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+(a -&gt; m b) -&gt; LastToFinish m a -&gt; m (LastToFinish m b)
+forall (f :: * -&gt; *) a b.
+Applicative f =&gt;
+(a -&gt; f b) -&gt; LastToFinish m a -&gt; f (LastToFinish m b)
+sequence :: LastToFinish m (m a) -&gt; m (LastToFinish m a)
+$csequence :: forall (m :: * -&gt; *) (m :: * -&gt; *) a.
+(Traversable m, Monad m) =&gt;
+LastToFinish m (m a) -&gt; m (LastToFinish m a)
+mapM :: (a -&gt; m b) -&gt; LastToFinish m a -&gt; m (LastToFinish m b)
+$cmapM :: forall (m :: * -&gt; *) (m :: * -&gt; *) a b.
+(Traversable m, Monad m) =&gt;
+(a -&gt; m b) -&gt; LastToFinish m a -&gt; m (LastToFinish m b)
+sequenceA :: LastToFinish m (f a) -&gt; f (LastToFinish m a)
+$csequenceA :: forall (m :: * -&gt; *) (f :: * -&gt; *) a.
+(Traversable m, Applicative f) =&gt;
+LastToFinish m (f a) -&gt; f (LastToFinish m a)
+traverse :: (a -&gt; f b) -&gt; LastToFinish m a -&gt; f (LastToFinish m b)
+$ctraverse :: forall (m :: * -&gt; *) (f :: * -&gt; *) a b.
+(Traversable m, Applicative f) =&gt;
+(a -&gt; f b) -&gt; LastToFinish m a -&gt; f (LastToFinish m b)
+$cp2Traversable :: forall (m :: * -&gt; *). Traversable m =&gt; Foldable (LastToFinish m)
+$cp1Traversable :: forall (m :: * -&gt; *). Traversable m =&gt; Functor (LastToFinish m)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Traversable</span></a></span></span></span></span></span><span>
+</span><span id="line-83"></span><span>                   </span><span class="hs-special">)</span><span>
+</span><span id="line-84"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679042368"><span id="local-6989586621679042370"><span id="local-6989586621679042372"><span id="local-6989586621679042374"><span id="local-6989586621679042376"><span id="local-6989586621679042378"><span id="local-6989586621679042380"><span id="local-6989586621679042382"><span id="local-6989586621679042384"><span id="local-6989586621679042386"><span id="local-6989586621679042388"><span id="local-6989586621679042390"><span id="local-6989586621679042392"><span id="local-6989586621679042394"><span id="local-6989586621679042396"><span id="local-6989586621679042398"><span id="local-6989586621679042400"><span class="annot"><span class="annottext">a -&gt; LastToFinish m a -&gt; Bool
+LastToFinish m m -&gt; m
+LastToFinish m a -&gt; [a]
+LastToFinish m a -&gt; Bool
+LastToFinish m a -&gt; Int
+LastToFinish m a -&gt; a
+LastToFinish m a -&gt; a
+LastToFinish m a -&gt; a
+LastToFinish m a -&gt; a
+(a -&gt; m) -&gt; LastToFinish m a -&gt; m
+(a -&gt; m) -&gt; LastToFinish m a -&gt; m
+(a -&gt; b -&gt; b) -&gt; b -&gt; LastToFinish m a -&gt; b
+(a -&gt; b -&gt; b) -&gt; b -&gt; LastToFinish m a -&gt; b
+(b -&gt; a -&gt; b) -&gt; b -&gt; LastToFinish m a -&gt; b
+(b -&gt; a -&gt; b) -&gt; b -&gt; LastToFinish m a -&gt; b
+(a -&gt; a -&gt; a) -&gt; LastToFinish m a -&gt; a
+(a -&gt; a -&gt; a) -&gt; LastToFinish m a -&gt; a
+(forall m. Monoid m =&gt; LastToFinish m m -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; LastToFinish m a -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; LastToFinish m a -&gt; m)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; LastToFinish m a -&gt; b)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; LastToFinish m a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; LastToFinish m a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; LastToFinish m a -&gt; b)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; LastToFinish m a -&gt; a)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; LastToFinish m a -&gt; a)
+-&gt; (forall a. LastToFinish m a -&gt; [a])
+-&gt; (forall a. LastToFinish m a -&gt; Bool)
+-&gt; (forall a. LastToFinish m a -&gt; Int)
+-&gt; (forall a. Eq a =&gt; a -&gt; LastToFinish m a -&gt; Bool)
+-&gt; (forall a. Ord a =&gt; LastToFinish m a -&gt; a)
+-&gt; (forall a. Ord a =&gt; LastToFinish m a -&gt; a)
+-&gt; (forall a. Num a =&gt; LastToFinish m a -&gt; a)
+-&gt; (forall a. Num a =&gt; LastToFinish m a -&gt; a)
+-&gt; Foldable (LastToFinish m)
+forall a. Eq a =&gt; a -&gt; LastToFinish m a -&gt; Bool
+forall a. Num a =&gt; LastToFinish m a -&gt; a
+forall a. Ord a =&gt; LastToFinish m a -&gt; a
+forall m. Monoid m =&gt; LastToFinish m m -&gt; m
+forall a. LastToFinish m a -&gt; Bool
+forall a. LastToFinish m a -&gt; Int
+forall a. LastToFinish m a -&gt; [a]
+forall a. (a -&gt; a -&gt; a) -&gt; LastToFinish m a -&gt; a
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; LastToFinish m a -&gt; m
+forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; LastToFinish m a -&gt; b
+forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; LastToFinish m a -&gt; b
+forall (m :: * -&gt; *) a.
+(Foldable m, Eq a) =&gt;
+a -&gt; LastToFinish m a -&gt; Bool
+forall (m :: * -&gt; *) a.
+(Foldable m, Num a) =&gt;
+LastToFinish m a -&gt; a
+forall (m :: * -&gt; *) a.
+(Foldable m, Ord a) =&gt;
+LastToFinish m a -&gt; a
+forall (m :: * -&gt; *) m.
+(Foldable m, Monoid m) =&gt;
+LastToFinish m m -&gt; m
+forall (m :: * -&gt; *) a. Foldable m =&gt; LastToFinish m a -&gt; Bool
+forall (m :: * -&gt; *) a. Foldable m =&gt; LastToFinish m a -&gt; Int
+forall (m :: * -&gt; *) a. Foldable m =&gt; LastToFinish m a -&gt; [a]
+forall (m :: * -&gt; *) a.
+Foldable m =&gt;
+(a -&gt; a -&gt; a) -&gt; LastToFinish m a -&gt; a
+forall (m :: * -&gt; *) m a.
+(Foldable m, Monoid m) =&gt;
+(a -&gt; m) -&gt; LastToFinish m a -&gt; m
+forall (m :: * -&gt; *) b a.
+Foldable m =&gt;
+(b -&gt; a -&gt; b) -&gt; b -&gt; LastToFinish m a -&gt; b
+forall (m :: * -&gt; *) a b.
+Foldable m =&gt;
+(a -&gt; b -&gt; b) -&gt; b -&gt; LastToFinish m a -&gt; b
+forall (t :: * -&gt; *).
+(forall m. Monoid m =&gt; t m -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; t a -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; t a -&gt; m)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; t a -&gt; a)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; t a -&gt; a)
+-&gt; (forall a. t a -&gt; [a])
+-&gt; (forall a. t a -&gt; Bool)
+-&gt; (forall a. t a -&gt; Int)
+-&gt; (forall a. Eq a =&gt; a -&gt; t a -&gt; Bool)
+-&gt; (forall a. Ord a =&gt; t a -&gt; a)
+-&gt; (forall a. Ord a =&gt; t a -&gt; a)
+-&gt; (forall a. Num a =&gt; t a -&gt; a)
+-&gt; (forall a. Num a =&gt; t a -&gt; a)
+-&gt; Foldable t
+product :: LastToFinish m a -&gt; a
+$cproduct :: forall (m :: * -&gt; *) a.
+(Foldable m, Num a) =&gt;
+LastToFinish m a -&gt; a
+sum :: LastToFinish m a -&gt; a
+$csum :: forall (m :: * -&gt; *) a.
+(Foldable m, Num a) =&gt;
+LastToFinish m a -&gt; a
+minimum :: LastToFinish m a -&gt; a
+$cminimum :: forall (m :: * -&gt; *) a.
+(Foldable m, Ord a) =&gt;
+LastToFinish m a -&gt; a
+maximum :: LastToFinish m a -&gt; a
+$cmaximum :: forall (m :: * -&gt; *) a.
+(Foldable m, Ord a) =&gt;
+LastToFinish m a -&gt; a
+elem :: a -&gt; LastToFinish m a -&gt; Bool
+$celem :: forall (m :: * -&gt; *) a.
+(Foldable m, Eq a) =&gt;
+a -&gt; LastToFinish m a -&gt; Bool
+length :: LastToFinish m a -&gt; Int
+$clength :: forall (m :: * -&gt; *) a. Foldable m =&gt; LastToFinish m a -&gt; Int
+null :: LastToFinish m a -&gt; Bool
+$cnull :: forall (m :: * -&gt; *) a. Foldable m =&gt; LastToFinish m a -&gt; Bool
+toList :: LastToFinish m a -&gt; [a]
+$ctoList :: forall (m :: * -&gt; *) a. Foldable m =&gt; LastToFinish m a -&gt; [a]
+foldl1 :: (a -&gt; a -&gt; a) -&gt; LastToFinish m a -&gt; a
+$cfoldl1 :: forall (m :: * -&gt; *) a.
+Foldable m =&gt;
+(a -&gt; a -&gt; a) -&gt; LastToFinish m a -&gt; a
+foldr1 :: (a -&gt; a -&gt; a) -&gt; LastToFinish m a -&gt; a
+$cfoldr1 :: forall (m :: * -&gt; *) a.
+Foldable m =&gt;
+(a -&gt; a -&gt; a) -&gt; LastToFinish m a -&gt; a
+foldl' :: (b -&gt; a -&gt; b) -&gt; b -&gt; LastToFinish m a -&gt; b
+$cfoldl' :: forall (m :: * -&gt; *) b a.
+Foldable m =&gt;
+(b -&gt; a -&gt; b) -&gt; b -&gt; LastToFinish m a -&gt; b
+foldl :: (b -&gt; a -&gt; b) -&gt; b -&gt; LastToFinish m a -&gt; b
+$cfoldl :: forall (m :: * -&gt; *) b a.
+Foldable m =&gt;
+(b -&gt; a -&gt; b) -&gt; b -&gt; LastToFinish m a -&gt; b
+foldr' :: (a -&gt; b -&gt; b) -&gt; b -&gt; LastToFinish m a -&gt; b
+$cfoldr' :: forall (m :: * -&gt; *) a b.
+Foldable m =&gt;
+(a -&gt; b -&gt; b) -&gt; b -&gt; LastToFinish m a -&gt; b
+foldr :: (a -&gt; b -&gt; b) -&gt; b -&gt; LastToFinish m a -&gt; b
+$cfoldr :: forall (m :: * -&gt; *) a b.
+Foldable m =&gt;
+(a -&gt; b -&gt; b) -&gt; b -&gt; LastToFinish m a -&gt; b
+foldMap' :: (a -&gt; m) -&gt; LastToFinish m a -&gt; m
+$cfoldMap' :: forall (m :: * -&gt; *) m a.
+(Foldable m, Monoid m) =&gt;
+(a -&gt; m) -&gt; LastToFinish m a -&gt; m
+foldMap :: (a -&gt; m) -&gt; LastToFinish m a -&gt; m
+$cfoldMap :: forall (m :: * -&gt; *) m a.
+(Foldable m, Monoid m) =&gt;
+(a -&gt; m) -&gt; LastToFinish m a -&gt; m
+fold :: LastToFinish m m -&gt; m
+$cfold :: forall (m :: * -&gt; *) m.
+(Foldable m, Monoid m) =&gt;
+LastToFinish m m -&gt; m
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Foldable</span></a></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Ap</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042687"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-85"></span><span>
+</span><span id="line-86"></span><span id="local-6989586621679042366"><span id="local-6989586621679042367"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679042361"><span id="local-6989586621679042363"><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">MonadPlus</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042367"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Semigroup</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Monoid.Synchronisation.html#LastToFinish"><span class="hs-identifier hs-type">LastToFinish</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042367"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042366"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-87"></span><span>    </span><span class="annot"><a href="Data.Monoid.Synchronisation.html#LastToFinish"><span class="hs-identifier hs-type">LastToFinish</span></a></span><span> </span><span id="local-6989586621679042360"><span class="annot"><span class="annottext">m a
+</span><a href="#local-6989586621679042360"><span class="hs-identifier hs-var">left</span></a></span></span><span> </span><span id="local-6989586621679042359"><span class="annot"><span class="annottext">&lt;&gt; :: LastToFinish m a -&gt; LastToFinish m a -&gt; LastToFinish m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var hs-var hs-var hs-var">&lt;&gt;</span></a></span></span><span> </span><span class="annot"><a href="Data.Monoid.Synchronisation.html#LastToFinish"><span class="hs-identifier hs-type">LastToFinish</span></a></span><span> </span><span id="local-6989586621679042358"><span class="annot"><span class="annottext">m a
+</span><a href="#local-6989586621679042358"><span class="hs-identifier hs-var">right</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">m a -&gt; LastToFinish m a
+forall (m :: * -&gt; *) a. m a -&gt; LastToFinish m a
+</span><a href="Data.Monoid.Synchronisation.html#LastToFinish"><span class="hs-identifier hs-var">LastToFinish</span></a></span><span> </span><span class="annot"><span class="annottext">(m a -&gt; LastToFinish m a) -&gt; m a -&gt; LastToFinish m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-88"></span><span>      </span><span id="local-6989586621679042357"><span class="annot"><span class="annottext">Either a a
+</span><a href="#local-6989586621679042357"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>  </span><span class="annot"><span class="annottext">a -&gt; Either a a
+forall a b. a -&gt; Either a b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Left</span></a></span><span>  </span><span class="annot"><span class="annottext">(a -&gt; Either a a) -&gt; m a -&gt; m (Either a a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">m a
+</span><a href="#local-6989586621679042360"><span class="hs-identifier hs-var">left</span></a></span><span>
+</span><span id="line-89"></span><span>        </span><span class="annot"><span class="annottext">m (Either a a) -&gt; m (Either a a) -&gt; m (Either a a)
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f a -&gt; f a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;|&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; Either a a
+forall a b. b -&gt; Either a b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Right</span></a></span><span> </span><span class="annot"><span class="annottext">(a -&gt; Either a a) -&gt; m a -&gt; m (Either a a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">m a
+</span><a href="#local-6989586621679042358"><span class="hs-identifier hs-var">right</span></a></span><span>
+</span><span id="line-90"></span><span>      </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Either a a
+</span><a href="#local-6989586621679042357"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-91"></span><span>        </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Left</span></a></span><span>  </span><span class="hs-special">{</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">m a
+</span><a href="#local-6989586621679042358"><span class="hs-identifier hs-var">right</span></a></span><span>
+</span><span id="line-92"></span><span>        </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Right</span></a></span><span> </span><span class="hs-special">{</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">m a
+</span><a href="#local-6989586621679042360"><span class="hs-identifier hs-var">left</span></a></span></span></span><span>
+</span><span id="line-93"></span><span>
+</span><span id="line-94"></span><span id="local-6989586621679042353"><span id="local-6989586621679042354"><span class="annot"><a href="Data.Monoid.Synchronisation.html#firstToLast"><span class="hs-identifier hs-type">firstToLast</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Monoid.Synchronisation.html#FirstToFinish"><span class="hs-identifier hs-type">FirstToFinish</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042354"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042353"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Data.Monoid.Synchronisation.html#LastToFinish"><span class="hs-identifier hs-type">LastToFinish</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042354"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042353"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-95"></span><span id="firstToLast"><span class="annot"><span class="annottext">firstToLast :: FirstToFinish m a -&gt; LastToFinish m a
+</span><a href="Data.Monoid.Synchronisation.html#firstToLast"><span class="hs-identifier hs-var hs-var">firstToLast</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FirstToFinish m a -&gt; LastToFinish m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">coerce</span></a></span><span>
+</span><span id="line-96"></span><span>
+</span><span id="line-97"></span><span id="local-6989586621679042351"><span id="local-6989586621679042352"><span class="annot"><a href="Data.Monoid.Synchronisation.html#lastToFirst"><span class="hs-identifier hs-type">lastToFirst</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Monoid.Synchronisation.html#LastToFinish"><span class="hs-identifier hs-type">LastToFinish</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042352"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042351"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Data.Monoid.Synchronisation.html#FirstToFinish"><span class="hs-identifier hs-type">FirstToFinish</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042352"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042351"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-98"></span><span id="lastToFirst"><span class="annot"><span class="annottext">lastToFirst :: LastToFinish m a -&gt; FirstToFinish m a
+</span><a href="Data.Monoid.Synchronisation.html#lastToFirst"><span class="hs-identifier hs-var hs-var">lastToFirst</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">LastToFinish m a -&gt; FirstToFinish m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">coerce</span></a></span><span>
+</span><span id="line-99"></span><span>
+</span><span id="line-100"></span><span>
+</span><span id="line-101"></span><span class="hs-comment">-- | Last-to-finish synchronisation. Like 'Ap' it is a monoid under '&lt;*&gt;'.</span><span>
+</span><span id="line-102"></span><span class="hs-comment">-- The advantage over 'LastToFinish' is that it has a 'Monoid' instance, but</span><span>
+</span><span id="line-103"></span><span class="hs-comment">-- 'a' must be a 'Monoid' as well.  'LastToFinishM' and 'FirstToFinish' form</span><span>
+</span><span id="line-104"></span><span class="hs-comment">-- a unitial near-ring when @m ~ STM@.</span><span>
+</span><span id="line-105"></span><span class="hs-comment">--</span><span>
+</span><span id="line-106"></span><span class="hs-comment">-- &gt; -- | Read all 'TMVar's and combine the result using 'Monoid' instance.</span><span>
+</span><span id="line-107"></span><span class="hs-comment">-- &gt; --</span><span>
+</span><span id="line-108"></span><span class="hs-comment">-- &gt; readAllTMVars :: Monoid a =&gt; [TMVar a] -&gt; STM a</span><span>
+</span><span id="line-109"></span><span class="hs-comment">-- &gt; readAllTMVars = runLastToFinish</span><span>
+</span><span id="line-110"></span><span class="hs-comment">-- &gt;               . foldMap (LastToFinish . readTMVar)</span><span>
+</span><span id="line-111"></span><span class="hs-comment">--</span><span>
+</span><span id="line-112"></span><span id="local-6989586621679042347"><span id="local-6989586621679042348"><span id="local-6989586621679042349"><span id="local-6989586621679042350"></span></span></span></span><span class="hs-keyword">newtype</span><span> </span><span id="LastToFinishM"><span class="annot"><a href="Data.Monoid.Synchronisation.html#LastToFinishM"><span class="hs-identifier hs-var">LastToFinishM</span></a></span></span><span> </span><span id="local-6989586621679042346"><span class="annot"><a href="#local-6989586621679042346"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679042345"><span class="annot"><a href="#local-6989586621679042345"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="LastToFinishM"><span class="annot"><a href="Data.Monoid.Synchronisation.html#LastToFinishM"><span class="hs-identifier hs-var">LastToFinishM</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="runLastToFinishM"><span class="annot"><span class="annottext">LastToFinishM m a -&gt; m a
+</span><a href="Data.Monoid.Synchronisation.html#runLastToFinishM"><span class="hs-identifier hs-var hs-var">runLastToFinishM</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679042346"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042345"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-113"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span id="local-6989586621679042339"><span id="local-6989586621679042341"><span class="annot"><span class="annottext">a -&gt; LastToFinishM m b -&gt; LastToFinishM m a
+(a -&gt; b) -&gt; LastToFinishM m a -&gt; LastToFinishM m b
+(forall a b. (a -&gt; b) -&gt; LastToFinishM m a -&gt; LastToFinishM m b)
+-&gt; (forall a b. a -&gt; LastToFinishM m b -&gt; LastToFinishM m a)
+-&gt; Functor (LastToFinishM m)
+forall a b. a -&gt; LastToFinishM m b -&gt; LastToFinishM m a
+forall a b. (a -&gt; b) -&gt; LastToFinishM m a -&gt; LastToFinishM m b
+forall (m :: * -&gt; *) a b.
+Functor m =&gt;
+a -&gt; LastToFinishM m b -&gt; LastToFinishM m a
+forall (m :: * -&gt; *) a b.
+Functor m =&gt;
+(a -&gt; b) -&gt; LastToFinishM m a -&gt; LastToFinishM m b
+forall (f :: * -&gt; *).
+(forall a b. (a -&gt; b) -&gt; f a -&gt; f b)
+-&gt; (forall a b. a -&gt; f b -&gt; f a) -&gt; Functor f
+&lt;$ :: a -&gt; LastToFinishM m b -&gt; LastToFinishM m a
+$c&lt;$ :: forall (m :: * -&gt; *) a b.
+Functor m =&gt;
+a -&gt; LastToFinishM m b -&gt; LastToFinishM m a
+fmap :: (a -&gt; b) -&gt; LastToFinishM m a -&gt; LastToFinishM m b
+$cfmap :: forall (m :: * -&gt; *) a b.
+Functor m =&gt;
+(a -&gt; b) -&gt; LastToFinishM m a -&gt; LastToFinishM m b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Functor</span></a></span></span></span><span>
+</span><span id="line-114"></span><span>  </span><span class="hs-keyword">deriving</span><span>         </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">(forall x. LastToFinishM m a -&gt; Rep (LastToFinishM m a) x)
+-&gt; (forall x. Rep (LastToFinishM m a) x -&gt; LastToFinishM m a)
+-&gt; Generic (LastToFinishM m a)
+forall x. Rep (LastToFinishM m a) x -&gt; LastToFinishM m a
+forall x. LastToFinishM m a -&gt; Rep (LastToFinishM m a) x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+forall (m :: * -&gt; *) a x.
+Rep (LastToFinishM m a) x -&gt; LastToFinishM m a
+forall (m :: * -&gt; *) a x.
+LastToFinishM m a -&gt; Rep (LastToFinishM m a) x
+$cto :: forall (m :: * -&gt; *) a x.
+Rep (LastToFinishM m a) x -&gt; LastToFinishM m a
+$cfrom :: forall (m :: * -&gt; *) a x.
+LastToFinishM m a -&gt; Rep (LastToFinishM m a) x
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span>
+</span><span id="line-115"></span><span>                   </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall a. LastToFinishM m a -&gt; Rep1 (LastToFinishM m) a)
+-&gt; (forall a. Rep1 (LastToFinishM m) a -&gt; LastToFinishM m a)
+-&gt; Generic1 (LastToFinishM m)
+forall a. Rep1 (LastToFinishM m) a -&gt; LastToFinishM m a
+forall a. LastToFinishM m a -&gt; Rep1 (LastToFinishM m) a
+forall k (f :: k -&gt; *).
+(forall (a :: k). f a -&gt; Rep1 f a)
+-&gt; (forall (a :: k). Rep1 f a -&gt; f a) -&gt; Generic1 f
+forall (m :: * -&gt; *) a.
+Rep1 (LastToFinishM m) a -&gt; LastToFinishM m a
+forall (m :: * -&gt; *) a.
+LastToFinishM m a -&gt; Rep1 (LastToFinishM m) a
+$cto1 :: forall (m :: * -&gt; *) a.
+Rep1 (LastToFinishM m) a -&gt; LastToFinishM m a
+$cfrom1 :: forall (m :: * -&gt; *) a.
+LastToFinishM m a -&gt; Rep1 (LastToFinishM m) a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic1</span></a></span><span>
+</span><span id="line-116"></span><span>                   </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679042324"><span id="local-6989586621679042326"><span id="local-6989586621679042328"><span id="local-6989586621679042330"><span id="local-6989586621679042332"><span class="annot"><span class="annottext">Functor (LastToFinishM m)
+a -&gt; LastToFinishM m a
+Functor (LastToFinishM m)
+-&gt; (forall a. a -&gt; LastToFinishM m a)
+-&gt; (forall a b.
+    LastToFinishM m (a -&gt; b) -&gt; LastToFinishM m a -&gt; LastToFinishM m b)
+-&gt; (forall a b c.
+    (a -&gt; b -&gt; c)
+    -&gt; LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m c)
+-&gt; (forall a b.
+    LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m b)
+-&gt; (forall a b.
+    LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m a)
+-&gt; Applicative (LastToFinishM m)
+LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m b
+LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m a
+LastToFinishM m (a -&gt; b) -&gt; LastToFinishM m a -&gt; LastToFinishM m b
+(a -&gt; b -&gt; c)
+-&gt; LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m c
+forall a. a -&gt; LastToFinishM m a
+forall a b.
+LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m a
+forall a b.
+LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m b
+forall a b.
+LastToFinishM m (a -&gt; b) -&gt; LastToFinishM m a -&gt; LastToFinishM m b
+forall a b c.
+(a -&gt; b -&gt; c)
+-&gt; LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m c
+forall (f :: * -&gt; *).
+Functor f
+-&gt; (forall a. a -&gt; f a)
+-&gt; (forall a b. f (a -&gt; b) -&gt; f a -&gt; f b)
+-&gt; (forall a b c. (a -&gt; b -&gt; c) -&gt; f a -&gt; f b -&gt; f c)
+-&gt; (forall a b. f a -&gt; f b -&gt; f b)
+-&gt; (forall a b. f a -&gt; f b -&gt; f a)
+-&gt; Applicative f
+forall (m :: * -&gt; *). Applicative m =&gt; Functor (LastToFinishM m)
+forall (m :: * -&gt; *) a. Applicative m =&gt; a -&gt; LastToFinishM m a
+forall (m :: * -&gt; *) a b.
+Applicative m =&gt;
+LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m a
+forall (m :: * -&gt; *) a b.
+Applicative m =&gt;
+LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m b
+forall (m :: * -&gt; *) a b.
+Applicative m =&gt;
+LastToFinishM m (a -&gt; b) -&gt; LastToFinishM m a -&gt; LastToFinishM m b
+forall (m :: * -&gt; *) a b c.
+Applicative m =&gt;
+(a -&gt; b -&gt; c)
+-&gt; LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m c
+&lt;* :: LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m a
+$c&lt;* :: forall (m :: * -&gt; *) a b.
+Applicative m =&gt;
+LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m a
+*&gt; :: LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m b
+$c*&gt; :: forall (m :: * -&gt; *) a b.
+Applicative m =&gt;
+LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m b
+liftA2 :: (a -&gt; b -&gt; c)
+-&gt; LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m c
+$cliftA2 :: forall (m :: * -&gt; *) a b c.
+Applicative m =&gt;
+(a -&gt; b -&gt; c)
+-&gt; LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m c
+&lt;*&gt; :: LastToFinishM m (a -&gt; b) -&gt; LastToFinishM m a -&gt; LastToFinishM m b
+$c&lt;*&gt; :: forall (m :: * -&gt; *) a b.
+Applicative m =&gt;
+LastToFinishM m (a -&gt; b) -&gt; LastToFinishM m a -&gt; LastToFinishM m b
+pure :: a -&gt; LastToFinishM m a
+$cpure :: forall (m :: * -&gt; *) a. Applicative m =&gt; a -&gt; LastToFinishM m a
+$cp1Applicative :: forall (m :: * -&gt; *). Applicative m =&gt; Functor (LastToFinishM m)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Applicative</span></a></span></span></span></span></span></span><span>
+</span><span id="line-117"></span><span>                   </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679042315"><span id="local-6989586621679042317"><span id="local-6989586621679042319"><span id="local-6989586621679042321"><span class="annot"><span class="annottext">Applicative (LastToFinishM m)
+LastToFinishM m a
+Applicative (LastToFinishM m)
+-&gt; (forall a. LastToFinishM m a)
+-&gt; (forall a.
+    LastToFinishM m a -&gt; LastToFinishM m a -&gt; LastToFinishM m a)
+-&gt; (forall a. LastToFinishM m a -&gt; LastToFinishM m [a])
+-&gt; (forall a. LastToFinishM m a -&gt; LastToFinishM m [a])
+-&gt; Alternative (LastToFinishM m)
+LastToFinishM m a -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+LastToFinishM m a -&gt; LastToFinishM m [a]
+LastToFinishM m a -&gt; LastToFinishM m [a]
+forall a. LastToFinishM m a
+forall a. LastToFinishM m a -&gt; LastToFinishM m [a]
+forall a.
+LastToFinishM m a -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+forall (f :: * -&gt; *).
+Applicative f
+-&gt; (forall a. f a)
+-&gt; (forall a. f a -&gt; f a -&gt; f a)
+-&gt; (forall a. f a -&gt; f [a])
+-&gt; (forall a. f a -&gt; f [a])
+-&gt; Alternative f
+forall (m :: * -&gt; *).
+Alternative m =&gt;
+Applicative (LastToFinishM m)
+forall (m :: * -&gt; *) a. Alternative m =&gt; LastToFinishM m a
+forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+LastToFinishM m a -&gt; LastToFinishM m [a]
+forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+LastToFinishM m a -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+many :: LastToFinishM m a -&gt; LastToFinishM m [a]
+$cmany :: forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+LastToFinishM m a -&gt; LastToFinishM m [a]
+some :: LastToFinishM m a -&gt; LastToFinishM m [a]
+$csome :: forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+LastToFinishM m a -&gt; LastToFinishM m [a]
+&lt;|&gt; :: LastToFinishM m a -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+$c&lt;|&gt; :: forall (m :: * -&gt; *) a.
+Alternative m =&gt;
+LastToFinishM m a -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+empty :: LastToFinishM m a
+$cempty :: forall (m :: * -&gt; *) a. Alternative m =&gt; LastToFinishM m a
+$cp1Alternative :: forall (m :: * -&gt; *).
+Alternative m =&gt;
+Applicative (LastToFinishM m)
+</span><a href="#local-6989586621679042315"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Alternative</span></a></span></span></span></span></span><span>
+</span><span id="line-118"></span><span>                   </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679042308"><span id="local-6989586621679042310"><span id="local-6989586621679042312"><span class="annot"><span class="annottext">Applicative (LastToFinishM m)
+a -&gt; LastToFinishM m a
+Applicative (LastToFinishM m)
+-&gt; (forall a b.
+    LastToFinishM m a -&gt; (a -&gt; LastToFinishM m b) -&gt; LastToFinishM m b)
+-&gt; (forall a b.
+    LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m b)
+-&gt; (forall a. a -&gt; LastToFinishM m a)
+-&gt; Monad (LastToFinishM m)
+LastToFinishM m a -&gt; (a -&gt; LastToFinishM m b) -&gt; LastToFinishM m b
+LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m b
+forall a. a -&gt; LastToFinishM m a
+forall a b.
+LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m b
+forall a b.
+LastToFinishM m a -&gt; (a -&gt; LastToFinishM m b) -&gt; LastToFinishM m b
+forall (m :: * -&gt; *). Monad m =&gt; Applicative (LastToFinishM m)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; LastToFinishM m a
+forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m b
+forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+LastToFinishM m a -&gt; (a -&gt; LastToFinishM m b) -&gt; LastToFinishM m b
+forall (m :: * -&gt; *).
+Applicative m
+-&gt; (forall a b. m a -&gt; (a -&gt; m b) -&gt; m b)
+-&gt; (forall a b. m a -&gt; m b -&gt; m b)
+-&gt; (forall a. a -&gt; m a)
+-&gt; Monad m
+return :: a -&gt; LastToFinishM m a
+$creturn :: forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; LastToFinishM m a
+&gt;&gt; :: LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m b
+$c&gt;&gt; :: forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+LastToFinishM m a -&gt; LastToFinishM m b -&gt; LastToFinishM m b
+&gt;&gt;= :: LastToFinishM m a -&gt; (a -&gt; LastToFinishM m b) -&gt; LastToFinishM m b
+$c&gt;&gt;= :: forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+LastToFinishM m a -&gt; (a -&gt; LastToFinishM m b) -&gt; LastToFinishM m b
+$cp1Monad :: forall (m :: * -&gt; *). Monad m =&gt; Applicative (LastToFinishM m)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Monad</span></a></span></span></span></span><span>
+</span><span id="line-119"></span><span>                   </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679042302"><span id="local-6989586621679042304"><span class="annot"><span class="annottext">Monad (LastToFinishM m)
+Alternative (LastToFinishM m)
+LastToFinishM m a
+Alternative (LastToFinishM m)
+-&gt; Monad (LastToFinishM m)
+-&gt; (forall a. LastToFinishM m a)
+-&gt; (forall a.
+    LastToFinishM m a -&gt; LastToFinishM m a -&gt; LastToFinishM m a)
+-&gt; MonadPlus (LastToFinishM m)
+LastToFinishM m a -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+forall a. LastToFinishM m a
+forall a.
+LastToFinishM m a -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+forall (m :: * -&gt; *).
+Alternative m
+-&gt; Monad m
+-&gt; (forall a. m a)
+-&gt; (forall a. m a -&gt; m a -&gt; m a)
+-&gt; MonadPlus m
+forall (m :: * -&gt; *). MonadPlus m =&gt; Monad (LastToFinishM m)
+forall (m :: * -&gt; *). MonadPlus m =&gt; Alternative (LastToFinishM m)
+forall (m :: * -&gt; *) a. MonadPlus m =&gt; LastToFinishM m a
+forall (m :: * -&gt; *) a.
+MonadPlus m =&gt;
+LastToFinishM m a -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+mplus :: LastToFinishM m a -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+$cmplus :: forall (m :: * -&gt; *) a.
+MonadPlus m =&gt;
+LastToFinishM m a -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+mzero :: LastToFinishM m a
+$cmzero :: forall (m :: * -&gt; *) a. MonadPlus m =&gt; LastToFinishM m a
+$cp2MonadPlus :: forall (m :: * -&gt; *). MonadPlus m =&gt; Monad (LastToFinishM m)
+$cp1MonadPlus :: forall (m :: * -&gt; *). MonadPlus m =&gt; Alternative (LastToFinishM m)
+</span><a href="#local-6989586621679042302"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">MonadPlus</span></a></span></span></span><span>
+</span><span id="line-120"></span><span>                   </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679042292"><span id="local-6989586621679042294"><span id="local-6989586621679042296"><span id="local-6989586621679042298"><span class="annot"><span class="annottext">Functor (LastToFinishM m)
+Foldable (LastToFinishM m)
+Functor (LastToFinishM m)
+-&gt; Foldable (LastToFinishM m)
+-&gt; (forall (f :: * -&gt; *) a b.
+    Applicative f =&gt;
+    (a -&gt; f b) -&gt; LastToFinishM m a -&gt; f (LastToFinishM m b))
+-&gt; (forall (f :: * -&gt; *) a.
+    Applicative f =&gt;
+    LastToFinishM m (f a) -&gt; f (LastToFinishM m a))
+-&gt; (forall (m :: * -&gt; *) a b.
+    Monad m =&gt;
+    (a -&gt; m b) -&gt; LastToFinishM m a -&gt; m (LastToFinishM m b))
+-&gt; (forall (m :: * -&gt; *) a.
+    Monad m =&gt;
+    LastToFinishM m (m a) -&gt; m (LastToFinishM m a))
+-&gt; Traversable (LastToFinishM m)
+(a -&gt; f b) -&gt; LastToFinishM m a -&gt; f (LastToFinishM m b)
+forall (t :: * -&gt; *).
+Functor t
+-&gt; Foldable t
+-&gt; (forall (f :: * -&gt; *) a b.
+    Applicative f =&gt;
+    (a -&gt; f b) -&gt; t a -&gt; f (t b))
+-&gt; (forall (f :: * -&gt; *) a. Applicative f =&gt; t (f a) -&gt; f (t a))
+-&gt; (forall (m :: * -&gt; *) a b.
+    Monad m =&gt;
+    (a -&gt; m b) -&gt; t a -&gt; m (t b))
+-&gt; (forall (m :: * -&gt; *) a. Monad m =&gt; t (m a) -&gt; m (t a))
+-&gt; Traversable t
+forall (m :: * -&gt; *). Traversable m =&gt; Functor (LastToFinishM m)
+forall (m :: * -&gt; *). Traversable m =&gt; Foldable (LastToFinishM m)
+forall (m :: * -&gt; *) (m :: * -&gt; *) a.
+(Traversable m, Monad m) =&gt;
+LastToFinishM m (m a) -&gt; m (LastToFinishM m a)
+forall (m :: * -&gt; *) (f :: * -&gt; *) a.
+(Traversable m, Applicative f) =&gt;
+LastToFinishM m (f a) -&gt; f (LastToFinishM m a)
+forall (m :: * -&gt; *) (m :: * -&gt; *) a b.
+(Traversable m, Monad m) =&gt;
+(a -&gt; m b) -&gt; LastToFinishM m a -&gt; m (LastToFinishM m b)
+forall (m :: * -&gt; *) (f :: * -&gt; *) a b.
+(Traversable m, Applicative f) =&gt;
+(a -&gt; f b) -&gt; LastToFinishM m a -&gt; f (LastToFinishM m b)
+forall (m :: * -&gt; *) a.
+Monad m =&gt;
+LastToFinishM m (m a) -&gt; m (LastToFinishM m a)
+forall (f :: * -&gt; *) a.
+Applicative f =&gt;
+LastToFinishM m (f a) -&gt; f (LastToFinishM m a)
+forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+(a -&gt; m b) -&gt; LastToFinishM m a -&gt; m (LastToFinishM m b)
+forall (f :: * -&gt; *) a b.
+Applicative f =&gt;
+(a -&gt; f b) -&gt; LastToFinishM m a -&gt; f (LastToFinishM m b)
+sequence :: LastToFinishM m (m a) -&gt; m (LastToFinishM m a)
+$csequence :: forall (m :: * -&gt; *) (m :: * -&gt; *) a.
+(Traversable m, Monad m) =&gt;
+LastToFinishM m (m a) -&gt; m (LastToFinishM m a)
+mapM :: (a -&gt; m b) -&gt; LastToFinishM m a -&gt; m (LastToFinishM m b)
+$cmapM :: forall (m :: * -&gt; *) (m :: * -&gt; *) a b.
+(Traversable m, Monad m) =&gt;
+(a -&gt; m b) -&gt; LastToFinishM m a -&gt; m (LastToFinishM m b)
+sequenceA :: LastToFinishM m (f a) -&gt; f (LastToFinishM m a)
+$csequenceA :: forall (m :: * -&gt; *) (f :: * -&gt; *) a.
+(Traversable m, Applicative f) =&gt;
+LastToFinishM m (f a) -&gt; f (LastToFinishM m a)
+traverse :: (a -&gt; f b) -&gt; LastToFinishM m a -&gt; f (LastToFinishM m b)
+$ctraverse :: forall (m :: * -&gt; *) (f :: * -&gt; *) a b.
+(Traversable m, Applicative f) =&gt;
+(a -&gt; f b) -&gt; LastToFinishM m a -&gt; f (LastToFinishM m b)
+$cp2Traversable :: forall (m :: * -&gt; *). Traversable m =&gt; Foldable (LastToFinishM m)
+$cp1Traversable :: forall (m :: * -&gt; *). Traversable m =&gt; Functor (LastToFinishM m)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Traversable</span></a></span></span></span></span></span><span>
+</span><span id="line-121"></span><span>                   </span><span class="hs-special">)</span><span>
+</span><span id="line-122"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679042286"><span id="local-6989586621679042288"><span id="local-6989586621679042290"><span class="annot"><span class="annottext">b -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+NonEmpty (LastToFinishM m a) -&gt; LastToFinishM m a
+LastToFinishM m a -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+(LastToFinishM m a -&gt; LastToFinishM m a -&gt; LastToFinishM m a)
+-&gt; (NonEmpty (LastToFinishM m a) -&gt; LastToFinishM m a)
+-&gt; (forall b.
+    Integral b =&gt;
+    b -&gt; LastToFinishM m a -&gt; LastToFinishM m a)
+-&gt; Semigroup (LastToFinishM m a)
+forall b. Integral b =&gt; b -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+forall a.
+(a -&gt; a -&gt; a)
+-&gt; (NonEmpty a -&gt; a)
+-&gt; (forall b. Integral b =&gt; b -&gt; a -&gt; a)
+-&gt; Semigroup a
+forall (m :: * -&gt; *) a.
+(Applicative m, Semigroup a) =&gt;
+NonEmpty (LastToFinishM m a) -&gt; LastToFinishM m a
+forall (m :: * -&gt; *) a.
+(Applicative m, Semigroup a) =&gt;
+LastToFinishM m a -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+forall (m :: * -&gt; *) a b.
+(Applicative m, Semigroup a, Integral b) =&gt;
+b -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+stimes :: b -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+$cstimes :: forall (m :: * -&gt; *) a b.
+(Applicative m, Semigroup a, Integral b) =&gt;
+b -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+sconcat :: NonEmpty (LastToFinishM m a) -&gt; LastToFinishM m a
+$csconcat :: forall (m :: * -&gt; *) a.
+(Applicative m, Semigroup a) =&gt;
+NonEmpty (LastToFinishM m a) -&gt; LastToFinishM m a
+&lt;&gt; :: LastToFinishM m a -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+$c&lt;&gt; :: forall (m :: * -&gt; *) a.
+(Applicative m, Semigroup a) =&gt;
+LastToFinishM m a -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Semigroup</span></a></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Ap</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042346"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042345"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-123"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679042279"><span id="local-6989586621679042281"><span id="local-6989586621679042283"><span class="annot"><span class="annottext">Semigroup (LastToFinishM m a)
+LastToFinishM m a
+Semigroup (LastToFinishM m a)
+-&gt; LastToFinishM m a
+-&gt; (LastToFinishM m a -&gt; LastToFinishM m a -&gt; LastToFinishM m a)
+-&gt; ([LastToFinishM m a] -&gt; LastToFinishM m a)
+-&gt; Monoid (LastToFinishM m a)
+[LastToFinishM m a] -&gt; LastToFinishM m a
+LastToFinishM m a -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+forall a.
+Semigroup a -&gt; a -&gt; (a -&gt; a -&gt; a) -&gt; ([a] -&gt; a) -&gt; Monoid a
+forall (m :: * -&gt; *) a.
+(Applicative m, Monoid a) =&gt;
+Semigroup (LastToFinishM m a)
+forall (m :: * -&gt; *) a.
+(Applicative m, Monoid a) =&gt;
+LastToFinishM m a
+forall (m :: * -&gt; *) a.
+(Applicative m, Monoid a) =&gt;
+[LastToFinishM m a] -&gt; LastToFinishM m a
+forall (m :: * -&gt; *) a.
+(Applicative m, Monoid a) =&gt;
+LastToFinishM m a -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+mconcat :: [LastToFinishM m a] -&gt; LastToFinishM m a
+$cmconcat :: forall (m :: * -&gt; *) a.
+(Applicative m, Monoid a) =&gt;
+[LastToFinishM m a] -&gt; LastToFinishM m a
+mappend :: LastToFinishM m a -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+$cmappend :: forall (m :: * -&gt; *) a.
+(Applicative m, Monoid a) =&gt;
+LastToFinishM m a -&gt; LastToFinishM m a -&gt; LastToFinishM m a
+mempty :: LastToFinishM m a
+$cmempty :: forall (m :: * -&gt; *) a.
+(Applicative m, Monoid a) =&gt;
+LastToFinishM m a
+$cp1Monoid :: forall (m :: * -&gt; *) a.
+(Applicative m, Monoid a) =&gt;
+Semigroup (LastToFinishM m a)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Monoid</span></a></span></span></span></span><span>    </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Ap</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042346"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042345"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-124"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679042245"><span id="local-6989586621679042247"><span id="local-6989586621679042249"><span id="local-6989586621679042251"><span id="local-6989586621679042253"><span id="local-6989586621679042255"><span id="local-6989586621679042257"><span id="local-6989586621679042259"><span id="local-6989586621679042261"><span id="local-6989586621679042263"><span id="local-6989586621679042265"><span id="local-6989586621679042267"><span id="local-6989586621679042269"><span id="local-6989586621679042271"><span id="local-6989586621679042273"><span id="local-6989586621679042275"><span id="local-6989586621679042277"><span class="annot"><span class="annottext">a -&gt; LastToFinishM m a -&gt; Bool
+LastToFinishM m m -&gt; m
+LastToFinishM m a -&gt; [a]
+LastToFinishM m a -&gt; Bool
+LastToFinishM m a -&gt; Int
+LastToFinishM m a -&gt; a
+LastToFinishM m a -&gt; a
+LastToFinishM m a -&gt; a
+LastToFinishM m a -&gt; a
+(a -&gt; m) -&gt; LastToFinishM m a -&gt; m
+(a -&gt; m) -&gt; LastToFinishM m a -&gt; m
+(a -&gt; b -&gt; b) -&gt; b -&gt; LastToFinishM m a -&gt; b
+(a -&gt; b -&gt; b) -&gt; b -&gt; LastToFinishM m a -&gt; b
+(b -&gt; a -&gt; b) -&gt; b -&gt; LastToFinishM m a -&gt; b
+(b -&gt; a -&gt; b) -&gt; b -&gt; LastToFinishM m a -&gt; b
+(a -&gt; a -&gt; a) -&gt; LastToFinishM m a -&gt; a
+(a -&gt; a -&gt; a) -&gt; LastToFinishM m a -&gt; a
+(forall m. Monoid m =&gt; LastToFinishM m m -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; LastToFinishM m a -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; LastToFinishM m a -&gt; m)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; LastToFinishM m a -&gt; b)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; LastToFinishM m a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; LastToFinishM m a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; LastToFinishM m a -&gt; b)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; LastToFinishM m a -&gt; a)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; LastToFinishM m a -&gt; a)
+-&gt; (forall a. LastToFinishM m a -&gt; [a])
+-&gt; (forall a. LastToFinishM m a -&gt; Bool)
+-&gt; (forall a. LastToFinishM m a -&gt; Int)
+-&gt; (forall a. Eq a =&gt; a -&gt; LastToFinishM m a -&gt; Bool)
+-&gt; (forall a. Ord a =&gt; LastToFinishM m a -&gt; a)
+-&gt; (forall a. Ord a =&gt; LastToFinishM m a -&gt; a)
+-&gt; (forall a. Num a =&gt; LastToFinishM m a -&gt; a)
+-&gt; (forall a. Num a =&gt; LastToFinishM m a -&gt; a)
+-&gt; Foldable (LastToFinishM m)
+forall a. Eq a =&gt; a -&gt; LastToFinishM m a -&gt; Bool
+forall a. Num a =&gt; LastToFinishM m a -&gt; a
+forall a. Ord a =&gt; LastToFinishM m a -&gt; a
+forall m. Monoid m =&gt; LastToFinishM m m -&gt; m
+forall a. LastToFinishM m a -&gt; Bool
+forall a. LastToFinishM m a -&gt; Int
+forall a. LastToFinishM m a -&gt; [a]
+forall a. (a -&gt; a -&gt; a) -&gt; LastToFinishM m a -&gt; a
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; LastToFinishM m a -&gt; m
+forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; LastToFinishM m a -&gt; b
+forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; LastToFinishM m a -&gt; b
+forall (m :: * -&gt; *) a.
+(Foldable m, Eq a) =&gt;
+a -&gt; LastToFinishM m a -&gt; Bool
+forall (m :: * -&gt; *) a.
+(Foldable m, Num a) =&gt;
+LastToFinishM m a -&gt; a
+forall (m :: * -&gt; *) a.
+(Foldable m, Ord a) =&gt;
+LastToFinishM m a -&gt; a
+forall (m :: * -&gt; *) m.
+(Foldable m, Monoid m) =&gt;
+LastToFinishM m m -&gt; m
+forall (m :: * -&gt; *) a. Foldable m =&gt; LastToFinishM m a -&gt; Bool
+forall (m :: * -&gt; *) a. Foldable m =&gt; LastToFinishM m a -&gt; Int
+forall (m :: * -&gt; *) a. Foldable m =&gt; LastToFinishM m a -&gt; [a]
+forall (m :: * -&gt; *) a.
+Foldable m =&gt;
+(a -&gt; a -&gt; a) -&gt; LastToFinishM m a -&gt; a
+forall (m :: * -&gt; *) m a.
+(Foldable m, Monoid m) =&gt;
+(a -&gt; m) -&gt; LastToFinishM m a -&gt; m
+forall (m :: * -&gt; *) b a.
+Foldable m =&gt;
+(b -&gt; a -&gt; b) -&gt; b -&gt; LastToFinishM m a -&gt; b
+forall (m :: * -&gt; *) a b.
+Foldable m =&gt;
+(a -&gt; b -&gt; b) -&gt; b -&gt; LastToFinishM m a -&gt; b
+forall (t :: * -&gt; *).
+(forall m. Monoid m =&gt; t m -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; t a -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; t a -&gt; m)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; t a -&gt; a)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; t a -&gt; a)
+-&gt; (forall a. t a -&gt; [a])
+-&gt; (forall a. t a -&gt; Bool)
+-&gt; (forall a. t a -&gt; Int)
+-&gt; (forall a. Eq a =&gt; a -&gt; t a -&gt; Bool)
+-&gt; (forall a. Ord a =&gt; t a -&gt; a)
+-&gt; (forall a. Ord a =&gt; t a -&gt; a)
+-&gt; (forall a. Num a =&gt; t a -&gt; a)
+-&gt; (forall a. Num a =&gt; t a -&gt; a)
+-&gt; Foldable t
+product :: LastToFinishM m a -&gt; a
+$cproduct :: forall (m :: * -&gt; *) a.
+(Foldable m, Num a) =&gt;
+LastToFinishM m a -&gt; a
+sum :: LastToFinishM m a -&gt; a
+$csum :: forall (m :: * -&gt; *) a.
+(Foldable m, Num a) =&gt;
+LastToFinishM m a -&gt; a
+minimum :: LastToFinishM m a -&gt; a
+$cminimum :: forall (m :: * -&gt; *) a.
+(Foldable m, Ord a) =&gt;
+LastToFinishM m a -&gt; a
+maximum :: LastToFinishM m a -&gt; a
+$cmaximum :: forall (m :: * -&gt; *) a.
+(Foldable m, Ord a) =&gt;
+LastToFinishM m a -&gt; a
+elem :: a -&gt; LastToFinishM m a -&gt; Bool
+$celem :: forall (m :: * -&gt; *) a.
+(Foldable m, Eq a) =&gt;
+a -&gt; LastToFinishM m a -&gt; Bool
+length :: LastToFinishM m a -&gt; Int
+$clength :: forall (m :: * -&gt; *) a. Foldable m =&gt; LastToFinishM m a -&gt; Int
+null :: LastToFinishM m a -&gt; Bool
+$cnull :: forall (m :: * -&gt; *) a. Foldable m =&gt; LastToFinishM m a -&gt; Bool
+toList :: LastToFinishM m a -&gt; [a]
+$ctoList :: forall (m :: * -&gt; *) a. Foldable m =&gt; LastToFinishM m a -&gt; [a]
+foldl1 :: (a -&gt; a -&gt; a) -&gt; LastToFinishM m a -&gt; a
+$cfoldl1 :: forall (m :: * -&gt; *) a.
+Foldable m =&gt;
+(a -&gt; a -&gt; a) -&gt; LastToFinishM m a -&gt; a
+foldr1 :: (a -&gt; a -&gt; a) -&gt; LastToFinishM m a -&gt; a
+$cfoldr1 :: forall (m :: * -&gt; *) a.
+Foldable m =&gt;
+(a -&gt; a -&gt; a) -&gt; LastToFinishM m a -&gt; a
+foldl' :: (b -&gt; a -&gt; b) -&gt; b -&gt; LastToFinishM m a -&gt; b
+$cfoldl' :: forall (m :: * -&gt; *) b a.
+Foldable m =&gt;
+(b -&gt; a -&gt; b) -&gt; b -&gt; LastToFinishM m a -&gt; b
+foldl :: (b -&gt; a -&gt; b) -&gt; b -&gt; LastToFinishM m a -&gt; b
+$cfoldl :: forall (m :: * -&gt; *) b a.
+Foldable m =&gt;
+(b -&gt; a -&gt; b) -&gt; b -&gt; LastToFinishM m a -&gt; b
+foldr' :: (a -&gt; b -&gt; b) -&gt; b -&gt; LastToFinishM m a -&gt; b
+$cfoldr' :: forall (m :: * -&gt; *) a b.
+Foldable m =&gt;
+(a -&gt; b -&gt; b) -&gt; b -&gt; LastToFinishM m a -&gt; b
+foldr :: (a -&gt; b -&gt; b) -&gt; b -&gt; LastToFinishM m a -&gt; b
+$cfoldr :: forall (m :: * -&gt; *) a b.
+Foldable m =&gt;
+(a -&gt; b -&gt; b) -&gt; b -&gt; LastToFinishM m a -&gt; b
+foldMap' :: (a -&gt; m) -&gt; LastToFinishM m a -&gt; m
+$cfoldMap' :: forall (m :: * -&gt; *) m a.
+(Foldable m, Monoid m) =&gt;
+(a -&gt; m) -&gt; LastToFinishM m a -&gt; m
+foldMap :: (a -&gt; m) -&gt; LastToFinishM m a -&gt; m
+$cfoldMap :: forall (m :: * -&gt; *) m a.
+(Foldable m, Monoid m) =&gt;
+(a -&gt; m) -&gt; LastToFinishM m a -&gt; m
+fold :: LastToFinishM m m -&gt; m
+$cfold :: forall (m :: * -&gt; *) m.
+(Foldable m, Monoid m) =&gt;
+LastToFinishM m m -&gt; m
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Foldable</span></a></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span>  </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Ap</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042346"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-125"></span><span>
+</span><span id="line-126"></span><span id="local-6989586621679042243"><span id="local-6989586621679042244"><span class="annot"><a href="Data.Monoid.Synchronisation.html#firstToLastM"><span class="hs-identifier hs-type">firstToLastM</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Monoid.Synchronisation.html#FirstToFinish"><span class="hs-identifier hs-type">FirstToFinish</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042244"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042243"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Data.Monoid.Synchronisation.html#LastToFinishM"><span class="hs-identifier hs-type">LastToFinishM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042244"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042243"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-127"></span><span id="firstToLastM"><span class="annot"><span class="annottext">firstToLastM :: FirstToFinish m a -&gt; LastToFinishM m a
+</span><a href="Data.Monoid.Synchronisation.html#firstToLastM"><span class="hs-identifier hs-var hs-var">firstToLastM</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FirstToFinish m a -&gt; LastToFinishM m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">coerce</span></a></span><span>
+</span><span id="line-128"></span><span>
+</span><span id="line-129"></span><span id="local-6989586621679042241"><span id="local-6989586621679042242"><span class="annot"><a href="Data.Monoid.Synchronisation.html#lastToFirstM"><span class="hs-identifier hs-type">lastToFirstM</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Monoid.Synchronisation.html#LastToFinishM"><span class="hs-identifier hs-type">LastToFinishM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042242"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042241"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Data.Monoid.Synchronisation.html#FirstToFinish"><span class="hs-identifier hs-type">FirstToFinish</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042242"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679042241"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-130"></span><span id="lastToFirstM"><span class="annot"><span class="annottext">lastToFirstM :: LastToFinishM m a -&gt; FirstToFinish m a
+</span><a href="Data.Monoid.Synchronisation.html#lastToFirstM"><span class="hs-identifier hs-var hs-var">lastToFirstM</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">LastToFinishM m a -&gt; FirstToFinish m a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">coerce</span></a></span><span>
+</span><span id="line-131"></span></pre></body></html>

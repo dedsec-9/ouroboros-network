@@ -13,7 +13,7 @@
 </span><span id="line-13"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Test.ThreadNet.TxGen.Shelley.html#mkGenEnv"><span class="hs-identifier">mkGenEnv</span></a></span><span>
 </span><span id="line-14"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-15"></span><span>
-</span><span id="line-16"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Monad.Except</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">runExcept</span></span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/mtl-2.2.2/src"><span class="hs-identifier">Control.Monad.Except</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier">runExcept</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-17"></span><span>
 </span><span id="line-18"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Crypto.Hash</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">HashAlgorithm</span></span><span class="hs-special">)</span><span>
 </span><span id="line-19"></span><span>
@@ -22,7 +22,7 @@
 </span><span id="line-22"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Ledger.Abstract</span></a></span><span>
 </span><span id="line-23"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Ledger.SupportsMempool</span></a></span><span>
 </span><span id="line-24"></span><span>
-</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Shelley.Spec.Ledger.API</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Shelley.API</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
 </span><span id="line-26"></span><span>
 </span><span id="line-27"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier">Ouroboros.Consensus.Shelley.Ledger</span></a></span><span>
 </span><span id="line-28"></span><span>
@@ -30,136 +30,138 @@
 </span><span id="line-30"></span><span>
 </span><span id="line-31"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-test-0.1.0.0/noopt/doc/html/ouroboros-consensus-test/src"><span class="hs-identifier">Test.ThreadNet.TxGen</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-test-0.1.0.0/noopt/doc/html/ouroboros-consensus-test/src"><span class="hs-identifier">TxGen</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-32"></span><span>
-</span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Test.Shelley.Spec.Ledger.Generator.Constants</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Gen</span></span><span>
-</span><span id="line-34"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Test.Shelley.Spec.Ledger.Generator.Core</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Gen</span></span><span>
-</span><span id="line-35"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Test.Shelley.Spec.Ledger.Generator.Presets</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Gen.Presets</span></span><span>
-</span><span id="line-36"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Test.Shelley.Spec.Ledger.Generator.ShelleyEraGen</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
-</span><span id="line-37"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Test.Shelley.Spec.Ledger.Generator.Utxo</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Gen</span></span><span>
-</span><span id="line-38"></span><span>
-</span><span id="line-39"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html"><span class="hs-identifier">Test.Consensus.Shelley.MockCrypto</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockCrypto"><span class="hs-identifier">MockCrypto</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier">MockShelley</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-40"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Test.ThreadNet.Infra.Shelley.html"><span class="hs-identifier">Test.ThreadNet.Infra.Shelley</span></a></span><span>
-</span><span id="line-41"></span><span>
-</span><span id="line-42"></span><span class="hs-keyword">data</span><span> </span><span id="ShelleyTxGenExtra"><span class="annot"><a href="Test.ThreadNet.TxGen.Shelley.html#ShelleyTxGenExtra"><span class="hs-identifier hs-var">ShelleyTxGenExtra</span></a></span></span><span> </span><span id="local-6989586621679315280"><span class="annot"><a href="#local-6989586621679315280"><span class="hs-identifier hs-type">h</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ShelleyTxGenExtra"><span class="annot"><a href="Test.ThreadNet.TxGen.Shelley.html#ShelleyTxGenExtra"><span class="hs-identifier hs-var">ShelleyTxGenExtra</span></a></span></span><span>
-</span><span id="line-43"></span><span>  </span><span class="hs-special">{</span><span> </span><span class="hs-comment">-- | Generator environment.</span><span>
-</span><span id="line-44"></span><span>    </span><span id="stgeGenEnv"><span class="annot"><span class="annottext">ShelleyTxGenExtra h -&gt; GenEnv (MockShelley h)
-</span><a href="Test.ThreadNet.TxGen.Shelley.html#stgeGenEnv"><span class="hs-identifier hs-var hs-var">stgeGenEnv</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen.GenEnv</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679315280"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-45"></span><span>    </span><span class="hs-comment">-- | Generate no transactions before this slot.</span><span>
-</span><span id="line-46"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="stgeStartAt"><span class="annot"><span class="annottext">ShelleyTxGenExtra h -&gt; SlotNo
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Test.Cardano.Ledger.Shelley.Generator.Constants</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Gen</span></span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Test.Cardano.Ledger.Shelley.Generator.Core</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Gen</span></span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Test.Cardano.Ledger.Shelley.Generator.EraGen</span></span><span>
+</span><span id="line-36"></span><span>                     </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">EraGen</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">genEraTwoPhase2Arg</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">genEraTwoPhase3Arg</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Test.Cardano.Ledger.Shelley.Generator.Presets</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Gen.Presets</span></span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Test.Cardano.Ledger.Shelley.Generator.ShelleyEraGen</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-39"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Test.Cardano.Ledger.Shelley.Generator.Utxo</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Gen</span></span><span>
+</span><span id="line-40"></span><span>
+</span><span id="line-41"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html"><span class="hs-identifier">Test.Consensus.Shelley.MockCrypto</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockCrypto"><span class="hs-identifier">MockCrypto</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier">MockShelley</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-42"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Test.ThreadNet.Infra.Shelley.html"><span class="hs-identifier">Test.ThreadNet.Infra.Shelley</span></a></span><span>
+</span><span id="line-43"></span><span>
+</span><span id="line-44"></span><span class="hs-keyword">data</span><span> </span><span id="ShelleyTxGenExtra"><span class="annot"><a href="Test.ThreadNet.TxGen.Shelley.html#ShelleyTxGenExtra"><span class="hs-identifier hs-var">ShelleyTxGenExtra</span></a></span></span><span> </span><span id="local-6989586621679387929"><span class="annot"><a href="#local-6989586621679387929"><span class="hs-identifier hs-type">h</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ShelleyTxGenExtra"><span class="annot"><a href="Test.ThreadNet.TxGen.Shelley.html#ShelleyTxGenExtra"><span class="hs-identifier hs-var">ShelleyTxGenExtra</span></a></span></span><span>
+</span><span id="line-45"></span><span>  </span><span class="hs-special">{</span><span> </span><span class="hs-comment">-- | Generator environment.</span><span>
+</span><span id="line-46"></span><span>    </span><span id="stgeGenEnv"><span class="annot"><span class="annottext">ShelleyTxGenExtra h -&gt; GenEnv (MockShelley h)
+</span><a href="Test.ThreadNet.TxGen.Shelley.html#stgeGenEnv"><span class="hs-identifier hs-var hs-var">stgeGenEnv</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen.GenEnv</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387929"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span>    </span><span class="hs-comment">-- | Generate no transactions before this slot.</span><span>
+</span><span id="line-48"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="stgeStartAt"><span class="annot"><span class="annottext">ShelleyTxGenExtra h -&gt; SlotNo
 </span><a href="Test.ThreadNet.TxGen.Shelley.html#stgeStartAt"><span class="hs-identifier hs-var hs-var">stgeStartAt</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span>
-</span><span id="line-47"></span><span>  </span><span class="hs-special">}</span><span>
-</span><span id="line-48"></span><span>
-</span><span id="line-49"></span><span id="local-6989586621679315179"><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HashAlgorithm</span></span><span> </span><span class="annot"><a href="#local-6989586621679315179"><span class="hs-identifier hs-type">h</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-test-0.1.0.0/noopt/doc/html/ouroboros-consensus-test/src"><span class="hs-identifier hs-type">TxGen</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679315179"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-49"></span><span>  </span><span class="hs-special">}</span><span>
 </span><span id="line-50"></span><span>
-</span><span id="line-51"></span><span>  </span><span class="hs-keyword">type</span><span> </span><span id="TxGenExtra"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-test-0.1.0.0/noopt/doc/html/ouroboros-consensus-test/src"><span class="hs-identifier hs-var">TxGenExtra</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679315179"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Test.ThreadNet.TxGen.Shelley.html#ShelleyTxGenExtra"><span class="hs-identifier hs-type">ShelleyTxGenExtra</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679315179"><span class="hs-identifier hs-type">h</span></a></span><span>
+</span><span id="line-51"></span><span id="local-6989586621679387817"><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HashAlgorithm</span></span><span> </span><span class="annot"><a href="#local-6989586621679387817"><span class="hs-identifier hs-type">h</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-test-0.1.0.0/noopt/doc/html/ouroboros-consensus-test/src"><span class="hs-identifier hs-type">TxGen</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387817"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-52"></span><span>
-</span><span id="line-53"></span><span>  </span><span id="local-6989586621679315176"><span class="annot"><span class="annottext">testGenTxs :: CoreNodeId
+</span><span id="line-53"></span><span>  </span><span class="hs-keyword">type</span><span> </span><span id="TxGenExtra"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-test-0.1.0.0/noopt/doc/html/ouroboros-consensus-test/src"><span class="hs-identifier hs-var">TxGenExtra</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387817"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Test.ThreadNet.TxGen.Shelley.html#ShelleyTxGenExtra"><span class="hs-identifier hs-type">ShelleyTxGenExtra</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387817"><span class="hs-identifier hs-type">h</span></a></span><span>
+</span><span id="line-54"></span><span>
+</span><span id="line-55"></span><span>  </span><span id="local-6989586621679387814"><span class="annot"><span class="annottext">testGenTxs :: CoreNodeId
 -&gt; NumCoreNodes
 -&gt; SlotNo
 -&gt; TopLevelConfig (ShelleyBlock (MockShelley h))
 -&gt; TxGenExtra (ShelleyBlock (MockShelley h))
 -&gt; LedgerState (ShelleyBlock (MockShelley h))
 -&gt; Gen [GenTx (ShelleyBlock (MockShelley h))]
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-test-0.1.0.0/noopt/doc/html/ouroboros-consensus-test/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">testGenTxs</span></a></span></span><span> </span><span id="local-6989586621679315174"><span class="annot"><span class="annottext">CoreNodeId
-</span><a href="#local-6989586621679315174"><span class="hs-identifier hs-var">_coreNodeId</span></a></span></span><span> </span><span id="local-6989586621679315173"><span class="annot"><span class="annottext">NumCoreNodes
-</span><a href="#local-6989586621679315173"><span class="hs-identifier hs-var">_numCoreNodes</span></a></span></span><span> </span><span id="local-6989586621679315172"><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679315172"><span class="hs-identifier hs-var">curSlotNo</span></a></span></span><span> </span><span id="local-6989586621679315171"><span class="annot"><span class="annottext">TopLevelConfig (ShelleyBlock (MockShelley h))
-</span><a href="#local-6989586621679315171"><span class="hs-identifier hs-var">cfg</span></a></span></span><span> </span><span id="local-6989586621679315170"><span class="annot"><span class="annottext">TxGenExtra (ShelleyBlock (MockShelley h))
-</span><a href="#local-6989586621679315170"><span class="hs-identifier hs-var">extra</span></a></span></span><span> </span><span id="local-6989586621679315169"><span class="annot"><span class="annottext">LedgerState (ShelleyBlock (MockShelley h))
-</span><a href="#local-6989586621679315169"><span class="hs-identifier hs-var">lst</span></a></span></span><span>
-</span><span id="line-54"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679315168"><span class="hs-identifier hs-var">stgeStartAt</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; SlotNo -&gt; Bool
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-test-0.1.0.0/noopt/doc/html/ouroboros-consensus-test/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">testGenTxs</span></a></span></span><span> </span><span id="local-6989586621679387812"><span class="annot"><span class="annottext">CoreNodeId
+</span><a href="#local-6989586621679387812"><span class="hs-identifier hs-var">_coreNodeId</span></a></span></span><span> </span><span id="local-6989586621679387811"><span class="annot"><span class="annottext">NumCoreNodes
+</span><a href="#local-6989586621679387811"><span class="hs-identifier hs-var">_numCoreNodes</span></a></span></span><span> </span><span id="local-6989586621679387810"><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679387810"><span class="hs-identifier hs-var">curSlotNo</span></a></span></span><span> </span><span id="local-6989586621679387809"><span class="annot"><span class="annottext">TopLevelConfig (ShelleyBlock (MockShelley h))
+</span><a href="#local-6989586621679387809"><span class="hs-identifier hs-var">cfg</span></a></span></span><span> </span><span id="local-6989586621679387808"><span class="annot"><span class="annottext">TxGenExtra (ShelleyBlock (MockShelley h))
+</span><a href="#local-6989586621679387808"><span class="hs-identifier hs-var">extra</span></a></span></span><span> </span><span id="local-6989586621679387807"><span class="annot"><span class="annottext">LedgerState (ShelleyBlock (MockShelley h))
+</span><a href="#local-6989586621679387807"><span class="hs-identifier hs-var">lst</span></a></span></span><span>
+</span><span id="line-56"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679387806"><span class="hs-identifier hs-var">stgeStartAt</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; SlotNo -&gt; Bool
 forall a. Ord a =&gt; a -&gt; a -&gt; Bool
-</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679315172"><span class="hs-identifier hs-var">curSlotNo</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679387810"><span class="hs-identifier hs-var">curSlotNo</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
 -&gt; Gen [GenTx (ShelleyBlock (MockShelley h))]
 forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
-</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
-</span><span id="line-55"></span><span>
-</span><span id="line-56"></span><span>      </span><span class="hs-comment">-- TODO Temporarily disable the transaction generator until we fix the</span><span>
-</span><span id="line-57"></span><span>      </span><span class="hs-comment">-- failing assertion in TxSubmission.Inbound, see #2680.</span><span>
-</span><span id="line-58"></span><span>      </span><span class="hs-comment">--</span><span>
-</span><span id="line-59"></span><span>      </span><span class="hs-comment">-- When fixed, remove the line below to re-enable the transaction</span><span>
-</span><span id="line-60"></span><span>      </span><span class="hs-comment">-- generator.</span><span>
-</span><span id="line-61"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><span class="hs-identifier hs-var">otherwise</span></span><span>               </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
--&gt; Gen [GenTx (ShelleyBlock (MockShelley h))]
-forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
-</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
-</span><span id="line-62"></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-57"></span><span>
+</span><span id="line-58"></span><span>      </span><span class="hs-comment">-- TODO Temporarily disable the transaction generator until we fix the</span><span>
+</span><span id="line-59"></span><span>      </span><span class="hs-comment">-- failing assertion in TxSubmission.Inbound, see #2680.</span><span>
+</span><span id="line-60"></span><span>      </span><span class="hs-comment">--</span><span>
+</span><span id="line-61"></span><span>      </span><span class="hs-comment">-- When fixed, remove the line below to re-enable the transaction</span><span>
+</span><span id="line-62"></span><span>      </span><span class="hs-comment">-- generator.</span><span>
 </span><span id="line-63"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><span class="hs-identifier hs-var">otherwise</span></span><span>               </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-64"></span><span>      </span><span id="local-6989586621679315166"><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679315166"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Integer, Integer) -&gt; Gen Integer
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>               </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
+-&gt; Gen [GenTx (ShelleyBlock (MockShelley h))]
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-64"></span><span>
+</span><span id="line-65"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>               </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-66"></span><span>      </span><span id="local-6989586621679387804"><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679387804"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Integer, Integer) -&gt; Gen Integer
 forall a. Random a =&gt; (a, a) -&gt; Gen a
 </span><span class="hs-identifier hs-var">choose</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">0</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">20</span></span><span class="hs-special">)</span><span>
-</span><span id="line-65"></span><span>      </span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
+</span><span id="line-67"></span><span>      </span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
 -&gt; Integer
 -&gt; TickedLedgerState (ShelleyBlock (MockShelley h))
 -&gt; Gen [GenTx (ShelleyBlock (MockShelley h))]
-</span><a href="#local-6989586621679315164"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679315166"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">(TickedLedgerState (ShelleyBlock (MockShelley h))
+</span><a href="#local-6989586621679387802"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679387804"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">(TickedLedgerState (ShelleyBlock (MockShelley h))
  -&gt; Gen [GenTx (ShelleyBlock (MockShelley h))])
 -&gt; TickedLedgerState (ShelleyBlock (MockShelley h))
 -&gt; Gen [GenTx (ShelleyBlock (MockShelley h))]
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">LedgerCfg (LedgerState (ShelleyBlock (MockShelley h)))
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerCfg (LedgerState (ShelleyBlock (MockShelley h)))
 -&gt; SlotNo
 -&gt; LedgerState (ShelleyBlock (MockShelley h))
 -&gt; TickedLedgerState (ShelleyBlock (MockShelley h))
 forall l. IsLedger l =&gt; LedgerCfg l -&gt; SlotNo -&gt; l -&gt; Ticked l
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">applyChainTick</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerCfg (LedgerState (ShelleyBlock (MockShelley h)))
-</span><a href="#local-6989586621679315162"><span class="hs-identifier hs-var">lcfg</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679315172"><span class="hs-identifier hs-var">curSlotNo</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerState (ShelleyBlock (MockShelley h))
-</span><a href="#local-6989586621679315169"><span class="hs-identifier hs-var">lst</span></a></span><span>
-</span><span id="line-66"></span><span>    </span><span class="hs-keyword">where</span><span>
-</span><span id="line-67"></span><span>      </span><span class="annot"><a href="Test.ThreadNet.TxGen.Shelley.html#ShelleyTxGenExtra"><span class="hs-identifier hs-type">ShelleyTxGenExtra</span></a></span><span>
-</span><span id="line-68"></span><span>        </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679315161"><span class="annot"><span class="annottext">GenEnv (MockShelley h)
+</span><a href="#local-6989586621679387800"><span class="hs-identifier hs-var">lcfg</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679387810"><span class="hs-identifier hs-var">curSlotNo</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerState (ShelleyBlock (MockShelley h))
+</span><a href="#local-6989586621679387807"><span class="hs-identifier hs-var">lst</span></a></span><span>
+</span><span id="line-68"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-69"></span><span>      </span><span class="annot"><a href="Test.ThreadNet.TxGen.Shelley.html#ShelleyTxGenExtra"><span class="hs-identifier hs-type">ShelleyTxGenExtra</span></a></span><span>
+</span><span id="line-70"></span><span>        </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679387799"><span class="annot"><span class="annottext">GenEnv (MockShelley h)
 stgeGenEnv :: GenEnv (MockShelley h)
 stgeGenEnv :: forall h. ShelleyTxGenExtra h -&gt; GenEnv (MockShelley h)
-</span><a href="#local-6989586621679315161"><span class="hs-identifier hs-var hs-var">stgeGenEnv</span></a></span></span><span>
-</span><span id="line-69"></span><span>        </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679315168"><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679387799"><span class="hs-identifier hs-var hs-var">stgeGenEnv</span></a></span></span><span>
+</span><span id="line-71"></span><span>        </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679387806"><span class="annot"><span class="annottext">SlotNo
 stgeStartAt :: SlotNo
 stgeStartAt :: forall h. ShelleyTxGenExtra h -&gt; SlotNo
-</span><a href="#local-6989586621679315168"><span class="hs-identifier hs-var hs-var">stgeStartAt</span></a></span></span><span>
-</span><span id="line-70"></span><span>        </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxGenExtra (ShelleyBlock (MockShelley h))
+</span><a href="#local-6989586621679387806"><span class="hs-identifier hs-var hs-var">stgeStartAt</span></a></span></span><span>
+</span><span id="line-72"></span><span>        </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxGenExtra (ShelleyBlock (MockShelley h))
 ShelleyTxGenExtra h
-</span><a href="#local-6989586621679315170"><span class="hs-identifier hs-var">extra</span></a></span><span>
-</span><span id="line-71"></span><span>
-</span><span id="line-72"></span><span>      </span><span class="annot"><a href="#local-6989586621679315162"><span class="hs-identifier hs-type">lcfg</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerConfig</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679315179"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-73"></span><span>      </span><span id="local-6989586621679315162"><span class="annot"><span class="annottext">lcfg :: LedgerCfg (LedgerState (ShelleyBlock (MockShelley h)))
-</span><a href="#local-6989586621679315162"><span class="hs-identifier hs-var hs-var">lcfg</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TopLevelConfig (ShelleyBlock (MockShelley h))
+</span><a href="#local-6989586621679387808"><span class="hs-identifier hs-var">extra</span></a></span><span>
+</span><span id="line-73"></span><span>
+</span><span id="line-74"></span><span>      </span><span class="annot"><a href="#local-6989586621679387800"><span class="hs-identifier hs-type">lcfg</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerConfig</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387817"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-75"></span><span>      </span><span id="local-6989586621679387800"><span class="annot"><span class="annottext">lcfg :: LedgerCfg (LedgerState (ShelleyBlock (MockShelley h)))
+</span><a href="#local-6989586621679387800"><span class="hs-identifier hs-var hs-var">lcfg</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TopLevelConfig (ShelleyBlock (MockShelley h))
 -&gt; LedgerCfg (LedgerState (ShelleyBlock (MockShelley h)))
 forall blk. TopLevelConfig blk -&gt; LedgerConfig blk
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">configLedger</span></a></span><span> </span><span class="annot"><span class="annottext">TopLevelConfig (ShelleyBlock (MockShelley h))
-</span><a href="#local-6989586621679315171"><span class="hs-identifier hs-var">cfg</span></a></span><span>
-</span><span id="line-74"></span><span>
-</span><span id="line-75"></span><span>      </span><span class="annot"><a href="#local-6989586621679315164"><span class="hs-identifier hs-type">go</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679315179"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">]</span><span>  </span><span class="hs-comment">-- ^ Accumulator</span><span>
-</span><span id="line-76"></span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integer</span></span><span>  </span><span class="hs-comment">-- ^ Number of txs to still produce</span><span>
-</span><span id="line-77"></span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">TickedLedgerState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679315179"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-78"></span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679315179"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">]</span><span>
-</span><span id="line-79"></span><span>      </span><span id="local-6989586621679315164"><span class="annot"><span class="annottext">go :: [GenTx (ShelleyBlock (MockShelley h))]
+</span><a href="#local-6989586621679387809"><span class="hs-identifier hs-var">cfg</span></a></span><span>
+</span><span id="line-76"></span><span>
+</span><span id="line-77"></span><span>      </span><span class="annot"><a href="#local-6989586621679387802"><span class="hs-identifier hs-type">go</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387817"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">]</span><span>  </span><span class="hs-comment">-- ^ Accumulator</span><span>
+</span><span id="line-78"></span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/integer-gmp-1.0.3.0/src"><span class="hs-identifier hs-type">Integer</span></a></span><span>  </span><span class="hs-comment">-- ^ Number of txs to still produce</span><span>
+</span><span id="line-79"></span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">TickedLedgerState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387817"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-80"></span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387817"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-81"></span><span>      </span><span id="local-6989586621679387802"><span class="annot"><span class="annottext">go :: [GenTx (ShelleyBlock (MockShelley h))]
 -&gt; Integer
 -&gt; TickedLedgerState (ShelleyBlock (MockShelley h))
 -&gt; Gen [GenTx (ShelleyBlock (MockShelley h))]
-</span><a href="#local-6989586621679315164"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span id="local-6989586621679315159"><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
-</span><a href="#local-6989586621679315159"><span class="hs-identifier hs-var">acc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679387802"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span id="local-6989586621679387797"><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
+</span><a href="#local-6989586621679387797"><span class="hs-identifier hs-var">acc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">TickedLedgerState (ShelleyBlock (MockShelley h))
 </span><span class="hs-identifier">_</span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
 -&gt; Gen [GenTx (ShelleyBlock (MockShelley h))]
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
-</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
 -&gt; [GenTx (ShelleyBlock (MockShelley h))]
 forall a. [a] -&gt; [a]
-</span><span class="hs-identifier hs-var">reverse</span></span><span> </span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
-</span><a href="#local-6989586621679315159"><span class="hs-identifier hs-var">acc</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-80"></span><span>      </span><span class="annot"><a href="#local-6989586621679315164"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679315157"><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
-</span><a href="#local-6989586621679315157"><span class="hs-identifier hs-var">acc</span></a></span></span><span> </span><span id="local-6989586621679315156"><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679315156"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span id="local-6989586621679315155"><span class="annot"><span class="annottext">TickedLedgerState (ShelleyBlock (MockShelley h))
-</span><a href="#local-6989586621679315155"><span class="hs-identifier hs-var">st</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-81"></span><span>        </span><span id="local-6989586621679315154"><span class="annot"><span class="annottext">Maybe (GenTx (ShelleyBlock (MockShelley h)))
-</span><a href="#local-6989586621679315154"><span class="hs-identifier hs-var">mbTx</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">TopLevelConfig (ShelleyBlock (MockShelley h))
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">reverse</span></a></span><span> </span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
+</span><a href="#local-6989586621679387797"><span class="hs-identifier hs-var">acc</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-82"></span><span>      </span><span class="annot"><a href="#local-6989586621679387802"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679387795"><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
+</span><a href="#local-6989586621679387795"><span class="hs-identifier hs-var">acc</span></a></span></span><span> </span><span id="local-6989586621679387794"><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679387794"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span id="local-6989586621679387793"><span class="annot"><span class="annottext">TickedLedgerState (ShelleyBlock (MockShelley h))
+</span><a href="#local-6989586621679387793"><span class="hs-identifier hs-var">st</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-83"></span><span>        </span><span id="local-6989586621679387792"><span class="annot"><span class="annottext">Maybe (GenTx (ShelleyBlock (MockShelley h)))
+</span><a href="#local-6989586621679387792"><span class="hs-identifier hs-var">mbTx</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">TopLevelConfig (ShelleyBlock (MockShelley h))
 -&gt; SlotNo
 -&gt; TickedLedgerState (ShelleyBlock (MockShelley h))
 -&gt; GenEnv (MockShelley h)
@@ -172,30 +174,30 @@ TopLevelConfig (ShelleyBlock (MockShelley h))
 -&gt; GenEnv (MockShelley h)
 -&gt; Gen (Maybe (GenTx (ShelleyBlock (MockShelley h))))
 </span><a href="Test.ThreadNet.TxGen.Shelley.html#genTx"><span class="hs-identifier hs-var">genTx</span></a></span><span> </span><span class="annot"><span class="annottext">TopLevelConfig (ShelleyBlock (MockShelley h))
-</span><a href="#local-6989586621679315171"><span class="hs-identifier hs-var">cfg</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679315172"><span class="hs-identifier hs-var">curSlotNo</span></a></span><span> </span><span class="annot"><span class="annottext">TickedLedgerState (ShelleyBlock (MockShelley h))
-</span><a href="#local-6989586621679315155"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="annot"><span class="annottext">GenEnv (MockShelley h)
-</span><a href="#local-6989586621679315161"><span class="hs-identifier hs-var">stgeGenEnv</span></a></span><span>
-</span><span id="line-82"></span><span>        </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Maybe (GenTx (ShelleyBlock (MockShelley h)))
-</span><a href="#local-6989586621679315154"><span class="hs-identifier hs-var">mbTx</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-83"></span><span>          </span><span class="annot"><span class="annottext">Maybe (GenTx (ShelleyBlock (MockShelley h)))
-</span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
+</span><a href="#local-6989586621679387809"><span class="hs-identifier hs-var">cfg</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679387810"><span class="hs-identifier hs-var">curSlotNo</span></a></span><span> </span><span class="annot"><span class="annottext">TickedLedgerState (ShelleyBlock (MockShelley h))
+</span><a href="#local-6989586621679387793"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="annot"><span class="annottext">GenEnv (MockShelley h)
+</span><a href="#local-6989586621679387799"><span class="hs-identifier hs-var">stgeGenEnv</span></a></span><span>
+</span><span id="line-84"></span><span>        </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Maybe (GenTx (ShelleyBlock (MockShelley h)))
+</span><a href="#local-6989586621679387792"><span class="hs-identifier hs-var">mbTx</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-85"></span><span>          </span><span class="annot"><span class="annottext">Maybe (GenTx (ShelleyBlock (MockShelley h)))
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
 -&gt; Gen [GenTx (ShelleyBlock (MockShelley h))]
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
-</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
 -&gt; [GenTx (ShelleyBlock (MockShelley h))]
 forall a. [a] -&gt; [a]
-</span><span class="hs-identifier hs-var">reverse</span></span><span> </span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
-</span><a href="#local-6989586621679315157"><span class="hs-identifier hs-var">acc</span></a></span><span class="hs-special">)</span><span>  </span><span class="hs-comment">-- cannot afford more transactions</span><span>
-</span><span id="line-84"></span><span>          </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679315153"><span class="annot"><span class="annottext">GenTx (ShelleyBlock (MockShelley h))
-</span><a href="#local-6989586621679315153"><span class="hs-identifier hs-var">tx</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Except
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">reverse</span></a></span><span> </span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
+</span><a href="#local-6989586621679387795"><span class="hs-identifier hs-var">acc</span></a></span><span class="hs-special">)</span><span>  </span><span class="hs-comment">-- cannot afford more transactions</span><span>
+</span><span id="line-86"></span><span>          </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Just</span></a></span><span> </span><span id="local-6989586621679387791"><span class="annot"><span class="annottext">GenTx (ShelleyBlock (MockShelley h))
+</span><a href="#local-6989586621679387791"><span class="hs-identifier hs-var">tx</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Except
   (ApplyTxError (MockShelley h))
   (TickedLedgerState (ShelleyBlock (MockShelley h)))
 -&gt; Either
      (ApplyTxError (MockShelley h))
      (TickedLedgerState (ShelleyBlock (MockShelley h)))
 forall e a. Except e a -&gt; Either e a
-</span><span class="hs-identifier hs-var">runExcept</span></span><span> </span><span class="annot"><span class="annottext">(Except
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-var">runExcept</span></a></span><span> </span><span class="annot"><span class="annottext">(Except
    (ApplyTxError (MockShelley h))
    (TickedLedgerState (ShelleyBlock (MockShelley h)))
  -&gt; Either
@@ -208,11 +210,11 @@ forall e a. Except e a -&gt; Either e a
      (ApplyTxError (MockShelley h))
      (TickedLedgerState (ShelleyBlock (MockShelley h)))
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(TickedLedgerState (ShelleyBlock (MockShelley h)),
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">(TickedLedgerState (ShelleyBlock (MockShelley h)),
  Validated (GenTx (ShelleyBlock (MockShelley h))))
 -&gt; TickedLedgerState (ShelleyBlock (MockShelley h))
 forall a b. (a, b) -&gt; a
-</span><span class="hs-identifier hs-var">fst</span></span><span> </span><span class="annot"><span class="annottext">((TickedLedgerState (ShelleyBlock (MockShelley h)),
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fst</span></a></span><span> </span><span class="annot"><span class="annottext">((TickedLedgerState (ShelleyBlock (MockShelley h)),
   Validated (GenTx (ShelleyBlock (MockShelley h))))
  -&gt; TickedLedgerState (ShelleyBlock (MockShelley h)))
 -&gt; ExceptT
@@ -224,7 +226,8 @@ forall a b. (a, b) -&gt; a
      (ApplyTxError (MockShelley h))
      (TickedLedgerState (ShelleyBlock (MockShelley h)))
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">LedgerCfg (LedgerState (ShelleyBlock (MockShelley h)))
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerCfg (LedgerState (ShelleyBlock (MockShelley h)))
+-&gt; WhetherToIntervene
 -&gt; SlotNo
 -&gt; GenTx (ShelleyBlock (MockShelley h))
 -&gt; TickedLedgerState (ShelleyBlock (MockShelley h))
@@ -235,78 +238,80 @@ forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 forall blk.
 LedgerSupportsMempool blk =&gt;
 LedgerConfig blk
+-&gt; WhetherToIntervene
 -&gt; SlotNo
 -&gt; GenTx blk
 -&gt; TickedLedgerState blk
 -&gt; Except
      (ApplyTxErr blk) (TickedLedgerState blk, Validated (GenTx blk))
 </span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">applyTx</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerCfg (LedgerState (ShelleyBlock (MockShelley h)))
-</span><a href="#local-6989586621679315162"><span class="hs-identifier hs-var">lcfg</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679315172"><span class="hs-identifier hs-var">curSlotNo</span></a></span><span> </span><span class="annot"><span class="annottext">GenTx (ShelleyBlock (MockShelley h))
-</span><a href="#local-6989586621679315153"><span class="hs-identifier hs-var">tx</span></a></span><span> </span><span class="annot"><span class="annottext">TickedLedgerState (ShelleyBlock (MockShelley h))
-</span><a href="#local-6989586621679315155"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-85"></span><span>              </span><span class="hs-comment">-- We don't mind generating invalid transactions</span><span>
-</span><span id="line-86"></span><span>              </span><span class="annot"><span class="hs-identifier hs-type">Left</span></span><span>  </span><span class="annot"><span class="annottext">ApplyTxError (MockShelley h)
+</span><a href="#local-6989586621679387800"><span class="hs-identifier hs-var">lcfg</span></a></span><span> </span><span class="annot"><span class="annottext">WhetherToIntervene
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">DoNotIntervene</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679387810"><span class="hs-identifier hs-var">curSlotNo</span></a></span><span> </span><span class="annot"><span class="annottext">GenTx (ShelleyBlock (MockShelley h))
+</span><a href="#local-6989586621679387791"><span class="hs-identifier hs-var">tx</span></a></span><span> </span><span class="annot"><span class="annottext">TickedLedgerState (ShelleyBlock (MockShelley h))
+</span><a href="#local-6989586621679387793"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-87"></span><span>              </span><span class="hs-comment">-- We don't mind generating invalid transactions</span><span>
+</span><span id="line-88"></span><span>              </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Left</span></a></span><span>  </span><span class="annot"><span class="annottext">ApplyTxError (MockShelley h)
 </span><span class="hs-identifier">_</span></span><span>   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
 -&gt; Integer
 -&gt; TickedLedgerState (ShelleyBlock (MockShelley h))
 -&gt; Gen [GenTx (ShelleyBlock (MockShelley h))]
-</span><a href="#local-6989586621679315164"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">GenTx (ShelleyBlock (MockShelley h))
-</span><a href="#local-6989586621679315153"><span class="hs-identifier hs-var">tx</span></a></span><span class="annot"><span class="annottext">GenTx (ShelleyBlock (MockShelley h))
+</span><a href="#local-6989586621679387802"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">GenTx (ShelleyBlock (MockShelley h))
+</span><a href="#local-6989586621679387791"><span class="hs-identifier hs-var">tx</span></a></span><span class="annot"><span class="annottext">GenTx (ShelleyBlock (MockShelley h))
 -&gt; [GenTx (ShelleyBlock (MockShelley h))]
 -&gt; [GenTx (ShelleyBlock (MockShelley h))]
 forall a. a -&gt; [a] -&gt; [a]
-</span><span class="hs-glyph hs-var">:</span></span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
-</span><a href="#local-6989586621679315157"><span class="hs-identifier hs-var">acc</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679315156"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-var">:</span></a></span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
+</span><a href="#local-6989586621679387795"><span class="hs-identifier hs-var">acc</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679387794"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-glyph hs-var">-</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">TickedLedgerState (ShelleyBlock (MockShelley h))
-</span><a href="#local-6989586621679315155"><span class="hs-identifier hs-var">st</span></a></span><span>
-</span><span id="line-87"></span><span>              </span><span class="annot"><span class="hs-identifier hs-type">Right</span></span><span> </span><span id="local-6989586621679315150"><span class="annot"><span class="annottext">TickedLedgerState (ShelleyBlock (MockShelley h))
-</span><a href="#local-6989586621679315150"><span class="hs-identifier hs-var">st'</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
+</span><a href="#local-6989586621679387793"><span class="hs-identifier hs-var">st</span></a></span><span>
+</span><span id="line-89"></span><span>              </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Right</span></a></span><span> </span><span id="local-6989586621679387787"><span class="annot"><span class="annottext">TickedLedgerState (ShelleyBlock (MockShelley h))
+</span><a href="#local-6989586621679387787"><span class="hs-identifier hs-var">st'</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
 -&gt; Integer
 -&gt; TickedLedgerState (ShelleyBlock (MockShelley h))
 -&gt; Gen [GenTx (ShelleyBlock (MockShelley h))]
-</span><a href="#local-6989586621679315164"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">GenTx (ShelleyBlock (MockShelley h))
-</span><a href="#local-6989586621679315153"><span class="hs-identifier hs-var">tx</span></a></span><span class="annot"><span class="annottext">GenTx (ShelleyBlock (MockShelley h))
+</span><a href="#local-6989586621679387802"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">GenTx (ShelleyBlock (MockShelley h))
+</span><a href="#local-6989586621679387791"><span class="hs-identifier hs-var">tx</span></a></span><span class="annot"><span class="annottext">GenTx (ShelleyBlock (MockShelley h))
 -&gt; [GenTx (ShelleyBlock (MockShelley h))]
 -&gt; [GenTx (ShelleyBlock (MockShelley h))]
 forall a. a -&gt; [a] -&gt; [a]
-</span><span class="hs-glyph hs-var">:</span></span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
-</span><a href="#local-6989586621679315157"><span class="hs-identifier hs-var">acc</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679315156"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-var">:</span></a></span><span class="annot"><span class="annottext">[GenTx (ShelleyBlock (MockShelley h))]
+</span><a href="#local-6989586621679387795"><span class="hs-identifier hs-var">acc</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679387794"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-glyph hs-var">-</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">TickedLedgerState (ShelleyBlock (MockShelley h))
-</span><a href="#local-6989586621679315150"><span class="hs-identifier hs-var">st'</span></a></span></span><span>
-</span><span id="line-88"></span><span>
-</span><span id="line-89"></span><span class="annot"><a href="Test.ThreadNet.TxGen.Shelley.html#genTx"><span class="hs-identifier hs-type">genTx</span></a></span><span>
-</span><span id="line-90"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679315274"><span class="annot"><a href="#local-6989586621679315274"><span class="hs-identifier hs-type">h</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HashAlgorithm</span></span><span> </span><span class="annot"><a href="#local-6989586621679315274"><span class="hs-identifier hs-type">h</span></a></span><span>
-</span><span id="line-91"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">TopLevelConfig</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679315274"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-92"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span>
-</span><span id="line-93"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">TickedLedgerState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679315274"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-94"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen.GenEnv</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679315274"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-95"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679315274"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-96"></span><span id="genTx"><span class="annot"><span class="annottext">genTx :: TopLevelConfig (ShelleyBlock (MockShelley h))
+</span><a href="#local-6989586621679387787"><span class="hs-identifier hs-var">st'</span></a></span></span><span>
+</span><span id="line-90"></span><span>
+</span><span id="line-91"></span><span class="annot"><a href="Test.ThreadNet.TxGen.Shelley.html#genTx"><span class="hs-identifier hs-type">genTx</span></a></span><span>
+</span><span id="line-92"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679387923"><span class="annot"><a href="#local-6989586621679387923"><span class="hs-identifier hs-type">h</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HashAlgorithm</span></span><span> </span><span class="annot"><a href="#local-6989586621679387923"><span class="hs-identifier hs-type">h</span></a></span><span>
+</span><span id="line-93"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">TopLevelConfig</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387923"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-94"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span>
+</span><span id="line-95"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">TickedLedgerState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387923"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-96"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen.GenEnv</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387923"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-97"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387923"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-98"></span><span id="genTx"><span class="annot"><span class="annottext">genTx :: TopLevelConfig (ShelleyBlock (MockShelley h))
 -&gt; SlotNo
 -&gt; TickedLedgerState (ShelleyBlock (MockShelley h))
 -&gt; GenEnv (MockShelley h)
 -&gt; Gen (Maybe (GenTx (ShelleyBlock (MockShelley h))))
-</span><a href="Test.ThreadNet.TxGen.Shelley.html#genTx"><span class="hs-identifier hs-var hs-var">genTx</span></a></span></span><span> </span><span id="local-6989586621679315149"><span class="annot"><span class="annottext">TopLevelConfig (ShelleyBlock (MockShelley h))
-</span><a href="#local-6989586621679315149"><span class="hs-identifier hs-var">_cfg</span></a></span></span><span> </span><span id="local-6989586621679315148"><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679315148"><span class="hs-identifier hs-var">slotNo</span></a></span></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">TickedShelleyLedgerState</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679315146"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-var hs-var">tickedShelleyLedgerState</span></a></span></span><span> </span><span class="hs-special">}</span><span> </span><span id="local-6989586621679315144"><span class="annot"><span class="annottext">GenEnv (MockShelley h)
-</span><a href="#local-6989586621679315144"><span class="hs-identifier hs-var">genEnv</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-97"></span><span>    </span><span class="annot"><span class="annottext">GenTx (ShelleyBlock (MockShelley h))
+</span><a href="Test.ThreadNet.TxGen.Shelley.html#genTx"><span class="hs-identifier hs-var hs-var">genTx</span></a></span></span><span> </span><span id="local-6989586621679387786"><span class="annot"><span class="annottext">TopLevelConfig (ShelleyBlock (MockShelley h))
+</span><a href="#local-6989586621679387786"><span class="hs-identifier hs-var">_cfg</span></a></span></span><span> </span><span id="local-6989586621679387785"><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679387785"><span class="hs-identifier hs-var">slotNo</span></a></span></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">TickedShelleyLedgerState</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679387783"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-shelley-0.1.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-var hs-var">tickedShelleyLedgerState</span></a></span></span><span> </span><span class="hs-special">}</span><span> </span><span id="local-6989586621679387781"><span class="annot"><span class="annottext">GenEnv (MockShelley h)
+</span><a href="#local-6989586621679387781"><span class="hs-identifier hs-var">genEnv</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-99"></span><span>    </span><span class="annot"><span class="annottext">GenTx (ShelleyBlock (MockShelley h))
 -&gt; Maybe (GenTx (ShelleyBlock (MockShelley h)))
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(GenTx (ShelleyBlock (MockShelley h))
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">(GenTx (ShelleyBlock (MockShelley h))
  -&gt; Maybe (GenTx (ShelleyBlock (MockShelley h))))
 -&gt; (Tx (MockShelley h) -&gt; GenTx (ShelleyBlock (MockShelley h)))
 -&gt; Tx (MockShelley h)
 -&gt; Maybe (GenTx (ShelleyBlock (MockShelley h)))
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Tx (MockShelley h) -&gt; GenTx (ShelleyBlock (MockShelley h))
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Tx (MockShelley h) -&gt; GenTx (ShelleyBlock (MockShelley h))
 forall era.
 ShelleyBasedEra era =&gt;
 Tx era -&gt; GenTx (ShelleyBlock era)
@@ -315,7 +320,7 @@ Tx era -&gt; GenTx (ShelleyBlock era)
 -&gt; Gen (Tx (MockShelley h))
 -&gt; Gen (Maybe (GenTx (ShelleyBlock (MockShelley h))))
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">GenEnv (MockShelley h)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">GenEnv (MockShelley h)
 -&gt; LedgerEnv (MockShelley h)
 -&gt; (UTxOState (MockShelley h), DPState (Crypto (MockShelley h)))
 -&gt; Gen (Tx (MockShelley h))
@@ -331,87 +336,88 @@ GenEnv era
 -&gt; (UTxOState era, DPState (Crypto era))
 -&gt; Gen (Tx era)
 </span><span class="hs-identifier hs-var">Gen.genTx</span></span><span>
-</span><span id="line-98"></span><span>      </span><span class="annot"><span class="annottext">GenEnv (MockShelley h)
-</span><a href="#local-6989586621679315144"><span class="hs-identifier hs-var">genEnv</span></a></span><span>
-</span><span id="line-99"></span><span>      </span><span class="annot"><span class="annottext">LedgerEnv (MockShelley h)
-</span><a href="#local-6989586621679315140"><span class="hs-identifier hs-var">ledgerEnv</span></a></span><span>
-</span><span id="line-100"></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="annottext">UTxOState (MockShelley h)
-</span><a href="#local-6989586621679315139"><span class="hs-identifier hs-var">utxoSt</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">DPState (Crypto (MockShelley h))
+</span><span id="line-100"></span><span>      </span><span class="annot"><span class="annottext">GenEnv (MockShelley h)
+</span><a href="#local-6989586621679387781"><span class="hs-identifier hs-var">genEnv</span></a></span><span>
+</span><span id="line-101"></span><span>      </span><span class="annot"><span class="annottext">LedgerEnv (MockShelley h)
+</span><a href="#local-6989586621679387777"><span class="hs-identifier hs-var">ledgerEnv</span></a></span><span>
+</span><span id="line-102"></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="annottext">UTxOState (MockShelley h)
+</span><a href="#local-6989586621679387776"><span class="hs-identifier hs-var">utxoSt</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">DPState (Crypto (MockShelley h))
 DPState (MockCrypto h)
-</span><a href="#local-6989586621679315138"><span class="hs-identifier hs-var">dpState</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-101"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-102"></span><span>    </span><span class="annot"><a href="#local-6989586621679315137"><span class="hs-identifier hs-type">epochState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.EpochState</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679315274"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-103"></span><span>    </span><span id="local-6989586621679315137"><span class="annot"><span class="annottext">epochState :: EpochState (MockShelley h)
-</span><a href="#local-6989586621679315137"><span class="hs-identifier hs-var hs-var">epochState</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NewEpochState (MockShelley h) -&gt; EpochState (MockShelley h)
+</span><a href="#local-6989586621679387775"><span class="hs-identifier hs-var">dpState</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-103"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-104"></span><span>    </span><span class="annot"><a href="#local-6989586621679387774"><span class="hs-identifier hs-type">epochState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.EpochState</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387923"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-105"></span><span>    </span><span id="local-6989586621679387774"><span class="annot"><span class="annottext">epochState :: EpochState (MockShelley h)
+</span><a href="#local-6989586621679387774"><span class="hs-identifier hs-var hs-var">epochState</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NewEpochState (MockShelley h) -&gt; EpochState (MockShelley h)
 forall era. NewEpochState era -&gt; EpochState era
 </span><span class="hs-identifier hs-var hs-var">SL.nesEs</span></span><span> </span><span class="annot"><span class="annottext">NewEpochState (MockShelley h)
-</span><a href="#local-6989586621679315146"><span class="hs-identifier hs-var">tickedShelleyLedgerState</span></a></span><span>
-</span><span id="line-104"></span><span>
-</span><span id="line-105"></span><span>    </span><span class="annot"><a href="#local-6989586621679315140"><span class="hs-identifier hs-type">ledgerEnv</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.LedgerEnv</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679315274"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-106"></span><span>    </span><span id="local-6989586621679315140"><span class="annot"><span class="annottext">ledgerEnv :: LedgerEnv (MockShelley h)
-</span><a href="#local-6989586621679315140"><span class="hs-identifier hs-var hs-var">ledgerEnv</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">LedgerEnv :: forall era.
-SlotNo -&gt; Ix -&gt; PParams era -&gt; AccountState -&gt; LedgerEnv era
+</span><a href="#local-6989586621679387783"><span class="hs-identifier hs-var">tickedShelleyLedgerState</span></a></span><span>
+</span><span id="line-106"></span><span>
+</span><span id="line-107"></span><span>    </span><span class="annot"><a href="#local-6989586621679387777"><span class="hs-identifier hs-type">ledgerEnv</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.LedgerEnv</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387923"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-108"></span><span>    </span><span id="local-6989586621679387777"><span class="annot"><span class="annottext">ledgerEnv :: LedgerEnv (MockShelley h)
+</span><a href="#local-6989586621679387777"><span class="hs-identifier hs-var hs-var">ledgerEnv</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">LedgerEnv :: forall era.
+SlotNo -&gt; TxIx -&gt; PParams era -&gt; AccountState -&gt; LedgerEnv era
 </span><span class="hs-identifier hs-type">SL.LedgerEnv</span></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-107"></span><span>        </span><span class="annot"><span class="annottext">ledgerSlotNo :: SlotNo
+</span><span id="line-109"></span><span>        </span><span class="annot"><span class="annottext">ledgerSlotNo :: SlotNo
 </span><span class="hs-identifier hs-var">ledgerSlotNo</span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621679315148"><span class="hs-identifier hs-var">slotNo</span></a></span><span>
-</span><span id="line-108"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ledgerIx :: Ix
-</span><span class="hs-identifier hs-var">ledgerIx</span></span><span>       </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Ix
-</span><span class="hs-number">0</span></span><span> </span><span class="hs-comment">-- TODO Ix</span><span>
-</span><span id="line-109"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ledgerPp :: PParams (MockShelley h)
+</span><a href="#local-6989586621679387785"><span class="hs-identifier hs-var">slotNo</span></a></span><span>
+</span><span id="line-110"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ledgerIx :: TxIx
+</span><span class="hs-identifier hs-var">ledgerIx</span></span><span>       </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxIx
+forall a. Bounded a =&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">minBound</span></a></span><span>
+</span><span id="line-111"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ledgerPp :: PParams (MockShelley h)
 </span><span class="hs-identifier hs-var">ledgerPp</span></span><span>       </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">EpochState (MockShelley h) -&gt; PParams (MockShelley h)
 forall era. EpochState era -&gt; PParams era
 </span><span class="hs-identifier hs-var hs-var">SL.esPp</span></span><span> </span><span class="annot"><span class="annottext">EpochState (MockShelley h)
-</span><a href="#local-6989586621679315137"><span class="hs-identifier hs-var">epochState</span></a></span><span>
-</span><span id="line-110"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ledgerAccount :: AccountState
+</span><a href="#local-6989586621679387774"><span class="hs-identifier hs-var">epochState</span></a></span><span>
+</span><span id="line-112"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ledgerAccount :: AccountState
 </span><span class="hs-identifier hs-var">ledgerAccount</span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">EpochState (MockShelley h) -&gt; AccountState
 forall era. EpochState era -&gt; AccountState
 </span><span class="hs-identifier hs-var hs-var">SL.esAccountState</span></span><span> </span><span class="annot"><span class="annottext">EpochState (MockShelley h)
-</span><a href="#local-6989586621679315137"><span class="hs-identifier hs-var">epochState</span></a></span><span>
-</span><span id="line-111"></span><span>      </span><span class="hs-special">}</span><span>
-</span><span id="line-112"></span><span>
-</span><span id="line-113"></span><span>    </span><span class="annot"><a href="#local-6989586621679315139"><span class="hs-identifier hs-type">utxoSt</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.UTxOState</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679315274"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-114"></span><span>    </span><span id="local-6989586621679315139"><span class="annot"><span class="annottext">utxoSt :: UTxOState (MockShelley h)
-</span><a href="#local-6989586621679315139"><span class="hs-identifier hs-var hs-var">utxoSt</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-115"></span><span>        </span><span class="annot"><span class="annottext">LedgerState (MockShelley h) -&gt; UTxOState (MockShelley h)
+</span><a href="#local-6989586621679387774"><span class="hs-identifier hs-var">epochState</span></a></span><span>
+</span><span id="line-113"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-114"></span><span>
+</span><span id="line-115"></span><span>    </span><span class="annot"><a href="#local-6989586621679387776"><span class="hs-identifier hs-type">utxoSt</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.UTxOState</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387923"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-116"></span><span>    </span><span id="local-6989586621679387776"><span class="annot"><span class="annottext">utxoSt :: UTxOState (MockShelley h)
+</span><a href="#local-6989586621679387776"><span class="hs-identifier hs-var hs-var">utxoSt</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-117"></span><span>        </span><span class="annot"><span class="annottext">LedgerState (MockShelley h) -&gt; UTxOState (MockShelley h)
 forall era. LedgerState era -&gt; UTxOState era
 </span><span class="hs-identifier hs-var hs-var">SL._utxoState</span></span><span>
-</span><span id="line-116"></span><span>      </span><span class="annot"><span class="annottext">(LedgerState (MockShelley h) -&gt; UTxOState (MockShelley h))
+</span><span id="line-118"></span><span>      </span><span class="annot"><span class="annottext">(LedgerState (MockShelley h) -&gt; UTxOState (MockShelley h))
 -&gt; (EpochState (MockShelley h) -&gt; LedgerState (MockShelley h))
 -&gt; EpochState (MockShelley h)
 -&gt; UTxOState (MockShelley h)
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">EpochState (MockShelley h) -&gt; LedgerState (MockShelley h)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">EpochState (MockShelley h) -&gt; LedgerState (MockShelley h)
 forall era. EpochState era -&gt; LedgerState era
 </span><span class="hs-identifier hs-var hs-var">SL.esLState</span></span><span>
-</span><span id="line-117"></span><span>      </span><span class="annot"><span class="annottext">(EpochState (MockShelley h) -&gt; UTxOState (MockShelley h))
+</span><span id="line-119"></span><span>      </span><span class="annot"><span class="annottext">(EpochState (MockShelley h) -&gt; UTxOState (MockShelley h))
 -&gt; EpochState (MockShelley h) -&gt; UTxOState (MockShelley h)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">EpochState (MockShelley h)
-</span><a href="#local-6989586621679315137"><span class="hs-identifier hs-var">epochState</span></a></span><span>
-</span><span id="line-118"></span><span>
-</span><span id="line-119"></span><span>    </span><span class="annot"><a href="#local-6989586621679315138"><span class="hs-identifier hs-type">dpState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.DPState</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockCrypto"><span class="hs-identifier hs-type">MockCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679315274"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-120"></span><span>    </span><span id="local-6989586621679315138"><span class="annot"><span class="annottext">dpState :: DPState (MockCrypto h)
-</span><a href="#local-6989586621679315138"><span class="hs-identifier hs-var hs-var">dpState</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-121"></span><span>        </span><span class="annot"><span class="annottext">LedgerState (MockShelley h) -&gt; DPState (MockCrypto h)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">EpochState (MockShelley h)
+</span><a href="#local-6989586621679387774"><span class="hs-identifier hs-var">epochState</span></a></span><span>
+</span><span id="line-120"></span><span>
+</span><span id="line-121"></span><span>    </span><span class="annot"><a href="#local-6989586621679387775"><span class="hs-identifier hs-type">dpState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.DPState</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockCrypto"><span class="hs-identifier hs-type">MockCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387923"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-122"></span><span>    </span><span id="local-6989586621679387775"><span class="annot"><span class="annottext">dpState :: DPState (MockCrypto h)
+</span><a href="#local-6989586621679387775"><span class="hs-identifier hs-var hs-var">dpState</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-123"></span><span>        </span><span class="annot"><span class="annottext">LedgerState (MockShelley h) -&gt; DPState (MockCrypto h)
 forall era. LedgerState era -&gt; DPState (Crypto era)
 </span><span class="hs-identifier hs-var hs-var">SL._delegationState</span></span><span>
-</span><span id="line-122"></span><span>      </span><span class="annot"><span class="annottext">(LedgerState (MockShelley h) -&gt; DPState (MockCrypto h))
+</span><span id="line-124"></span><span>      </span><span class="annot"><span class="annottext">(LedgerState (MockShelley h) -&gt; DPState (MockCrypto h))
 -&gt; (EpochState (MockShelley h) -&gt; LedgerState (MockShelley h))
 -&gt; EpochState (MockShelley h)
 -&gt; DPState (MockCrypto h)
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">EpochState (MockShelley h) -&gt; LedgerState (MockShelley h)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">EpochState (MockShelley h) -&gt; LedgerState (MockShelley h)
 forall era. EpochState era -&gt; LedgerState era
 </span><span class="hs-identifier hs-var hs-var">SL.esLState</span></span><span>
-</span><span id="line-123"></span><span>      </span><span class="annot"><span class="annottext">(EpochState (MockShelley h) -&gt; DPState (MockCrypto h))
+</span><span id="line-125"></span><span>      </span><span class="annot"><span class="annottext">(EpochState (MockShelley h) -&gt; DPState (MockCrypto h))
 -&gt; EpochState (MockShelley h) -&gt; DPState (MockCrypto h)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">EpochState (MockShelley h)
-</span><a href="#local-6989586621679315137"><span class="hs-identifier hs-var">epochState</span></a></span><span>
-</span><span id="line-124"></span><span>
-</span><span id="line-125"></span><span class="hs-keyword">data</span><span> </span><span id="WhetherToGeneratePPUs"><span class="annot"><a href="Test.ThreadNet.TxGen.Shelley.html#WhetherToGeneratePPUs"><span class="hs-identifier hs-var">WhetherToGeneratePPUs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="DoNotGeneratePPUs"><span class="annot"><a href="Test.ThreadNet.TxGen.Shelley.html#DoNotGeneratePPUs"><span class="hs-identifier hs-var">DoNotGeneratePPUs</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="DoGeneratePPUs"><span class="annot"><a href="Test.ThreadNet.TxGen.Shelley.html#DoGeneratePPUs"><span class="hs-identifier hs-var">DoGeneratePPUs</span></a></span></span><span>
-</span><span id="line-126"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679315118"><span id="local-6989586621679315120"><span id="local-6989586621679315122"><span class="annot"><span class="annottext">Int -&gt; WhetherToGeneratePPUs -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">EpochState (MockShelley h)
+</span><a href="#local-6989586621679387774"><span class="hs-identifier hs-var">epochState</span></a></span><span>
+</span><span id="line-126"></span><span>
+</span><span id="line-127"></span><span class="hs-keyword">data</span><span> </span><span id="WhetherToGeneratePPUs"><span class="annot"><a href="Test.ThreadNet.TxGen.Shelley.html#WhetherToGeneratePPUs"><span class="hs-identifier hs-var">WhetherToGeneratePPUs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="DoNotGeneratePPUs"><span class="annot"><a href="Test.ThreadNet.TxGen.Shelley.html#DoNotGeneratePPUs"><span class="hs-identifier hs-var">DoNotGeneratePPUs</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="DoGeneratePPUs"><span class="annot"><a href="Test.ThreadNet.TxGen.Shelley.html#DoGeneratePPUs"><span class="hs-identifier hs-var">DoGeneratePPUs</span></a></span></span><span>
+</span><span id="line-128"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679387754"><span id="local-6989586621679387756"><span id="local-6989586621679387758"><span class="annot"><span class="annottext">Int -&gt; WhetherToGeneratePPUs -&gt; ShowS
 [WhetherToGeneratePPUs] -&gt; ShowS
 WhetherToGeneratePPUs -&gt; String
 (Int -&gt; WhetherToGeneratePPUs -&gt; ShowS)
@@ -426,76 +432,81 @@ show :: WhetherToGeneratePPUs -&gt; String
 $cshow :: WhetherToGeneratePPUs -&gt; String
 showsPrec :: Int -&gt; WhetherToGeneratePPUs -&gt; ShowS
 $cshowsPrec :: Int -&gt; WhetherToGeneratePPUs -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
-</span><span id="line-127"></span><span>
-</span><span id="line-128"></span><span class="annot"><a href="Test.ThreadNet.TxGen.Shelley.html#mkGenEnv"><span class="hs-identifier hs-type">mkGenEnv</span></a></span><span> </span><span class="hs-glyph">::</span><span>
-</span><span id="line-129"></span><span>     </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679315116"><span class="annot"><a href="#local-6989586621679315116"><span class="hs-identifier hs-type">h</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HashAlgorithm</span></span><span> </span><span class="annot"><a href="#local-6989586621679315116"><span class="hs-identifier hs-type">h</span></a></span><span>
-</span><span id="line-130"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Test.ThreadNet.TxGen.Shelley.html#WhetherToGeneratePPUs"><span class="hs-identifier hs-type">WhetherToGeneratePPUs</span></a></span><span>
-</span><span id="line-131"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Test.ThreadNet.Infra.Shelley.html#CoreNode"><span class="hs-identifier hs-type">CoreNode</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockCrypto"><span class="hs-identifier hs-type">MockCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679315116"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
-</span><span id="line-132"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen.GenEnv</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679315116"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-133"></span><span id="mkGenEnv"><span class="annot"><span class="annottext">mkGenEnv :: WhetherToGeneratePPUs
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-129"></span><span>
+</span><span id="line-130"></span><span class="annot"><a href="Test.ThreadNet.TxGen.Shelley.html#mkGenEnv"><span class="hs-identifier hs-type">mkGenEnv</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-131"></span><span>     </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679387752"><span class="annot"><a href="#local-6989586621679387752"><span class="hs-identifier hs-type">h</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HashAlgorithm</span></span><span> </span><span class="annot"><a href="#local-6989586621679387752"><span class="hs-identifier hs-type">h</span></a></span><span>
+</span><span id="line-132"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Test.ThreadNet.TxGen.Shelley.html#WhetherToGeneratePPUs"><span class="hs-identifier hs-type">WhetherToGeneratePPUs</span></a></span><span>
+</span><span id="line-133"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Test.ThreadNet.Infra.Shelley.html#CoreNode"><span class="hs-identifier hs-type">CoreNode</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockCrypto"><span class="hs-identifier hs-type">MockCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387752"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-134"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen.GenEnv</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387752"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-135"></span><span id="mkGenEnv"><span class="annot"><span class="annottext">mkGenEnv :: WhetherToGeneratePPUs
 -&gt; [CoreNode (MockCrypto h)] -&gt; GenEnv (MockShelley h)
-</span><a href="Test.ThreadNet.TxGen.Shelley.html#mkGenEnv"><span class="hs-identifier hs-var hs-var">mkGenEnv</span></a></span></span><span> </span><span id="local-6989586621679315115"><span class="annot"><span class="annottext">WhetherToGeneratePPUs
-</span><a href="#local-6989586621679315115"><span class="hs-identifier hs-var">whetherPPUs</span></a></span></span><span> </span><span id="local-6989586621679315114"><span class="annot"><span class="annottext">[CoreNode (MockCrypto h)]
-</span><a href="#local-6989586621679315114"><span class="hs-identifier hs-var">coreNodes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">KeySpace (MockShelley h) -&gt; Constants -&gt; GenEnv (MockShelley h)
-forall era. KeySpace era -&gt; Constants -&gt; GenEnv era
+</span><a href="Test.ThreadNet.TxGen.Shelley.html#mkGenEnv"><span class="hs-identifier hs-var hs-var">mkGenEnv</span></a></span></span><span> </span><span id="local-6989586621679387751"><span class="annot"><span class="annottext">WhetherToGeneratePPUs
+</span><a href="#local-6989586621679387751"><span class="hs-identifier hs-var">whetherPPUs</span></a></span></span><span> </span><span id="local-6989586621679387750"><span class="annot"><span class="annottext">[CoreNode (MockCrypto h)]
+</span><a href="#local-6989586621679387750"><span class="hs-identifier hs-var">coreNodes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">KeySpace (MockShelley h)
+-&gt; ScriptSpace (MockShelley h)
+-&gt; Constants
+-&gt; GenEnv (MockShelley h)
+forall era.
+KeySpace era -&gt; ScriptSpace era -&gt; Constants -&gt; GenEnv era
 </span><span class="hs-identifier hs-var">Gen.GenEnv</span></span><span> </span><span class="annot"><span class="annottext">KeySpace (MockShelley h)
-</span><a href="#local-6989586621679315112"><span class="hs-identifier hs-var">keySpace</span></a></span><span> </span><span class="annot"><span class="annottext">Constants
-</span><a href="#local-6989586621679315111"><span class="hs-identifier hs-var">constants</span></a></span><span>
-</span><span id="line-134"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-135"></span><span>    </span><span class="hs-comment">-- Configuration of the transaction generator</span><span>
-</span><span id="line-136"></span><span>    </span><span class="annot"><a href="#local-6989586621679315111"><span class="hs-identifier hs-type">constants</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen.Constants</span></span><span>
-</span><span id="line-137"></span><span>    </span><span id="local-6989586621679315111"><span class="annot"><span class="annottext">constants :: Constants
-</span><a href="#local-6989586621679315111"><span class="hs-identifier hs-var hs-var">constants</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-138"></span><span>        </span><span class="annot"><span class="annottext">Constants -&gt; Constants
-</span><a href="#local-6989586621679315110"><span class="hs-identifier hs-var">setCerts</span></a></span><span> </span><span class="annot"><span class="annottext">(Constants -&gt; Constants) -&gt; Constants -&gt; Constants
+</span><a href="#local-6989586621679387748"><span class="hs-identifier hs-var">keySpace</span></a></span><span> </span><span class="annot"><span class="annottext">ScriptSpace (MockShelley h)
+</span><a href="#local-6989586621679387747"><span class="hs-identifier hs-var">scriptSpace</span></a></span><span> </span><span class="annot"><span class="annottext">Constants
+</span><a href="#local-6989586621679387746"><span class="hs-identifier hs-var">constants</span></a></span><span>
+</span><span id="line-136"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-137"></span><span>    </span><span class="hs-comment">-- Configuration of the transaction generator</span><span>
+</span><span id="line-138"></span><span>    </span><span class="annot"><a href="#local-6989586621679387746"><span class="hs-identifier hs-type">constants</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen.Constants</span></span><span>
+</span><span id="line-139"></span><span>    </span><span id="local-6989586621679387746"><span class="annot"><span class="annottext">constants :: Constants
+</span><a href="#local-6989586621679387746"><span class="hs-identifier hs-var hs-var">constants</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-140"></span><span>        </span><span class="annot"><span class="annottext">Constants -&gt; Constants
+</span><a href="#local-6989586621679387745"><span class="hs-identifier hs-var">setCerts</span></a></span><span> </span><span class="annot"><span class="annottext">(Constants -&gt; Constants) -&gt; Constants -&gt; Constants
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span>
-</span><span id="line-139"></span><span>        </span><span class="annot"><span class="annottext">Constants -&gt; Constants
-</span><a href="#local-6989586621679315109"><span class="hs-identifier hs-var">setPPUs</span></a></span><span> </span><span class="annot"><span class="annottext">(Constants -&gt; Constants) -&gt; Constants -&gt; Constants
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-141"></span><span>        </span><span class="annot"><span class="annottext">Constants -&gt; Constants
+</span><a href="#local-6989586621679387744"><span class="hs-identifier hs-var">setPPUs</span></a></span><span> </span><span class="annot"><span class="annottext">(Constants -&gt; Constants) -&gt; Constants -&gt; Constants
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span>
-</span><span id="line-140"></span><span>        </span><span class="annot"><span class="annottext">Constants
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-142"></span><span>        </span><span class="annot"><span class="annottext">Constants
 </span><span class="hs-identifier hs-var">Gen.defaultConstants</span></span><span>
-</span><span id="line-141"></span><span>          </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">frequencyMIRCert :: Int
+</span><span id="line-143"></span><span>          </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">frequencyMIRCert :: Int
 </span><span class="hs-identifier hs-var">Gen.frequencyMIRCert</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">0</span></span><span>
-</span><span id="line-142"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">genTxStableUtxoSize :: Int
+</span><span id="line-144"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">genTxStableUtxoSize :: Int
 </span><span class="hs-identifier hs-var">Gen.genTxStableUtxoSize</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">100</span></span><span>
-</span><span id="line-143"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">genTxUtxoIncrement :: Int
+</span><span id="line-145"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">genTxUtxoIncrement :: Int
 </span><span class="hs-identifier hs-var">Gen.genTxUtxoIncrement</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">3</span></span><span>
-</span><span id="line-144"></span><span>          </span><span class="hs-special">}</span><span>
-</span><span id="line-145"></span><span>      </span><span class="hs-keyword">where</span><span>
-</span><span id="line-146"></span><span>        </span><span class="hs-comment">-- Testing with certificates requires additional handling in the</span><span>
-</span><span id="line-147"></span><span>        </span><span class="hs-comment">-- testing framework, because, for example, they may transfer block</span><span>
-</span><span id="line-148"></span><span>        </span><span class="hs-comment">-- issuance rights from one node to another, and we must have the</span><span>
-</span><span id="line-149"></span><span>        </span><span class="hs-comment">-- relevant nodes brought online at that point.</span><span>
-</span><span id="line-150"></span><span>        </span><span id="local-6989586621679315110"><span class="annot"><span class="annottext">setCerts :: Constants -&gt; Constants
-</span><a href="#local-6989586621679315110"><span class="hs-identifier hs-var hs-var">setCerts</span></a></span></span><span> </span><span id="local-6989586621679315104"><span class="annot"><span class="annottext">Constants
-</span><a href="#local-6989586621679315104"><span class="hs-identifier hs-var">cs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constants
-</span><a href="#local-6989586621679315104"><span class="hs-identifier hs-var">cs</span></a></span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">maxCertsPerTx :: Word64
+</span><span id="line-146"></span><span>          </span><span class="hs-special">}</span><span>
+</span><span id="line-147"></span><span>      </span><span class="hs-keyword">where</span><span>
+</span><span id="line-148"></span><span>        </span><span class="hs-comment">-- Testing with certificates requires additional handling in the</span><span>
+</span><span id="line-149"></span><span>        </span><span class="hs-comment">-- testing framework, because, for example, they may transfer block</span><span>
+</span><span id="line-150"></span><span>        </span><span class="hs-comment">-- issuance rights from one node to another, and we must have the</span><span>
+</span><span id="line-151"></span><span>        </span><span class="hs-comment">-- relevant nodes brought online at that point.</span><span>
+</span><span id="line-152"></span><span>        </span><span id="local-6989586621679387745"><span class="annot"><span class="annottext">setCerts :: Constants -&gt; Constants
+</span><a href="#local-6989586621679387745"><span class="hs-identifier hs-var hs-var">setCerts</span></a></span></span><span> </span><span id="local-6989586621679387739"><span class="annot"><span class="annottext">Constants
+</span><a href="#local-6989586621679387739"><span class="hs-identifier hs-var">cs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constants
+</span><a href="#local-6989586621679387739"><span class="hs-identifier hs-var">cs</span></a></span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">maxCertsPerTx :: Word64
 </span><span class="hs-identifier hs-var">Gen.maxCertsPerTx</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word64
 </span><span class="hs-number">0</span></span><span> </span><span class="hs-special">}</span><span>
-</span><span id="line-151"></span><span>
-</span><span id="line-152"></span><span>        </span><span id="local-6989586621679315109"><span class="annot"><span class="annottext">setPPUs :: Constants -&gt; Constants
-</span><a href="#local-6989586621679315109"><span class="hs-identifier hs-var hs-var">setPPUs</span></a></span></span><span> </span><span id="local-6989586621679315102"><span class="annot"><span class="annottext">Constants
-</span><a href="#local-6989586621679315102"><span class="hs-identifier hs-var">cs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">WhetherToGeneratePPUs
-</span><a href="#local-6989586621679315115"><span class="hs-identifier hs-var">whetherPPUs</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-153"></span><span>            </span><span class="annot"><span class="annottext">WhetherToGeneratePPUs
+</span><span id="line-153"></span><span>
+</span><span id="line-154"></span><span>        </span><span id="local-6989586621679387744"><span class="annot"><span class="annottext">setPPUs :: Constants -&gt; Constants
+</span><a href="#local-6989586621679387744"><span class="hs-identifier hs-var hs-var">setPPUs</span></a></span></span><span> </span><span id="local-6989586621679387737"><span class="annot"><span class="annottext">Constants
+</span><a href="#local-6989586621679387737"><span class="hs-identifier hs-var">cs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">WhetherToGeneratePPUs
+</span><a href="#local-6989586621679387751"><span class="hs-identifier hs-var">whetherPPUs</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-155"></span><span>            </span><span class="annot"><span class="annottext">WhetherToGeneratePPUs
 </span><a href="Test.ThreadNet.TxGen.Shelley.html#DoGeneratePPUs"><span class="hs-identifier hs-var">DoGeneratePPUs</span></a></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Constants
-</span><a href="#local-6989586621679315102"><span class="hs-identifier hs-var">cs</span></a></span><span>
-</span><span id="line-154"></span><span>            </span><span class="annot"><span class="annottext">WhetherToGeneratePPUs
+</span><a href="#local-6989586621679387737"><span class="hs-identifier hs-var">cs</span></a></span><span>
+</span><span id="line-156"></span><span>            </span><span class="annot"><span class="annottext">WhetherToGeneratePPUs
 </span><a href="Test.ThreadNet.TxGen.Shelley.html#DoNotGeneratePPUs"><span class="hs-identifier hs-var">DoNotGeneratePPUs</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Constants
-</span><a href="#local-6989586621679315102"><span class="hs-identifier hs-var">cs</span></a></span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">frequencyTxUpdates :: Int
+</span><a href="#local-6989586621679387737"><span class="hs-identifier hs-var">cs</span></a></span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">frequencyTxUpdates :: Int
 </span><span class="hs-identifier hs-var">Gen.frequencyTxUpdates</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">0</span></span><span> </span><span class="hs-special">}</span><span>
-</span><span id="line-155"></span><span>
-</span><span id="line-156"></span><span>    </span><span class="annot"><a href="#local-6989586621679315112"><span class="hs-identifier hs-type">keySpace</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen.KeySpace</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679315116"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-157"></span><span>    </span><span id="local-6989586621679315112"><span class="annot"><span class="annottext">keySpace :: KeySpace (MockShelley h)
-</span><a href="#local-6989586621679315112"><span class="hs-identifier hs-var hs-var">keySpace</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-158"></span><span>      </span><span class="annot"><span class="annottext">[(GenesisKeyPair (Crypto (MockShelley h)),
+</span><span id="line-157"></span><span>
+</span><span id="line-158"></span><span>    </span><span class="annot"><a href="#local-6989586621679387748"><span class="hs-identifier hs-type">keySpace</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen.KeySpace</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387752"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-159"></span><span>    </span><span id="local-6989586621679387748"><span class="annot"><span class="annottext">keySpace :: KeySpace (MockShelley h)
+</span><a href="#local-6989586621679387748"><span class="hs-identifier hs-var hs-var">keySpace</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-160"></span><span>      </span><span class="annot"><span class="annottext">[(GenesisKeyPair (Crypto (MockShelley h)),
   AllIssuerKeys (Crypto (MockShelley h)) 'GenesisDelegate)]
 -&gt; [AllIssuerKeys (Crypto (MockShelley h)) 'GenesisDelegate]
 -&gt; [AllIssuerKeys (Crypto (MockShelley h)) 'StakePool]
@@ -512,7 +523,7 @@ ScriptClass era =&gt;
 -&gt; [(Script era, Script era)]
 -&gt; KeySpace era
 </span><span class="hs-identifier hs-var">Gen.KeySpace</span></span><span>
-</span><span id="line-159"></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CoreNodeKeyInfo (MockCrypto h)
+</span><span id="line-161"></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CoreNodeKeyInfo (MockCrypto h)
 -&gt; (KeyPair 'Genesis (MockCrypto h),
     AllIssuerKeys (MockCrypto h) 'GenesisDelegate)
 forall c.
@@ -525,23 +536,23 @@ CoreNodeKeyInfo c
 -&gt; [(KeyPair 'Genesis (MockCrypto h),
      AllIssuerKeys (MockCrypto h) 'GenesisDelegate)]
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">[CoreNodeKeyInfo (MockCrypto h)]
-</span><a href="#local-6989586621679315098"><span class="hs-identifier hs-var">cn</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-160"></span><span>        </span><span class="annot"><span class="annottext">[AllIssuerKeys (Crypto (MockShelley h)) 'GenesisDelegate]
-</span><a href="#local-6989586621679315097"><span class="hs-identifier hs-var">ksGenesisDelegates</span></a></span><span>
-</span><span id="line-161"></span><span>        </span><span class="annot"><span class="annottext">[AllIssuerKeys (Crypto (MockShelley h)) 'StakePool]
-</span><a href="#local-6989586621679315096"><span class="hs-identifier hs-var">ksStakePools</span></a></span><span>
-</span><span id="line-162"></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">KeyPairs (Crypto (MockShelley h))
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">[CoreNodeKeyInfo (MockCrypto h)]
+</span><a href="#local-6989586621679387733"><span class="hs-identifier hs-var">cn</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-162"></span><span>        </span><span class="annot"><span class="annottext">[AllIssuerKeys (Crypto (MockShelley h)) 'GenesisDelegate]
+</span><a href="#local-6989586621679387732"><span class="hs-identifier hs-var">ksGenesisDelegates</span></a></span><span>
+</span><span id="line-163"></span><span>        </span><span class="annot"><span class="annottext">[AllIssuerKeys (Crypto (MockShelley h)) 'StakePool]
+</span><a href="#local-6989586621679387731"><span class="hs-identifier hs-var">ksStakePools</span></a></span><span>
+</span><span id="line-164"></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">KeyPairs (Crypto (MockShelley h))
 [(KeyPair 'Payment (MockCrypto h),
   KeyPair 'Staking (MockCrypto h))]
-</span><a href="#local-6989586621679315095"><span class="hs-identifier hs-var">ksKeyPairs</span></a></span><span> </span><span class="annot"><span class="annottext">[(KeyPair 'Payment (MockCrypto h),
+</span><a href="#local-6989586621679387730"><span class="hs-identifier hs-var">ksKeyPairs</span></a></span><span> </span><span class="annot"><span class="annottext">[(KeyPair 'Payment (MockCrypto h),
   KeyPair 'Staking (MockCrypto h))]
 -&gt; [(KeyPair 'Payment (MockCrypto h),
      KeyPair 'Staking (MockCrypto h))]
 -&gt; [(KeyPair 'Payment (MockCrypto h),
      KeyPair 'Staking (MockCrypto h))]
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CoreNodeKeyInfo (MockCrypto h)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CoreNodeKeyInfo (MockCrypto h)
 -&gt; (KeyPair 'Payment (MockCrypto h),
     KeyPair 'Staking (MockCrypto h))
 forall c.
@@ -553,40 +564,57 @@ CoreNodeKeyInfo c -&gt; (KeyPair 'Payment c, KeyPair 'Staking c)
 -&gt; [(KeyPair 'Payment (MockCrypto h),
      KeyPair 'Staking (MockCrypto h))]
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">[CoreNodeKeyInfo (MockCrypto h)]
-</span><a href="#local-6989586621679315098"><span class="hs-identifier hs-var">cn</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-163"></span><span>        </span><span class="annot"><span class="annottext">[(Script (MockShelley h), Script (MockShelley h))]
-</span><a href="#local-6989586621679315093"><span class="hs-identifier hs-var">ksMSigScripts</span></a></span><span>
-</span><span id="line-164"></span><span>      </span><span class="hs-keyword">where</span><span>
-</span><span id="line-165"></span><span>        </span><span id="local-6989586621679315098"><span class="annot"><span class="annottext">cn :: [CoreNodeKeyInfo (MockCrypto h)]
-</span><a href="#local-6989586621679315098"><span class="hs-identifier hs-var hs-var">cn</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">CoreNode (MockCrypto h) -&gt; CoreNodeKeyInfo (MockCrypto h)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">[CoreNodeKeyInfo (MockCrypto h)]
+</span><a href="#local-6989586621679387733"><span class="hs-identifier hs-var">cn</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-165"></span><span>        </span><span class="annot"><span class="annottext">[(Script (MockShelley h), Script (MockShelley h))]
+</span><a href="#local-6989586621679387728"><span class="hs-identifier hs-var">ksMSigScripts</span></a></span><span>
+</span><span id="line-166"></span><span>      </span><span class="hs-keyword">where</span><span>
+</span><span id="line-167"></span><span>        </span><span id="local-6989586621679387733"><span class="annot"><span class="annottext">cn :: [CoreNodeKeyInfo (MockCrypto h)]
+</span><a href="#local-6989586621679387733"><span class="hs-identifier hs-var hs-var">cn</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">CoreNode (MockCrypto h) -&gt; CoreNodeKeyInfo (MockCrypto h)
 forall c. PraosCrypto c =&gt; CoreNode c -&gt; CoreNodeKeyInfo c
 </span><a href="Test.ThreadNet.Infra.Shelley.html#coreNodeKeys"><span class="hs-identifier hs-var">coreNodeKeys</span></a></span><span> </span><span class="annot"><span class="annottext">(CoreNode (MockCrypto h) -&gt; CoreNodeKeyInfo (MockCrypto h))
 -&gt; [CoreNode (MockCrypto h)] -&gt; [CoreNodeKeyInfo (MockCrypto h)]
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">[CoreNode (MockCrypto h)]
-</span><a href="#local-6989586621679315114"><span class="hs-identifier hs-var">coreNodes</span></a></span><span>
-</span><span id="line-166"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Gen.KeySpace_</span></span><span>
-</span><span id="line-167"></span><span>          </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679315095"><span class="annot"><span class="annottext">KeyPairs (Crypto (MockShelley h))
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">[CoreNode (MockCrypto h)]
+</span><a href="#local-6989586621679387750"><span class="hs-identifier hs-var">coreNodes</span></a></span><span>
+</span><span id="line-168"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Gen.KeySpace_</span></span><span>
+</span><span id="line-169"></span><span>          </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679387730"><span class="annot"><span class="annottext">KeyPairs (Crypto (MockShelley h))
 ksKeyPairs :: forall era. KeySpace era -&gt; KeyPairs (Crypto era)
 ksKeyPairs :: KeyPairs (Crypto (MockShelley h))
 </span><span class="hs-identifier hs-var hs-var">ksKeyPairs</span></span></span><span class="hs-special">,</span><span>
-</span><span id="line-168"></span><span>            </span><span id="local-6989586621679315093"><span class="annot"><span class="annottext">[(Script (MockShelley h), Script (MockShelley h))]
+</span><span id="line-170"></span><span>            </span><span id="local-6989586621679387728"><span class="annot"><span class="annottext">[(Script (MockShelley h), Script (MockShelley h))]
 ksMSigScripts :: forall era. KeySpace era -&gt; [(Script era, Script era)]
 ksMSigScripts :: [(Script (MockShelley h), Script (MockShelley h))]
 </span><span class="hs-identifier hs-var hs-var">ksMSigScripts</span></span></span><span class="hs-special">,</span><span>
-</span><span id="line-169"></span><span>            </span><span id="local-6989586621679315097"><span class="annot"><span class="annottext">[AllIssuerKeys (Crypto (MockShelley h)) 'GenesisDelegate]
+</span><span id="line-171"></span><span>            </span><span id="local-6989586621679387732"><span class="annot"><span class="annottext">[AllIssuerKeys (Crypto (MockShelley h)) 'GenesisDelegate]
 ksGenesisDelegates :: forall era.
 KeySpace era -&gt; [AllIssuerKeys (Crypto era) 'GenesisDelegate]
 ksGenesisDelegates :: [AllIssuerKeys (Crypto (MockShelley h)) 'GenesisDelegate]
 </span><span class="hs-identifier hs-var hs-var">ksGenesisDelegates</span></span></span><span class="hs-special">,</span><span>
-</span><span id="line-170"></span><span>            </span><span id="local-6989586621679315096"><span class="annot"><span class="annottext">[AllIssuerKeys (Crypto (MockShelley h)) 'StakePool]
+</span><span id="line-172"></span><span>            </span><span id="local-6989586621679387731"><span class="annot"><span class="annottext">[AllIssuerKeys (Crypto (MockShelley h)) 'StakePool]
 ksStakePools :: forall era. KeySpace era -&gt; [AllIssuerKeys (Crypto era) 'StakePool]
 ksStakePools :: [AllIssuerKeys (Crypto (MockShelley h)) 'StakePool]
 </span><span class="hs-identifier hs-var hs-var">ksStakePools</span></span></span><span>
-</span><span id="line-171"></span><span>          </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-172"></span><span>            </span><span class="annot"><span class="annottext">Constants -&gt; KeySpace (MockShelley h)
-forall era. ScriptClass era =&gt; Constants -&gt; KeySpace era
-</span><span class="hs-identifier hs-var">Gen.Presets.keySpace</span></span><span> </span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679315116"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Constants
-</span><a href="#local-6989586621679315111"><span class="hs-identifier hs-var">constants</span></a></span><span>
-</span><span id="line-173"></span></pre></body></html>
+</span><span id="line-173"></span><span>          </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-174"></span><span>            </span><span class="annot"><span class="annottext">Constants -&gt; KeySpace (MockShelley h)
+forall era. EraGen era =&gt; Constants -&gt; KeySpace era
+</span><span class="hs-identifier hs-var">Gen.Presets.keySpace</span></span><span> </span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387752"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Constants
+</span><a href="#local-6989586621679387746"><span class="hs-identifier hs-var">constants</span></a></span><span>
+</span><span id="line-175"></span><span>
+</span><span id="line-176"></span><span>    </span><span class="annot"><a href="#local-6989586621679387747"><span class="hs-identifier hs-type">scriptSpace</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen.ScriptSpace</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387752"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-177"></span><span>    </span><span id="local-6989586621679387747"><span class="annot"><span class="annottext">scriptSpace :: ScriptSpace (MockShelley h)
+</span><a href="#local-6989586621679387747"><span class="hs-identifier hs-var hs-var">scriptSpace</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-178"></span><span>      </span><span class="annot"><span class="annottext">[TwoPhase3ArgInfo (MockShelley h)]
+-&gt; [TwoPhase2ArgInfo (MockShelley h)]
+-&gt; ScriptSpace (MockShelley h)
+forall era.
+ValidateScript era =&gt;
+[TwoPhase3ArgInfo era] -&gt; [TwoPhase2ArgInfo era] -&gt; ScriptSpace era
+</span><span class="hs-identifier hs-var">Gen.Presets.scriptSpace</span></span><span> </span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387752"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-179"></span><span>           </span><span class="hs-special">(</span><span class="annot"><span class="annottext">EraGen (MockShelley h) =&gt; [TwoPhase3ArgInfo (MockShelley h)]
+forall era. EraGen era =&gt; [TwoPhase3ArgInfo era]
+</span><span class="hs-identifier hs-var">genEraTwoPhase3Arg</span></span><span> </span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387752"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-180"></span><span>           </span><span class="hs-special">(</span><span class="annot"><span class="annottext">EraGen (MockShelley h) =&gt; [TwoPhase2ArgInfo (MockShelley h)]
+forall era. EraGen era =&gt; [TwoPhase2ArgInfo era]
+</span><span class="hs-identifier hs-var">genEraTwoPhase2Arg</span></span><span> </span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="Test.Consensus.Shelley.MockCrypto.html#MockShelley"><span class="hs-identifier hs-type">MockShelley</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679387752"><span class="hs-identifier hs-type">h</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-181"></span></pre></body></html>

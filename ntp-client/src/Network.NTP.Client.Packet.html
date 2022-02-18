@@ -15,16 +15,16 @@
 </span><span id="line-15"></span><span>    </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-16"></span><span>
 </span><span id="line-17"></span><span>
-</span><span id="line-18"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Monad</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">replicateM_</span></span><span class="hs-special">)</span><span>
-</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Binary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Binary</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-20"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Binary.Get</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">getInt8</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">getWord32be</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">getWord8</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">skip</span></span><span class="hs-special">)</span><span>
-</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Binary.Put</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">putInt8</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">putWord32be</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">putWord8</span></span><span class="hs-special">)</span><span>
-</span><span id="line-22"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Int</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Int8</span></span><span class="hs-special">)</span><span>
-</span><span id="line-23"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Time.Clock.POSIX</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">getPOSIXTime</span></span><span class="hs-special">)</span><span>
-</span><span id="line-24"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Word</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Word32</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Word8</span></span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Control.Monad</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">replicateM_</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier">Data.Binary</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier">Binary</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier">Data.Binary.Get</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier">getInt8</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier">getWord32be</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier">getWord8</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier">skip</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier">Data.Binary.Put</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier">putInt8</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier">putWord32be</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier">putWord8</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Int</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Int8</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier">Data.Time.Clock.POSIX</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier">getPOSIXTime</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Word</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Word32</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Word8</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-25"></span><span>
-</span><span id="line-26"></span><span class="hs-keyword">newtype</span><span> </span><span id="Microsecond"><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-var">Microsecond</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Microsecond"><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-var">Microsecond</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integer</span></span><span>
-</span><span id="line-27"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679051580"><span id="local-6989586621679051582"><span id="local-6989586621679051584"><span id="local-6989586621679051586"><span id="local-6989586621679051588"><span id="local-6989586621679051590"><span id="local-6989586621679051592"><span id="local-6989586621679051594"><span class="annot"><span class="annottext">Int -&gt; Microsecond
+</span><span id="line-26"></span><span class="hs-keyword">newtype</span><span> </span><span id="Microsecond"><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-var">Microsecond</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Microsecond"><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-var">Microsecond</span></a></span></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/integer-gmp-1.0.3.0/src"><span class="hs-identifier hs-type">Integer</span></a></span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679051609"><span id="local-6989586621679051611"><span id="local-6989586621679051613"><span id="local-6989586621679051615"><span id="local-6989586621679051617"><span id="local-6989586621679051619"><span id="local-6989586621679051621"><span id="local-6989586621679051623"><span class="annot"><span class="annottext">Int -&gt; Microsecond
 Microsecond -&gt; Int
 Microsecond -&gt; [Microsecond]
 Microsecond -&gt; Microsecond
@@ -65,7 +65,7 @@ pred :: Microsecond -&gt; Microsecond
 $cpred :: Microsecond -&gt; Microsecond
 succ :: Microsecond -&gt; Microsecond
 $csucc :: Microsecond -&gt; Microsecond
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051575"><span id="local-6989586621679051577"><span class="annot"><span class="annottext">Microsecond -&gt; Microsecond -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></a></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051604"><span id="local-6989586621679051606"><span class="annot"><span class="annottext">Microsecond -&gt; Microsecond -&gt; Bool
 (Microsecond -&gt; Microsecond -&gt; Bool)
 -&gt; (Microsecond -&gt; Microsecond -&gt; Bool) -&gt; Eq Microsecond
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -73,7 +73,7 @@ forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 $c/= :: Microsecond -&gt; Microsecond -&gt; Bool
 == :: Microsecond -&gt; Microsecond -&gt; Bool
 $c== :: Microsecond -&gt; Microsecond -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051560"><span id="local-6989586621679051562"><span id="local-6989586621679051564"><span id="local-6989586621679051566"><span id="local-6989586621679051568"><span id="local-6989586621679051570"><span id="local-6989586621679051572"><span class="annot"><span class="annottext">Integer -&gt; Microsecond
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051589"><span id="local-6989586621679051591"><span id="local-6989586621679051593"><span id="local-6989586621679051595"><span id="local-6989586621679051597"><span id="local-6989586621679051599"><span id="local-6989586621679051601"><span class="annot"><span class="annottext">Integer -&gt; Microsecond
 Microsecond -&gt; Microsecond
 Microsecond -&gt; Microsecond -&gt; Microsecond
 (Microsecond -&gt; Microsecond -&gt; Microsecond)
@@ -107,7 +107,7 @@ $c* :: Microsecond -&gt; Microsecond -&gt; Microsecond
 $c- :: Microsecond -&gt; Microsecond -&gt; Microsecond
 + :: Microsecond -&gt; Microsecond -&gt; Microsecond
 $c+ :: Microsecond -&gt; Microsecond -&gt; Microsecond
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Num</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051544"><span id="local-6989586621679051546"><span id="local-6989586621679051548"><span id="local-6989586621679051550"><span id="local-6989586621679051552"><span id="local-6989586621679051554"><span id="local-6989586621679051556"><span class="annot"><span class="annottext">Eq Microsecond
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Num</span></a></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051573"><span id="local-6989586621679051575"><span id="local-6989586621679051577"><span id="local-6989586621679051579"><span id="local-6989586621679051581"><span id="local-6989586621679051583"><span id="local-6989586621679051585"><span class="annot"><span class="annottext">Eq Microsecond
 Eq Microsecond
 -&gt; (Microsecond -&gt; Microsecond -&gt; Ordering)
 -&gt; (Microsecond -&gt; Microsecond -&gt; Bool)
@@ -145,7 +145,7 @@ $c&lt; :: Microsecond -&gt; Microsecond -&gt; Bool
 compare :: Microsecond -&gt; Microsecond -&gt; Ordering
 $ccompare :: Microsecond -&gt; Microsecond -&gt; Ordering
 $cp1Ord :: Eq Microsecond
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051539"><span class="annot"><span class="annottext">Num Microsecond
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></a></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051568"><span class="annot"><span class="annottext">Num Microsecond
 Ord Microsecond
 Num Microsecond
 -&gt; Ord Microsecond -&gt; (Microsecond -&gt; Rational) -&gt; Real Microsecond
@@ -155,7 +155,7 @@ toRational :: Microsecond -&gt; Rational
 $ctoRational :: Microsecond -&gt; Rational
 $cp2Real :: Ord Microsecond
 $cp1Real :: Num Microsecond
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Real</span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051532"><span id="local-6989586621679051534"><span id="local-6989586621679051536"><span class="annot"><span class="annottext">Int -&gt; Microsecond -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Real</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051561"><span id="local-6989586621679051563"><span id="local-6989586621679051565"><span class="annot"><span class="annottext">Int -&gt; Microsecond -&gt; ShowS
 [Microsecond] -&gt; ShowS
 Microsecond -&gt; String
 (Int -&gt; Microsecond -&gt; ShowS)
@@ -170,44 +170,44 @@ show :: Microsecond -&gt; String
 $cshow :: Microsecond -&gt; String
 showsPrec :: Int -&gt; Microsecond -&gt; ShowS
 $cshowsPrec :: Int -&gt; Microsecond -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-28"></span><span>
 </span><span id="line-29"></span><span class="hs-comment">-- The derived instance is using `toInteger :: Integer -&gt; Integer` which gives</span><span>
 </span><span id="line-30"></span><span class="hs-comment">-- a warning (`-Widentities`)</span><span>
-</span><span id="line-31"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679051518"><span id="local-6989586621679051521"><span id="local-6989586621679051523"><span id="local-6989586621679051525"><span id="local-6989586621679051527"><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-type">Microsecond</span></a></span></span></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-32"></span><span>  </span><span id="local-6989586621679051515"><span class="annot"><span class="annottext">toInteger :: Microsecond -&gt; Integer
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">toInteger</span></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-type">Microsecond</span></a></span><span> </span><span id="local-6989586621679051514"><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679051514"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679051514"><span class="hs-identifier hs-var">a</span></a></span><span>
-</span><span id="line-33"></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-type">Microsecond</span></a></span><span> </span><span id="local-6989586621679051513"><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679051513"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679051512"><span class="annot"><span class="annottext">quotRem :: Microsecond -&gt; Microsecond -&gt; (Microsecond, Microsecond)
-</span><span class="hs-operator hs-var hs-var hs-var hs-var">`quotRem`</span></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-type">Microsecond</span></a></span><span> </span><span id="local-6989586621679051510"><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679051510"><span class="hs-identifier hs-var">b</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-31"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679051547"><span id="local-6989586621679051550"><span id="local-6989586621679051552"><span id="local-6989586621679051554"><span id="local-6989586621679051556"><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Integral</span></a></span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-type">Microsecond</span></a></span></span></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-32"></span><span>  </span><span id="local-6989586621679051544"><span class="annot"><span class="annottext">toInteger :: Microsecond -&gt; Integer
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">toInteger</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-type">Microsecond</span></a></span><span> </span><span id="local-6989586621679051543"><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679051543"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679051543"><span class="hs-identifier hs-var">a</span></a></span><span>
+</span><span id="line-33"></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-type">Microsecond</span></a></span><span> </span><span id="local-6989586621679051542"><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679051542"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679051541"><span class="annot"><span class="annottext">quotRem :: Microsecond -&gt; Microsecond -&gt; (Microsecond, Microsecond)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var hs-var hs-var hs-var">`quotRem`</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-type">Microsecond</span></a></span><span> </span><span id="local-6989586621679051539"><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679051539"><span class="hs-identifier hs-var">b</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-34"></span><span>    </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679051513"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; (Integer, Integer)
+</span><a href="#local-6989586621679051542"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; (Integer, Integer)
 forall a. Integral a =&gt; a -&gt; a -&gt; (a, a)
-</span><span class="hs-operator hs-var">`quotRem`</span></span><span> </span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679051510"><span class="hs-identifier hs-var">b</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-35"></span><span>      </span><span class="hs-special">(</span><span id="local-6989586621679051509"><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679051509"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051508"><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679051508"><span class="hs-identifier hs-var">r</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer -&gt; Microsecond
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">`quotRem`</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679051539"><span class="hs-identifier hs-var">b</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-35"></span><span>      </span><span class="hs-special">(</span><span id="local-6989586621679051538"><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679051538"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051537"><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679051537"><span class="hs-identifier hs-var">r</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer -&gt; Microsecond
 </span><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-var">Microsecond</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679051509"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Microsecond
+</span><a href="#local-6989586621679051538"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Microsecond
 </span><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-var">Microsecond</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679051508"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679051537"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-36"></span><span>
 </span><span id="line-37"></span><span class="hs-keyword">data</span><span> </span><span id="NtpPacket"><span class="annot"><a href="Network.NTP.Client.Packet.html#NtpPacket"><span class="hs-identifier hs-var">NtpPacket</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="NtpPacket"><span class="annot"><a href="Network.NTP.Client.Packet.html#NtpPacket"><span class="hs-identifier hs-var">NtpPacket</span></a></span></span><span>
 </span><span id="line-38"></span><span>    </span><span class="hs-special">{</span><span> </span><span id="ntpParams"><span class="annot"><span class="annottext">NtpPacket -&gt; Word8
-</span><a href="Network.NTP.Client.Packet.html#ntpParams"><span class="hs-identifier hs-var hs-var">ntpParams</span></a></span></span><span>       </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Word8</span></span><span>        </span><span class="hs-comment">-- ^ some magic parameters</span><span>
+</span><a href="Network.NTP.Client.Packet.html#ntpParams"><span class="hs-identifier hs-var hs-var">ntpParams</span></a></span></span><span>       </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Word8</span></a></span><span>        </span><span class="hs-comment">-- ^ some magic parameters</span><span>
 </span><span id="line-39"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="ntpPoll"><span class="annot"><span class="annottext">NtpPacket -&gt; Int8
-</span><a href="Network.NTP.Client.Packet.html#ntpPoll"><span class="hs-identifier hs-var hs-var">ntpPoll</span></a></span></span><span>         </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int8</span></span><span>         </span><span class="hs-comment">-- ^ poll delay between requests</span><span>
+</span><a href="Network.NTP.Client.Packet.html#ntpPoll"><span class="hs-identifier hs-var hs-var">ntpPoll</span></a></span></span><span>         </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Int8</span></a></span><span>         </span><span class="hs-comment">-- ^ poll delay between requests</span><span>
 </span><span id="line-40"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="ntpOriginTime"><span class="annot"><span class="annottext">NtpPacket -&gt; Microsecond
 </span><a href="Network.NTP.Client.Packet.html#ntpOriginTime"><span class="hs-identifier hs-var hs-var">ntpOriginTime</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-type">Microsecond</span></a></span><span>  </span><span class="hs-comment">-- ^ when server sent reply</span><span>
 </span><span id="line-41"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="ntpReceivedTime"><span class="annot"><span class="annottext">NtpPacket -&gt; Microsecond
 </span><a href="Network.NTP.Client.Packet.html#ntpReceivedTime"><span class="hs-identifier hs-var hs-var">ntpReceivedTime</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-type">Microsecond</span></a></span><span>  </span><span class="hs-comment">-- ^ when server got request</span><span>
 </span><span id="line-42"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="ntpTransmitTime"><span class="annot"><span class="annottext">NtpPacket -&gt; Microsecond
 </span><a href="Network.NTP.Client.Packet.html#ntpTransmitTime"><span class="hs-identifier hs-var hs-var">ntpTransmitTime</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-type">Microsecond</span></a></span><span>  </span><span class="hs-comment">-- ^ when client sent request</span><span>
-</span><span id="line-43"></span><span>    </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679051496"><span id="local-6989586621679051498"><span id="local-6989586621679051500"><span class="annot"><span class="annottext">Int -&gt; NtpPacket -&gt; ShowS
+</span><span id="line-43"></span><span>    </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679051525"><span id="local-6989586621679051527"><span id="local-6989586621679051529"><span class="annot"><span class="annottext">Int -&gt; NtpPacket -&gt; ShowS
 [NtpPacket] -&gt; ShowS
 NtpPacket -&gt; String
 (Int -&gt; NtpPacket -&gt; ShowS)
@@ -222,7 +222,7 @@ show :: NtpPacket -&gt; String
 $cshow :: NtpPacket -&gt; String
 showsPrec :: Int -&gt; NtpPacket -&gt; ShowS
 $cshowsPrec :: Int -&gt; NtpPacket -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051492"><span id="local-6989586621679051494"><span class="annot"><span class="annottext">NtpPacket -&gt; NtpPacket -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051521"><span id="local-6989586621679051523"><span class="annot"><span class="annottext">NtpPacket -&gt; NtpPacket -&gt; Bool
 (NtpPacket -&gt; NtpPacket -&gt; Bool)
 -&gt; (NtpPacket -&gt; NtpPacket -&gt; Bool) -&gt; Eq NtpPacket
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -230,11 +230,11 @@ forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 $c/= :: NtpPacket -&gt; NtpPacket -&gt; Bool
 == :: NtpPacket -&gt; NtpPacket -&gt; Bool
 $c== :: NtpPacket -&gt; NtpPacket -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">)</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-44"></span><span>
-</span><span id="line-45"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679051488"><span class="annot"><span class="hs-identifier hs-type">Binary</span></span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#NtpPacket"><span class="hs-identifier hs-type">NtpPacket</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-46"></span><span>    </span><span id="local-6989586621679051486"><span class="annot"><span class="annottext">put :: NtpPacket -&gt; Put
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">put</span></span></span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#NtpPacket"><span class="hs-identifier hs-type">NtpPacket</span></a></span><span class="hs-special">{</span><span id="local-6989586621679051480"><span id="local-6989586621679051481"><span id="local-6989586621679051482"><span id="local-6989586621679051483"><span id="local-6989586621679051484"><span class="annot"><span class="annottext">Int8
+</span><span id="line-45"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679051517"><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier hs-type">Binary</span></a></span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#NtpPacket"><span class="hs-identifier hs-type">NtpPacket</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-46"></span><span>    </span><span id="local-6989586621679051515"><span class="annot"><span class="annottext">put :: NtpPacket -&gt; Put
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">put</span></a></span></span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#NtpPacket"><span class="hs-identifier hs-type">NtpPacket</span></a></span><span class="hs-special">{</span><span id="local-6989586621679051509"><span id="local-6989586621679051510"><span id="local-6989586621679051511"><span id="local-6989586621679051512"><span id="local-6989586621679051513"><span class="annot"><span class="annottext">Int8
 Word8
 Microsecond
 ntpTransmitTime :: Microsecond
@@ -247,97 +247,97 @@ ntpReceivedTime :: NtpPacket -&gt; Microsecond
 ntpOriginTime :: NtpPacket -&gt; Microsecond
 ntpPoll :: NtpPacket -&gt; Int8
 ntpParams :: NtpPacket -&gt; Word8
-</span><a href="#local-6989586621679051480"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><a href="#local-6989586621679051509"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
 </span><span id="line-47"></span><span>        </span><span class="annot"><span class="annottext">Word8 -&gt; Put
-</span><span class="hs-identifier hs-var">putWord8</span></span><span> </span><span class="annot"><span class="annottext">Word8
-</span><a href="#local-6989586621679051484"><span class="hs-identifier hs-var">ntpParams</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier hs-var">putWord8</span></a></span><span> </span><span class="annot"><span class="annottext">Word8
+</span><a href="#local-6989586621679051513"><span class="hs-identifier hs-var">ntpParams</span></a></span><span>
 </span><span id="line-48"></span><span>        </span><span class="annot"><span class="annottext">Word8 -&gt; Put
-</span><span class="hs-identifier hs-var">putWord8</span></span><span> </span><span class="annot"><span class="annottext">Word8
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier hs-var">putWord8</span></a></span><span> </span><span class="annot"><span class="annottext">Word8
 </span><span class="hs-number">0</span></span><span>
 </span><span id="line-49"></span><span>        </span><span class="annot"><span class="annottext">Int8 -&gt; Put
-</span><span class="hs-identifier hs-var">putInt8</span></span><span> </span><span class="annot"><span class="annottext">Int8
-</span><a href="#local-6989586621679051483"><span class="hs-identifier hs-var">ntpPoll</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier hs-var">putInt8</span></a></span><span> </span><span class="annot"><span class="annottext">Int8
+</span><a href="#local-6989586621679051512"><span class="hs-identifier hs-var">ntpPoll</span></a></span><span>
 </span><span id="line-50"></span><span>        </span><span class="annot"><span class="annottext">Word8 -&gt; Put
-</span><span class="hs-identifier hs-var">putWord8</span></span><span> </span><span class="annot"><span class="annottext">Word8
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier hs-var">putWord8</span></a></span><span> </span><span class="annot"><span class="annottext">Word8
 </span><span class="hs-number">0</span></span><span>
 </span><span id="line-51"></span><span>
 </span><span id="line-52"></span><span>        </span><span class="annot"><span class="annottext">Int -&gt; Put -&gt; Put
 forall (m :: * -&gt; *) a. Applicative m =&gt; Int -&gt; m a -&gt; m ()
-</span><span class="hs-identifier hs-var">replicateM_</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">replicateM_</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">5</span></span><span> </span><span class="annot"><span class="annottext">(Put -&gt; Put) -&gt; Put -&gt; Put
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; Put
-</span><span class="hs-identifier hs-var">putWord32be</span></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; Put
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier hs-var">putWord32be</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
 </span><span class="hs-number">0</span></span><span>
 </span><span id="line-53"></span><span>
-</span><span id="line-54"></span><span>        </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679051479"><span class="annot"><span class="annottext">Word32
-</span><a href="#local-6989586621679051479"><span class="hs-identifier hs-var">osec</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051478"><span class="annot"><span class="annottext">Word32
-</span><a href="#local-6989586621679051478"><span class="hs-identifier hs-var">ofrac</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Microsecond -&gt; (Word32, Word32)
+</span><span id="line-54"></span><span>        </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679051508"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679051508"><span class="hs-identifier hs-var">osec</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051507"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679051507"><span class="hs-identifier hs-var">ofrac</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Microsecond -&gt; (Word32, Word32)
 </span><a href="Network.NTP.Client.Packet.html#realMcsToNtp"><span class="hs-identifier hs-var">realMcsToNtp</span></a></span><span> </span><span class="annot"><span class="annottext">Microsecond
-</span><a href="#local-6989586621679051482"><span class="hs-identifier hs-var">ntpOriginTime</span></a></span><span>
+</span><a href="#local-6989586621679051511"><span class="hs-identifier hs-var">ntpOriginTime</span></a></span><span>
 </span><span id="line-55"></span><span>        </span><span class="annot"><span class="annottext">Word32 -&gt; Put
-</span><span class="hs-identifier hs-var">putWord32be</span></span><span> </span><span class="annot"><span class="annottext">Word32
-</span><a href="#local-6989586621679051479"><span class="hs-identifier hs-var">osec</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier hs-var">putWord32be</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679051508"><span class="hs-identifier hs-var">osec</span></a></span><span>
 </span><span id="line-56"></span><span>        </span><span class="annot"><span class="annottext">Word32 -&gt; Put
-</span><span class="hs-identifier hs-var">putWord32be</span></span><span> </span><span class="annot"><span class="annottext">Word32
-</span><a href="#local-6989586621679051478"><span class="hs-identifier hs-var">ofrac</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier hs-var">putWord32be</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679051507"><span class="hs-identifier hs-var">ofrac</span></a></span><span>
 </span><span id="line-57"></span><span>
-</span><span id="line-58"></span><span>        </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679051477"><span class="annot"><span class="annottext">Word32
-</span><a href="#local-6989586621679051477"><span class="hs-identifier hs-var">rsec</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051476"><span class="annot"><span class="annottext">Word32
-</span><a href="#local-6989586621679051476"><span class="hs-identifier hs-var">rfrac</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Microsecond -&gt; (Word32, Word32)
+</span><span id="line-58"></span><span>        </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679051506"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679051506"><span class="hs-identifier hs-var">rsec</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051505"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679051505"><span class="hs-identifier hs-var">rfrac</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Microsecond -&gt; (Word32, Word32)
 </span><a href="Network.NTP.Client.Packet.html#realMcsToNtp"><span class="hs-identifier hs-var">realMcsToNtp</span></a></span><span> </span><span class="annot"><span class="annottext">Microsecond
-</span><a href="#local-6989586621679051481"><span class="hs-identifier hs-var">ntpReceivedTime</span></a></span><span>
+</span><a href="#local-6989586621679051510"><span class="hs-identifier hs-var">ntpReceivedTime</span></a></span><span>
 </span><span id="line-59"></span><span>        </span><span class="annot"><span class="annottext">Word32 -&gt; Put
-</span><span class="hs-identifier hs-var">putWord32be</span></span><span> </span><span class="annot"><span class="annottext">Word32
-</span><a href="#local-6989586621679051477"><span class="hs-identifier hs-var">rsec</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier hs-var">putWord32be</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679051506"><span class="hs-identifier hs-var">rsec</span></a></span><span>
 </span><span id="line-60"></span><span>        </span><span class="annot"><span class="annottext">Word32 -&gt; Put
-</span><span class="hs-identifier hs-var">putWord32be</span></span><span> </span><span class="annot"><span class="annottext">Word32
-</span><a href="#local-6989586621679051476"><span class="hs-identifier hs-var">rfrac</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier hs-var">putWord32be</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679051505"><span class="hs-identifier hs-var">rfrac</span></a></span><span>
 </span><span id="line-61"></span><span>
-</span><span id="line-62"></span><span>        </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679051475"><span class="annot"><span class="annottext">Word32
-</span><a href="#local-6989586621679051475"><span class="hs-identifier hs-var">tsec</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051474"><span class="annot"><span class="annottext">Word32
-</span><a href="#local-6989586621679051474"><span class="hs-identifier hs-var">tfrac</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Microsecond -&gt; (Word32, Word32)
+</span><span id="line-62"></span><span>        </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679051504"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679051504"><span class="hs-identifier hs-var">tsec</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051503"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679051503"><span class="hs-identifier hs-var">tfrac</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Microsecond -&gt; (Word32, Word32)
 </span><a href="Network.NTP.Client.Packet.html#realMcsToNtp"><span class="hs-identifier hs-var">realMcsToNtp</span></a></span><span> </span><span class="annot"><span class="annottext">Microsecond
-</span><a href="#local-6989586621679051480"><span class="hs-identifier hs-var">ntpTransmitTime</span></a></span><span>
+</span><a href="#local-6989586621679051509"><span class="hs-identifier hs-var">ntpTransmitTime</span></a></span><span>
 </span><span id="line-63"></span><span>        </span><span class="annot"><span class="annottext">Word32 -&gt; Put
-</span><span class="hs-identifier hs-var">putWord32be</span></span><span> </span><span class="annot"><span class="annottext">Word32
-</span><a href="#local-6989586621679051475"><span class="hs-identifier hs-var">tsec</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier hs-var">putWord32be</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679051504"><span class="hs-identifier hs-var">tsec</span></a></span><span>
 </span><span id="line-64"></span><span>        </span><span class="annot"><span class="annottext">Word32 -&gt; Put
-</span><span class="hs-identifier hs-var">putWord32be</span></span><span> </span><span class="annot"><span class="annottext">Word32
-</span><a href="#local-6989586621679051474"><span class="hs-identifier hs-var">tfrac</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier hs-var">putWord32be</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679051503"><span class="hs-identifier hs-var">tfrac</span></a></span><span>
 </span><span id="line-65"></span><span>
-</span><span id="line-66"></span><span>    </span><span id="local-6989586621679051473"><span class="annot"><span class="annottext">get :: Get NtpPacket
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">get</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-67"></span><span>        </span><span id="local-6989586621679051471"><span class="annot"><span class="annottext">Word8
-</span><a href="#local-6989586621679051471"><span class="hs-identifier hs-var">ntpParams</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Get Word8
-</span><span class="hs-identifier hs-var">getWord8</span></span><span>
+</span><span id="line-66"></span><span>    </span><span id="local-6989586621679051502"><span class="annot"><span class="annottext">get :: Get NtpPacket
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">get</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-67"></span><span>        </span><span id="local-6989586621679051500"><span class="annot"><span class="annottext">Word8
+</span><a href="#local-6989586621679051500"><span class="hs-identifier hs-var">ntpParams</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Get Word8
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier hs-var">getWord8</span></a></span><span>
 </span><span id="line-68"></span><span>        </span><span class="annot"><span class="annottext">Word8
 </span><span class="hs-identifier">_</span></span><span>         </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Get Word8
-</span><span class="hs-identifier hs-var">getWord8</span></span><span>
-</span><span id="line-69"></span><span>        </span><span id="local-6989586621679051470"><span class="annot"><span class="annottext">Int8
-</span><a href="#local-6989586621679051470"><span class="hs-identifier hs-var">ntpPoll</span></a></span></span><span>   </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Get Int8
-</span><span class="hs-identifier hs-var">getInt8</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier hs-var">getWord8</span></a></span><span>
+</span><span id="line-69"></span><span>        </span><span id="local-6989586621679051499"><span class="annot"><span class="annottext">Int8
+</span><a href="#local-6989586621679051499"><span class="hs-identifier hs-var">ntpPoll</span></a></span></span><span>   </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Get Int8
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier hs-var">getInt8</span></a></span><span>
 </span><span id="line-70"></span><span>        </span><span class="annot"><span class="annottext">Word8
 </span><span class="hs-identifier">_</span></span><span>         </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Get Word8
-</span><span class="hs-identifier hs-var">getWord8</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier hs-var">getWord8</span></a></span><span>
 </span><span id="line-71"></span><span>
 </span><span id="line-72"></span><span>        </span><span class="hs-comment">-- skip 5 @'Word32'@ words</span><span>
 </span><span id="line-73"></span><span>        </span><span class="annot"><span class="annottext">Int -&gt; Get ()
-</span><span class="hs-identifier hs-var">skip</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier hs-var">skip</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">20</span></span><span>
 </span><span id="line-74"></span><span>
-</span><span id="line-75"></span><span>        </span><span id="local-6989586621679051469"><span class="annot"><span class="annottext">Microsecond
-</span><a href="#local-6989586621679051469"><span class="hs-identifier hs-var">ntpOriginTime</span></a></span></span><span>   </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Get Microsecond
-</span><a href="#local-6989586621679051468"><span class="hs-identifier hs-var">getTimestamp</span></a></span><span>
-</span><span id="line-76"></span><span>        </span><span id="local-6989586621679051467"><span class="annot"><span class="annottext">Microsecond
-</span><a href="#local-6989586621679051467"><span class="hs-identifier hs-var">ntpReceivedTime</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Get Microsecond
-</span><a href="#local-6989586621679051468"><span class="hs-identifier hs-var">getTimestamp</span></a></span><span>
-</span><span id="line-77"></span><span>        </span><span id="local-6989586621679051466"><span class="annot"><span class="annottext">Microsecond
-</span><a href="#local-6989586621679051466"><span class="hs-identifier hs-var">ntpTransmitTime</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Get Microsecond
-</span><a href="#local-6989586621679051468"><span class="hs-identifier hs-var">getTimestamp</span></a></span><span>
+</span><span id="line-75"></span><span>        </span><span id="local-6989586621679051498"><span class="annot"><span class="annottext">Microsecond
+</span><a href="#local-6989586621679051498"><span class="hs-identifier hs-var">ntpOriginTime</span></a></span></span><span>   </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Get Microsecond
+</span><a href="#local-6989586621679051497"><span class="hs-identifier hs-var">getTimestamp</span></a></span><span>
+</span><span id="line-76"></span><span>        </span><span id="local-6989586621679051496"><span class="annot"><span class="annottext">Microsecond
+</span><a href="#local-6989586621679051496"><span class="hs-identifier hs-var">ntpReceivedTime</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Get Microsecond
+</span><a href="#local-6989586621679051497"><span class="hs-identifier hs-var">getTimestamp</span></a></span><span>
+</span><span id="line-77"></span><span>        </span><span id="local-6989586621679051495"><span class="annot"><span class="annottext">Microsecond
+</span><a href="#local-6989586621679051495"><span class="hs-identifier hs-var">ntpTransmitTime</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Get Microsecond
+</span><a href="#local-6989586621679051497"><span class="hs-identifier hs-var">getTimestamp</span></a></span><span>
 </span><span id="line-78"></span><span>        </span><span class="annot"><span class="annottext">NtpPacket -&gt; Get NtpPacket
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
-</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">NtpPacket :: Word8
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">NtpPacket :: Word8
 -&gt; Int8 -&gt; Microsecond -&gt; Microsecond -&gt; Microsecond -&gt; NtpPacket
 </span><a href="Network.NTP.Client.Packet.html#NtpPacket"><span class="hs-identifier hs-type">NtpPacket</span></a></span><span class="hs-special">{</span><span class="annot"><span class="annottext">Int8
 Word8
@@ -352,25 +352,25 @@ ntpReceivedTime :: Microsecond
 ntpOriginTime :: Microsecond
 ntpPoll :: Int8
 ntpParams :: Word8
-</span><a href="#local-6989586621679051466"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span><span class="hs-special">}</span><span>
+</span><a href="#local-6989586621679051495"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span><span class="hs-special">}</span><span>
 </span><span id="line-79"></span><span>      </span><span class="hs-keyword">where</span><span>
-</span><span id="line-80"></span><span>        </span><span id="local-6989586621679051468"><span class="annot"><span class="annottext">getTimestamp :: Get Microsecond
-</span><a href="#local-6989586621679051468"><span class="hs-identifier hs-var hs-var">getTimestamp</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; Word32 -&gt; Microsecond
+</span><span id="line-80"></span><span>        </span><span id="local-6989586621679051497"><span class="annot"><span class="annottext">getTimestamp :: Get Microsecond
+</span><a href="#local-6989586621679051497"><span class="hs-identifier hs-var hs-var">getTimestamp</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; Word32 -&gt; Microsecond
 </span><a href="Network.NTP.Client.Packet.html#ntpToRealMcs"><span class="hs-identifier hs-var">ntpToRealMcs</span></a></span><span> </span><span class="annot"><span class="annottext">(Word32 -&gt; Word32 -&gt; Microsecond)
 -&gt; Get Word32 -&gt; Get (Word32 -&gt; Microsecond)
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Get Word32
-</span><span class="hs-identifier hs-var">getWord32be</span></span><span> </span><span class="annot"><span class="annottext">Get (Word32 -&gt; Microsecond) -&gt; Get Word32 -&gt; Get Microsecond
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Get Word32
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier hs-var">getWord32be</span></a></span><span> </span><span class="annot"><span class="annottext">Get (Word32 -&gt; Microsecond) -&gt; Get Word32 -&gt; Get Microsecond
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Get Word32
-</span><span class="hs-identifier hs-var">getWord32be</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;*&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Get Word32
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/binary-0.8.8.0/src"><span class="hs-identifier hs-var">getWord32be</span></a></span><span>
 </span><span id="line-81"></span><span>
 </span><span id="line-82"></span><span class="hs-comment">-- |</span><span>
 </span><span id="line-83"></span><span class="hs-comment">-- NTP timestamp start in 1.1.1900, i.e. 70 years before UNIX epoch.</span><span>
 </span><span id="line-84"></span><span class="hs-comment">-- references:</span><span>
 </span><span id="line-85"></span><span class="hs-comment">--  * https://tools.ietf.org/html/rfc5905#section-6</span><span>
 </span><span id="line-86"></span><span class="hs-comment">--  * https://tools.ietf.org/html/rfc5905#appendix-A.4</span><span>
-</span><span id="line-87"></span><span class="annot"><a href="Network.NTP.Client.Packet.html#ntpTimestampDelta"><span class="hs-identifier hs-type">ntpTimestampDelta</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integer</span></span><span>
+</span><span id="line-87"></span><span class="annot"><a href="Network.NTP.Client.Packet.html#ntpTimestampDelta"><span class="hs-identifier hs-type">ntpTimestampDelta</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/integer-gmp-1.0.3.0/src"><span class="hs-identifier hs-type">Integer</span></a></span><span>
 </span><span id="line-88"></span><span id="ntpTimestampDelta"><span class="annot"><span class="annottext">ntpTimestampDelta :: Integer
 </span><a href="Network.NTP.Client.Packet.html#ntpTimestampDelta"><span class="hs-identifier hs-var hs-var">ntpTimestampDelta</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">2208988800</span></span><span>
@@ -378,7 +378,7 @@ forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f
 </span><span id="line-90"></span><span class="hs-comment">-- |</span><span>
 </span><span id="line-91"></span><span class="hs-comment">-- We only need first 48 bytes of a packet:</span><span>
 </span><span id="line-92"></span><span class="hs-comment">-- reference: https://tools.ietf.org/html/rfc5905#section-7.3</span><span>
-</span><span id="line-93"></span><span class="annot"><a href="Network.NTP.Client.Packet.html#ntpPacketSize"><span class="hs-identifier hs-type">ntpPacketSize</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-93"></span><span class="annot"><a href="Network.NTP.Client.Packet.html#ntpPacketSize"><span class="hs-identifier hs-type">ntpPacketSize</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span>
 </span><span id="line-94"></span><span id="ntpPacketSize"><span class="annot"><span class="annottext">ntpPacketSize :: Int
 </span><a href="Network.NTP.Client.Packet.html#ntpPacketSize"><span class="hs-identifier hs-var hs-var">ntpPacketSize</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">48</span></span><span>
@@ -387,45 +387,45 @@ forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f
 </span><span id="line-97"></span><span class="hs-comment">-- For pairs @(x, y) :: (Word32, Word32)@ with @y \`mod\` 4294 == 0@ it is</span><span>
 </span><span id="line-98"></span><span class="hs-comment">-- be right inverse of @'realMsgToNtp'@.   In general it is not injective (for that</span><span>
 </span><span id="line-99"></span><span class="hs-comment">-- we'd need to use @'Picosecond'@ instead of @'Microsecond'@).</span><span>
-</span><span id="line-100"></span><span class="annot"><a href="Network.NTP.Client.Packet.html#ntpToRealMcs"><span class="hs-identifier hs-type">ntpToRealMcs</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Word32</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Word32</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-type">Microsecond</span></a></span><span>
+</span><span id="line-100"></span><span class="annot"><a href="Network.NTP.Client.Packet.html#ntpToRealMcs"><span class="hs-identifier hs-type">ntpToRealMcs</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-type">Microsecond</span></a></span><span>
 </span><span id="line-101"></span><span id="ntpToRealMcs"><span class="annot"><span class="annottext">ntpToRealMcs :: Word32 -&gt; Word32 -&gt; Microsecond
-</span><a href="Network.NTP.Client.Packet.html#ntpToRealMcs"><span class="hs-identifier hs-var hs-var">ntpToRealMcs</span></a></span></span><span> </span><span id="local-6989586621679051463"><span class="annot"><span class="annottext">Word32
-</span><a href="#local-6989586621679051463"><span class="hs-identifier hs-var">sec</span></a></span></span><span> </span><span id="local-6989586621679051462"><span class="annot"><span class="annottext">Word32
-</span><a href="#local-6989586621679051462"><span class="hs-identifier hs-var">frac</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="Network.NTP.Client.Packet.html#ntpToRealMcs"><span class="hs-identifier hs-var hs-var">ntpToRealMcs</span></a></span></span><span> </span><span id="local-6989586621679051492"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679051492"><span class="hs-identifier hs-var">sec</span></a></span></span><span> </span><span id="local-6989586621679051491"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679051491"><span class="hs-identifier hs-var">frac</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-102"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span class="hs-comment">-- microseconds</span><span>
-</span><span id="line-103"></span><span>        </span><span class="annot"><a href="#local-6989586621679051461"><span class="hs-identifier hs-type">secMicro</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integer</span></span><span>
-</span><span id="line-104"></span><span>        </span><span id="local-6989586621679051461"><span class="annot"><span class="annottext">secMicro :: Integer
-</span><a href="#local-6989586621679051461"><span class="hs-identifier hs-var hs-var">secMicro</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word32 -&gt; Integer
+</span><span id="line-103"></span><span>        </span><span class="annot"><a href="#local-6989586621679051490"><span class="hs-identifier hs-type">secMicro</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/integer-gmp-1.0.3.0/src"><span class="hs-identifier hs-type">Integer</span></a></span><span>
+</span><span id="line-104"></span><span>        </span><span id="local-6989586621679051490"><span class="annot"><span class="annottext">secMicro :: Integer
+</span><a href="#local-6989586621679051490"><span class="hs-identifier hs-var hs-var">secMicro</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word32 -&gt; Integer
 forall a b. (Integral a, Num b) =&gt; a -&gt; b
-</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">Word32
-</span><a href="#local-6989586621679051463"><span class="hs-identifier hs-var">sec</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679051492"><span class="hs-identifier hs-var">sec</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-glyph hs-var">-</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
 </span><a href="Network.NTP.Client.Packet.html#ntpTimestampDelta"><span class="hs-identifier hs-var">ntpTimestampDelta</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">*</span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">*</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">1000000</span></span><span>
 </span><span id="line-105"></span><span>        </span><span class="hs-comment">-- We divide 1 second into 2 ^ 32 parts, giving 2.3283064365386963e-10</span><span>
 </span><span id="line-106"></span><span>        </span><span class="hs-comment">-- as the quantum. A picosecond is 10e-12 of a second, so this is 232</span><span>
 </span><span id="line-107"></span><span>        </span><span class="hs-comment">-- picoseconds or `1/4294` of a millisecond.</span><span>
 </span><span id="line-108"></span><span>        </span><span class="hs-comment">-- ref: https://tools.ietf.org/html/rfc5905#section-6</span><span>
-</span><span id="line-109"></span><span>        </span><span class="annot"><a href="#local-6989586621679051459"><span class="hs-identifier hs-type">fracMicro</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integer</span></span><span>
-</span><span id="line-110"></span><span>        </span><span id="local-6989586621679051459"><span class="annot"><span class="annottext">fracMicro :: Integer
-</span><a href="#local-6989586621679051459"><span class="hs-identifier hs-var hs-var">fracMicro</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word32 -&gt; Integer
+</span><span id="line-109"></span><span>        </span><span class="annot"><a href="#local-6989586621679051488"><span class="hs-identifier hs-type">fracMicro</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/integer-gmp-1.0.3.0/src"><span class="hs-identifier hs-type">Integer</span></a></span><span>
+</span><span id="line-110"></span><span>        </span><span id="local-6989586621679051488"><span class="annot"><span class="annottext">fracMicro :: Integer
+</span><a href="#local-6989586621679051488"><span class="hs-identifier hs-var hs-var">fracMicro</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word32 -&gt; Integer
 forall a b. (Integral a, Num b) =&gt; a -&gt; b
-</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">Word32
-</span><a href="#local-6989586621679051462"><span class="hs-identifier hs-var">frac</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679051491"><span class="hs-identifier hs-var">frac</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
 forall a. Integral a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">`div`</span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">`div`</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">4294</span></span><span>
 </span><span id="line-111"></span><span>    </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Microsecond
 </span><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-var">Microsecond</span></a></span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; Microsecond) -&gt; Integer -&gt; Microsecond
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679051461"><span class="hs-identifier hs-var">secMicro</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679051490"><span class="hs-identifier hs-var">secMicro</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679051459"><span class="hs-identifier hs-var">fracMicro</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679051488"><span class="hs-identifier hs-var">fracMicro</span></a></span><span>
 </span><span id="line-112"></span><span>
 </span><span id="line-113"></span><span class="hs-comment">-- |</span><span>
 </span><span id="line-114"></span><span class="hs-comment">-- It is a partial function, since @Microsecond ~ Integer@; it is well defined</span><span>
@@ -434,59 +434,59 @@ forall a. Num a =&gt; a -&gt; a -&gt; a
 </span><span id="line-117"></span><span class="hs-comment">--  x &lt; 2085978496 = (maxBound @Word32 * 1000000) - ntpTimestampDelta + 1`</span><span>
 </span><span id="line-118"></span><span class="hs-comment">-- @</span><span>
 </span><span id="line-119"></span><span class="hs-comment">-- (in microseconds; this is roughly 66 years, so we're fine untill 2036).</span><span>
-</span><span id="line-120"></span><span class="annot"><a href="Network.NTP.Client.Packet.html#realMcsToNtp"><span class="hs-identifier hs-type">realMcsToNtp</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-type">Microsecond</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Word32</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Word32</span></span><span class="hs-special">)</span><span>
+</span><span id="line-120"></span><span class="annot"><a href="Network.NTP.Client.Packet.html#realMcsToNtp"><span class="hs-identifier hs-type">realMcsToNtp</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-type">Microsecond</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-121"></span><span id="realMcsToNtp"><span class="annot"><span class="annottext">realMcsToNtp :: Microsecond -&gt; (Word32, Word32)
-</span><a href="Network.NTP.Client.Packet.html#realMcsToNtp"><span class="hs-identifier hs-var hs-var">realMcsToNtp</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-type">Microsecond</span></a></span><span> </span><span id="local-6989586621679051456"><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679051456"><span class="hs-identifier hs-var">mcs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-122"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679051455"><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679051455"><span class="hs-identifier hs-var">sec</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051454"><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679051454"><span class="hs-identifier hs-var">frac</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; (Integer, Integer)
+</span><a href="Network.NTP.Client.Packet.html#realMcsToNtp"><span class="hs-identifier hs-var hs-var">realMcsToNtp</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-type">Microsecond</span></a></span><span> </span><span id="local-6989586621679051485"><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679051485"><span class="hs-identifier hs-var">mcs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-122"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679051484"><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679051484"><span class="hs-identifier hs-var">sec</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051483"><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679051483"><span class="hs-identifier hs-var">frac</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; (Integer, Integer)
 forall a. Integral a =&gt; a -&gt; a -&gt; (a, a)
-</span><span class="hs-identifier hs-var">divMod</span></span><span> </span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679051456"><span class="hs-identifier hs-var">mcs</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">divMod</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679051485"><span class="hs-identifier hs-var">mcs</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">1000000</span></span><span>
 </span><span id="line-123"></span><span>    </span><span class="hs-keyword">in</span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Word32
 forall a b. (Integral a, Num b) =&gt; a -&gt; b
-</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; Word32) -&gt; Integer -&gt; Word32
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; Word32) -&gt; Integer -&gt; Word32
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679051455"><span class="hs-identifier hs-var">sec</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679051484"><span class="hs-identifier hs-var">sec</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
 </span><a href="Network.NTP.Client.Packet.html#ntpTimestampDelta"><span class="hs-identifier hs-var">ntpTimestampDelta</span></a></span><span>
 </span><span id="line-124"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Word32
 forall a b. (Integral a, Num b) =&gt; a -&gt; b
-</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; Word32) -&gt; Integer -&gt; Word32
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; Word32) -&gt; Integer -&gt; Word32
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679051454"><span class="hs-identifier hs-var">frac</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679051483"><span class="hs-identifier hs-var">frac</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">*</span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">*</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">4294</span></span><span class="hs-special">)</span><span>
 </span><span id="line-125"></span><span>
 </span><span id="line-126"></span><span class="hs-comment">-- |</span><span>
 </span><span id="line-127"></span><span class="hs-comment">-- Smart constructor for @'NtpPacket'@.</span><span>
-</span><span id="line-128"></span><span class="annot"><a href="Network.NTP.Client.Packet.html#mkNtpPacket"><span class="hs-identifier hs-type">mkNtpPacket</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#NtpPacket"><span class="hs-identifier hs-type">NtpPacket</span></a></span><span>
+</span><span id="line-128"></span><span class="annot"><a href="Network.NTP.Client.Packet.html#mkNtpPacket"><span class="hs-identifier hs-type">mkNtpPacket</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#NtpPacket"><span class="hs-identifier hs-type">NtpPacket</span></a></span><span>
 </span><span id="line-129"></span><span id="mkNtpPacket"><span class="annot"><span class="annottext">mkNtpPacket :: IO NtpPacket
 </span><a href="Network.NTP.Client.Packet.html#mkNtpPacket"><span class="hs-identifier hs-var hs-var">mkNtpPacket</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-130"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679051452"><span class="annot"><span class="annottext">ntpParams :: Word8
-</span><a href="#local-6989586621679051452"><span class="hs-identifier hs-var hs-var">ntpParams</span></a></span></span><span>       </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word8
+</span><span id="line-130"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679051481"><span class="annot"><span class="annottext">ntpParams :: Word8
+</span><a href="#local-6989586621679051481"><span class="hs-identifier hs-var hs-var">ntpParams</span></a></span></span><span>       </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word8
 </span><span class="hs-number">0x1b</span></span><span>
-</span><span id="line-131"></span><span>        </span><span id="local-6989586621679051451"><span class="annot"><span class="annottext">ntpPoll :: Int8
-</span><a href="#local-6989586621679051451"><span class="hs-identifier hs-var hs-var">ntpPoll</span></a></span></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int8
+</span><span id="line-131"></span><span>        </span><span id="local-6989586621679051480"><span class="annot"><span class="annottext">ntpPoll :: Int8
+</span><a href="#local-6989586621679051480"><span class="hs-identifier hs-var hs-var">ntpPoll</span></a></span></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int8
 </span><span class="hs-number">0</span></span><span>
-</span><span id="line-132"></span><span>        </span><span id="local-6989586621679051450"><span class="annot"><span class="annottext">ntpOriginTime :: Microsecond
-</span><a href="#local-6989586621679051450"><span class="hs-identifier hs-var hs-var">ntpOriginTime</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Microsecond
+</span><span id="line-132"></span><span>        </span><span id="local-6989586621679051479"><span class="annot"><span class="annottext">ntpOriginTime :: Microsecond
+</span><a href="#local-6989586621679051479"><span class="hs-identifier hs-var hs-var">ntpOriginTime</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Microsecond
 </span><span class="hs-number">0</span></span><span>
-</span><span id="line-133"></span><span>        </span><span id="local-6989586621679051449"><span class="annot"><span class="annottext">ntpReceivedTime :: Microsecond
-</span><a href="#local-6989586621679051449"><span class="hs-identifier hs-var hs-var">ntpReceivedTime</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Microsecond
+</span><span id="line-133"></span><span>        </span><span id="local-6989586621679051478"><span class="annot"><span class="annottext">ntpReceivedTime :: Microsecond
+</span><a href="#local-6989586621679051478"><span class="hs-identifier hs-var hs-var">ntpReceivedTime</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Microsecond
 </span><span class="hs-number">0</span></span><span>
-</span><span id="line-134"></span><span>    </span><span id="local-6989586621679051448"><span class="annot"><span class="annottext">Microsecond
-</span><a href="#local-6989586621679051448"><span class="hs-identifier hs-var">ntpTransmitTime</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">IO Microsecond
+</span><span id="line-134"></span><span>    </span><span id="local-6989586621679051477"><span class="annot"><span class="annottext">Microsecond
+</span><a href="#local-6989586621679051477"><span class="hs-identifier hs-var">ntpTransmitTime</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">IO Microsecond
 </span><a href="Network.NTP.Client.Packet.html#getCurrentTime"><span class="hs-identifier hs-var">getCurrentTime</span></a></span><span>
 </span><span id="line-135"></span><span>    </span><span class="annot"><span class="annottext">NtpPacket -&gt; IO NtpPacket
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
-</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">NtpPacket :: Word8
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">NtpPacket :: Word8
 -&gt; Int8 -&gt; Microsecond -&gt; Microsecond -&gt; Microsecond -&gt; NtpPacket
 </span><a href="Network.NTP.Client.Packet.html#NtpPacket"><span class="hs-identifier hs-type">NtpPacket</span></a></span><span class="hs-special">{</span><span class="annot"><span class="annottext">Int8
 Word8
@@ -501,13 +501,13 @@ ntpReceivedTime :: Microsecond
 ntpOriginTime :: Microsecond
 ntpPoll :: Int8
 ntpParams :: Word8
-</span><a href="#local-6989586621679051448"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span><span class="hs-special">}</span><span>
+</span><a href="#local-6989586621679051477"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span><span class="hs-special">}</span><span>
 </span><span id="line-136"></span><span>
 </span><span id="line-137"></span><span class="hs-comment">-- |</span><span>
 </span><span id="line-138"></span><span class="hs-comment">-- @'NtpOffset'@ is the difference between NTP time and local time.</span><span>
 </span><span id="line-139"></span><span class="hs-keyword">newtype</span><span> </span><span id="NtpOffset"><span class="annot"><a href="Network.NTP.Client.Packet.html#NtpOffset"><span class="hs-identifier hs-var">NtpOffset</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="NtpOffset"><span class="annot"><a href="Network.NTP.Client.Packet.html#NtpOffset"><span class="hs-identifier hs-var">NtpOffset</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="getNtpOffset"><span class="annot"><span class="annottext">NtpOffset -&gt; Microsecond
 </span><a href="Network.NTP.Client.Packet.html#getNtpOffset"><span class="hs-identifier hs-var hs-var">getNtpOffset</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-type">Microsecond</span></a></span><span> </span><span class="hs-special">}</span><span>
-</span><span id="line-140"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679051430"><span id="local-6989586621679051432"><span id="local-6989586621679051434"><span id="local-6989586621679051436"><span id="local-6989586621679051438"><span id="local-6989586621679051440"><span id="local-6989586621679051442"><span id="local-6989586621679051444"><span class="annot"><span class="annottext">Int -&gt; NtpOffset
+</span><span id="line-140"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679051459"><span id="local-6989586621679051461"><span id="local-6989586621679051463"><span id="local-6989586621679051465"><span id="local-6989586621679051467"><span id="local-6989586621679051469"><span id="local-6989586621679051471"><span id="local-6989586621679051473"><span class="annot"><span class="annottext">Int -&gt; NtpOffset
 NtpOffset -&gt; Int
 NtpOffset -&gt; [NtpOffset]
 NtpOffset -&gt; NtpOffset
@@ -548,7 +548,7 @@ pred :: NtpOffset -&gt; NtpOffset
 $cpred :: NtpOffset -&gt; NtpOffset
 succ :: NtpOffset -&gt; NtpOffset
 $csucc :: NtpOffset -&gt; NtpOffset
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051426"><span id="local-6989586621679051428"><span class="annot"><span class="annottext">NtpOffset -&gt; NtpOffset -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></a></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051455"><span id="local-6989586621679051457"><span class="annot"><span class="annottext">NtpOffset -&gt; NtpOffset -&gt; Bool
 (NtpOffset -&gt; NtpOffset -&gt; Bool)
 -&gt; (NtpOffset -&gt; NtpOffset -&gt; Bool) -&gt; Eq NtpOffset
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -556,7 +556,7 @@ forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 $c/= :: NtpOffset -&gt; NtpOffset -&gt; Bool
 == :: NtpOffset -&gt; NtpOffset -&gt; Bool
 $c== :: NtpOffset -&gt; NtpOffset -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051410"><span id="local-6989586621679051412"><span id="local-6989586621679051414"><span id="local-6989586621679051416"><span id="local-6989586621679051418"><span id="local-6989586621679051420"><span id="local-6989586621679051422"><span class="annot"><span class="annottext">Enum NtpOffset
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051439"><span id="local-6989586621679051441"><span id="local-6989586621679051443"><span id="local-6989586621679051445"><span id="local-6989586621679051447"><span id="local-6989586621679051449"><span id="local-6989586621679051451"><span class="annot"><span class="annottext">Enum NtpOffset
 Real NtpOffset
 Real NtpOffset
 -&gt; Enum NtpOffset
@@ -598,7 +598,7 @@ quot :: NtpOffset -&gt; NtpOffset -&gt; NtpOffset
 $cquot :: NtpOffset -&gt; NtpOffset -&gt; NtpOffset
 $cp2Integral :: Enum NtpOffset
 $cp1Integral :: Real NtpOffset
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Integral</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051396"><span id="local-6989586621679051398"><span id="local-6989586621679051400"><span id="local-6989586621679051402"><span id="local-6989586621679051404"><span id="local-6989586621679051406"><span id="local-6989586621679051408"><span class="annot"><span class="annottext">Integer -&gt; NtpOffset
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Integral</span></a></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051425"><span id="local-6989586621679051427"><span id="local-6989586621679051429"><span id="local-6989586621679051431"><span id="local-6989586621679051433"><span id="local-6989586621679051435"><span id="local-6989586621679051437"><span class="annot"><span class="annottext">Integer -&gt; NtpOffset
 NtpOffset -&gt; NtpOffset
 NtpOffset -&gt; NtpOffset -&gt; NtpOffset
 (NtpOffset -&gt; NtpOffset -&gt; NtpOffset)
@@ -632,7 +632,7 @@ $c* :: NtpOffset -&gt; NtpOffset -&gt; NtpOffset
 $c- :: NtpOffset -&gt; NtpOffset -&gt; NtpOffset
 + :: NtpOffset -&gt; NtpOffset -&gt; NtpOffset
 $c+ :: NtpOffset -&gt; NtpOffset -&gt; NtpOffset
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Num</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051381"><span id="local-6989586621679051383"><span id="local-6989586621679051385"><span id="local-6989586621679051387"><span id="local-6989586621679051389"><span id="local-6989586621679051391"><span id="local-6989586621679051393"><span class="annot"><span class="annottext">Eq NtpOffset
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Num</span></a></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051410"><span id="local-6989586621679051412"><span id="local-6989586621679051414"><span id="local-6989586621679051416"><span id="local-6989586621679051418"><span id="local-6989586621679051420"><span id="local-6989586621679051422"><span class="annot"><span class="annottext">Eq NtpOffset
 Eq NtpOffset
 -&gt; (NtpOffset -&gt; NtpOffset -&gt; Ordering)
 -&gt; (NtpOffset -&gt; NtpOffset -&gt; Bool)
@@ -670,7 +670,7 @@ $c&lt; :: NtpOffset -&gt; NtpOffset -&gt; Bool
 compare :: NtpOffset -&gt; NtpOffset -&gt; Ordering
 $ccompare :: NtpOffset -&gt; NtpOffset -&gt; Ordering
 $cp1Ord :: Eq NtpOffset
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051377"><span class="annot"><span class="annottext">Num NtpOffset
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></a></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051406"><span class="annot"><span class="annottext">Num NtpOffset
 Ord NtpOffset
 Num NtpOffset
 -&gt; Ord NtpOffset -&gt; (NtpOffset -&gt; Rational) -&gt; Real NtpOffset
@@ -680,7 +680,7 @@ toRational :: NtpOffset -&gt; Rational
 $ctoRational :: NtpOffset -&gt; Rational
 $cp2Real :: Ord NtpOffset
 $cp1Real :: Num NtpOffset
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Real</span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051371"><span id="local-6989586621679051373"><span id="local-6989586621679051375"><span class="annot"><span class="annottext">Int -&gt; NtpOffset -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Real</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679051400"><span id="local-6989586621679051402"><span id="local-6989586621679051404"><span class="annot"><span class="annottext">Int -&gt; NtpOffset -&gt; ShowS
 [NtpOffset] -&gt; ShowS
 NtpOffset -&gt; String
 (Int -&gt; NtpOffset -&gt; ShowS)
@@ -695,11 +695,11 @@ show :: NtpOffset -&gt; String
 $cshow :: NtpOffset -&gt; String
 showsPrec :: Int -&gt; NtpOffset -&gt; ShowS
 $cshowsPrec :: Int -&gt; NtpOffset -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-141"></span><span>
 </span><span id="line-142"></span><span class="annot"><a href="Network.NTP.Client.Packet.html#clockOffsetPure"><span class="hs-identifier hs-type">clockOffsetPure</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#NtpPacket"><span class="hs-identifier hs-type">NtpPacket</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-type">Microsecond</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#NtpOffset"><span class="hs-identifier hs-type">NtpOffset</span></a></span><span>
 </span><span id="line-143"></span><span id="clockOffsetPure"><span class="annot"><span class="annottext">clockOffsetPure :: NtpPacket -&gt; Microsecond -&gt; NtpOffset
-</span><a href="Network.NTP.Client.Packet.html#clockOffsetPure"><span class="hs-identifier hs-var hs-var">clockOffsetPure</span></a></span></span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#NtpPacket"><span class="hs-identifier hs-type">NtpPacket</span></a></span><span class="hs-special">{</span><span id="local-6989586621679051366"><span id="local-6989586621679051367"><span id="local-6989586621679051368"><span id="local-6989586621679051369"><span id="local-6989586621679051370"><span class="annot"><span class="annottext">Int8
+</span><a href="Network.NTP.Client.Packet.html#clockOffsetPure"><span class="hs-identifier hs-var hs-var">clockOffsetPure</span></a></span></span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#NtpPacket"><span class="hs-identifier hs-type">NtpPacket</span></a></span><span class="hs-special">{</span><span id="local-6989586621679051395"><span id="local-6989586621679051396"><span id="local-6989586621679051397"><span id="local-6989586621679051398"><span id="local-6989586621679051399"><span class="annot"><span class="annottext">Int8
 Word8
 Microsecond
 ntpTransmitTime :: Microsecond
@@ -712,25 +712,25 @@ ntpReceivedTime :: NtpPacket -&gt; Microsecond
 ntpOriginTime :: NtpPacket -&gt; Microsecond
 ntpPoll :: NtpPacket -&gt; Int8
 ntpParams :: NtpPacket -&gt; Word8
-</span><a href="#local-6989586621679051366"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span></span></span><span class="hs-special">}</span><span> </span><span id="local-6989586621679051365"><span class="annot"><span class="annottext">Microsecond
-</span><a href="#local-6989586621679051365"><span class="hs-identifier hs-var">localTime</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Microsecond -&gt; NtpOffset
+</span><a href="#local-6989586621679051395"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span></span></span><span class="hs-special">}</span><span> </span><span id="local-6989586621679051394"><span class="annot"><span class="annottext">Microsecond
+</span><a href="#local-6989586621679051394"><span class="hs-identifier hs-var">localTime</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Microsecond -&gt; NtpOffset
 </span><a href="Network.NTP.Client.Packet.html#NtpOffset"><span class="hs-identifier hs-var">NtpOffset</span></a></span><span>
 </span><span id="line-144"></span><span>    </span><span class="annot"><span class="annottext">(Microsecond -&gt; NtpOffset) -&gt; Microsecond -&gt; NtpOffset
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Microsecond
-</span><a href="#local-6989586621679051367"><span class="hs-identifier hs-var">ntpReceivedTime</span></a></span><span> </span><span class="annot"><span class="annottext">Microsecond -&gt; Microsecond -&gt; Microsecond
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Microsecond
+</span><a href="#local-6989586621679051396"><span class="hs-identifier hs-var">ntpReceivedTime</span></a></span><span> </span><span class="annot"><span class="annottext">Microsecond -&gt; Microsecond -&gt; Microsecond
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Microsecond
-</span><a href="#local-6989586621679051368"><span class="hs-identifier hs-var">ntpOriginTime</span></a></span><span> </span><span class="annot"><span class="annottext">Microsecond -&gt; Microsecond -&gt; Microsecond
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-glyph hs-var">-</span></a></span><span> </span><span class="annot"><span class="annottext">Microsecond
+</span><a href="#local-6989586621679051397"><span class="hs-identifier hs-var">ntpOriginTime</span></a></span><span> </span><span class="annot"><span class="annottext">Microsecond -&gt; Microsecond -&gt; Microsecond
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Microsecond
-</span><a href="#local-6989586621679051366"><span class="hs-identifier hs-var">ntpTransmitTime</span></a></span><span> </span><span class="annot"><span class="annottext">Microsecond -&gt; Microsecond -&gt; Microsecond
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="annot"><span class="annottext">Microsecond
+</span><a href="#local-6989586621679051395"><span class="hs-identifier hs-var">ntpTransmitTime</span></a></span><span> </span><span class="annot"><span class="annottext">Microsecond -&gt; Microsecond -&gt; Microsecond
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Microsecond
-</span><a href="#local-6989586621679051365"><span class="hs-identifier hs-var">localTime</span></a></span><span class="hs-special">)</span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-glyph hs-var">-</span></a></span><span> </span><span class="annot"><span class="annottext">Microsecond
+</span><a href="#local-6989586621679051394"><span class="hs-identifier hs-var">localTime</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-145"></span><span>      </span><span class="annot"><span class="annottext">Microsecond -&gt; Microsecond -&gt; Microsecond
 forall a. Integral a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">`div`</span></span><span> </span><span class="annot"><span class="annottext">Microsecond
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">`div`</span></a></span><span> </span><span class="annot"><span class="annottext">Microsecond
 </span><span class="hs-number">2</span></span><span>
 </span><span id="line-146"></span><span>
 </span><span id="line-147"></span><span class="hs-comment">-- |</span><span>
@@ -740,63 +740,63 @@ forall a. Integral a =&gt; a -&gt; a -&gt; a
 </span><span id="line-151"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-type">Microsecond</span></a></span><span>
 </span><span id="line-152"></span><span>    </span><span class="hs-comment">-- ^ @'ntpResponseTimeout'@, ignore responses which come after it passed.</span><span>
 </span><span id="line-153"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#NtpPacket"><span class="hs-identifier hs-type">NtpPacket</span></a></span><span>
-</span><span id="line-154"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#NtpOffset"><span class="hs-identifier hs-type">NtpOffset</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-154"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#NtpOffset"><span class="hs-identifier hs-type">NtpOffset</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-155"></span><span id="clockOffset"><span class="annot"><span class="annottext">clockOffset :: Microsecond -&gt; NtpPacket -&gt; IO (Maybe NtpOffset)
-</span><a href="Network.NTP.Client.Packet.html#clockOffset"><span class="hs-identifier hs-var hs-var">clockOffset</span></a></span></span><span> </span><span id="local-6989586621679051364"><span class="annot"><span class="annottext">Microsecond
-</span><a href="#local-6989586621679051364"><span class="hs-identifier hs-var">respTimeout</span></a></span></span><span> </span><span id="local-6989586621679051363"><span class="annot"><span class="annottext">NtpPacket
-</span><a href="#local-6989586621679051363"><span class="hs-identifier hs-var">packet</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-156"></span><span>    </span><span id="local-6989586621679051362"><span class="annot"><span class="annottext">Microsecond
-</span><a href="#local-6989586621679051362"><span class="hs-identifier hs-var">time</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">IO Microsecond
+</span><a href="Network.NTP.Client.Packet.html#clockOffset"><span class="hs-identifier hs-var hs-var">clockOffset</span></a></span></span><span> </span><span id="local-6989586621679051393"><span class="annot"><span class="annottext">Microsecond
+</span><a href="#local-6989586621679051393"><span class="hs-identifier hs-var">respTimeout</span></a></span></span><span> </span><span id="local-6989586621679051392"><span class="annot"><span class="annottext">NtpPacket
+</span><a href="#local-6989586621679051392"><span class="hs-identifier hs-var">packet</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-156"></span><span>    </span><span id="local-6989586621679051391"><span class="annot"><span class="annottext">Microsecond
+</span><a href="#local-6989586621679051391"><span class="hs-identifier hs-var">time</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">IO Microsecond
 </span><a href="Network.NTP.Client.Packet.html#getCurrentTime"><span class="hs-identifier hs-var">getCurrentTime</span></a></span><span>
-</span><span id="line-157"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679051361"><span class="annot"><span class="annottext">isLate :: Bool
-</span><a href="#local-6989586621679051361"><span class="hs-identifier hs-var hs-var">isLate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Microsecond
-</span><a href="#local-6989586621679051362"><span class="hs-identifier hs-var">time</span></a></span><span> </span><span class="annot"><span class="annottext">Microsecond -&gt; Microsecond -&gt; Microsecond
+</span><span id="line-157"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679051390"><span class="annot"><span class="annottext">isLate :: Bool
+</span><a href="#local-6989586621679051390"><span class="hs-identifier hs-var hs-var">isLate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Microsecond
+</span><a href="#local-6989586621679051391"><span class="hs-identifier hs-var">time</span></a></span><span> </span><span class="annot"><span class="annottext">Microsecond -&gt; Microsecond -&gt; Microsecond
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">NtpPacket -&gt; Microsecond
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-glyph hs-var">-</span></a></span><span> </span><span class="annot"><span class="annottext">NtpPacket -&gt; Microsecond
 </span><a href="Network.NTP.Client.Packet.html#ntpOriginTime"><span class="hs-identifier hs-var hs-var">ntpOriginTime</span></a></span><span> </span><span class="annot"><span class="annottext">NtpPacket
-</span><a href="#local-6989586621679051363"><span class="hs-identifier hs-var">packet</span></a></span><span> </span><span class="annot"><span class="annottext">Microsecond -&gt; Microsecond -&gt; Bool
+</span><a href="#local-6989586621679051392"><span class="hs-identifier hs-var">packet</span></a></span><span> </span><span class="annot"><span class="annottext">Microsecond -&gt; Microsecond -&gt; Bool
 forall a. Ord a =&gt; a -&gt; a -&gt; Bool
-</span><span class="hs-operator hs-var">&gt;=</span></span><span> </span><span class="annot"><span class="annottext">Microsecond
-</span><a href="#local-6989586621679051364"><span class="hs-identifier hs-var">respTimeout</span></a></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;=</span></a></span><span> </span><span class="annot"><span class="annottext">Microsecond
+</span><a href="#local-6989586621679051393"><span class="hs-identifier hs-var">respTimeout</span></a></span><span>
 </span><span id="line-158"></span><span>    </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679051361"><span class="hs-identifier hs-var">isLate</span></a></span><span>
+</span><a href="#local-6989586621679051390"><span class="hs-identifier hs-var">isLate</span></a></span><span>
 </span><span id="line-159"></span><span>        </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Maybe NtpOffset -&gt; IO (Maybe NtpOffset)
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
-</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">Maybe NtpOffset
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe NtpOffset
 forall a. Maybe a
-</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span>
 </span><span id="line-160"></span><span>        </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">Maybe NtpOffset -&gt; IO (Maybe NtpOffset)
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
-</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Maybe NtpOffset -&gt; IO (Maybe NtpOffset))
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe NtpOffset -&gt; IO (Maybe NtpOffset))
 -&gt; Maybe NtpOffset -&gt; IO (Maybe NtpOffset)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">NtpOffset -&gt; Maybe NtpOffset
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">NtpOffset -&gt; Maybe NtpOffset
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(NtpOffset -&gt; Maybe NtpOffset) -&gt; NtpOffset -&gt; Maybe NtpOffset
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">(NtpOffset -&gt; Maybe NtpOffset) -&gt; NtpOffset -&gt; Maybe NtpOffset
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">NtpPacket -&gt; Microsecond -&gt; NtpOffset
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">NtpPacket -&gt; Microsecond -&gt; NtpOffset
 </span><a href="Network.NTP.Client.Packet.html#clockOffsetPure"><span class="hs-identifier hs-var">clockOffsetPure</span></a></span><span> </span><span class="annot"><span class="annottext">NtpPacket
-</span><a href="#local-6989586621679051363"><span class="hs-identifier hs-var">packet</span></a></span><span> </span><span class="annot"><span class="annottext">Microsecond
-</span><a href="#local-6989586621679051362"><span class="hs-identifier hs-var">time</span></a></span><span>
+</span><a href="#local-6989586621679051392"><span class="hs-identifier hs-var">packet</span></a></span><span> </span><span class="annot"><span class="annottext">Microsecond
+</span><a href="#local-6989586621679051391"><span class="hs-identifier hs-var">time</span></a></span><span>
 </span><span id="line-161"></span><span>
 </span><span id="line-162"></span><span class="hs-comment">-- |</span><span>
 </span><span id="line-163"></span><span class="hs-comment">-- Helper function to get current time in @Microsecond@.</span><span>
-</span><span id="line-164"></span><span class="annot"><a href="Network.NTP.Client.Packet.html#getCurrentTime"><span class="hs-identifier hs-type">getCurrentTime</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-type">Microsecond</span></a></span><span>
+</span><span id="line-164"></span><span class="annot"><a href="Network.NTP.Client.Packet.html#getCurrentTime"><span class="hs-identifier hs-type">getCurrentTime</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="annot"><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-type">Microsecond</span></a></span><span>
 </span><span id="line-165"></span><span id="getCurrentTime"><span class="annot"><span class="annottext">getCurrentTime :: IO Microsecond
 </span><a href="Network.NTP.Client.Packet.html#getCurrentTime"><span class="hs-identifier hs-var hs-var">getCurrentTime</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Microsecond
 </span><a href="Network.NTP.Client.Packet.html#Microsecond"><span class="hs-identifier hs-var">Microsecond</span></a></span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; Microsecond)
 -&gt; (POSIXTime -&gt; Integer) -&gt; POSIXTime -&gt; Microsecond
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">POSIXTime -&gt; Integer
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">POSIXTime -&gt; Integer
 forall a b. (RealFrac a, Integral b) =&gt; a -&gt; b
-</span><span class="hs-identifier hs-var">round</span></span><span> </span><span class="annot"><span class="annottext">(POSIXTime -&gt; Integer)
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">round</span></a></span><span> </span><span class="annot"><span class="annottext">(POSIXTime -&gt; Integer)
 -&gt; (POSIXTime -&gt; POSIXTime) -&gt; POSIXTime -&gt; Integer
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">POSIXTime -&gt; POSIXTime -&gt; POSIXTime
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">POSIXTime -&gt; POSIXTime -&gt; POSIXTime
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">*</span></span><span> </span><span class="annot"><span class="annottext">POSIXTime
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">*</span></a></span><span> </span><span class="annot"><span class="annottext">POSIXTime
 </span><span class="hs-number">1000000</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(POSIXTime -&gt; Microsecond) -&gt; IO POSIXTime -&gt; IO Microsecond
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">IO POSIXTime
-</span><span class="hs-identifier hs-var">getPOSIXTime</span></span><span>
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">IO POSIXTime
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-var">getPOSIXTime</span></a></span><span>
 </span><span id="line-166"></span></pre></body></html>

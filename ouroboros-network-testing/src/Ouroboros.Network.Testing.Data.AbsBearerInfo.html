@@ -1,0 +1,1145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="%24con2tag_791WQrFXkPvB0F2ZD4SkYj"><span id="%24con2tag_Jb2K32dscUK3SSJviEdVMX"></span></span><span class="hs-pragma">{-# LANGUAGE DerivingStrategies #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DerivingVia        #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE NumericUnderscores #-}</span><span>
+</span><span id="line-4"></span><span>
+</span><span id="line-5"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.Testing.Data.AbsBearerInfo</span><span>
+</span><span id="line-6"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfoScript"><span class="hs-identifier">AbsBearerInfoScript</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-7"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#canFail"><span class="hs-identifier">canFail</span></a></span><span>
+</span><span id="line-8"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NonFailingAbsBearerInfoScript"><span class="hs-identifier">NonFailingAbsBearerInfoScript</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-9"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsDelay"><span class="hs-identifier">AbsDelay</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-10"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#delay"><span class="hs-identifier">delay</span></a></span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsSpeed"><span class="hs-identifier">AbsSpeed</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#speedToRational"><span class="hs-identifier">speedToRational</span></a></span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#delayAtSpeed"><span class="hs-identifier">delayAtSpeed</span></a></span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsSDUSize"><span class="hs-identifier">AbsSDUSize</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#toSduSize"><span class="hs-identifier">toSduSize</span></a></span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsAttenuation"><span class="hs-identifier">AbsAttenuation</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#attenuation"><span class="hs-identifier">attenuation</span></a></span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#absNoAttenuation"><span class="hs-identifier">absNoAttenuation</span></a></span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfo"><span class="hs-identifier">AbsBearerInfo</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#toNonFailingAbsBearerInfoScript"><span class="hs-identifier">toNonFailingAbsBearerInfoScript</span></a></span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-22"></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier">Control.Monad.Class.MonadTime</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier">DiffTime</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier">Time</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier">addTime</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.List</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">List</span></span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.List.NonEmpty</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">NonEmpty</span></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Monoid</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Any</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier">Network.Mux.Bearer.AttenuatedChannel</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier">Size</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-30"></span><span>                     </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier">SuccessOrFailure</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier">Network.Mux.Types</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier">SDUSize</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html"><span class="hs-identifier">Ouroboros.Network.Testing.Data.Script</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier">Script</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html"><span class="hs-identifier">Ouroboros.Network.Testing.Utils</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#Delay"><span class="hs-identifier">Delay</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Test.QuickCheck</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Arbitrary</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Gen</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">arbitrarySizedNatural</span></span><span class="hs-special">,</span><span>
+</span><span id="line-37"></span><span>                     </span><span class="annot"><span class="hs-identifier">elements</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">frequency</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">listOf1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">resize</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">shrinkList</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">suchThat</span></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="hs-keyword">data</span><span> </span><span id="AbsDelay"><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsDelay"><span class="hs-identifier hs-var">AbsDelay</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="SmallDelay"><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SmallDelay"><span class="hs-identifier hs-var">SmallDelay</span></a></span></span><span>
+</span><span id="line-40"></span><span>              </span><span class="hs-glyph">|</span><span> </span><span id="NormalDelay"><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NormalDelay"><span class="hs-identifier hs-var">NormalDelay</span></a></span></span><span>
+</span><span id="line-41"></span><span>              </span><span class="hs-glyph">|</span><span> </span><span id="LargeDelay"><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#LargeDelay"><span class="hs-identifier hs-var">LargeDelay</span></a></span></span><span>
+</span><span id="line-42"></span><span>
+</span><span id="line-43"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679088297"><span id="local-6989586621679088299"><span class="annot"><span class="annottext">AbsDelay -&gt; AbsDelay -&gt; Bool
+(AbsDelay -&gt; AbsDelay -&gt; Bool)
+-&gt; (AbsDelay -&gt; AbsDelay -&gt; Bool) -&gt; Eq AbsDelay
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: AbsDelay -&gt; AbsDelay -&gt; Bool
+$c/= :: AbsDelay -&gt; AbsDelay -&gt; Bool
+== :: AbsDelay -&gt; AbsDelay -&gt; Bool
+$c== :: AbsDelay -&gt; AbsDelay -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679088281"><span id="local-6989586621679088283"><span id="local-6989586621679088285"><span id="local-6989586621679088287"><span id="local-6989586621679088289"><span id="local-6989586621679088291"><span id="local-6989586621679088293"><span class="annot"><span class="annottext">Eq AbsDelay
+Eq AbsDelay
+-&gt; (AbsDelay -&gt; AbsDelay -&gt; Ordering)
+-&gt; (AbsDelay -&gt; AbsDelay -&gt; Bool)
+-&gt; (AbsDelay -&gt; AbsDelay -&gt; Bool)
+-&gt; (AbsDelay -&gt; AbsDelay -&gt; Bool)
+-&gt; (AbsDelay -&gt; AbsDelay -&gt; Bool)
+-&gt; (AbsDelay -&gt; AbsDelay -&gt; AbsDelay)
+-&gt; (AbsDelay -&gt; AbsDelay -&gt; AbsDelay)
+-&gt; Ord AbsDelay
+AbsDelay -&gt; AbsDelay -&gt; Bool
+AbsDelay -&gt; AbsDelay -&gt; Ordering
+AbsDelay -&gt; AbsDelay -&gt; AbsDelay
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: AbsDelay -&gt; AbsDelay -&gt; AbsDelay
+$cmin :: AbsDelay -&gt; AbsDelay -&gt; AbsDelay
+max :: AbsDelay -&gt; AbsDelay -&gt; AbsDelay
+$cmax :: AbsDelay -&gt; AbsDelay -&gt; AbsDelay
+&gt;= :: AbsDelay -&gt; AbsDelay -&gt; Bool
+$c&gt;= :: AbsDelay -&gt; AbsDelay -&gt; Bool
+&gt; :: AbsDelay -&gt; AbsDelay -&gt; Bool
+$c&gt; :: AbsDelay -&gt; AbsDelay -&gt; Bool
+&lt;= :: AbsDelay -&gt; AbsDelay -&gt; Bool
+$c&lt;= :: AbsDelay -&gt; AbsDelay -&gt; Bool
+&lt; :: AbsDelay -&gt; AbsDelay -&gt; Bool
+$c&lt; :: AbsDelay -&gt; AbsDelay -&gt; Bool
+compare :: AbsDelay -&gt; AbsDelay -&gt; Ordering
+$ccompare :: AbsDelay -&gt; AbsDelay -&gt; Ordering
+$cp1Ord :: Eq AbsDelay
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></a></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679088274"><span id="local-6989586621679088276"><span id="local-6989586621679088278"><span class="annot"><span class="annottext">Int -&gt; AbsDelay -&gt; ShowS
+[AbsDelay] -&gt; ShowS
+AbsDelay -&gt; String
+(Int -&gt; AbsDelay -&gt; ShowS)
+-&gt; (AbsDelay -&gt; String) -&gt; ([AbsDelay] -&gt; ShowS) -&gt; Show AbsDelay
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [AbsDelay] -&gt; ShowS
+$cshowList :: [AbsDelay] -&gt; ShowS
+show :: AbsDelay -&gt; String
+$cshow :: AbsDelay -&gt; String
+showsPrec :: Int -&gt; AbsDelay -&gt; ShowS
+$cshowsPrec :: Int -&gt; AbsDelay -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#delay"><span class="hs-identifier hs-type">delay</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsDelay"><span class="hs-identifier hs-type">AbsDelay</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span>
+</span><span id="line-46"></span><span id="delay"><span class="annot"><span class="annottext">delay :: AbsDelay -&gt; DiffTime
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#delay"><span class="hs-identifier hs-var hs-var">delay</span></a></span></span><span> </span><span class="annot"><span class="annottext">AbsDelay
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SmallDelay"><span class="hs-identifier hs-var">SmallDelay</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-number">0.1</span></span><span>
+</span><span id="line-47"></span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#delay"><span class="hs-identifier hs-var">delay</span></a></span><span> </span><span class="annot"><span class="annottext">AbsDelay
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NormalDelay"><span class="hs-identifier hs-var">NormalDelay</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-48"></span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#delay"><span class="hs-identifier hs-var">delay</span></a></span><span> </span><span class="annot"><span class="annottext">AbsDelay
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#LargeDelay"><span class="hs-identifier hs-var">LargeDelay</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-number">20</span></span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsDelay"><span class="hs-identifier hs-type">AbsDelay</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-51"></span><span>    </span><span id="local-6989586621679088269"><span class="annot"><span class="annottext">arbitrary :: Gen AbsDelay
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(Int, Gen AbsDelay)] -&gt; Gen AbsDelay
+forall a. [(Int, Gen a)] -&gt; Gen a
+</span><span class="hs-identifier hs-var">frequency</span></span><span>
+</span><span id="line-52"></span><span>      </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">AbsDelay -&gt; Gen AbsDelay
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">AbsDelay
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SmallDelay"><span class="hs-identifier hs-var">SmallDelay</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-53"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">AbsDelay -&gt; Gen AbsDelay
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">AbsDelay
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NormalDelay"><span class="hs-identifier hs-var">NormalDelay</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-54"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">AbsDelay -&gt; Gen AbsDelay
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">AbsDelay
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#LargeDelay"><span class="hs-identifier hs-var">LargeDelay</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-55"></span><span>      </span><span class="hs-special">]</span><span>
+</span><span id="line-56"></span><span>    </span><span id="local-6989586621679088267"><span class="annot"><span class="annottext">shrink :: AbsDelay -&gt; [AbsDelay]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></span></span><span> </span><span class="annot"><span class="annottext">AbsDelay
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SmallDelay"><span class="hs-identifier hs-var">SmallDelay</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-57"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="annot"><span class="annottext">AbsDelay
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NormalDelay"><span class="hs-identifier hs-var">NormalDelay</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">AbsDelay
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SmallDelay"><span class="hs-identifier hs-var">SmallDelay</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-58"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="annot"><span class="annottext">AbsDelay
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#LargeDelay"><span class="hs-identifier hs-var">LargeDelay</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">AbsDelay
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SmallDelay"><span class="hs-identifier hs-var">SmallDelay</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">AbsDelay
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NormalDelay"><span class="hs-identifier hs-var">NormalDelay</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-59"></span><span>
+</span><span id="line-60"></span><span class="hs-keyword">data</span><span> </span><span id="AbsSpeed"><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsSpeed"><span class="hs-identifier hs-var">AbsSpeed</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="SlowSpeed"><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SlowSpeed"><span class="hs-identifier hs-var">SlowSpeed</span></a></span></span><span>
+</span><span id="line-61"></span><span>              </span><span class="hs-glyph">|</span><span> </span><span id="NormalSpeed"><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NormalSpeed"><span class="hs-identifier hs-var">NormalSpeed</span></a></span></span><span>
+</span><span id="line-62"></span><span>              </span><span class="hs-glyph">|</span><span> </span><span id="FastSpeed"><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#FastSpeed"><span class="hs-identifier hs-var">FastSpeed</span></a></span></span><span>
+</span><span id="line-63"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679088259"><span id="local-6989586621679088261"><span class="annot"><span class="annottext">AbsSpeed -&gt; AbsSpeed -&gt; Bool
+(AbsSpeed -&gt; AbsSpeed -&gt; Bool)
+-&gt; (AbsSpeed -&gt; AbsSpeed -&gt; Bool) -&gt; Eq AbsSpeed
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: AbsSpeed -&gt; AbsSpeed -&gt; Bool
+$c/= :: AbsSpeed -&gt; AbsSpeed -&gt; Bool
+== :: AbsSpeed -&gt; AbsSpeed -&gt; Bool
+$c== :: AbsSpeed -&gt; AbsSpeed -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679088244"><span id="local-6989586621679088246"><span id="local-6989586621679088248"><span id="local-6989586621679088250"><span id="local-6989586621679088252"><span id="local-6989586621679088254"><span id="local-6989586621679088256"><span class="annot"><span class="annottext">Eq AbsSpeed
+Eq AbsSpeed
+-&gt; (AbsSpeed -&gt; AbsSpeed -&gt; Ordering)
+-&gt; (AbsSpeed -&gt; AbsSpeed -&gt; Bool)
+-&gt; (AbsSpeed -&gt; AbsSpeed -&gt; Bool)
+-&gt; (AbsSpeed -&gt; AbsSpeed -&gt; Bool)
+-&gt; (AbsSpeed -&gt; AbsSpeed -&gt; Bool)
+-&gt; (AbsSpeed -&gt; AbsSpeed -&gt; AbsSpeed)
+-&gt; (AbsSpeed -&gt; AbsSpeed -&gt; AbsSpeed)
+-&gt; Ord AbsSpeed
+AbsSpeed -&gt; AbsSpeed -&gt; Bool
+AbsSpeed -&gt; AbsSpeed -&gt; Ordering
+AbsSpeed -&gt; AbsSpeed -&gt; AbsSpeed
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: AbsSpeed -&gt; AbsSpeed -&gt; AbsSpeed
+$cmin :: AbsSpeed -&gt; AbsSpeed -&gt; AbsSpeed
+max :: AbsSpeed -&gt; AbsSpeed -&gt; AbsSpeed
+$cmax :: AbsSpeed -&gt; AbsSpeed -&gt; AbsSpeed
+&gt;= :: AbsSpeed -&gt; AbsSpeed -&gt; Bool
+$c&gt;= :: AbsSpeed -&gt; AbsSpeed -&gt; Bool
+&gt; :: AbsSpeed -&gt; AbsSpeed -&gt; Bool
+$c&gt; :: AbsSpeed -&gt; AbsSpeed -&gt; Bool
+&lt;= :: AbsSpeed -&gt; AbsSpeed -&gt; Bool
+$c&lt;= :: AbsSpeed -&gt; AbsSpeed -&gt; Bool
+&lt; :: AbsSpeed -&gt; AbsSpeed -&gt; Bool
+$c&lt; :: AbsSpeed -&gt; AbsSpeed -&gt; Bool
+compare :: AbsSpeed -&gt; AbsSpeed -&gt; Ordering
+$ccompare :: AbsSpeed -&gt; AbsSpeed -&gt; Ordering
+$cp1Ord :: Eq AbsSpeed
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></a></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679088238"><span id="local-6989586621679088240"><span id="local-6989586621679088242"><span class="annot"><span class="annottext">Int -&gt; AbsSpeed -&gt; ShowS
+[AbsSpeed] -&gt; ShowS
+AbsSpeed -&gt; String
+(Int -&gt; AbsSpeed -&gt; ShowS)
+-&gt; (AbsSpeed -&gt; String) -&gt; ([AbsSpeed] -&gt; ShowS) -&gt; Show AbsSpeed
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [AbsSpeed] -&gt; ShowS
+$cshowList :: [AbsSpeed] -&gt; ShowS
+show :: AbsSpeed -&gt; String
+$cshow :: AbsSpeed -&gt; String
+showsPrec :: Int -&gt; AbsSpeed -&gt; ShowS
+$cshowsPrec :: Int -&gt; AbsSpeed -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-64"></span><span>
+</span><span id="line-65"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsSpeed"><span class="hs-identifier hs-type">AbsSpeed</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-66"></span><span>    </span><span id="local-6989586621679088235"><span class="annot"><span class="annottext">arbitrary :: Gen AbsSpeed
+</span><a href="#local-6989586621679088235"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(Int, Gen AbsSpeed)] -&gt; Gen AbsSpeed
+forall a. [(Int, Gen a)] -&gt; Gen a
+</span><span class="hs-identifier hs-var">frequency</span></span><span>
+</span><span id="line-67"></span><span>      </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">AbsSpeed -&gt; Gen AbsSpeed
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SlowSpeed"><span class="hs-identifier hs-var">SlowSpeed</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-68"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">AbsSpeed -&gt; Gen AbsSpeed
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NormalSpeed"><span class="hs-identifier hs-var">NormalSpeed</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-69"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">AbsSpeed -&gt; Gen AbsSpeed
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#FastSpeed"><span class="hs-identifier hs-var">FastSpeed</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-70"></span><span>      </span><span class="hs-special">]</span><span>
+</span><span id="line-71"></span><span>    </span><span id="local-6989586621679088234"><span class="annot"><span class="annottext">shrink :: AbsSpeed -&gt; [AbsSpeed]
+</span><a href="#local-6989586621679088234"><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></a></span></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SlowSpeed"><span class="hs-identifier hs-var">SlowSpeed</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#FastSpeed"><span class="hs-identifier hs-var">FastSpeed</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NormalSpeed"><span class="hs-identifier hs-var">NormalSpeed</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-72"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NormalSpeed"><span class="hs-identifier hs-var">NormalSpeed</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#FastSpeed"><span class="hs-identifier hs-var">FastSpeed</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-73"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#FastSpeed"><span class="hs-identifier hs-var">FastSpeed</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-74"></span><span>
+</span><span id="line-75"></span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#speedToRational"><span class="hs-identifier hs-type">speedToRational</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsSpeed"><span class="hs-identifier hs-type">AbsSpeed</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Rational</span></a></span><span>
+</span><span id="line-76"></span><span id="speedToRational"><span class="annot"><span class="annottext">speedToRational :: AbsSpeed -&gt; Rational
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#speedToRational"><span class="hs-identifier hs-var hs-var">speedToRational</span></a></span></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SlowSpeed"><span class="hs-identifier hs-var">SlowSpeed</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Rational
+</span><span class="hs-number">3057</span></span><span>    </span><span class="hs-comment">-- 12228 / 4</span><span>
+</span><span id="line-77"></span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#speedToRational"><span class="hs-identifier hs-var">speedToRational</span></a></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NormalSpeed"><span class="hs-identifier hs-var">NormalSpeed</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Rational
+</span><span class="hs-number">48912</span></span><span>   </span><span class="hs-comment">-- 12228 * 4</span><span>
+</span><span id="line-78"></span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#speedToRational"><span class="hs-identifier hs-var">speedToRational</span></a></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#FastSpeed"><span class="hs-identifier hs-var">FastSpeed</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Rational
+</span><span class="hs-number">1048576</span></span><span> </span><span class="hs-comment">-- 1Mb/s</span><span>
+</span><span id="line-79"></span><span>
+</span><span id="line-80"></span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#delayAtSpeed"><span class="hs-identifier hs-type">delayAtSpeed</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsSpeed"><span class="hs-identifier hs-type">AbsSpeed</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-type">Size</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span>
+</span><span id="line-81"></span><span id="delayAtSpeed"><span class="annot"><span class="annottext">delayAtSpeed :: AbsSpeed -&gt; Size -&gt; DiffTime
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#delayAtSpeed"><span class="hs-identifier hs-var hs-var">delayAtSpeed</span></a></span></span><span> </span><span id="local-6989586621679088233"><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088233"><span class="hs-identifier hs-var">speed</span></a></span></span><span> </span><span id="local-6989586621679088232"><span class="annot"><span class="annottext">Size
+</span><a href="#local-6989586621679088232"><span class="hs-identifier hs-var">size</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Rational -&gt; DiffTime
+forall a. Fractional a =&gt; Rational -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fromRational</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Size -&gt; Rational
+forall a. Real a =&gt; a -&gt; Rational
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">toRational</span></a></span><span> </span><span class="annot"><span class="annottext">Size
+</span><a href="#local-6989586621679088232"><span class="hs-identifier hs-var">size</span></a></span><span> </span><span class="annot"><span class="annottext">Rational -&gt; Rational -&gt; Rational
+forall a. Fractional a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">/</span></a></span><span> </span><span class="annot"><span class="annottext">AbsSpeed -&gt; Rational
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#speedToRational"><span class="hs-identifier hs-var">speedToRational</span></a></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088233"><span class="hs-identifier hs-var">speed</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-82"></span><span>
+</span><span id="line-83"></span><span>
+</span><span id="line-84"></span><span class="hs-keyword">data</span><span> </span><span id="AbsSDUSize"><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsSDUSize"><span class="hs-identifier hs-var">AbsSDUSize</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="SmallSDU"><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SmallSDU"><span class="hs-identifier hs-var">SmallSDU</span></a></span></span><span>
+</span><span id="line-85"></span><span>                </span><span class="hs-glyph">|</span><span> </span><span id="NormalSDU"><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NormalSDU"><span class="hs-identifier hs-var">NormalSDU</span></a></span></span><span>
+</span><span id="line-86"></span><span>                </span><span class="hs-glyph">|</span><span> </span><span id="LargeSDU"><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#LargeSDU"><span class="hs-identifier hs-var">LargeSDU</span></a></span></span><span>
+</span><span id="line-87"></span><span>
+</span><span id="line-88"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679088224"><span id="local-6989586621679088226"><span class="annot"><span class="annottext">AbsSDUSize -&gt; AbsSDUSize -&gt; Bool
+(AbsSDUSize -&gt; AbsSDUSize -&gt; Bool)
+-&gt; (AbsSDUSize -&gt; AbsSDUSize -&gt; Bool) -&gt; Eq AbsSDUSize
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: AbsSDUSize -&gt; AbsSDUSize -&gt; Bool
+$c/= :: AbsSDUSize -&gt; AbsSDUSize -&gt; Bool
+== :: AbsSDUSize -&gt; AbsSDUSize -&gt; Bool
+$c== :: AbsSDUSize -&gt; AbsSDUSize -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679088218"><span id="local-6989586621679088220"><span id="local-6989586621679088222"><span class="annot"><span class="annottext">Int -&gt; AbsSDUSize -&gt; ShowS
+[AbsSDUSize] -&gt; ShowS
+AbsSDUSize -&gt; String
+(Int -&gt; AbsSDUSize -&gt; ShowS)
+-&gt; (AbsSDUSize -&gt; String)
+-&gt; ([AbsSDUSize] -&gt; ShowS)
+-&gt; Show AbsSDUSize
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [AbsSDUSize] -&gt; ShowS
+$cshowList :: [AbsSDUSize] -&gt; ShowS
+show :: AbsSDUSize -&gt; String
+$cshow :: AbsSDUSize -&gt; String
+showsPrec :: Int -&gt; AbsSDUSize -&gt; ShowS
+$cshowsPrec :: Int -&gt; AbsSDUSize -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-89"></span><span>
+</span><span id="line-90"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsSDUSize"><span class="hs-identifier hs-type">AbsSDUSize</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-91"></span><span>    </span><span id="local-6989586621679088215"><span class="annot"><span class="annottext">arbitrary :: Gen AbsSDUSize
+</span><a href="#local-6989586621679088215"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[AbsSDUSize] -&gt; Gen AbsSDUSize
+forall a. [a] -&gt; Gen a
+</span><span class="hs-identifier hs-var">elements</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">AbsSDUSize
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SmallSDU"><span class="hs-identifier hs-var">SmallSDU</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">AbsSDUSize
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NormalSDU"><span class="hs-identifier hs-var">NormalSDU</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">AbsSDUSize
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#LargeSDU"><span class="hs-identifier hs-var">LargeSDU</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-92"></span><span>    </span><span id="local-6989586621679088214"><span class="annot"><span class="annottext">shrink :: AbsSDUSize -&gt; [AbsSDUSize]
+</span><a href="#local-6989586621679088214"><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></a></span></span><span> </span><span class="annot"><span class="annottext">AbsSDUSize
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SmallSDU"><span class="hs-identifier hs-var">SmallSDU</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">AbsSDUSize
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#LargeSDU"><span class="hs-identifier hs-var">LargeSDU</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">AbsSDUSize
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NormalSDU"><span class="hs-identifier hs-var">NormalSDU</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-93"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="annot"><span class="annottext">AbsSDUSize
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NormalSDU"><span class="hs-identifier hs-var">NormalSDU</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">AbsSDUSize
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#LargeSDU"><span class="hs-identifier hs-var">LargeSDU</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-94"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="annot"><span class="annottext">AbsSDUSize
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#LargeSDU"><span class="hs-identifier hs-var">LargeSDU</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-95"></span><span>
+</span><span id="line-96"></span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#toSduSize"><span class="hs-identifier hs-type">toSduSize</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsSDUSize"><span class="hs-identifier hs-type">AbsSDUSize</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-type">SDUSize</span></a></span><span>
+</span><span id="line-97"></span><span id="toSduSize"><span class="annot"><span class="annottext">toSduSize :: AbsSDUSize -&gt; SDUSize
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#toSduSize"><span class="hs-identifier hs-var hs-var">toSduSize</span></a></span></span><span> </span><span class="annot"><span class="annottext">AbsSDUSize
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SmallSDU"><span class="hs-identifier hs-var">SmallSDU</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word16 -&gt; SDUSize
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-var">SDUSize</span></a></span><span> </span><span class="annot"><span class="annottext">Word16
+</span><span class="hs-number">1_024</span></span><span>
+</span><span id="line-98"></span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#toSduSize"><span class="hs-identifier hs-var">toSduSize</span></a></span><span> </span><span class="annot"><span class="annottext">AbsSDUSize
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NormalSDU"><span class="hs-identifier hs-var">NormalSDU</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word16 -&gt; SDUSize
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-var">SDUSize</span></a></span><span> </span><span class="annot"><span class="annottext">Word16
+</span><span class="hs-number">12_228</span></span><span>
+</span><span id="line-99"></span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#toSduSize"><span class="hs-identifier hs-var">toSduSize</span></a></span><span> </span><span class="annot"><span class="annottext">AbsSDUSize
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#LargeSDU"><span class="hs-identifier hs-var">LargeSDU</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word16 -&gt; SDUSize
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-var">SDUSize</span></a></span><span> </span><span class="annot"><span class="annottext">Word16
+</span><span class="hs-number">32_768</span></span><span>
+</span><span id="line-100"></span><span>
+</span><span id="line-101"></span><span class="hs-keyword">data</span><span> </span><span id="AbsAttenuation"><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsAttenuation"><span class="hs-identifier hs-var">AbsAttenuation</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-102"></span><span>    </span><span id="NoAttenuation"><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NoAttenuation"><span class="hs-identifier hs-var">NoAttenuation</span></a></span></span><span>    </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsSpeed"><span class="hs-identifier hs-type">AbsSpeed</span></a></span><span>
+</span><span id="line-103"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="SpeedAttenuation"><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SpeedAttenuation"><span class="hs-identifier hs-var">SpeedAttenuation</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsSpeed"><span class="hs-identifier hs-type">AbsSpeed</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">Time</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span>
+</span><span id="line-104"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="ErrorInterval"><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#ErrorInterval"><span class="hs-identifier hs-var">ErrorInterval</span></a></span></span><span>    </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsSpeed"><span class="hs-identifier hs-type">AbsSpeed</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">Time</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span>
+</span><span id="line-105"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679088206"><span id="local-6989586621679088208"><span class="annot"><span class="annottext">AbsAttenuation -&gt; AbsAttenuation -&gt; Bool
+(AbsAttenuation -&gt; AbsAttenuation -&gt; Bool)
+-&gt; (AbsAttenuation -&gt; AbsAttenuation -&gt; Bool) -&gt; Eq AbsAttenuation
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: AbsAttenuation -&gt; AbsAttenuation -&gt; Bool
+$c/= :: AbsAttenuation -&gt; AbsAttenuation -&gt; Bool
+== :: AbsAttenuation -&gt; AbsAttenuation -&gt; Bool
+$c== :: AbsAttenuation -&gt; AbsAttenuation -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679088200"><span id="local-6989586621679088202"><span id="local-6989586621679088204"><span class="annot"><span class="annottext">Int -&gt; AbsAttenuation -&gt; ShowS
+[AbsAttenuation] -&gt; ShowS
+AbsAttenuation -&gt; String
+(Int -&gt; AbsAttenuation -&gt; ShowS)
+-&gt; (AbsAttenuation -&gt; String)
+-&gt; ([AbsAttenuation] -&gt; ShowS)
+-&gt; Show AbsAttenuation
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [AbsAttenuation] -&gt; ShowS
+$cshowList :: [AbsAttenuation] -&gt; ShowS
+show :: AbsAttenuation -&gt; String
+$cshow :: AbsAttenuation -&gt; String
+showsPrec :: Int -&gt; AbsAttenuation -&gt; ShowS
+$cshowsPrec :: Int -&gt; AbsAttenuation -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-106"></span><span>
+</span><span id="line-107"></span><span class="hs-comment">-- | At most `Time 20s`.</span><span>
+</span><span id="line-108"></span><span class="hs-comment">--</span><span>
+</span><span id="line-109"></span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#genTime"><span class="hs-identifier hs-type">genTime</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">Time</span></a></span><span>
+</span><span id="line-110"></span><span id="genTime"><span class="annot"><span class="annottext">genTime :: Gen Time
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#genTime"><span class="hs-identifier hs-var hs-var">genTime</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; Time
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">Time</span></a></span><span> </span><span class="annot"><span class="annottext">(DiffTime -&gt; Time) -&gt; (Delay -&gt; DiffTime) -&gt; Delay -&gt; Time
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Delay -&gt; DiffTime
+</span><a href="Ouroboros.Network.Testing.Utils.html#getDelay"><span class="hs-identifier hs-var hs-var">getDelay</span></a></span><span> </span><span class="annot"><span class="annottext">(Delay -&gt; Time) -&gt; Gen Delay -&gt; Gen Time
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Gen Delay
+forall a. Arbitrary a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrary</span></span><span>
+</span><span id="line-111"></span><span>
+</span><span id="line-112"></span><span class="hs-comment">-- | At most `1_000`s.</span><span>
+</span><span id="line-113"></span><span class="hs-comment">--</span><span>
+</span><span id="line-114"></span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#genLongDelay"><span class="hs-identifier hs-type">genLongDelay</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span>
+</span><span id="line-115"></span><span id="genLongDelay"><span class="annot"><span class="annottext">genLongDelay :: Gen DiffTime
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#genLongDelay"><span class="hs-identifier hs-var hs-var">genLongDelay</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Delay -&gt; DiffTime
+</span><a href="Ouroboros.Network.Testing.Utils.html#getDelay"><span class="hs-identifier hs-var hs-var">getDelay</span></a></span><span> </span><span class="annot"><span class="annottext">(Delay -&gt; DiffTime) -&gt; Gen Delay -&gt; Gen DiffTime
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Gen Delay -&gt; Gen Delay
+forall a. Int -&gt; Gen a -&gt; Gen a
+</span><span class="hs-identifier hs-var">resize</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1_000</span></span><span> </span><span class="annot"><span class="annottext">Gen Delay
+forall a. Arbitrary a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrary</span></span><span>
+</span><span id="line-116"></span><span>
+</span><span id="line-117"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsAttenuation"><span class="hs-identifier hs-type">AbsAttenuation</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-118"></span><span>    </span><span id="local-6989586621679088191"><span class="annot"><span class="annottext">arbitrary :: Gen AbsAttenuation
+</span><a href="#local-6989586621679088191"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-119"></span><span>      </span><span class="annot"><span class="annottext">[(Int, Gen AbsAttenuation)] -&gt; Gen AbsAttenuation
+forall a. [(Int, Gen a)] -&gt; Gen a
+</span><span class="hs-identifier hs-var">frequency</span></span><span>
+</span><span id="line-120"></span><span>        </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">AbsSpeed -&gt; AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NoAttenuation"><span class="hs-identifier hs-var">NoAttenuation</span></a></span><span> </span><span class="annot"><span class="annottext">(AbsSpeed -&gt; AbsAttenuation) -&gt; Gen AbsSpeed -&gt; Gen AbsAttenuation
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Gen AbsSpeed
+forall a. Arbitrary a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrary</span></span><span class="hs-special">)</span><span>
+</span><span id="line-121"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">AbsSpeed -&gt; Time -&gt; DiffTime -&gt; AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SpeedAttenuation"><span class="hs-identifier hs-var">SpeedAttenuation</span></a></span><span> </span><span class="annot"><span class="annottext">(AbsSpeed -&gt; Time -&gt; DiffTime -&gt; AbsAttenuation)
+-&gt; Gen AbsSpeed -&gt; Gen (Time -&gt; DiffTime -&gt; AbsAttenuation)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Gen AbsSpeed
+forall a. Arbitrary a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrary</span></span><span> </span><span class="annot"><span class="annottext">Gen AbsSpeed -&gt; (AbsSpeed -&gt; Bool) -&gt; Gen AbsSpeed
+forall a. Gen a -&gt; (a -&gt; Bool) -&gt; Gen a
+</span><span class="hs-operator hs-var">`suchThat`</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AbsSpeed -&gt; AbsSpeed -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SlowSpeed"><span class="hs-identifier hs-var">SlowSpeed</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-122"></span><span>                               </span><span class="annot"><span class="annottext">Gen (Time -&gt; DiffTime -&gt; AbsAttenuation)
+-&gt; Gen Time -&gt; Gen (DiffTime -&gt; AbsAttenuation)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;*&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Gen Time
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#genTime"><span class="hs-identifier hs-var">genTime</span></a></span><span>
+</span><span id="line-123"></span><span>                               </span><span class="annot"><span class="annottext">Gen (DiffTime -&gt; AbsAttenuation)
+-&gt; Gen DiffTime -&gt; Gen AbsAttenuation
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;*&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Gen DiffTime
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#genLongDelay"><span class="hs-identifier hs-var">genLongDelay</span></a></span><span>
+</span><span id="line-124"></span><span>          </span><span class="hs-special">)</span><span>
+</span><span id="line-125"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">AbsSpeed -&gt; Time -&gt; DiffTime -&gt; AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#ErrorInterval"><span class="hs-identifier hs-var">ErrorInterval</span></a></span><span> </span><span class="annot"><span class="annottext">(AbsSpeed -&gt; Time -&gt; DiffTime -&gt; AbsAttenuation)
+-&gt; Gen AbsSpeed -&gt; Gen (Time -&gt; DiffTime -&gt; AbsAttenuation)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Gen AbsSpeed
+forall a. Arbitrary a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrary</span></span><span>
+</span><span id="line-126"></span><span>                            </span><span class="annot"><span class="annottext">Gen (Time -&gt; DiffTime -&gt; AbsAttenuation)
+-&gt; Gen Time -&gt; Gen (DiffTime -&gt; AbsAttenuation)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;*&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Gen Time
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#genTime"><span class="hs-identifier hs-var">genTime</span></a></span><span>
+</span><span id="line-127"></span><span>                            </span><span class="annot"><span class="annottext">Gen (DiffTime -&gt; AbsAttenuation)
+-&gt; Gen DiffTime -&gt; Gen AbsAttenuation
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;*&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Gen DiffTime
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#genLongDelay"><span class="hs-identifier hs-var">genLongDelay</span></a></span><span>
+</span><span id="line-128"></span><span>          </span><span class="hs-special">)</span><span>
+</span><span id="line-129"></span><span>        </span><span class="hs-special">]</span><span>
+</span><span id="line-130"></span><span>
+</span><span id="line-131"></span><span>    </span><span id="local-6989586621679088189"><span class="annot"><span class="annottext">shrink :: AbsAttenuation -&gt; [AbsAttenuation]
+</span><a href="#local-6989586621679088189"><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NoAttenuation"><span class="hs-identifier hs-type">NoAttenuation</span></a></span><span> </span><span id="local-6989586621679088188"><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088188"><span class="hs-identifier hs-var">speed</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-132"></span><span>      </span><span class="hs-special">[</span><span class="annot"><span class="annottext">AbsSpeed -&gt; AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NoAttenuation"><span class="hs-identifier hs-var">NoAttenuation</span></a></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088187"><span class="hs-identifier hs-var">speed'</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679088187"><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088187"><span class="hs-identifier hs-var">speed'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">AbsSpeed -&gt; [AbsSpeed]
+forall a. Arbitrary a =&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088188"><span class="hs-identifier hs-var">speed</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-133"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SpeedAttenuation"><span class="hs-identifier hs-type">SpeedAttenuation</span></a></span><span> </span><span id="local-6989586621679088186"><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088186"><span class="hs-identifier hs-var">speed</span></a></span></span><span> </span><span id="local-6989586621679088185"><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679088185"><span class="hs-identifier hs-var">time</span></a></span></span><span> </span><span id="local-6989586621679088184"><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679088184"><span class="hs-identifier hs-var">len</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-134"></span><span>      </span><span class="hs-special">[</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679088183"><span class="hs-identifier hs-var">len'</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&lt;</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-135"></span><span>         </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">AbsSpeed -&gt; AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NoAttenuation"><span class="hs-identifier hs-var">NoAttenuation</span></a></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088186"><span class="hs-identifier hs-var">speed</span></a></span><span>
+</span><span id="line-136"></span><span>         </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">AbsSpeed -&gt; Time -&gt; DiffTime -&gt; AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SpeedAttenuation"><span class="hs-identifier hs-var">SpeedAttenuation</span></a></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088186"><span class="hs-identifier hs-var">speed</span></a></span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679088185"><span class="hs-identifier hs-var">time</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679088183"><span class="hs-identifier hs-var">len'</span></a></span><span>
+</span><span id="line-137"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#Delay"><span class="hs-identifier hs-type">Delay</span></a></span><span> </span><span id="local-6989586621679088183"><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679088183"><span class="hs-identifier hs-var">len'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Delay -&gt; [Delay]
+forall a. Arbitrary a =&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">DiffTime -&gt; Delay
+</span><a href="Ouroboros.Network.Testing.Utils.html#Delay"><span class="hs-identifier hs-var">Delay</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679088184"><span class="hs-identifier hs-var">len</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-138"></span><span>      </span><span class="hs-special">]</span><span>
+</span><span id="line-139"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#ErrorInterval"><span class="hs-identifier hs-type">ErrorInterval</span></a></span><span> </span><span id="local-6989586621679088180"><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088180"><span class="hs-identifier hs-var">speed</span></a></span></span><span> </span><span id="local-6989586621679088179"><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679088179"><span class="hs-identifier hs-var">time</span></a></span></span><span> </span><span id="local-6989586621679088178"><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679088178"><span class="hs-identifier hs-var">len</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-140"></span><span>      </span><span class="hs-special">[</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679088177"><span class="hs-identifier hs-var">len'</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; DiffTime -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&lt;</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-141"></span><span>         </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">AbsSpeed -&gt; AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NoAttenuation"><span class="hs-identifier hs-var">NoAttenuation</span></a></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088180"><span class="hs-identifier hs-var">speed</span></a></span><span>
+</span><span id="line-142"></span><span>         </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">AbsSpeed -&gt; Time -&gt; DiffTime -&gt; AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SpeedAttenuation"><span class="hs-identifier hs-var">SpeedAttenuation</span></a></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088180"><span class="hs-identifier hs-var">speed</span></a></span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679088179"><span class="hs-identifier hs-var">time</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679088177"><span class="hs-identifier hs-var">len'</span></a></span><span>
+</span><span id="line-143"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Utils.html#Delay"><span class="hs-identifier hs-type">Delay</span></a></span><span> </span><span id="local-6989586621679088177"><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679088177"><span class="hs-identifier hs-var">len'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Delay -&gt; [Delay]
+forall a. Arbitrary a =&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">DiffTime -&gt; Delay
+</span><a href="Ouroboros.Network.Testing.Utils.html#Delay"><span class="hs-identifier hs-var">Delay</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679088178"><span class="hs-identifier hs-var">len</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-144"></span><span>      </span><span class="hs-special">]</span><span>
+</span><span id="line-145"></span><span>
+</span><span id="line-146"></span><span>
+</span><span id="line-147"></span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#attenuation"><span class="hs-identifier hs-type">attenuation</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsAttenuation"><span class="hs-identifier hs-type">AbsAttenuation</span></a></span><span>
+</span><span id="line-148"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">Time</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-type">Size</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-type">SuccessOrFailure</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-149"></span><span id="attenuation"><span class="annot"><span class="annottext">attenuation :: AbsAttenuation -&gt; Time -&gt; Size -&gt; (DiffTime, SuccessOrFailure)
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#attenuation"><span class="hs-identifier hs-var hs-var">attenuation</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NoAttenuation"><span class="hs-identifier hs-type">NoAttenuation</span></a></span><span> </span><span id="local-6989586621679088176"><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088176"><span class="hs-identifier hs-var">speed</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-150"></span><span>   </span><span class="hs-glyph">\</span><span class="annot"><span class="annottext">Time
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679088175"><span class="annot"><span class="annottext">Size
+</span><a href="#local-6989586621679088175"><span class="hs-identifier hs-var">size</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AbsSpeed -&gt; Size -&gt; DiffTime
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#delayAtSpeed"><span class="hs-identifier hs-var">delayAtSpeed</span></a></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088176"><span class="hs-identifier hs-var">speed</span></a></span><span> </span><span class="annot"><span class="annottext">Size
+</span><a href="#local-6989586621679088175"><span class="hs-identifier hs-var">size</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">SuccessOrFailure
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-var">Success</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-151"></span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#attenuation"><span class="hs-identifier hs-var">attenuation</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SpeedAttenuation"><span class="hs-identifier hs-type">SpeedAttenuation</span></a></span><span> </span><span id="local-6989586621679088173"><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088173"><span class="hs-identifier hs-var">normalSpeed</span></a></span></span><span> </span><span id="local-6989586621679088172"><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679088172"><span class="hs-identifier hs-var">from</span></a></span></span><span> </span><span id="local-6989586621679088171"><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679088171"><span class="hs-identifier hs-var">len</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-152"></span><span>    </span><span class="hs-glyph">\</span><span id="local-6989586621679088170"><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679088170"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span id="local-6989586621679088169"><span class="annot"><span class="annottext">Size
+</span><a href="#local-6989586621679088169"><span class="hs-identifier hs-var">size</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-153"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679088168"><span class="annot"><span class="annottext">speed :: AbsSpeed
+</span><a href="#local-6989586621679088168"><span class="hs-identifier hs-var hs-var">speed</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679088170"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">Time -&gt; Time -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&lt;</span></a></span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679088172"><span class="hs-identifier hs-var">from</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">||</span></a></span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679088170"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">Time -&gt; Time -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;=</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679088171"><span class="hs-identifier hs-var">len</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; Time -&gt; Time
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-operator hs-var">`addTime`</span></a></span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679088172"><span class="hs-identifier hs-var">from</span></a></span><span>
+</span><span id="line-154"></span><span>                    </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088173"><span class="hs-identifier hs-var">normalSpeed</span></a></span><span>
+</span><span id="line-155"></span><span>                    </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SlowSpeed"><span class="hs-identifier hs-var">SlowSpeed</span></a></span><span>
+</span><span id="line-156"></span><span>      </span><span class="hs-keyword">in</span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">AbsSpeed -&gt; Size -&gt; DiffTime
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#delayAtSpeed"><span class="hs-identifier hs-var">delayAtSpeed</span></a></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088168"><span class="hs-identifier hs-var">speed</span></a></span><span> </span><span class="annot"><span class="annottext">Size
+</span><a href="#local-6989586621679088169"><span class="hs-identifier hs-var">size</span></a></span><span>
+</span><span id="line-157"></span><span>         </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">SuccessOrFailure
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-var">Success</span></a></span><span>
+</span><span id="line-158"></span><span>         </span><span class="hs-special">)</span><span>
+</span><span id="line-159"></span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#attenuation"><span class="hs-identifier hs-var">attenuation</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#ErrorInterval"><span class="hs-identifier hs-type">ErrorInterval</span></a></span><span> </span><span id="local-6989586621679088166"><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088166"><span class="hs-identifier hs-var">speed</span></a></span></span><span> </span><span id="local-6989586621679088165"><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679088165"><span class="hs-identifier hs-var">from</span></a></span></span><span> </span><span id="local-6989586621679088164"><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679088164"><span class="hs-identifier hs-var">len</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-160"></span><span>    </span><span class="hs-glyph">\</span><span id="local-6989586621679088163"><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679088163"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span id="local-6989586621679088162"><span class="annot"><span class="annottext">Size
+</span><a href="#local-6989586621679088162"><span class="hs-identifier hs-var">size</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-161"></span><span>        </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">AbsSpeed -&gt; Size -&gt; DiffTime
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#delayAtSpeed"><span class="hs-identifier hs-var">delayAtSpeed</span></a></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088166"><span class="hs-identifier hs-var">speed</span></a></span><span> </span><span class="annot"><span class="annottext">Size
+</span><a href="#local-6989586621679088162"><span class="hs-identifier hs-var">size</span></a></span><span>
+</span><span id="line-162"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679088163"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">Time -&gt; Time -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&lt;</span></a></span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679088165"><span class="hs-identifier hs-var">from</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">||</span></a></span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679088163"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">Time -&gt; Time -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;=</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679088164"><span class="hs-identifier hs-var">len</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; Time -&gt; Time
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-operator hs-var">`addTime`</span></a></span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679088165"><span class="hs-identifier hs-var">from</span></a></span><span>
+</span><span id="line-163"></span><span>            </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">SuccessOrFailure
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-var">Success</span></a></span><span>
+</span><span id="line-164"></span><span>            </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">SuccessOrFailure
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/network-mux-0.1.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-var">Failure</span></a></span><span>
+</span><span id="line-165"></span><span>        </span><span class="hs-special">)</span><span>
+</span><span id="line-166"></span><span>
+</span><span id="line-167"></span><span class="hs-keyword">data</span><span> </span><span id="AbsBearerInfo"><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfo"><span class="hs-identifier hs-var">AbsBearerInfo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="AbsBearerInfo"><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfo"><span class="hs-identifier hs-var">AbsBearerInfo</span></a></span></span><span>
+</span><span id="line-168"></span><span>    </span><span class="hs-special">{</span><span> </span><span id="abiConnectionDelay"><span class="annot"><span class="annottext">AbsBearerInfo -&gt; AbsDelay
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiConnectionDelay"><span class="hs-identifier hs-var hs-var">abiConnectionDelay</span></a></span></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsDelay"><span class="hs-identifier hs-type">AbsDelay</span></a></span><span>
+</span><span id="line-169"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="abiInboundAttenuation"><span class="annot"><span class="annottext">AbsBearerInfo -&gt; AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiInboundAttenuation"><span class="hs-identifier hs-var hs-var">abiInboundAttenuation</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsAttenuation"><span class="hs-identifier hs-type">AbsAttenuation</span></a></span><span>
+</span><span id="line-170"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="abiOutboundAttenuation"><span class="annot"><span class="annottext">AbsBearerInfo -&gt; AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiOutboundAttenuation"><span class="hs-identifier hs-var hs-var">abiOutboundAttenuation</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsAttenuation"><span class="hs-identifier hs-type">AbsAttenuation</span></a></span><span>
+</span><span id="line-171"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="abiInboundWriteFailure"><span class="annot"><span class="annottext">AbsBearerInfo -&gt; Maybe Int
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiInboundWriteFailure"><span class="hs-identifier hs-var hs-var">abiInboundWriteFailure</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-172"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="abiOutboundWriteFailure"><span class="annot"><span class="annottext">AbsBearerInfo -&gt; Maybe Int
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiOutboundWriteFailure"><span class="hs-identifier hs-var hs-var">abiOutboundWriteFailure</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-173"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="abiSDUSize"><span class="annot"><span class="annottext">AbsBearerInfo -&gt; AbsSDUSize
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiSDUSize"><span class="hs-identifier hs-var hs-var">abiSDUSize</span></a></span></span><span>              </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsSDUSize"><span class="hs-identifier hs-type">AbsSDUSize</span></a></span><span>
+</span><span id="line-174"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-175"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679088150"><span id="local-6989586621679088152"><span class="annot"><span class="annottext">AbsBearerInfo -&gt; AbsBearerInfo -&gt; Bool
+(AbsBearerInfo -&gt; AbsBearerInfo -&gt; Bool)
+-&gt; (AbsBearerInfo -&gt; AbsBearerInfo -&gt; Bool) -&gt; Eq AbsBearerInfo
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: AbsBearerInfo -&gt; AbsBearerInfo -&gt; Bool
+$c/= :: AbsBearerInfo -&gt; AbsBearerInfo -&gt; Bool
+== :: AbsBearerInfo -&gt; AbsBearerInfo -&gt; Bool
+$c== :: AbsBearerInfo -&gt; AbsBearerInfo -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679088144"><span id="local-6989586621679088146"><span id="local-6989586621679088148"><span class="annot"><span class="annottext">Int -&gt; AbsBearerInfo -&gt; ShowS
+[AbsBearerInfo] -&gt; ShowS
+AbsBearerInfo -&gt; String
+(Int -&gt; AbsBearerInfo -&gt; ShowS)
+-&gt; (AbsBearerInfo -&gt; String)
+-&gt; ([AbsBearerInfo] -&gt; ShowS)
+-&gt; Show AbsBearerInfo
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [AbsBearerInfo] -&gt; ShowS
+$cshowList :: [AbsBearerInfo] -&gt; ShowS
+show :: AbsBearerInfo -&gt; String
+$cshow :: AbsBearerInfo -&gt; String
+showsPrec :: Int -&gt; AbsBearerInfo -&gt; ShowS
+$cshowsPrec :: Int -&gt; AbsBearerInfo -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-176"></span><span>
+</span><span id="line-177"></span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#absNoAttenuation"><span class="hs-identifier hs-type">absNoAttenuation</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfo"><span class="hs-identifier hs-type">AbsBearerInfo</span></a></span><span>
+</span><span id="line-178"></span><span id="absNoAttenuation"><span class="annot"><span class="annottext">absNoAttenuation :: AbsBearerInfo
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#absNoAttenuation"><span class="hs-identifier hs-var hs-var">absNoAttenuation</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo :: AbsDelay
+-&gt; AbsAttenuation
+-&gt; AbsAttenuation
+-&gt; Maybe Int
+-&gt; Maybe Int
+-&gt; AbsSDUSize
+-&gt; AbsBearerInfo
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfo"><span class="hs-identifier hs-type">AbsBearerInfo</span></a></span><span>
+</span><span id="line-179"></span><span>    </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">abiConnectionDelay :: AbsDelay
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiConnectionDelay"><span class="hs-identifier hs-var">abiConnectionDelay</span></a></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AbsDelay
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NormalDelay"><span class="hs-identifier hs-var">NormalDelay</span></a></span><span>
+</span><span id="line-180"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">abiInboundAttenuation :: AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiInboundAttenuation"><span class="hs-identifier hs-var">abiInboundAttenuation</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AbsSpeed -&gt; AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NoAttenuation"><span class="hs-identifier hs-var">NoAttenuation</span></a></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NormalSpeed"><span class="hs-identifier hs-var">NormalSpeed</span></a></span><span>
+</span><span id="line-181"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">abiOutboundAttenuation :: AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiOutboundAttenuation"><span class="hs-identifier hs-var">abiOutboundAttenuation</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AbsSpeed -&gt; AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NoAttenuation"><span class="hs-identifier hs-var">NoAttenuation</span></a></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NormalSpeed"><span class="hs-identifier hs-var">NormalSpeed</span></a></span><span>
+</span><span id="line-182"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">abiInboundWriteFailure :: Maybe Int
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiInboundWriteFailure"><span class="hs-identifier hs-var">abiInboundWriteFailure</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe Int
+forall a. Maybe a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span>
+</span><span id="line-183"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">abiOutboundWriteFailure :: Maybe Int
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiOutboundWriteFailure"><span class="hs-identifier hs-var">abiOutboundWriteFailure</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe Int
+forall a. Maybe a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span>
+</span><span id="line-184"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">abiSDUSize :: AbsSDUSize
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiSDUSize"><span class="hs-identifier hs-var">abiSDUSize</span></a></span><span>              </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AbsSDUSize
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NormalSDU"><span class="hs-identifier hs-var">NormalSDU</span></a></span><span>
+</span><span id="line-185"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-186"></span><span>
+</span><span id="line-187"></span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#canFail"><span class="hs-identifier hs-type">canFail</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfo"><span class="hs-identifier hs-type">AbsBearerInfo</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Bool</span></a></span><span>
+</span><span id="line-188"></span><span id="canFail"><span class="annot"><span class="annottext">canFail :: AbsBearerInfo -&gt; Bool
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#canFail"><span class="hs-identifier hs-var hs-var">canFail</span></a></span></span><span> </span><span id="local-6989586621679088143"><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="#local-6989586621679088143"><span class="hs-identifier hs-var">abi</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Any -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var">getAny</span></a></span><span> </span><span class="annot"><span class="annottext">(Any -&gt; Bool) -&gt; Any -&gt; Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-189"></span><span>      </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo -&gt; AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiInboundAttenuation"><span class="hs-identifier hs-var hs-var">abiInboundAttenuation</span></a></span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="#local-6989586621679088143"><span class="hs-identifier hs-var">abi</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-190"></span><span>         </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NoAttenuation"><span class="hs-identifier hs-type">NoAttenuation</span></a></span><span> </span><span class="hs-special">{</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Any
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Any</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">False</span></a></span><span>
+</span><span id="line-191"></span><span>         </span><span class="annot"><span class="annottext">AbsAttenuation
+</span><span class="hs-identifier">_</span></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Any
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Any</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">True</span></a></span><span>
+</span><span id="line-192"></span><span>    </span><span class="annot"><span class="annottext">Any -&gt; Any -&gt; Any
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo -&gt; AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiOutboundAttenuation"><span class="hs-identifier hs-var hs-var">abiOutboundAttenuation</span></a></span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="#local-6989586621679088143"><span class="hs-identifier hs-var">abi</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-193"></span><span>         </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NoAttenuation"><span class="hs-identifier hs-type">NoAttenuation</span></a></span><span> </span><span class="hs-special">{</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Any
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Any</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">False</span></a></span><span>
+</span><span id="line-194"></span><span>         </span><span class="annot"><span class="annottext">AbsAttenuation
+</span><span class="hs-identifier">_</span></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Any
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Any</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">True</span></a></span><span>
+</span><span id="line-195"></span><span>    </span><span class="annot"><span class="annottext">Any -&gt; Any -&gt; Any
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo -&gt; Maybe Int
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiInboundWriteFailure"><span class="hs-identifier hs-var hs-var">abiInboundWriteFailure</span></a></span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="#local-6989586621679088143"><span class="hs-identifier hs-var">abi</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-196"></span><span>         </span><span class="annot"><span class="annottext">Maybe Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Any
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Any</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">False</span></a></span><span>
+</span><span id="line-197"></span><span>         </span><span class="annot"><span class="annottext">Maybe Int
+</span><span class="hs-identifier">_</span></span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Any
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Any</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">True</span></a></span><span>
+</span><span id="line-198"></span><span>    </span><span class="annot"><span class="annottext">Any -&gt; Any -&gt; Any
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo -&gt; Maybe Int
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiOutboundWriteFailure"><span class="hs-identifier hs-var hs-var">abiOutboundWriteFailure</span></a></span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="#local-6989586621679088143"><span class="hs-identifier hs-var">abi</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-199"></span><span>         </span><span class="annot"><span class="annottext">Maybe Int
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Any
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Any</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">False</span></a></span><span>
+</span><span id="line-200"></span><span>         </span><span class="annot"><span class="annottext">Maybe Int
+</span><span class="hs-identifier">_</span></span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Any
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Any</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">True</span></a></span><span>
+</span><span id="line-201"></span><span>
+</span><span id="line-202"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfo"><span class="hs-identifier hs-type">AbsBearerInfo</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-203"></span><span>    </span><span id="local-6989586621679088138"><span class="annot"><span class="annottext">arbitrary :: Gen AbsBearerInfo
+</span><a href="#local-6989586621679088138"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-204"></span><span>        </span><span class="annot"><span class="annottext">AbsDelay
+-&gt; AbsAttenuation
+-&gt; AbsAttenuation
+-&gt; Maybe Int
+-&gt; Maybe Int
+-&gt; AbsSDUSize
+-&gt; AbsBearerInfo
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfo"><span class="hs-identifier hs-var">AbsBearerInfo</span></a></span><span> </span><span class="annot"><span class="annottext">(AbsDelay
+ -&gt; AbsAttenuation
+ -&gt; AbsAttenuation
+ -&gt; Maybe Int
+ -&gt; Maybe Int
+ -&gt; AbsSDUSize
+ -&gt; AbsBearerInfo)
+-&gt; Gen AbsDelay
+-&gt; Gen
+     (AbsAttenuation
+      -&gt; AbsAttenuation
+      -&gt; Maybe Int
+      -&gt; Maybe Int
+      -&gt; AbsSDUSize
+      -&gt; AbsBearerInfo)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Gen AbsDelay
+forall a. Arbitrary a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrary</span></span><span>
+</span><span id="line-205"></span><span>                      </span><span class="annot"><span class="annottext">Gen
+  (AbsAttenuation
+   -&gt; AbsAttenuation
+   -&gt; Maybe Int
+   -&gt; Maybe Int
+   -&gt; AbsSDUSize
+   -&gt; AbsBearerInfo)
+-&gt; Gen AbsAttenuation
+-&gt; Gen
+     (AbsAttenuation
+      -&gt; Maybe Int -&gt; Maybe Int -&gt; AbsSDUSize -&gt; AbsBearerInfo)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;*&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Gen AbsAttenuation
+forall a. Arbitrary a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrary</span></span><span>
+</span><span id="line-206"></span><span>                      </span><span class="annot"><span class="annottext">Gen
+  (AbsAttenuation
+   -&gt; Maybe Int -&gt; Maybe Int -&gt; AbsSDUSize -&gt; AbsBearerInfo)
+-&gt; Gen AbsAttenuation
+-&gt; Gen (Maybe Int -&gt; Maybe Int -&gt; AbsSDUSize -&gt; AbsBearerInfo)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;*&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Gen AbsAttenuation
+forall a. Arbitrary a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrary</span></span><span>
+</span><span id="line-207"></span><span>                      </span><span class="annot"><span class="annottext">Gen (Maybe Int -&gt; Maybe Int -&gt; AbsSDUSize -&gt; AbsBearerInfo)
+-&gt; Gen (Maybe Int)
+-&gt; Gen (Maybe Int -&gt; AbsSDUSize -&gt; AbsBearerInfo)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;*&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Gen (Maybe Int)
+</span><a href="#local-6989586621679088137"><span class="hs-identifier hs-var">genWriteFailure</span></a></span><span>
+</span><span id="line-208"></span><span>                      </span><span class="annot"><span class="annottext">Gen (Maybe Int -&gt; AbsSDUSize -&gt; AbsBearerInfo)
+-&gt; Gen (Maybe Int) -&gt; Gen (AbsSDUSize -&gt; AbsBearerInfo)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;*&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Gen (Maybe Int)
+</span><a href="#local-6989586621679088137"><span class="hs-identifier hs-var">genWriteFailure</span></a></span><span>
+</span><span id="line-209"></span><span>                      </span><span class="annot"><span class="annottext">Gen (AbsSDUSize -&gt; AbsBearerInfo)
+-&gt; Gen AbsSDUSize -&gt; Gen AbsBearerInfo
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;*&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Gen AbsSDUSize
+forall a. Arbitrary a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrary</span></span><span>
+</span><span id="line-210"></span><span>      </span><span class="hs-keyword">where</span><span>
+</span><span id="line-211"></span><span>        </span><span id="local-6989586621679088137"><span class="annot"><span class="annottext">genWriteFailure :: Gen (Maybe Int)
+</span><a href="#local-6989586621679088137"><span class="hs-identifier hs-var hs-var">genWriteFailure</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-212"></span><span>          </span><span class="annot"><span class="annottext">[(Int, Gen (Maybe Int))] -&gt; Gen (Maybe Int)
+forall a. [(Int, Gen a)] -&gt; Gen a
+</span><span class="hs-identifier hs-var">frequency</span></span><span>
+</span><span id="line-213"></span><span>            </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Maybe Int -&gt; Gen (Maybe Int)
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe Int
+forall a. Maybe a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-214"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Maybe Int
+forall a. a -&gt; Maybe a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Maybe Int) -&gt; Gen Int -&gt; Gen (Maybe Int)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Gen Int
+forall a. Integral a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrarySizedNatural</span></span><span class="hs-special">)</span><span>
+</span><span id="line-215"></span><span>            </span><span class="hs-special">]</span><span>
+</span><span id="line-216"></span><span>
+</span><span id="line-217"></span><span>    </span><span id="local-6989586621679088136"><span class="annot"><span class="annottext">shrink :: AbsBearerInfo -&gt; [AbsBearerInfo]
+</span><a href="#local-6989586621679088136"><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></a></span></span><span> </span><span id="local-6989586621679088135"><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="#local-6989586621679088135"><span class="hs-identifier hs-var">abi</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-218"></span><span>      </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="#local-6989586621679088135"><span class="hs-identifier hs-var">abi</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">abiConnectionDelay :: AbsDelay
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiConnectionDelay"><span class="hs-identifier hs-var">abiConnectionDelay</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AbsDelay
+</span><a href="#local-6989586621679088134"><span class="hs-identifier hs-var">connDelay</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-219"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679088134"><span class="annot"><span class="annottext">AbsDelay
+</span><a href="#local-6989586621679088134"><span class="hs-identifier hs-var">connDelay</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">AbsDelay -&gt; [AbsDelay]
+forall a. Arbitrary a =&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AbsBearerInfo -&gt; AbsDelay
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiConnectionDelay"><span class="hs-identifier hs-var hs-var">abiConnectionDelay</span></a></span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="#local-6989586621679088135"><span class="hs-identifier hs-var">abi</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-220"></span><span>      </span><span class="annot"><span class="annottext">[AbsBearerInfo] -&gt; [AbsBearerInfo] -&gt; [AbsBearerInfo]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">++</span></a></span><span>
+</span><span id="line-221"></span><span>      </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="#local-6989586621679088135"><span class="hs-identifier hs-var">abi</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">abiInboundAttenuation :: AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiInboundAttenuation"><span class="hs-identifier hs-var">abiInboundAttenuation</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AbsAttenuation
+</span><a href="#local-6989586621679088133"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-222"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679088133"><span class="annot"><span class="annottext">AbsAttenuation
+</span><a href="#local-6989586621679088133"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">AbsAttenuation -&gt; [AbsAttenuation]
+forall a. Arbitrary a =&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AbsBearerInfo -&gt; AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiInboundAttenuation"><span class="hs-identifier hs-var hs-var">abiInboundAttenuation</span></a></span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="#local-6989586621679088135"><span class="hs-identifier hs-var">abi</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-223"></span><span>      </span><span class="annot"><span class="annottext">[AbsBearerInfo] -&gt; [AbsBearerInfo] -&gt; [AbsBearerInfo]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">++</span></a></span><span>
+</span><span id="line-224"></span><span>      </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="#local-6989586621679088135"><span class="hs-identifier hs-var">abi</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">abiOutboundAttenuation :: AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiOutboundAttenuation"><span class="hs-identifier hs-var">abiOutboundAttenuation</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AbsAttenuation
+</span><a href="#local-6989586621679088132"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-225"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679088132"><span class="annot"><span class="annottext">AbsAttenuation
+</span><a href="#local-6989586621679088132"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">AbsAttenuation -&gt; [AbsAttenuation]
+forall a. Arbitrary a =&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AbsBearerInfo -&gt; AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiOutboundAttenuation"><span class="hs-identifier hs-var hs-var">abiOutboundAttenuation</span></a></span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="#local-6989586621679088135"><span class="hs-identifier hs-var">abi</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-226"></span><span>      </span><span class="annot"><span class="annottext">[AbsBearerInfo] -&gt; [AbsBearerInfo] -&gt; [AbsBearerInfo]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">++</span></a></span><span>
+</span><span id="line-227"></span><span>      </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="#local-6989586621679088135"><span class="hs-identifier hs-var">abi</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">abiInboundWriteFailure :: Maybe Int
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiInboundWriteFailure"><span class="hs-identifier hs-var">abiInboundWriteFailure</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe Int
+</span><a href="#local-6989586621679088131"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-228"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679088131"><span class="annot"><span class="annottext">Maybe Int
+</span><a href="#local-6989586621679088131"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Maybe Int -&gt; [Maybe Int]
+forall a. Arbitrary a =&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AbsBearerInfo -&gt; Maybe Int
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiInboundWriteFailure"><span class="hs-identifier hs-var hs-var">abiInboundWriteFailure</span></a></span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="#local-6989586621679088135"><span class="hs-identifier hs-var">abi</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-229"></span><span>      </span><span class="annot"><span class="annottext">[AbsBearerInfo] -&gt; [AbsBearerInfo] -&gt; [AbsBearerInfo]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">++</span></a></span><span>
+</span><span id="line-230"></span><span>      </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="#local-6989586621679088135"><span class="hs-identifier hs-var">abi</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">abiOutboundWriteFailure :: Maybe Int
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiOutboundWriteFailure"><span class="hs-identifier hs-var">abiOutboundWriteFailure</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe Int
+</span><a href="#local-6989586621679088130"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-231"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679088130"><span class="annot"><span class="annottext">Maybe Int
+</span><a href="#local-6989586621679088130"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Maybe Int -&gt; [Maybe Int]
+forall a. Arbitrary a =&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AbsBearerInfo -&gt; Maybe Int
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiOutboundWriteFailure"><span class="hs-identifier hs-var hs-var">abiOutboundWriteFailure</span></a></span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="#local-6989586621679088135"><span class="hs-identifier hs-var">abi</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-232"></span><span>      </span><span class="annot"><span class="annottext">[AbsBearerInfo] -&gt; [AbsBearerInfo] -&gt; [AbsBearerInfo]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">++</span></a></span><span>
+</span><span id="line-233"></span><span>      </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="#local-6989586621679088135"><span class="hs-identifier hs-var">abi</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">abiSDUSize :: AbsSDUSize
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiSDUSize"><span class="hs-identifier hs-var">abiSDUSize</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AbsSDUSize
+</span><a href="#local-6989586621679088129"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-234"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679088129"><span class="annot"><span class="annottext">AbsSDUSize
+</span><a href="#local-6989586621679088129"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">AbsSDUSize -&gt; [AbsSDUSize]
+forall a. Arbitrary a =&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AbsBearerInfo -&gt; AbsSDUSize
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiSDUSize"><span class="hs-identifier hs-var hs-var">abiSDUSize</span></a></span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="#local-6989586621679088135"><span class="hs-identifier hs-var">abi</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-235"></span><span>      </span><span class="hs-special">]</span><span>
+</span><span id="line-236"></span><span>
+</span><span id="line-237"></span><span class="hs-keyword">newtype</span><span> </span><span id="AbsBearerInfoScript"><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfoScript"><span class="hs-identifier hs-var">AbsBearerInfoScript</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-238"></span><span>  </span><span id="AbsBearerInfoScript"><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfoScript"><span class="hs-identifier hs-var">AbsBearerInfoScript</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="unBIScript"><span class="annot"><span class="annottext">AbsBearerInfoScript -&gt; Script AbsBearerInfo
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#unBIScript"><span class="hs-identifier hs-var hs-var">unBIScript</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfo"><span class="hs-identifier hs-type">AbsBearerInfo</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-239"></span><span>  </span><span class="hs-keyword">deriving</span><span>       </span><span id="local-6989586621679088121"><span id="local-6989586621679088123"><span id="local-6989586621679088125"><span class="annot"><span class="annottext">Int -&gt; AbsBearerInfoScript -&gt; ShowS
+[AbsBearerInfoScript] -&gt; ShowS
+AbsBearerInfoScript -&gt; String
+(Int -&gt; AbsBearerInfoScript -&gt; ShowS)
+-&gt; (AbsBearerInfoScript -&gt; String)
+-&gt; ([AbsBearerInfoScript] -&gt; ShowS)
+-&gt; Show AbsBearerInfoScript
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [AbsBearerInfoScript] -&gt; ShowS
+$cshowList :: [AbsBearerInfoScript] -&gt; ShowS
+show :: AbsBearerInfoScript -&gt; String
+$cshow :: AbsBearerInfoScript -&gt; String
+showsPrec :: Int -&gt; AbsBearerInfoScript -&gt; ShowS
+$cshowsPrec :: Int -&gt; AbsBearerInfoScript -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfo"><span class="hs-identifier hs-type">AbsBearerInfo</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-240"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span id="local-6989586621679088117"><span id="local-6989586621679088119"><span class="annot"><span class="annottext">AbsBearerInfoScript -&gt; AbsBearerInfoScript -&gt; Bool
+(AbsBearerInfoScript -&gt; AbsBearerInfoScript -&gt; Bool)
+-&gt; (AbsBearerInfoScript -&gt; AbsBearerInfoScript -&gt; Bool)
+-&gt; Eq AbsBearerInfoScript
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: AbsBearerInfoScript -&gt; AbsBearerInfoScript -&gt; Bool
+$c/= :: AbsBearerInfoScript -&gt; AbsBearerInfoScript -&gt; Bool
+== :: AbsBearerInfoScript -&gt; AbsBearerInfoScript -&gt; Bool
+$c== :: AbsBearerInfoScript -&gt; AbsBearerInfoScript -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span>
+</span><span id="line-241"></span><span>
+</span><span id="line-242"></span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#fixupAbsBearerInfos"><span class="hs-identifier hs-type">fixupAbsBearerInfos</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfo"><span class="hs-identifier hs-type">AbsBearerInfo</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfo"><span class="hs-identifier hs-type">AbsBearerInfo</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-243"></span><span id="fixupAbsBearerInfos"><span class="annot"><span class="annottext">fixupAbsBearerInfos :: [AbsBearerInfo] -&gt; [AbsBearerInfo]
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#fixupAbsBearerInfos"><span class="hs-identifier hs-var hs-var">fixupAbsBearerInfos</span></a></span></span><span> </span><span id="local-6989586621679088115"><span class="annot"><span class="annottext">[AbsBearerInfo]
+</span><a href="#local-6989586621679088115"><span class="hs-identifier hs-var">bis</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-244"></span><span>    </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo -&gt; Bool
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#canFail"><span class="hs-identifier hs-var">canFail</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[AbsBearerInfo] -&gt; AbsBearerInfo
+forall a. [a] -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">last</span></a></span><span> </span><span class="annot"><span class="annottext">[AbsBearerInfo]
+</span><a href="#local-6989586621679088115"><span class="hs-identifier hs-var">bis</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-245"></span><span>      </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">[AbsBearerInfo]
+</span><a href="#local-6989586621679088115"><span class="hs-identifier hs-var">bis</span></a></span><span> </span><span class="annot"><span class="annottext">[AbsBearerInfo] -&gt; [AbsBearerInfo] -&gt; [AbsBearerInfo]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">++</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#absNoAttenuation"><span class="hs-identifier hs-var">absNoAttenuation</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-246"></span><span>      </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">[AbsBearerInfo]
+</span><a href="#local-6989586621679088115"><span class="hs-identifier hs-var">bis</span></a></span><span>
+</span><span id="line-247"></span><span>
+</span><span id="line-248"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfoScript"><span class="hs-identifier hs-type">AbsBearerInfoScript</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-249"></span><span>  </span><span id="local-6989586621679088111"><span class="annot"><span class="annottext">arbitrary :: Gen AbsBearerInfoScript
+</span><a href="#local-6989586621679088111"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Script AbsBearerInfo -&gt; AbsBearerInfoScript
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfoScript"><span class="hs-identifier hs-var">AbsBearerInfoScript</span></a></span><span>
+</span><span id="line-250"></span><span>            </span><span class="annot"><span class="annottext">(Script AbsBearerInfo -&gt; AbsBearerInfoScript)
+-&gt; ([AbsBearerInfo] -&gt; Script AbsBearerInfo)
+-&gt; [AbsBearerInfo]
+-&gt; AbsBearerInfoScript
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">NonEmpty AbsBearerInfo -&gt; Script AbsBearerInfo
+forall a. NonEmpty a -&gt; Script a
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-var">Script</span></a></span><span>
+</span><span id="line-251"></span><span>            </span><span class="annot"><span class="annottext">(NonEmpty AbsBearerInfo -&gt; Script AbsBearerInfo)
+-&gt; ([AbsBearerInfo] -&gt; NonEmpty AbsBearerInfo)
+-&gt; [AbsBearerInfo]
+-&gt; Script AbsBearerInfo
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">[AbsBearerInfo] -&gt; NonEmpty AbsBearerInfo
+forall a. [a] -&gt; NonEmpty a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">NonEmpty.fromList</span></a></span><span>
+</span><span id="line-252"></span><span>            </span><span class="annot"><span class="annottext">([AbsBearerInfo] -&gt; NonEmpty AbsBearerInfo)
+-&gt; ([AbsBearerInfo] -&gt; [AbsBearerInfo])
+-&gt; [AbsBearerInfo]
+-&gt; NonEmpty AbsBearerInfo
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">[AbsBearerInfo] -&gt; [AbsBearerInfo]
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#fixupAbsBearerInfos"><span class="hs-identifier hs-var">fixupAbsBearerInfos</span></a></span><span>
+</span><span id="line-253"></span><span>          </span><span class="annot"><span class="annottext">([AbsBearerInfo] -&gt; AbsBearerInfoScript)
+-&gt; Gen [AbsBearerInfo] -&gt; Gen AbsBearerInfoScript
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Gen AbsBearerInfo -&gt; Gen [AbsBearerInfo]
+forall a. Gen a -&gt; Gen [a]
+</span><span class="hs-identifier hs-var">listOf1</span></span><span> </span><span class="annot"><span class="annottext">Gen AbsBearerInfo
+forall a. Arbitrary a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrary</span></span><span>
+</span><span id="line-254"></span><span>
+</span><span id="line-255"></span><span>  </span><span id="local-6989586621679088108"><span class="annot"><span class="annottext">shrink :: AbsBearerInfoScript -&gt; [AbsBearerInfoScript]
+</span><a href="#local-6989586621679088108"><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfoScript"><span class="hs-identifier hs-type">AbsBearerInfoScript</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span id="local-6989586621679088107"><span class="annot"><span class="annottext">NonEmpty AbsBearerInfo
+</span><a href="#local-6989586621679088107"><span class="hs-identifier hs-var">script</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-256"></span><span>    </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">Script AbsBearerInfo -&gt; AbsBearerInfoScript
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfoScript"><span class="hs-identifier hs-var">AbsBearerInfoScript</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NonEmpty AbsBearerInfo -&gt; Script AbsBearerInfo
+forall a. NonEmpty a -&gt; Script a
+</span><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-var">Script</span></a></span><span> </span><span class="annot"><span class="annottext">NonEmpty AbsBearerInfo
+</span><a href="#local-6989586621679088106"><span class="hs-identifier hs-var">script'</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-257"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679088106"><span class="annot"><span class="annottext">NonEmpty AbsBearerInfo
+</span><a href="#local-6989586621679088106"><span class="hs-identifier hs-var">script'</span></a></span></span><span>
+</span><span id="line-258"></span><span>        </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">([AbsBearerInfo] -&gt; NonEmpty AbsBearerInfo)
+-&gt; [[AbsBearerInfo]] -&gt; [NonEmpty AbsBearerInfo]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">map</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[AbsBearerInfo] -&gt; NonEmpty AbsBearerInfo
+forall a. [a] -&gt; NonEmpty a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">NonEmpty.fromList</span></a></span><span> </span><span class="annot"><span class="annottext">([AbsBearerInfo] -&gt; NonEmpty AbsBearerInfo)
+-&gt; ([AbsBearerInfo] -&gt; [AbsBearerInfo])
+-&gt; [AbsBearerInfo]
+-&gt; NonEmpty AbsBearerInfo
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">[AbsBearerInfo] -&gt; [AbsBearerInfo]
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#fixupAbsBearerInfos"><span class="hs-identifier hs-var">fixupAbsBearerInfos</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-259"></span><span>        </span><span class="annot"><span class="annottext">([[AbsBearerInfo]] -&gt; [NonEmpty AbsBearerInfo])
+-&gt; ([[AbsBearerInfo]] -&gt; [[AbsBearerInfo]])
+-&gt; [[AbsBearerInfo]]
+-&gt; [NonEmpty AbsBearerInfo]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">([AbsBearerInfo] -&gt; Bool) -&gt; [[AbsBearerInfo]] -&gt; [[AbsBearerInfo]]
+forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">filter</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">not</span></a></span><span> </span><span class="annot"><span class="annottext">(Bool -&gt; Bool)
+-&gt; ([AbsBearerInfo] -&gt; Bool) -&gt; [AbsBearerInfo] -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">[AbsBearerInfo] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">List.null</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-260"></span><span>         </span><span class="hs-comment">-- TODO: shrinking of 'AbsBearerInfo' needs to be more aggresive to use</span><span>
+</span><span id="line-261"></span><span>         </span><span class="hs-comment">-- @shrinkList shrink@</span><span>
+</span><span id="line-262"></span><span>         </span><span class="annot"><span class="annottext">([[AbsBearerInfo]] -&gt; [NonEmpty AbsBearerInfo])
+-&gt; [[AbsBearerInfo]] -&gt; [NonEmpty AbsBearerInfo]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">(AbsBearerInfo -&gt; [AbsBearerInfo])
+-&gt; [AbsBearerInfo] -&gt; [[AbsBearerInfo]]
+forall a. (a -&gt; [a]) -&gt; [a] -&gt; [[a]]
+</span><span class="hs-identifier hs-var">shrinkList</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[AbsBearerInfo] -&gt; AbsBearerInfo -&gt; [AbsBearerInfo]
+forall a b. a -&gt; b -&gt; a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">const</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NonEmpty AbsBearerInfo -&gt; [AbsBearerInfo]
+forall a. NonEmpty a -&gt; [a]
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">NonEmpty.toList</span></a></span><span> </span><span class="annot"><span class="annottext">NonEmpty AbsBearerInfo
+</span><a href="#local-6989586621679088107"><span class="hs-identifier hs-var">script</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-263"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">NonEmpty AbsBearerInfo
+</span><a href="#local-6989586621679088106"><span class="hs-identifier hs-var">script'</span></a></span><span> </span><span class="annot"><span class="annottext">NonEmpty AbsBearerInfo -&gt; NonEmpty AbsBearerInfo -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">/=</span></a></span><span> </span><span class="annot"><span class="annottext">NonEmpty AbsBearerInfo
+</span><a href="#local-6989586621679088107"><span class="hs-identifier hs-var">script</span></a></span><span>
+</span><span id="line-264"></span><span>    </span><span class="hs-special">]</span><span>
+</span><span id="line-265"></span><span>
+</span><span id="line-266"></span><span class="hs-keyword">newtype</span><span> </span><span id="NonFailingAbsBearerInfoScript"><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NonFailingAbsBearerInfoScript"><span class="hs-identifier hs-var">NonFailingAbsBearerInfoScript</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-267"></span><span>  </span><span id="NonFailingAbsBearerInfoScript"><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NonFailingAbsBearerInfoScript"><span class="hs-identifier hs-var">NonFailingAbsBearerInfoScript</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="unNFBIScript"><span class="annot"><span class="annottext">NonFailingAbsBearerInfoScript -&gt; Script AbsBearerInfo
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#unNFBIScript"><span class="hs-identifier hs-var hs-var">unNFBIScript</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfo"><span class="hs-identifier hs-type">AbsBearerInfo</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-268"></span><span>  </span><span class="hs-keyword">deriving</span><span>       </span><span id="local-6989586621679088093"><span id="local-6989586621679088095"><span id="local-6989586621679088097"><span class="annot"><span class="annottext">Int -&gt; NonFailingAbsBearerInfoScript -&gt; ShowS
+[NonFailingAbsBearerInfoScript] -&gt; ShowS
+NonFailingAbsBearerInfoScript -&gt; String
+(Int -&gt; NonFailingAbsBearerInfoScript -&gt; ShowS)
+-&gt; (NonFailingAbsBearerInfoScript -&gt; String)
+-&gt; ([NonFailingAbsBearerInfoScript] -&gt; ShowS)
+-&gt; Show NonFailingAbsBearerInfoScript
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [NonFailingAbsBearerInfoScript] -&gt; ShowS
+$cshowList :: [NonFailingAbsBearerInfoScript] -&gt; ShowS
+show :: NonFailingAbsBearerInfoScript -&gt; String
+$cshow :: NonFailingAbsBearerInfoScript -&gt; String
+showsPrec :: Int -&gt; NonFailingAbsBearerInfoScript -&gt; ShowS
+$cshowsPrec :: Int -&gt; NonFailingAbsBearerInfoScript -&gt; ShowS
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.Script.html#Script"><span class="hs-identifier hs-type">Script</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfo"><span class="hs-identifier hs-type">AbsBearerInfo</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-269"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span id="local-6989586621679088089"><span id="local-6989586621679088091"><span class="annot"><span class="annottext">NonFailingAbsBearerInfoScript
+-&gt; NonFailingAbsBearerInfoScript -&gt; Bool
+(NonFailingAbsBearerInfoScript
+ -&gt; NonFailingAbsBearerInfoScript -&gt; Bool)
+-&gt; (NonFailingAbsBearerInfoScript
+    -&gt; NonFailingAbsBearerInfoScript -&gt; Bool)
+-&gt; Eq NonFailingAbsBearerInfoScript
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: NonFailingAbsBearerInfoScript
+-&gt; NonFailingAbsBearerInfoScript -&gt; Bool
+$c/= :: NonFailingAbsBearerInfoScript
+-&gt; NonFailingAbsBearerInfoScript -&gt; Bool
+== :: NonFailingAbsBearerInfoScript
+-&gt; NonFailingAbsBearerInfoScript -&gt; Bool
+$c== :: NonFailingAbsBearerInfoScript
+-&gt; NonFailingAbsBearerInfoScript -&gt; Bool
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span>
+</span><span id="line-270"></span><span>
+</span><span id="line-271"></span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#toNonFailingAbsBearerInfoScript"><span class="hs-identifier hs-type">toNonFailingAbsBearerInfoScript</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfoScript"><span class="hs-identifier hs-type">AbsBearerInfoScript</span></a></span><span>
+</span><span id="line-272"></span><span>                                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NonFailingAbsBearerInfoScript"><span class="hs-identifier hs-type">NonFailingAbsBearerInfoScript</span></a></span><span>
+</span><span id="line-273"></span><span id="toNonFailingAbsBearerInfoScript"><span class="annot"><span class="annottext">toNonFailingAbsBearerInfoScript :: AbsBearerInfoScript -&gt; NonFailingAbsBearerInfoScript
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#toNonFailingAbsBearerInfoScript"><span class="hs-identifier hs-var hs-var">toNonFailingAbsBearerInfoScript</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfoScript"><span class="hs-identifier hs-type">AbsBearerInfoScript</span></a></span><span> </span><span id="local-6989586621679088088"><span class="annot"><span class="annottext">Script AbsBearerInfo
+</span><a href="#local-6989586621679088088"><span class="hs-identifier hs-var">script</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-274"></span><span>    </span><span class="annot"><span class="annottext">Script AbsBearerInfo -&gt; NonFailingAbsBearerInfoScript
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NonFailingAbsBearerInfoScript"><span class="hs-identifier hs-var">NonFailingAbsBearerInfoScript</span></a></span><span> </span><span class="annot"><span class="annottext">(Script AbsBearerInfo -&gt; NonFailingAbsBearerInfoScript)
+-&gt; Script AbsBearerInfo -&gt; NonFailingAbsBearerInfoScript
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">(AbsBearerInfo -&gt; AbsBearerInfo)
+-&gt; Script AbsBearerInfo -&gt; Script AbsBearerInfo
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fmap</span></a></span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo -&gt; AbsBearerInfo
+</span><a href="#local-6989586621679088087"><span class="hs-identifier hs-var">unfail</span></a></span><span> </span><span class="annot"><span class="annottext">Script AbsBearerInfo
+</span><a href="#local-6989586621679088088"><span class="hs-identifier hs-var">script</span></a></span><span>
+</span><span id="line-275"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-276"></span><span>    </span><span class="annot"><a href="#local-6989586621679088087"><span class="hs-identifier hs-type">unfail</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfo"><span class="hs-identifier hs-type">AbsBearerInfo</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfo"><span class="hs-identifier hs-type">AbsBearerInfo</span></a></span><span>
+</span><span id="line-277"></span><span>    </span><span id="local-6989586621679088087"><span class="annot"><span class="annottext">unfail :: AbsBearerInfo -&gt; AbsBearerInfo
+</span><a href="#local-6989586621679088087"><span class="hs-identifier hs-var hs-var">unfail</span></a></span></span><span> </span><span id="local-6989586621679088086"><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="#local-6989586621679088086"><span class="hs-identifier hs-var">bi</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-278"></span><span>      </span><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="#local-6989586621679088086"><span class="hs-identifier hs-var">bi</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">abiInboundWriteFailure :: Maybe Int
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiInboundWriteFailure"><span class="hs-identifier hs-var">abiInboundWriteFailure</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe Int
+forall a. Maybe a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span>
+</span><span id="line-279"></span><span>         </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">abiOutboundWriteFailure :: Maybe Int
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiOutboundWriteFailure"><span class="hs-identifier hs-var">abiOutboundWriteFailure</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe Int
+forall a. Maybe a
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span>
+</span><span id="line-280"></span><span>         </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">abiInboundAttenuation :: AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiInboundAttenuation"><span class="hs-identifier hs-var">abiInboundAttenuation</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AbsAttenuation -&gt; AbsAttenuation
+</span><a href="#local-6989586621679088085"><span class="hs-identifier hs-var">unfailAtt</span></a></span><span> </span><span class="annot"><span class="annottext">(AbsAttenuation -&gt; AbsAttenuation)
+-&gt; AbsAttenuation -&gt; AbsAttenuation
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo -&gt; AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiInboundAttenuation"><span class="hs-identifier hs-var hs-var">abiInboundAttenuation</span></a></span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="#local-6989586621679088086"><span class="hs-identifier hs-var">bi</span></a></span><span>
+</span><span id="line-281"></span><span>         </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">abiOutboundAttenuation :: AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiOutboundAttenuation"><span class="hs-identifier hs-var">abiOutboundAttenuation</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AbsAttenuation -&gt; AbsAttenuation
+</span><a href="#local-6989586621679088085"><span class="hs-identifier hs-var">unfailAtt</span></a></span><span> </span><span class="annot"><span class="annottext">(AbsAttenuation -&gt; AbsAttenuation)
+-&gt; AbsAttenuation -&gt; AbsAttenuation
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo -&gt; AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#abiOutboundAttenuation"><span class="hs-identifier hs-var hs-var">abiOutboundAttenuation</span></a></span><span> </span><span class="annot"><span class="annottext">AbsBearerInfo
+</span><a href="#local-6989586621679088086"><span class="hs-identifier hs-var">bi</span></a></span><span>
+</span><span id="line-282"></span><span>         </span><span class="hs-special">}</span><span>
+</span><span id="line-283"></span><span>
+</span><span id="line-284"></span><span>    </span><span id="local-6989586621679088085"><span class="annot"><span class="annottext">unfailAtt :: AbsAttenuation -&gt; AbsAttenuation
+</span><a href="#local-6989586621679088085"><span class="hs-identifier hs-var hs-var">unfailAtt</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#ErrorInterval"><span class="hs-identifier hs-type">ErrorInterval</span></a></span><span>    </span><span id="local-6989586621679088084"><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088084"><span class="hs-identifier hs-var">speed</span></a></span></span><span> </span><span class="annot"><span class="annottext">Time
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AbsSpeed -&gt; AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NoAttenuation"><span class="hs-identifier hs-var">NoAttenuation</span></a></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088084"><span class="hs-identifier hs-var">speed</span></a></span><span>
+</span><span id="line-285"></span><span>    </span><span class="annot"><a href="#local-6989586621679088085"><span class="hs-identifier hs-var">unfailAtt</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#SpeedAttenuation"><span class="hs-identifier hs-type">SpeedAttenuation</span></a></span><span> </span><span id="local-6989586621679088083"><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088083"><span class="hs-identifier hs-var">speed</span></a></span></span><span> </span><span class="annot"><span class="annottext">Time
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AbsSpeed -&gt; AbsAttenuation
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NoAttenuation"><span class="hs-identifier hs-var">NoAttenuation</span></a></span><span> </span><span class="annot"><span class="annottext">AbsSpeed
+</span><a href="#local-6989586621679088083"><span class="hs-identifier hs-var">speed</span></a></span><span>
+</span><span id="line-286"></span><span>    </span><span class="annot"><a href="#local-6989586621679088085"><span class="hs-identifier hs-var">unfailAtt</span></a></span><span> </span><span id="local-6989586621679088082"><span class="annot"><span class="annottext">AbsAttenuation
+</span><a href="#local-6989586621679088082"><span class="hs-identifier hs-var">a</span></a></span></span><span>                            </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AbsAttenuation
+</span><a href="#local-6989586621679088082"><span class="hs-identifier hs-var">a</span></a></span><span>
+</span><span id="line-287"></span><span>
+</span><span id="line-288"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NonFailingAbsBearerInfoScript"><span class="hs-identifier hs-type">NonFailingAbsBearerInfoScript</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-289"></span><span>  </span><span id="local-6989586621679088079"><span class="annot"><span class="annottext">arbitrary :: Gen NonFailingAbsBearerInfoScript
+</span><a href="#local-6989586621679088079"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AbsBearerInfoScript -&gt; NonFailingAbsBearerInfoScript
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#toNonFailingAbsBearerInfoScript"><span class="hs-identifier hs-var">toNonFailingAbsBearerInfoScript</span></a></span><span> </span><span class="annot"><span class="annottext">(AbsBearerInfoScript -&gt; NonFailingAbsBearerInfoScript)
+-&gt; Gen AbsBearerInfoScript -&gt; Gen NonFailingAbsBearerInfoScript
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Gen AbsBearerInfoScript
+forall a. Arbitrary a =&gt; Gen a
+</span><span class="hs-identifier hs-var">arbitrary</span></span><span>
+</span><span id="line-290"></span><span>  </span><span id="local-6989586621679088078"><span class="annot"><span class="annottext">shrink :: NonFailingAbsBearerInfoScript -&gt; [NonFailingAbsBearerInfoScript]
+</span><a href="#local-6989586621679088078"><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#NonFailingAbsBearerInfoScript"><span class="hs-identifier hs-type">NonFailingAbsBearerInfoScript</span></a></span><span> </span><span id="local-6989586621679088077"><span class="annot"><span class="annottext">Script AbsBearerInfo
+</span><a href="#local-6989586621679088077"><span class="hs-identifier hs-var">script</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-291"></span><span>    </span><span class="annot"><span class="annottext">AbsBearerInfoScript -&gt; NonFailingAbsBearerInfoScript
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#toNonFailingAbsBearerInfoScript"><span class="hs-identifier hs-var">toNonFailingAbsBearerInfoScript</span></a></span><span> </span><span class="annot"><span class="annottext">(AbsBearerInfoScript -&gt; NonFailingAbsBearerInfoScript)
+-&gt; [AbsBearerInfoScript] -&gt; [NonFailingAbsBearerInfoScript]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">AbsBearerInfoScript -&gt; [AbsBearerInfoScript]
+forall a. Arbitrary a =&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">shrink</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Script AbsBearerInfo -&gt; AbsBearerInfoScript
+</span><a href="Ouroboros.Network.Testing.Data.AbsBearerInfo.html#AbsBearerInfoScript"><span class="hs-identifier hs-var">AbsBearerInfoScript</span></a></span><span> </span><span class="annot"><span class="annottext">Script AbsBearerInfo
+</span><a href="#local-6989586621679088077"><span class="hs-identifier hs-var">script</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-292"></span></pre></body></html>
