@@ -1,0 +1,1076 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DataKinds                  #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DeriveGeneric              #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE DerivingStrategies         #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE DerivingVia                #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE FlexibleInstances          #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE GeneralizedNewtypeDeriving #-}</span><span>
+</span><span id="line-7"></span><span class="hs-pragma">{-# LANGUAGE NamedFieldPuns             #-}</span><span>
+</span><span id="line-8"></span><span class="hs-pragma">{-# LANGUAGE PatternSynonyms            #-}</span><span>
+</span><span id="line-9"></span><span class="hs-pragma">{-# LANGUAGE StandaloneDeriving         #-}</span><span>
+</span><span id="line-10"></span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- | Block header associated with Praos.</span><span>
+</span><span id="line-12"></span><span class="hs-comment">--</span><span>
+</span><span id="line-13"></span><span class="hs-comment">-- The choice of whether to associate the header with the ledger era or the</span><span>
+</span><span id="line-14"></span><span class="hs-comment">-- protocol is a little artitrary. Functionally the header contains things which</span><span>
+</span><span id="line-15"></span><span class="hs-comment">-- are associated with both ledger and protocol, and which are used by both.</span><span>
+</span><span id="line-16"></span><span class="hs-comment">--</span><span>
+</span><span id="line-17"></span><span class="hs-comment">-- We choose to associate the header with the protocol, since it more strongly</span><span>
+</span><span id="line-18"></span><span class="hs-comment">-- binds in that direction, and to assist with the mental picture that the</span><span>
+</span><span id="line-19"></span><span class="hs-comment">-- protocol is concerned with the block header, while the ledger is concerned</span><span>
+</span><span id="line-20"></span><span class="hs-comment">-- with the block body. However, in order to more cleanly illustrate which parts</span><span>
+</span><span id="line-21"></span><span class="hs-comment">-- of the header are _strictly_ protocol concerns, we also provide a view of the</span><span>
+</span><span id="line-22"></span><span class="hs-comment">-- header (in 'Ouroboros.Consensus.Protocol.Praos.Views') which extracts just</span><span>
+</span><span id="line-23"></span><span class="hs-comment">-- the fields needed for the Praos protocol. This also allows us to hide the</span><span>
+</span><span id="line-24"></span><span class="hs-comment">-- more detailed construction of the header.</span><span>
+</span><span id="line-25"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Consensus.Protocol.Praos.Header</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-26"></span><span>    </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#Header"><span class="hs-identifier">Header</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#Header"><span class="hs-identifier">Header</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#headerBody"><span class="hs-identifier">headerBody</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#headerSig"><span class="hs-identifier">headerSig</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderBody"><span class="hs-identifier">HeaderBody</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#headerHash"><span class="hs-identifier">headerHash</span></a></span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#headerSize"><span class="hs-identifier">headerSize</span></a></span><span>
+</span><span id="line-30"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Binary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">FromCBOR</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">fromCBOR</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">ToCBOR</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">toCBOR</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-33"></span><span>                     </span><span class="annot"><span class="hs-identifier">serialize'</span></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Crypto.Hash</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Hash</span></span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Crypto.Util</span></span><span>
+</span><span id="line-36"></span><span>                     </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">SignableRepresentation</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">getSignableRepresentation</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.BaseTypes</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">ProtVer</span></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Crypto</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">CC</span></span><span>
+</span><span id="line-39"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Hashes</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">EraIndependentBlockBody</span></span><span class="hs-special">,</span><span>
+</span><span id="line-40"></span><span>                     </span><span class="annot"><span class="hs-identifier">EraIndependentBlockHeader</span></span><span class="hs-special">)</span><span>
+</span><span id="line-41"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Keys</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">CertifiedVRF</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Hash</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">KeyRole</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">BlockIssuer</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-42"></span><span>                     </span><span class="annot"><span class="hs-identifier">SignedKES</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">VKey</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">VerKeyVRF</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">decodeSignedKES</span></span><span class="hs-special">,</span><span>
+</span><span id="line-43"></span><span>                     </span><span class="annot"><span class="hs-identifier">decodeVerKeyVRF</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">encodeSignedKES</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">encodeVerKeyVRF</span></span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Serialization</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">CBORGroup</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">unCBORGroup</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-45"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Protocol.TPraos.BHeader</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">PrevHash</span></span><span class="hs-special">)</span><span>
+</span><span id="line-46"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Protocol.TPraos.OCert</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">OCert</span></span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Slotting.Block</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">BlockNo</span></span><span class="hs-special">)</span><span>
+</span><span id="line-48"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Slotting.Slot</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">SlotNo</span></span><span class="hs-special">)</span><span>
+</span><span id="line-49"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier">Data.ByteString.Short</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SBS</span></span><span>
+</span><span id="line-50"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Coders</span></span><span>
+</span><span id="line-51"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.MemoBytes</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Mem</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">MemoBytes</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Memo</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">memoBytes</span></span><span class="hs-special">)</span><span>
+</span><span id="line-52"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Word</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Word32</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-53"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">GHC.Generics</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Generic</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-54"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">NoThunks.Class</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NoThunks</span></span><span class="hs-special">)</span><span>
+</span><span id="line-55"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html"><span class="hs-identifier">Ouroboros.Consensus.Protocol.Praos.VRF</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#InputVRF"><span class="hs-identifier">InputVRF</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-56"></span><span>
+</span><span id="line-57"></span><span class="hs-comment">-- | The body of the header is the part which gets hashed to form the hash</span><span>
+</span><span id="line-58"></span><span class="hs-comment">-- chain.</span><span>
+</span><span id="line-59"></span><span id="local-6989586621679276478"><span id="local-6989586621679276479"></span></span><span class="hs-keyword">data</span><span> </span><span id="HeaderBody"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderBody"><span class="hs-identifier hs-var">HeaderBody</span></a></span></span><span> </span><span id="local-6989586621679276547"><span class="annot"><a href="#local-6989586621679276547"><span class="hs-identifier hs-type">crypto</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="HeaderBody"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderBody"><span class="hs-identifier hs-var">HeaderBody</span></a></span></span><span>
+</span><span id="line-60"></span><span>  </span><span class="hs-special">{</span><span> </span><span class="hs-comment">-- | block number</span><span>
+</span><span id="line-61"></span><span>    </span><span id="hbBlockNo"><span class="annot"><span class="annottext">HeaderBody crypto -&gt; BlockNo
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#hbBlockNo"><span class="hs-identifier hs-var hs-var">hbBlockNo</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span class="hs-special">,</span><span>
+</span><span id="line-62"></span><span>    </span><span class="hs-comment">-- | block slot</span><span>
+</span><span id="line-63"></span><span>    </span><span id="hbSlotNo"><span class="annot"><span class="annottext">HeaderBody crypto -&gt; SlotNo
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#hbSlotNo"><span class="hs-identifier hs-var hs-var">hbSlotNo</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span class="hs-special">,</span><span>
+</span><span id="line-64"></span><span>    </span><span class="hs-comment">-- | Hash of the previous block header</span><span>
+</span><span id="line-65"></span><span>    </span><span id="hbPrev"><span class="annot"><span class="annottext">HeaderBody crypto -&gt; PrevHash crypto
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#hbPrev"><span class="hs-identifier hs-var hs-var">hbPrev</span></a></span></span><span>     </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">PrevHash</span></span><span> </span><span class="annot"><a href="#local-6989586621679276547"><span class="hs-identifier hs-type">crypto</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-66"></span><span>    </span><span class="hs-comment">-- | verification key of block issuer</span><span>
+</span><span id="line-67"></span><span>    </span><span id="hbVk"><span class="annot"><span class="annottext">HeaderBody crypto -&gt; VKey 'BlockIssuer crypto
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#hbVk"><span class="hs-identifier hs-var hs-var">hbVk</span></a></span></span><span>       </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">VKey</span></span><span> </span><span class="hs-special">'</span><span class="annot"><span class="hs-identifier hs-type">BlockIssuer</span></span><span> </span><span class="annot"><a href="#local-6989586621679276547"><span class="hs-identifier hs-type">crypto</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-68"></span><span>    </span><span class="hs-comment">-- | VRF verification key for block issuer</span><span>
+</span><span id="line-69"></span><span>    </span><span id="hbVrfVk"><span class="annot"><span class="annottext">HeaderBody crypto -&gt; VerKeyVRF crypto
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#hbVrfVk"><span class="hs-identifier hs-var hs-var">hbVrfVk</span></a></span></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">VerKeyVRF</span></span><span> </span><span class="annot"><a href="#local-6989586621679276547"><span class="hs-identifier hs-type">crypto</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-70"></span><span>    </span><span class="hs-comment">-- | Certified VRF value</span><span>
+</span><span id="line-71"></span><span>    </span><span id="hbVrfRes"><span class="annot"><span class="annottext">HeaderBody crypto -&gt; CertifiedVRF crypto InputVRF
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#hbVrfRes"><span class="hs-identifier hs-var hs-var">hbVrfRes</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CertifiedVRF</span></span><span> </span><span class="annot"><a href="#local-6989586621679276547"><span class="hs-identifier hs-type">crypto</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#InputVRF"><span class="hs-identifier hs-type">InputVRF</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-72"></span><span>    </span><span class="hs-comment">-- | Size of the block body</span><span>
+</span><span id="line-73"></span><span>    </span><span id="hbBodySize"><span class="annot"><span class="annottext">HeaderBody crypto -&gt; Word32
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#hbBodySize"><span class="hs-identifier hs-var hs-var">hbBodySize</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-74"></span><span>    </span><span class="hs-comment">-- | Hash of block body</span><span>
+</span><span id="line-75"></span><span>    </span><span id="hbBodyHash"><span class="annot"><span class="annottext">HeaderBody crypto -&gt; Hash crypto EraIndependentBlockBody
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#hbBodyHash"><span class="hs-identifier hs-var hs-var">hbBodyHash</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Hash</span></span><span> </span><span class="annot"><a href="#local-6989586621679276547"><span class="hs-identifier hs-type">crypto</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">EraIndependentBlockBody</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-76"></span><span>    </span><span class="hs-comment">-- | operational certificate</span><span>
+</span><span id="line-77"></span><span>    </span><span id="hbOCert"><span class="annot"><span class="annottext">HeaderBody crypto -&gt; OCert crypto
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#hbOCert"><span class="hs-identifier hs-var hs-var">hbOCert</span></a></span></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">OCert</span></span><span> </span><span class="annot"><a href="#local-6989586621679276547"><span class="hs-identifier hs-type">crypto</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-78"></span><span>    </span><span class="hs-comment">-- | protocol version</span><span>
+</span><span id="line-79"></span><span>    </span><span id="hbProtVer"><span class="annot"><span class="annottext">HeaderBody crypto -&gt; ProtVer
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#hbProtVer"><span class="hs-identifier hs-var hs-var">hbProtVer</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><span class="hs-identifier hs-type">ProtVer</span></span><span>
+</span><span id="line-80"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-81"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(forall x. HeaderBody crypto -&gt; Rep (HeaderBody crypto) x)
+-&gt; (forall x. Rep (HeaderBody crypto) x -&gt; HeaderBody crypto)
+-&gt; Generic (HeaderBody crypto)
+forall x. Rep (HeaderBody crypto) x -&gt; HeaderBody crypto
+forall x. HeaderBody crypto -&gt; Rep (HeaderBody crypto) x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+forall crypto x. Rep (HeaderBody crypto) x -&gt; HeaderBody crypto
+forall crypto x. HeaderBody crypto -&gt; Rep (HeaderBody crypto) x
+$cto :: forall crypto x. Rep (HeaderBody crypto) x -&gt; HeaderBody crypto
+$cfrom :: forall crypto x. HeaderBody crypto -&gt; Rep (HeaderBody crypto) x
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-82"></span><span>
+</span><span id="line-83"></span><span id="local-6989586621679276457"><span id="local-6989586621679276459"><span id="local-6989586621679276461"><span id="local-6989586621679276463"><span class="hs-keyword">deriving</span><span> </span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CC.Crypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679276463"><span class="hs-identifier hs-type">crypto</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderBody"><span class="hs-identifier hs-type">HeaderBody</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276463"><span class="hs-identifier hs-type">crypto</span></a></span><span class="hs-special">)</span></span></span></span></span><span>
+</span><span id="line-84"></span><span>
+</span><span id="line-85"></span><span id="local-6989586621679276451"><span id="local-6989586621679276453"><span id="local-6989586621679276455"><span class="hs-keyword">deriving</span><span> </span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CC.Crypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679276455"><span class="hs-identifier hs-type">crypto</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Eq</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderBody"><span class="hs-identifier hs-type">HeaderBody</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276455"><span class="hs-identifier hs-type">crypto</span></a></span><span class="hs-special">)</span></span></span></span><span>
+</span><span id="line-86"></span><span>
+</span><span id="line-87"></span><span id="local-6989586621679276449"><span class="hs-keyword">instance</span><span>
+</span><span id="line-88"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">CC.Crypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679276449"><span class="hs-identifier hs-type">crypto</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-89"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">SignableRepresentation</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderBody"><span class="hs-identifier hs-type">HeaderBody</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276449"><span class="hs-identifier hs-type">crypto</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-90"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-91"></span><span>  </span><span id="local-6989586621679276446"><span class="annot"><span class="annottext">getSignableRepresentation :: HeaderBody crypto -&gt; ByteString
+</span><a href="#local-6989586621679276446"><span class="hs-identifier hs-var hs-var hs-var hs-var">getSignableRepresentation</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">HeaderBody crypto -&gt; ByteString
+forall a. ToCBOR a =&gt; a -&gt; ByteString
+</span><span class="hs-identifier hs-var">serialize'</span></span></span><span>
+</span><span id="line-92"></span><span>
+</span><span id="line-93"></span><span id="local-6989586621679276445"><span class="hs-keyword">instance</span><span>
+</span><span id="line-94"></span><span>  </span><span id="local-6989586621679276439"><span id="local-6989586621679276441"><span id="local-6989586621679276443"><span class="annot"><span class="hs-identifier hs-type">CC.Crypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679276445"><span class="hs-identifier hs-type">crypto</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-95"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">NoThunks</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderBody"><span class="hs-identifier hs-type">HeaderBody</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276445"><span class="hs-identifier hs-type">crypto</span></a></span><span class="hs-special">)</span></span></span></span></span><span>
+</span><span id="line-96"></span><span>
+</span><span id="line-97"></span><span id="local-6989586621679276436"><span id="local-6989586621679276437"></span></span><span class="hs-keyword">data</span><span> </span><span id="HeaderRaw"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderRaw"><span class="hs-identifier hs-var">HeaderRaw</span></a></span></span><span> </span><span id="local-6989586621679276564"><span class="annot"><a href="#local-6989586621679276564"><span class="hs-identifier hs-type">crypto</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="HeaderRaw"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderRaw"><span class="hs-identifier hs-var">HeaderRaw</span></a></span></span><span>
+</span><span id="line-98"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="headerRawBody"><span class="annot"><span class="annottext">HeaderRaw crypto -&gt; HeaderBody crypto
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#headerRawBody"><span class="hs-identifier hs-var hs-var">headerRawBody</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderBody"><span class="hs-identifier hs-type">HeaderBody</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276564"><span class="hs-identifier hs-type">crypto</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-99"></span><span>    </span><span id="headerRawSig"><span class="annot"><span class="annottext">HeaderRaw crypto -&gt; SignedKES crypto (HeaderBody crypto)
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#headerRawSig"><span class="hs-identifier hs-var hs-var">headerRawSig</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SignedKES</span></span><span> </span><span class="annot"><a href="#local-6989586621679276564"><span class="hs-identifier hs-type">crypto</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderBody"><span class="hs-identifier hs-type">HeaderBody</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276564"><span class="hs-identifier hs-type">crypto</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-100"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-101"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679276427"><span id="local-6989586621679276429"><span id="local-6989586621679276431"><span class="annot"><span class="annottext">Int -&gt; HeaderRaw crypto -&gt; ShowS
+[HeaderRaw crypto] -&gt; ShowS
+HeaderRaw crypto -&gt; String
+(Int -&gt; HeaderRaw crypto -&gt; ShowS)
+-&gt; (HeaderRaw crypto -&gt; String)
+-&gt; ([HeaderRaw crypto] -&gt; ShowS)
+-&gt; Show (HeaderRaw crypto)
+forall crypto. Crypto crypto =&gt; Int -&gt; HeaderRaw crypto -&gt; ShowS
+forall crypto. Crypto crypto =&gt; [HeaderRaw crypto] -&gt; ShowS
+forall crypto. Crypto crypto =&gt; HeaderRaw crypto -&gt; String
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [HeaderRaw crypto] -&gt; ShowS
+$cshowList :: forall crypto. Crypto crypto =&gt; [HeaderRaw crypto] -&gt; ShowS
+show :: HeaderRaw crypto -&gt; String
+$cshow :: forall crypto. Crypto crypto =&gt; HeaderRaw crypto -&gt; String
+showsPrec :: Int -&gt; HeaderRaw crypto -&gt; ShowS
+$cshowsPrec :: forall crypto. Crypto crypto =&gt; Int -&gt; HeaderRaw crypto -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. HeaderRaw crypto -&gt; Rep (HeaderRaw crypto) x)
+-&gt; (forall x. Rep (HeaderRaw crypto) x -&gt; HeaderRaw crypto)
+-&gt; Generic (HeaderRaw crypto)
+forall x. Rep (HeaderRaw crypto) x -&gt; HeaderRaw crypto
+forall x. HeaderRaw crypto -&gt; Rep (HeaderRaw crypto) x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+forall crypto x. Rep (HeaderRaw crypto) x -&gt; HeaderRaw crypto
+forall crypto x. HeaderRaw crypto -&gt; Rep (HeaderRaw crypto) x
+$cto :: forall crypto x. Rep (HeaderRaw crypto) x -&gt; HeaderRaw crypto
+$cfrom :: forall crypto x. HeaderRaw crypto -&gt; Rep (HeaderRaw crypto) x
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-102"></span><span>
+</span><span id="line-103"></span><span id="local-6989586621679276424"><span class="hs-keyword">instance</span><span>
+</span><span id="line-104"></span><span>  </span><span id="local-6989586621679276418"><span id="local-6989586621679276420"><span id="local-6989586621679276422"><span class="annot"><span class="hs-identifier hs-type">CC.Crypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679276424"><span class="hs-identifier hs-type">crypto</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-105"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">NoThunks</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderRaw"><span class="hs-identifier hs-type">HeaderRaw</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276424"><span class="hs-identifier hs-type">crypto</span></a></span><span class="hs-special">)</span></span></span></span></span><span>
+</span><span id="line-106"></span><span>
+</span><span id="line-107"></span><span class="hs-comment">-- | Full header type, carrying its own memoised bytes.</span><span>
+</span><span id="line-108"></span><span class="hs-keyword">newtype</span><span> </span><span id="Header"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#Header"><span class="hs-identifier hs-var">Header</span></a></span></span><span> </span><span id="local-6989586621679276575"><span class="annot"><a href="#local-6989586621679276575"><span class="hs-identifier hs-type">crypto</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="HeaderConstr"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderConstr"><span class="hs-identifier hs-var">HeaderConstr</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MemoBytes</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderRaw"><span class="hs-identifier hs-type">HeaderRaw</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276575"><span class="hs-identifier hs-type">crypto</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-109"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679276413"><span id="local-6989586621679276415"><span class="annot"><span class="annottext">Header crypto -&gt; Header crypto -&gt; Bool
+(Header crypto -&gt; Header crypto -&gt; Bool)
+-&gt; (Header crypto -&gt; Header crypto -&gt; Bool) -&gt; Eq (Header crypto)
+forall crypto. Header crypto -&gt; Header crypto -&gt; Bool
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Header crypto -&gt; Header crypto -&gt; Bool
+$c/= :: forall crypto. Header crypto -&gt; Header crypto -&gt; Bool
+== :: Header crypto -&gt; Header crypto -&gt; Bool
+$c== :: forall crypto. Header crypto -&gt; Header crypto -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276407"><span id="local-6989586621679276409"><span id="local-6989586621679276411"><span class="annot"><span class="annottext">Int -&gt; Header crypto -&gt; ShowS
+[Header crypto] -&gt; ShowS
+Header crypto -&gt; String
+(Int -&gt; Header crypto -&gt; ShowS)
+-&gt; (Header crypto -&gt; String)
+-&gt; ([Header crypto] -&gt; ShowS)
+-&gt; Show (Header crypto)
+forall crypto. Crypto crypto =&gt; Int -&gt; Header crypto -&gt; ShowS
+forall crypto. Crypto crypto =&gt; [Header crypto] -&gt; ShowS
+forall crypto. Crypto crypto =&gt; Header crypto -&gt; String
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Header crypto] -&gt; ShowS
+$cshowList :: forall crypto. Crypto crypto =&gt; [Header crypto] -&gt; ShowS
+show :: Header crypto -&gt; String
+$cshow :: forall crypto. Crypto crypto =&gt; Header crypto -&gt; String
+showsPrec :: Int -&gt; Header crypto -&gt; ShowS
+$cshowsPrec :: forall crypto. Crypto crypto =&gt; Int -&gt; Header crypto -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276401"><span id="local-6989586621679276403"><span id="local-6989586621679276405"><span class="annot"><span class="annottext">Context -&gt; Header crypto -&gt; IO (Maybe ThunkInfo)
+Proxy (Header crypto) -&gt; String
+(Context -&gt; Header crypto -&gt; IO (Maybe ThunkInfo))
+-&gt; (Context -&gt; Header crypto -&gt; IO (Maybe ThunkInfo))
+-&gt; (Proxy (Header crypto) -&gt; String)
+-&gt; NoThunks (Header crypto)
+forall crypto.
+Crypto crypto =&gt;
+Context -&gt; Header crypto -&gt; IO (Maybe ThunkInfo)
+forall crypto. Crypto crypto =&gt; Proxy (Header crypto) -&gt; String
+forall a.
+(Context -&gt; a -&gt; IO (Maybe ThunkInfo))
+-&gt; (Context -&gt; a -&gt; IO (Maybe ThunkInfo))
+-&gt; (Proxy a -&gt; String)
+-&gt; NoThunks a
+showTypeOf :: Proxy (Header crypto) -&gt; String
+$cshowTypeOf :: forall crypto. Crypto crypto =&gt; Proxy (Header crypto) -&gt; String
+wNoThunks :: Context -&gt; Header crypto -&gt; IO (Maybe ThunkInfo)
+$cwNoThunks :: forall crypto.
+Crypto crypto =&gt;
+Context -&gt; Header crypto -&gt; IO (Maybe ThunkInfo)
+noThunks :: Context -&gt; Header crypto -&gt; IO (Maybe ThunkInfo)
+$cnoThunks :: forall crypto.
+Crypto crypto =&gt;
+Context -&gt; Header crypto -&gt; IO (Maybe ThunkInfo)
+</span><a href="#local-6989586621679276401"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">NoThunks</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276394"><span id="local-6989586621679276396"><span id="local-6989586621679276398"><span class="annot"><span class="annottext">Typeable (Header crypto)
+Typeable (Header crypto)
+-&gt; (Header crypto -&gt; Encoding)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+    -&gt; Proxy (Header crypto) -&gt; Size)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+    -&gt; Proxy [Header crypto] -&gt; Size)
+-&gt; ToCBOR (Header crypto)
+Header crypto -&gt; Encoding
+(forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy [Header crypto] -&gt; Size
+(forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy (Header crypto) -&gt; Size
+forall crypto. Typeable crypto =&gt; Typeable (Header crypto)
+forall crypto. Typeable crypto =&gt; Header crypto -&gt; Encoding
+forall a.
+Typeable a
+-&gt; (a -&gt; Encoding)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size) -&gt; Proxy a -&gt; Size)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size) -&gt; Proxy [a] -&gt; Size)
+-&gt; ToCBOR a
+forall crypto.
+Typeable crypto =&gt;
+(forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy [Header crypto] -&gt; Size
+forall crypto.
+Typeable crypto =&gt;
+(forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy (Header crypto) -&gt; Size
+encodedListSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy [Header crypto] -&gt; Size
+$cencodedListSizeExpr :: forall crypto.
+Typeable crypto =&gt;
+(forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy [Header crypto] -&gt; Size
+encodedSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy (Header crypto) -&gt; Size
+$cencodedSizeExpr :: forall crypto.
+Typeable crypto =&gt;
+(forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy (Header crypto) -&gt; Size
+toCBOR :: Header crypto -&gt; Encoding
+$ctoCBOR :: forall crypto. Typeable crypto =&gt; Header crypto -&gt; Encoding
+$cp1ToCBOR :: forall crypto. Typeable crypto =&gt; Typeable (Header crypto)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">ToCBOR</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-110"></span><span>
+</span><span id="line-111"></span><span id="local-6989586621679276388"><span id="local-6989586621679276390"><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679276386"><span class="hs-keyword">via</span><span>
+</span><span id="line-112"></span><span>  </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Mem</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderRaw"><span class="hs-identifier hs-type">HeaderRaw</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276386"><span class="hs-identifier hs-type">crypto</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span></span><span>
+</span><span id="line-113"></span><span>  </span><span class="hs-keyword">instance</span><span>
+</span><span id="line-114"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">CC.Crypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679276386"><span class="hs-identifier hs-type">crypto</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">FromCBOR</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Annotator</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#Header"><span class="hs-identifier hs-type">Header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276386"><span class="hs-identifier hs-type">crypto</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-115"></span><span>
+</span><span id="line-116"></span><span id="local-6989586621679276581"><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#Header"><span class="hs-identifier hs-type">Header</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-117"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">CC.Crypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679276581"><span class="hs-identifier hs-type">crypto</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-118"></span><span>  </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderBody"><span class="hs-identifier hs-type">HeaderBody</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276581"><span class="hs-identifier hs-type">crypto</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-119"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">SignedKES</span></span><span> </span><span class="annot"><a href="#local-6989586621679276581"><span class="hs-identifier hs-type">crypto</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderBody"><span class="hs-identifier hs-type">HeaderBody</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276581"><span class="hs-identifier hs-type">crypto</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-120"></span><span>  </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#Header"><span class="hs-identifier hs-type">Header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276581"><span class="hs-identifier hs-type">crypto</span></a></span></span><span>
+</span><span id="line-121"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bHeader"><span id="%24mHeader"><span id="Header"><span class="annot"><span class="annottext">$bHeader :: HeaderBody crypto
+-&gt; SignedKES crypto (HeaderBody crypto) -&gt; Header crypto
+$mHeader :: forall r crypto.
+Crypto crypto =&gt;
+Header crypto
+-&gt; (HeaderBody crypto -&gt; SignedKES crypto (HeaderBody crypto) -&gt; r)
+-&gt; (Void# -&gt; r)
+-&gt; r
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#%24bHeader"><span class="hs-identifier hs-var hs-var hs-var hs-var">Header</span></a></span></span></span></span><span> </span><span class="hs-special">{</span><span id="headerBody"><span class="annot"><span class="annottext">Header crypto -&gt; Crypto crypto =&gt; HeaderBody crypto
+</span><a href="#local-6989586621679276383"><span class="hs-identifier hs-var hs-var hs-var">headerBody</span></a></span></span><span class="hs-special">,</span><span> </span><span id="headerSig"><span class="annot"><span class="annottext">Header crypto
+-&gt; Crypto crypto =&gt; SignedKES crypto (HeaderBody crypto)
+</span><a href="#local-6989586621679276382"><span class="hs-identifier hs-var hs-var hs-var">headerSig</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-122"></span><span>  </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderConstr"><span class="hs-identifier hs-type">HeaderConstr</span></a></span><span>
+</span><span id="line-123"></span><span>    </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Memo</span></span><span>
+</span><span id="line-124"></span><span>        </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderRaw"><span class="hs-identifier hs-type">HeaderRaw</span></a></span><span>
+</span><span id="line-125"></span><span>          </span><span class="hs-special">{</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#headerRawBody"><span class="hs-identifier hs-var">headerRawBody</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679276383"><span class="annot"><a href="#local-6989586621679276383"><span class="hs-identifier hs-var">headerBody</span></a></span></span><span class="hs-special">,</span><span>
+</span><span id="line-126"></span><span>            </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#headerRawSig"><span class="hs-identifier hs-var">headerRawSig</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679276382"><span class="annot"><a href="#local-6989586621679276382"><span class="hs-identifier hs-var">headerSig</span></a></span></span><span>
+</span><span id="line-127"></span><span>          </span><span class="hs-special">}</span><span>
+</span><span id="line-128"></span><span>        </span><span class="annot"><span class="hs-identifier">_</span></span><span>
+</span><span id="line-129"></span><span>      </span><span class="hs-special">)</span><span>
+</span><span id="line-130"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-131"></span><span>    </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#Header"><span class="hs-identifier hs-var">Header</span></a></span><span> </span><span id="local-6989586621679276381"><span class="annot"><span class="annottext">HeaderBody crypto
+</span><a href="#local-6989586621679276381"><span class="hs-identifier hs-var">body</span></a></span></span><span> </span><span id="local-6989586621679276380"><span class="annot"><span class="annottext">SignedKES crypto (HeaderBody crypto)
+</span><a href="#local-6989586621679276380"><span class="hs-identifier hs-var">sig</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-132"></span><span>      </span><span class="annot"><span class="annottext">MemoBytes (HeaderRaw crypto) -&gt; Header crypto
+forall crypto. MemoBytes (HeaderRaw crypto) -&gt; Header crypto
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderConstr"><span class="hs-identifier hs-var">HeaderConstr</span></a></span><span> </span><span class="annot"><span class="annottext">(MemoBytes (HeaderRaw crypto) -&gt; Header crypto)
+-&gt; MemoBytes (HeaderRaw crypto) -&gt; Header crypto
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Encode ('Closed 'Dense) (HeaderRaw crypto)
+-&gt; MemoBytes (HeaderRaw crypto)
+forall (w :: Wrapped) t. Encode w t -&gt; MemoBytes t
+</span><span class="hs-identifier hs-var">memoBytes</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">HeaderRaw crypto -&gt; Encode ('Closed 'Dense) (HeaderRaw crypto)
+forall crypto.
+Crypto crypto =&gt;
+HeaderRaw crypto -&gt; Encode ('Closed 'Dense) (HeaderRaw crypto)
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#encodeHeaderRaw"><span class="hs-identifier hs-var">encodeHeaderRaw</span></a></span><span> </span><span class="annot"><span class="annottext">(HeaderRaw crypto -&gt; Encode ('Closed 'Dense) (HeaderRaw crypto))
+-&gt; HeaderRaw crypto -&gt; Encode ('Closed 'Dense) (HeaderRaw crypto)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">HeaderBody crypto
+-&gt; SignedKES crypto (HeaderBody crypto) -&gt; HeaderRaw crypto
+forall crypto.
+HeaderBody crypto
+-&gt; SignedKES crypto (HeaderBody crypto) -&gt; HeaderRaw crypto
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderRaw"><span class="hs-identifier hs-var">HeaderRaw</span></a></span><span> </span><span class="annot"><span class="annottext">HeaderBody crypto
+</span><a href="#local-6989586621679276381"><span class="hs-identifier hs-var">body</span></a></span><span> </span><span class="annot"><span class="annottext">SignedKES crypto (HeaderBody crypto)
+</span><a href="#local-6989586621679276380"><span class="hs-identifier hs-var">sig</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-133"></span><span>
+</span><span id="line-134"></span><span class="hs-pragma">{-# COMPLETE</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#Header"><span class="hs-pragma hs-type">Header</span></a></span><span> </span><span class="hs-pragma">#-}</span><span>
+</span><span id="line-135"></span><span>
+</span><span id="line-136"></span><span class="hs-comment">-- | Compute the size of the header</span><span>
+</span><span id="line-137"></span><span id="local-6989586621679276378"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#headerSize"><span class="hs-identifier hs-type">headerSize</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#Header"><span class="hs-identifier hs-type">Header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276378"><span class="hs-identifier hs-type">crypto</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span></span><span>
+</span><span id="line-138"></span><span id="headerSize"><span class="annot"><span class="annottext">headerSize :: Header crypto -&gt; Int
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#headerSize"><span class="hs-identifier hs-var hs-var">headerSize</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderConstr"><span class="hs-identifier hs-type">HeaderConstr</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Memo</span></span><span> </span><span class="annot"><span class="annottext">HeaderRaw crypto
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679276377"><span class="annot"><span class="annottext">ShortByteString
+</span><a href="#local-6989586621679276377"><span class="hs-identifier hs-var">bytes</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ShortByteString -&gt; Int
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-var">SBS.length</span></a></span><span> </span><span class="annot"><span class="annottext">ShortByteString
+</span><a href="#local-6989586621679276377"><span class="hs-identifier hs-var">bytes</span></a></span><span>
+</span><span id="line-139"></span><span>
+</span><span id="line-140"></span><span class="hs-comment">-- | Hash a header</span><span>
+</span><span id="line-141"></span><span id="local-6989586621679276375"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#headerHash"><span class="hs-identifier hs-type">headerHash</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-142"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">CC.Crypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679276375"><span class="hs-identifier hs-type">crypto</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-143"></span><span>  </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#Header"><span class="hs-identifier hs-type">Header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276375"><span class="hs-identifier hs-type">crypto</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-144"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Hash.Hash</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CC.HASH</span></span><span> </span><span class="annot"><a href="#local-6989586621679276375"><span class="hs-identifier hs-type">crypto</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">EraIndependentBlockHeader</span></span></span><span>
+</span><span id="line-145"></span><span id="headerHash"><span class="annot"><span class="annottext">headerHash :: Header crypto -&gt; Hash (HASH crypto) EraIndependentBlockHeader
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#headerHash"><span class="hs-identifier hs-var hs-var">headerHash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Hash (HASH crypto) (Header crypto)
+-&gt; Hash (HASH crypto) EraIndependentBlockHeader
+forall h a b. Hash h a -&gt; Hash h b
+</span><span class="hs-identifier hs-var">Hash.castHash</span></span><span> </span><span class="annot"><span class="annottext">(Hash (HASH crypto) (Header crypto)
+ -&gt; Hash (HASH crypto) EraIndependentBlockHeader)
+-&gt; (Header crypto -&gt; Hash (HASH crypto) (Header crypto))
+-&gt; Header crypto
+-&gt; Hash (HASH crypto) EraIndependentBlockHeader
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">(Header crypto -&gt; Encoding)
+-&gt; Header crypto -&gt; Hash (HASH crypto) (Header crypto)
+forall h a. HashAlgorithm h =&gt; (a -&gt; Encoding) -&gt; a -&gt; Hash h a
+</span><span class="hs-identifier hs-var">Hash.hashWithSerialiser</span></span><span> </span><span class="annot"><span class="annottext">Header crypto -&gt; Encoding
+forall a. ToCBOR a =&gt; a -&gt; Encoding
+</span><span class="hs-identifier hs-var">toCBOR</span></span><span>
+</span><span id="line-146"></span><span>
+</span><span id="line-147"></span><span class="hs-comment">--------------------------------------------------------------------------------</span><span>
+</span><span id="line-148"></span><span class="hs-comment">-- Serialisation</span><span>
+</span><span id="line-149"></span><span class="hs-comment">--------------------------------------------------------------------------------</span><span>
+</span><span id="line-150"></span><span>
+</span><span id="line-151"></span><span id="local-6989586621679276371"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679276365"><span id="local-6989586621679276367"><span class="annot"><span class="hs-identifier hs-type">CC.Crypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679276371"><span class="hs-identifier hs-type">crypto</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ToCBOR</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderBody"><span class="hs-identifier hs-type">HeaderBody</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276371"><span class="hs-identifier hs-type">crypto</span></a></span><span class="hs-special">)</span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-152"></span><span>  </span><span id="local-6989586621679276364"><span class="annot"><span class="annottext">toCBOR :: HeaderBody crypto -&gt; Encoding
+</span><a href="#local-6989586621679276364"><span class="hs-identifier hs-var hs-var hs-var hs-var">toCBOR</span></a></span></span><span>
+</span><span id="line-153"></span><span>    </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderBody"><span class="hs-identifier hs-type">HeaderBody</span></a></span><span>
+</span><span id="line-154"></span><span>      </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679276363"><span class="annot"><span class="annottext">BlockNo
+hbBlockNo :: BlockNo
+hbBlockNo :: forall crypto. HeaderBody crypto -&gt; BlockNo
+</span><a href="#local-6989586621679276363"><span class="hs-identifier hs-var hs-var">hbBlockNo</span></a></span></span><span class="hs-special">,</span><span>
+</span><span id="line-155"></span><span>        </span><span id="local-6989586621679276362"><span class="annot"><span class="annottext">SlotNo
+hbSlotNo :: SlotNo
+hbSlotNo :: forall crypto. HeaderBody crypto -&gt; SlotNo
+</span><a href="#local-6989586621679276362"><span class="hs-identifier hs-var hs-var">hbSlotNo</span></a></span></span><span class="hs-special">,</span><span>
+</span><span id="line-156"></span><span>        </span><span id="local-6989586621679276361"><span class="annot"><span class="annottext">PrevHash crypto
+hbPrev :: PrevHash crypto
+hbPrev :: forall crypto. HeaderBody crypto -&gt; PrevHash crypto
+</span><a href="#local-6989586621679276361"><span class="hs-identifier hs-var hs-var">hbPrev</span></a></span></span><span class="hs-special">,</span><span>
+</span><span id="line-157"></span><span>        </span><span id="local-6989586621679276360"><span class="annot"><span class="annottext">VKey 'BlockIssuer crypto
+hbVk :: VKey 'BlockIssuer crypto
+hbVk :: forall crypto. HeaderBody crypto -&gt; VKey 'BlockIssuer crypto
+</span><a href="#local-6989586621679276360"><span class="hs-identifier hs-var hs-var">hbVk</span></a></span></span><span class="hs-special">,</span><span>
+</span><span id="line-158"></span><span>        </span><span id="local-6989586621679276359"><span class="annot"><span class="annottext">VerKeyVRF crypto
+hbVrfVk :: VerKeyVRF crypto
+hbVrfVk :: forall crypto. HeaderBody crypto -&gt; VerKeyVRF crypto
+</span><a href="#local-6989586621679276359"><span class="hs-identifier hs-var hs-var">hbVrfVk</span></a></span></span><span class="hs-special">,</span><span>
+</span><span id="line-159"></span><span>        </span><span id="local-6989586621679276358"><span class="annot"><span class="annottext">CertifiedVRF crypto InputVRF
+hbVrfRes :: CertifiedVRF crypto InputVRF
+hbVrfRes :: forall crypto. HeaderBody crypto -&gt; CertifiedVRF crypto InputVRF
+</span><a href="#local-6989586621679276358"><span class="hs-identifier hs-var hs-var">hbVrfRes</span></a></span></span><span class="hs-special">,</span><span>
+</span><span id="line-160"></span><span>        </span><span id="local-6989586621679276357"><span class="annot"><span class="annottext">Word32
+hbBodySize :: Word32
+hbBodySize :: forall crypto. HeaderBody crypto -&gt; Word32
+</span><a href="#local-6989586621679276357"><span class="hs-identifier hs-var hs-var">hbBodySize</span></a></span></span><span class="hs-special">,</span><span>
+</span><span id="line-161"></span><span>        </span><span id="local-6989586621679276356"><span class="annot"><span class="annottext">Hash crypto EraIndependentBlockBody
+hbBodyHash :: Hash crypto EraIndependentBlockBody
+hbBodyHash :: forall crypto.
+HeaderBody crypto -&gt; Hash crypto EraIndependentBlockBody
+</span><a href="#local-6989586621679276356"><span class="hs-identifier hs-var hs-var">hbBodyHash</span></a></span></span><span class="hs-special">,</span><span>
+</span><span id="line-162"></span><span>        </span><span id="local-6989586621679276355"><span class="annot"><span class="annottext">OCert crypto
+hbOCert :: OCert crypto
+hbOCert :: forall crypto. HeaderBody crypto -&gt; OCert crypto
+</span><a href="#local-6989586621679276355"><span class="hs-identifier hs-var hs-var">hbOCert</span></a></span></span><span class="hs-special">,</span><span>
+</span><span id="line-163"></span><span>        </span><span id="local-6989586621679276354"><span class="annot"><span class="annottext">ProtVer
+hbProtVer :: ProtVer
+hbProtVer :: forall crypto. HeaderBody crypto -&gt; ProtVer
+</span><a href="#local-6989586621679276354"><span class="hs-identifier hs-var hs-var">hbProtVer</span></a></span></span><span>
+</span><span id="line-164"></span><span>      </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-165"></span><span>      </span><span class="annot"><span class="annottext">Encode ('Closed 'Dense) (HeaderBody crypto) -&gt; Encoding
+forall (w :: Wrapped) t. Encode w t -&gt; Encoding
+</span><span class="hs-identifier hs-var">encode</span></span><span> </span><span class="annot"><span class="annottext">(Encode ('Closed 'Dense) (HeaderBody crypto) -&gt; Encoding)
+-&gt; Encode ('Closed 'Dense) (HeaderBody crypto) -&gt; Encoding
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-166"></span><span>        </span><span class="annot"><span class="annottext">(BlockNo
+ -&gt; SlotNo
+ -&gt; PrevHash crypto
+ -&gt; VKey 'BlockIssuer crypto
+ -&gt; VerKeyVRF crypto
+ -&gt; CertifiedVRF crypto InputVRF
+ -&gt; Word32
+ -&gt; Hash crypto EraIndependentBlockBody
+ -&gt; OCert crypto
+ -&gt; ProtVer
+ -&gt; HeaderBody crypto)
+-&gt; Encode
+     ('Closed 'Dense)
+     (BlockNo
+      -&gt; SlotNo
+      -&gt; PrevHash crypto
+      -&gt; VKey 'BlockIssuer crypto
+      -&gt; VerKeyVRF crypto
+      -&gt; CertifiedVRF crypto InputVRF
+      -&gt; Word32
+      -&gt; Hash crypto EraIndependentBlockBody
+      -&gt; OCert crypto
+      -&gt; ProtVer
+      -&gt; HeaderBody crypto)
+forall t. t -&gt; Encode ('Closed 'Dense) t
+</span><span class="hs-identifier hs-var">Rec</span></span><span> </span><span class="annot"><span class="annottext">BlockNo
+-&gt; SlotNo
+-&gt; PrevHash crypto
+-&gt; VKey 'BlockIssuer crypto
+-&gt; VerKeyVRF crypto
+-&gt; CertifiedVRF crypto InputVRF
+-&gt; Word32
+-&gt; Hash crypto EraIndependentBlockBody
+-&gt; OCert crypto
+-&gt; ProtVer
+-&gt; HeaderBody crypto
+forall crypto.
+BlockNo
+-&gt; SlotNo
+-&gt; PrevHash crypto
+-&gt; VKey 'BlockIssuer crypto
+-&gt; VerKeyVRF crypto
+-&gt; CertifiedVRF crypto InputVRF
+-&gt; Word32
+-&gt; Hash crypto EraIndependentBlockBody
+-&gt; OCert crypto
+-&gt; ProtVer
+-&gt; HeaderBody crypto
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderBody"><span class="hs-identifier hs-var">HeaderBody</span></a></span><span>
+</span><span id="line-167"></span><span>          </span><span class="annot"><span class="annottext">Encode
+  ('Closed 'Dense)
+  (BlockNo
+   -&gt; SlotNo
+   -&gt; PrevHash crypto
+   -&gt; VKey 'BlockIssuer crypto
+   -&gt; VerKeyVRF crypto
+   -&gt; CertifiedVRF crypto InputVRF
+   -&gt; Word32
+   -&gt; Hash crypto EraIndependentBlockBody
+   -&gt; OCert crypto
+   -&gt; ProtVer
+   -&gt; HeaderBody crypto)
+-&gt; Encode ('Closed 'Dense) BlockNo
+-&gt; Encode
+     ('Closed 'Dense)
+     (SlotNo
+      -&gt; PrevHash crypto
+      -&gt; VKey 'BlockIssuer crypto
+      -&gt; VerKeyVRF crypto
+      -&gt; CertifiedVRF crypto InputVRF
+      -&gt; Word32
+      -&gt; Hash crypto EraIndependentBlockBody
+      -&gt; OCert crypto
+      -&gt; ProtVer
+      -&gt; HeaderBody crypto)
+forall (w :: Wrapped) a t (r :: Density).
+Encode w (a -&gt; t) -&gt; Encode ('Closed r) a -&gt; Encode w t
+</span><span class="hs-operator hs-var">!&gt;</span></span><span> </span><span class="annot"><span class="annottext">BlockNo -&gt; Encode ('Closed 'Dense) BlockNo
+forall t. ToCBOR t =&gt; t -&gt; Encode ('Closed 'Dense) t
+</span><span class="hs-identifier hs-var">To</span></span><span> </span><span class="annot"><span class="annottext">BlockNo
+</span><a href="#local-6989586621679276363"><span class="hs-identifier hs-var">hbBlockNo</span></a></span><span>
+</span><span id="line-168"></span><span>          </span><span class="annot"><span class="annottext">Encode
+  ('Closed 'Dense)
+  (SlotNo
+   -&gt; PrevHash crypto
+   -&gt; VKey 'BlockIssuer crypto
+   -&gt; VerKeyVRF crypto
+   -&gt; CertifiedVRF crypto InputVRF
+   -&gt; Word32
+   -&gt; Hash crypto EraIndependentBlockBody
+   -&gt; OCert crypto
+   -&gt; ProtVer
+   -&gt; HeaderBody crypto)
+-&gt; Encode ('Closed 'Dense) SlotNo
+-&gt; Encode
+     ('Closed 'Dense)
+     (PrevHash crypto
+      -&gt; VKey 'BlockIssuer crypto
+      -&gt; VerKeyVRF crypto
+      -&gt; CertifiedVRF crypto InputVRF
+      -&gt; Word32
+      -&gt; Hash crypto EraIndependentBlockBody
+      -&gt; OCert crypto
+      -&gt; ProtVer
+      -&gt; HeaderBody crypto)
+forall (w :: Wrapped) a t (r :: Density).
+Encode w (a -&gt; t) -&gt; Encode ('Closed r) a -&gt; Encode w t
+</span><span class="hs-operator hs-var">!&gt;</span></span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; Encode ('Closed 'Dense) SlotNo
+forall t. ToCBOR t =&gt; t -&gt; Encode ('Closed 'Dense) t
+</span><span class="hs-identifier hs-var">To</span></span><span> </span><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679276362"><span class="hs-identifier hs-var">hbSlotNo</span></a></span><span>
+</span><span id="line-169"></span><span>          </span><span class="annot"><span class="annottext">Encode
+  ('Closed 'Dense)
+  (PrevHash crypto
+   -&gt; VKey 'BlockIssuer crypto
+   -&gt; VerKeyVRF crypto
+   -&gt; CertifiedVRF crypto InputVRF
+   -&gt; Word32
+   -&gt; Hash crypto EraIndependentBlockBody
+   -&gt; OCert crypto
+   -&gt; ProtVer
+   -&gt; HeaderBody crypto)
+-&gt; Encode ('Closed 'Dense) (PrevHash crypto)
+-&gt; Encode
+     ('Closed 'Dense)
+     (VKey 'BlockIssuer crypto
+      -&gt; VerKeyVRF crypto
+      -&gt; CertifiedVRF crypto InputVRF
+      -&gt; Word32
+      -&gt; Hash crypto EraIndependentBlockBody
+      -&gt; OCert crypto
+      -&gt; ProtVer
+      -&gt; HeaderBody crypto)
+forall (w :: Wrapped) a t (r :: Density).
+Encode w (a -&gt; t) -&gt; Encode ('Closed r) a -&gt; Encode w t
+</span><span class="hs-operator hs-var">!&gt;</span></span><span> </span><span class="annot"><span class="annottext">PrevHash crypto -&gt; Encode ('Closed 'Dense) (PrevHash crypto)
+forall t. ToCBOR t =&gt; t -&gt; Encode ('Closed 'Dense) t
+</span><span class="hs-identifier hs-var">To</span></span><span> </span><span class="annot"><span class="annottext">PrevHash crypto
+</span><a href="#local-6989586621679276361"><span class="hs-identifier hs-var">hbPrev</span></a></span><span>
+</span><span id="line-170"></span><span>          </span><span class="annot"><span class="annottext">Encode
+  ('Closed 'Dense)
+  (VKey 'BlockIssuer crypto
+   -&gt; VerKeyVRF crypto
+   -&gt; CertifiedVRF crypto InputVRF
+   -&gt; Word32
+   -&gt; Hash crypto EraIndependentBlockBody
+   -&gt; OCert crypto
+   -&gt; ProtVer
+   -&gt; HeaderBody crypto)
+-&gt; Encode ('Closed 'Dense) (VKey 'BlockIssuer crypto)
+-&gt; Encode
+     ('Closed 'Dense)
+     (VerKeyVRF crypto
+      -&gt; CertifiedVRF crypto InputVRF
+      -&gt; Word32
+      -&gt; Hash crypto EraIndependentBlockBody
+      -&gt; OCert crypto
+      -&gt; ProtVer
+      -&gt; HeaderBody crypto)
+forall (w :: Wrapped) a t (r :: Density).
+Encode w (a -&gt; t) -&gt; Encode ('Closed r) a -&gt; Encode w t
+</span><span class="hs-operator hs-var">!&gt;</span></span><span> </span><span class="annot"><span class="annottext">VKey 'BlockIssuer crypto
+-&gt; Encode ('Closed 'Dense) (VKey 'BlockIssuer crypto)
+forall t. ToCBOR t =&gt; t -&gt; Encode ('Closed 'Dense) t
+</span><span class="hs-identifier hs-var">To</span></span><span> </span><span class="annot"><span class="annottext">VKey 'BlockIssuer crypto
+</span><a href="#local-6989586621679276360"><span class="hs-identifier hs-var">hbVk</span></a></span><span>
+</span><span id="line-171"></span><span>          </span><span class="annot"><span class="annottext">Encode
+  ('Closed 'Dense)
+  (VerKeyVRF crypto
+   -&gt; CertifiedVRF crypto InputVRF
+   -&gt; Word32
+   -&gt; Hash crypto EraIndependentBlockBody
+   -&gt; OCert crypto
+   -&gt; ProtVer
+   -&gt; HeaderBody crypto)
+-&gt; Encode ('Closed 'Dense) (VerKeyVRF crypto)
+-&gt; Encode
+     ('Closed 'Dense)
+     (CertifiedVRF crypto InputVRF
+      -&gt; Word32
+      -&gt; Hash crypto EraIndependentBlockBody
+      -&gt; OCert crypto
+      -&gt; ProtVer
+      -&gt; HeaderBody crypto)
+forall (w :: Wrapped) a t (r :: Density).
+Encode w (a -&gt; t) -&gt; Encode ('Closed r) a -&gt; Encode w t
+</span><span class="hs-operator hs-var">!&gt;</span></span><span> </span><span class="annot"><span class="annottext">(VerKeyVRF crypto -&gt; Encoding)
+-&gt; VerKeyVRF crypto -&gt; Encode ('Closed 'Dense) (VerKeyVRF crypto)
+forall t. (t -&gt; Encoding) -&gt; t -&gt; Encode ('Closed 'Dense) t
+</span><span class="hs-identifier hs-var">E</span></span><span> </span><span class="annot"><span class="annottext">VerKeyVRF crypto -&gt; Encoding
+forall v. VRFAlgorithm v =&gt; VerKeyVRF v -&gt; Encoding
+</span><span class="hs-identifier hs-var">encodeVerKeyVRF</span></span><span> </span><span class="annot"><span class="annottext">VerKeyVRF crypto
+</span><a href="#local-6989586621679276359"><span class="hs-identifier hs-var">hbVrfVk</span></a></span><span>
+</span><span id="line-172"></span><span>          </span><span class="annot"><span class="annottext">Encode
+  ('Closed 'Dense)
+  (CertifiedVRF crypto InputVRF
+   -&gt; Word32
+   -&gt; Hash crypto EraIndependentBlockBody
+   -&gt; OCert crypto
+   -&gt; ProtVer
+   -&gt; HeaderBody crypto)
+-&gt; Encode ('Closed 'Dense) (CertifiedVRF crypto InputVRF)
+-&gt; Encode
+     ('Closed 'Dense)
+     (Word32
+      -&gt; Hash crypto EraIndependentBlockBody
+      -&gt; OCert crypto
+      -&gt; ProtVer
+      -&gt; HeaderBody crypto)
+forall (w :: Wrapped) a t (r :: Density).
+Encode w (a -&gt; t) -&gt; Encode ('Closed r) a -&gt; Encode w t
+</span><span class="hs-operator hs-var">!&gt;</span></span><span> </span><span class="annot"><span class="annottext">CertifiedVRF crypto InputVRF
+-&gt; Encode ('Closed 'Dense) (CertifiedVRF crypto InputVRF)
+forall t. ToCBOR t =&gt; t -&gt; Encode ('Closed 'Dense) t
+</span><span class="hs-identifier hs-var">To</span></span><span> </span><span class="annot"><span class="annottext">CertifiedVRF crypto InputVRF
+</span><a href="#local-6989586621679276358"><span class="hs-identifier hs-var">hbVrfRes</span></a></span><span>
+</span><span id="line-173"></span><span>          </span><span class="annot"><span class="annottext">Encode
+  ('Closed 'Dense)
+  (Word32
+   -&gt; Hash crypto EraIndependentBlockBody
+   -&gt; OCert crypto
+   -&gt; ProtVer
+   -&gt; HeaderBody crypto)
+-&gt; Encode ('Closed 'Dense) Word32
+-&gt; Encode
+     ('Closed 'Dense)
+     (Hash crypto EraIndependentBlockBody
+      -&gt; OCert crypto -&gt; ProtVer -&gt; HeaderBody crypto)
+forall (w :: Wrapped) a t (r :: Density).
+Encode w (a -&gt; t) -&gt; Encode ('Closed r) a -&gt; Encode w t
+</span><span class="hs-operator hs-var">!&gt;</span></span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; Encode ('Closed 'Dense) Word32
+forall t. ToCBOR t =&gt; t -&gt; Encode ('Closed 'Dense) t
+</span><span class="hs-identifier hs-var">To</span></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679276357"><span class="hs-identifier hs-var">hbBodySize</span></a></span><span>
+</span><span id="line-174"></span><span>          </span><span class="annot"><span class="annottext">Encode
+  ('Closed 'Dense)
+  (Hash crypto EraIndependentBlockBody
+   -&gt; OCert crypto -&gt; ProtVer -&gt; HeaderBody crypto)
+-&gt; Encode ('Closed 'Dense) (Hash crypto EraIndependentBlockBody)
+-&gt; Encode
+     ('Closed 'Dense) (OCert crypto -&gt; ProtVer -&gt; HeaderBody crypto)
+forall (w :: Wrapped) a t (r :: Density).
+Encode w (a -&gt; t) -&gt; Encode ('Closed r) a -&gt; Encode w t
+</span><span class="hs-operator hs-var">!&gt;</span></span><span> </span><span class="annot"><span class="annottext">Hash crypto EraIndependentBlockBody
+-&gt; Encode ('Closed 'Dense) (Hash crypto EraIndependentBlockBody)
+forall t. ToCBOR t =&gt; t -&gt; Encode ('Closed 'Dense) t
+</span><span class="hs-identifier hs-var">To</span></span><span> </span><span class="annot"><span class="annottext">Hash crypto EraIndependentBlockBody
+</span><a href="#local-6989586621679276356"><span class="hs-identifier hs-var">hbBodyHash</span></a></span><span>
+</span><span id="line-175"></span><span>          </span><span class="annot"><span class="annottext">Encode
+  ('Closed 'Dense) (OCert crypto -&gt; ProtVer -&gt; HeaderBody crypto)
+-&gt; Encode ('Closed 'Dense) (OCert crypto)
+-&gt; Encode ('Closed 'Dense) (ProtVer -&gt; HeaderBody crypto)
+forall (w :: Wrapped) a t (r :: Density).
+Encode w (a -&gt; t) -&gt; Encode ('Closed r) a -&gt; Encode w t
+</span><span class="hs-operator hs-var">!&gt;</span></span><span> </span><span class="annot"><span class="annottext">OCert crypto -&gt; Encode ('Closed 'Dense) (OCert crypto)
+forall t. ToCBOR t =&gt; t -&gt; Encode ('Closed 'Dense) t
+</span><span class="hs-identifier hs-var">To</span></span><span> </span><span class="annot"><span class="annottext">OCert crypto
+</span><a href="#local-6989586621679276355"><span class="hs-identifier hs-var">hbOCert</span></a></span><span>
+</span><span id="line-176"></span><span>          </span><span class="annot"><span class="annottext">Encode ('Closed 'Dense) (ProtVer -&gt; HeaderBody crypto)
+-&gt; Encode ('Closed 'Dense) ProtVer
+-&gt; Encode ('Closed 'Dense) (HeaderBody crypto)
+forall (w :: Wrapped) a t (r :: Density).
+Encode w (a -&gt; t) -&gt; Encode ('Closed r) a -&gt; Encode w t
+</span><span class="hs-operator hs-var">!&gt;</span></span><span> </span><span class="annot"><span class="annottext">ProtVer -&gt; Encode ('Closed 'Dense) ProtVer
+forall t. ToCBOR t =&gt; t -&gt; Encode ('Closed 'Dense) t
+</span><span class="hs-identifier hs-var">To</span></span><span> </span><span class="annot"><span class="annottext">ProtVer
+</span><a href="#local-6989586621679276354"><span class="hs-identifier hs-var">hbProtVer</span></a></span></span><span>
+</span><span id="line-177"></span><span>
+</span><span id="line-178"></span><span id="local-6989586621679276348"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679276344"><span class="annot"><span class="hs-identifier hs-type">CC.Crypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679276348"><span class="hs-identifier hs-type">crypto</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FromCBOR</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderBody"><span class="hs-identifier hs-type">HeaderBody</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276348"><span class="hs-identifier hs-type">crypto</span></a></span><span class="hs-special">)</span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-179"></span><span>  </span><span id="local-6989586621679276343"><span class="annot"><span class="annottext">fromCBOR :: Decoder s (HeaderBody crypto)
+</span><a href="#local-6989586621679276343"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromCBOR</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-180"></span><span>    </span><span class="annot"><span class="annottext">Decode ('Closed 'Dense) (HeaderBody crypto)
+-&gt; Decoder s (HeaderBody crypto)
+forall (w :: Wrapped) t s. Decode w t -&gt; Decoder s t
+</span><span class="hs-identifier hs-var">decode</span></span><span> </span><span class="annot"><span class="annottext">(Decode ('Closed 'Dense) (HeaderBody crypto)
+ -&gt; Decoder s (HeaderBody crypto))
+-&gt; Decode ('Closed 'Dense) (HeaderBody crypto)
+-&gt; Decoder s (HeaderBody crypto)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-181"></span><span>      </span><span class="annot"><span class="annottext">(BlockNo
+ -&gt; SlotNo
+ -&gt; PrevHash crypto
+ -&gt; VKey 'BlockIssuer crypto
+ -&gt; VerKeyVRF (VRF crypto)
+ -&gt; CertifiedVRF (VRF crypto) InputVRF
+ -&gt; Word32
+ -&gt; Hash (HASH crypto) EraIndependentBlockBody
+ -&gt; OCert crypto
+ -&gt; ProtVer
+ -&gt; HeaderBody crypto)
+-&gt; Decode
+     ('Closed 'Dense)
+     (BlockNo
+      -&gt; SlotNo
+      -&gt; PrevHash crypto
+      -&gt; VKey 'BlockIssuer crypto
+      -&gt; VerKeyVRF (VRF crypto)
+      -&gt; CertifiedVRF (VRF crypto) InputVRF
+      -&gt; Word32
+      -&gt; Hash (HASH crypto) EraIndependentBlockBody
+      -&gt; OCert crypto
+      -&gt; ProtVer
+      -&gt; HeaderBody crypto)
+forall t. t -&gt; Decode ('Closed 'Dense) t
+</span><span class="hs-identifier hs-var">RecD</span></span><span> </span><span class="annot"><span class="annottext">BlockNo
+-&gt; SlotNo
+-&gt; PrevHash crypto
+-&gt; VKey 'BlockIssuer crypto
+-&gt; VerKeyVRF (VRF crypto)
+-&gt; CertifiedVRF (VRF crypto) InputVRF
+-&gt; Word32
+-&gt; Hash (HASH crypto) EraIndependentBlockBody
+-&gt; OCert crypto
+-&gt; ProtVer
+-&gt; HeaderBody crypto
+forall crypto.
+BlockNo
+-&gt; SlotNo
+-&gt; PrevHash crypto
+-&gt; VKey 'BlockIssuer crypto
+-&gt; VerKeyVRF crypto
+-&gt; CertifiedVRF crypto InputVRF
+-&gt; Word32
+-&gt; Hash crypto EraIndependentBlockBody
+-&gt; OCert crypto
+-&gt; ProtVer
+-&gt; HeaderBody crypto
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderBody"><span class="hs-identifier hs-var">HeaderBody</span></a></span><span>
+</span><span id="line-182"></span><span>        </span><span class="annot"><span class="annottext">Decode
+  ('Closed 'Dense)
+  (BlockNo
+   -&gt; SlotNo
+   -&gt; PrevHash crypto
+   -&gt; VKey 'BlockIssuer crypto
+   -&gt; VerKeyVRF (VRF crypto)
+   -&gt; CertifiedVRF (VRF crypto) InputVRF
+   -&gt; Word32
+   -&gt; Hash (HASH crypto) EraIndependentBlockBody
+   -&gt; OCert crypto
+   -&gt; ProtVer
+   -&gt; HeaderBody crypto)
+-&gt; Decode ('Closed Any) BlockNo
+-&gt; Decode
+     ('Closed 'Dense)
+     (SlotNo
+      -&gt; PrevHash crypto
+      -&gt; VKey 'BlockIssuer crypto
+      -&gt; VerKeyVRF (VRF crypto)
+      -&gt; CertifiedVRF (VRF crypto) InputVRF
+      -&gt; Word32
+      -&gt; Hash (HASH crypto) EraIndependentBlockBody
+      -&gt; OCert crypto
+      -&gt; ProtVer
+      -&gt; HeaderBody crypto)
+forall (w1 :: Wrapped) a t (w :: Density).
+Decode w1 (a -&gt; t) -&gt; Decode ('Closed w) a -&gt; Decode w1 t
+</span><span class="hs-operator hs-var">&lt;!</span></span><span> </span><span class="annot"><span class="annottext">Decode ('Closed Any) BlockNo
+forall t (w :: Wrapped). FromCBOR t =&gt; Decode w t
+</span><span class="hs-identifier hs-var">From</span></span><span>
+</span><span id="line-183"></span><span>        </span><span class="annot"><span class="annottext">Decode
+  ('Closed 'Dense)
+  (SlotNo
+   -&gt; PrevHash crypto
+   -&gt; VKey 'BlockIssuer crypto
+   -&gt; VerKeyVRF (VRF crypto)
+   -&gt; CertifiedVRF (VRF crypto) InputVRF
+   -&gt; Word32
+   -&gt; Hash (HASH crypto) EraIndependentBlockBody
+   -&gt; OCert crypto
+   -&gt; ProtVer
+   -&gt; HeaderBody crypto)
+-&gt; Decode ('Closed Any) SlotNo
+-&gt; Decode
+     ('Closed 'Dense)
+     (PrevHash crypto
+      -&gt; VKey 'BlockIssuer crypto
+      -&gt; VerKeyVRF (VRF crypto)
+      -&gt; CertifiedVRF (VRF crypto) InputVRF
+      -&gt; Word32
+      -&gt; Hash (HASH crypto) EraIndependentBlockBody
+      -&gt; OCert crypto
+      -&gt; ProtVer
+      -&gt; HeaderBody crypto)
+forall (w1 :: Wrapped) a t (w :: Density).
+Decode w1 (a -&gt; t) -&gt; Decode ('Closed w) a -&gt; Decode w1 t
+</span><span class="hs-operator hs-var">&lt;!</span></span><span> </span><span class="annot"><span class="annottext">Decode ('Closed Any) SlotNo
+forall t (w :: Wrapped). FromCBOR t =&gt; Decode w t
+</span><span class="hs-identifier hs-var">From</span></span><span>
+</span><span id="line-184"></span><span>        </span><span class="annot"><span class="annottext">Decode
+  ('Closed 'Dense)
+  (PrevHash crypto
+   -&gt; VKey 'BlockIssuer crypto
+   -&gt; VerKeyVRF (VRF crypto)
+   -&gt; CertifiedVRF (VRF crypto) InputVRF
+   -&gt; Word32
+   -&gt; Hash (HASH crypto) EraIndependentBlockBody
+   -&gt; OCert crypto
+   -&gt; ProtVer
+   -&gt; HeaderBody crypto)
+-&gt; Decode ('Closed Any) (PrevHash crypto)
+-&gt; Decode
+     ('Closed 'Dense)
+     (VKey 'BlockIssuer crypto
+      -&gt; VerKeyVRF (VRF crypto)
+      -&gt; CertifiedVRF (VRF crypto) InputVRF
+      -&gt; Word32
+      -&gt; Hash (HASH crypto) EraIndependentBlockBody
+      -&gt; OCert crypto
+      -&gt; ProtVer
+      -&gt; HeaderBody crypto)
+forall (w1 :: Wrapped) a t (w :: Density).
+Decode w1 (a -&gt; t) -&gt; Decode ('Closed w) a -&gt; Decode w1 t
+</span><span class="hs-operator hs-var">&lt;!</span></span><span> </span><span class="annot"><span class="annottext">Decode ('Closed Any) (PrevHash crypto)
+forall t (w :: Wrapped). FromCBOR t =&gt; Decode w t
+</span><span class="hs-identifier hs-var">From</span></span><span>
+</span><span id="line-185"></span><span>        </span><span class="annot"><span class="annottext">Decode
+  ('Closed 'Dense)
+  (VKey 'BlockIssuer crypto
+   -&gt; VerKeyVRF (VRF crypto)
+   -&gt; CertifiedVRF (VRF crypto) InputVRF
+   -&gt; Word32
+   -&gt; Hash (HASH crypto) EraIndependentBlockBody
+   -&gt; OCert crypto
+   -&gt; ProtVer
+   -&gt; HeaderBody crypto)
+-&gt; Decode ('Closed Any) (VKey 'BlockIssuer crypto)
+-&gt; Decode
+     ('Closed 'Dense)
+     (VerKeyVRF (VRF crypto)
+      -&gt; CertifiedVRF (VRF crypto) InputVRF
+      -&gt; Word32
+      -&gt; Hash (HASH crypto) EraIndependentBlockBody
+      -&gt; OCert crypto
+      -&gt; ProtVer
+      -&gt; HeaderBody crypto)
+forall (w1 :: Wrapped) a t (w :: Density).
+Decode w1 (a -&gt; t) -&gt; Decode ('Closed w) a -&gt; Decode w1 t
+</span><span class="hs-operator hs-var">&lt;!</span></span><span> </span><span class="annot"><span class="annottext">Decode ('Closed Any) (VKey 'BlockIssuer crypto)
+forall t (w :: Wrapped). FromCBOR t =&gt; Decode w t
+</span><span class="hs-identifier hs-var">From</span></span><span>
+</span><span id="line-186"></span><span>        </span><span class="annot"><span class="annottext">Decode
+  ('Closed 'Dense)
+  (VerKeyVRF (VRF crypto)
+   -&gt; CertifiedVRF (VRF crypto) InputVRF
+   -&gt; Word32
+   -&gt; Hash (HASH crypto) EraIndependentBlockBody
+   -&gt; OCert crypto
+   -&gt; ProtVer
+   -&gt; HeaderBody crypto)
+-&gt; Decode ('Closed 'Dense) (VerKeyVRF (VRF crypto))
+-&gt; Decode
+     ('Closed 'Dense)
+     (CertifiedVRF (VRF crypto) InputVRF
+      -&gt; Word32
+      -&gt; Hash (HASH crypto) EraIndependentBlockBody
+      -&gt; OCert crypto
+      -&gt; ProtVer
+      -&gt; HeaderBody crypto)
+forall (w1 :: Wrapped) a t (w :: Density).
+Decode w1 (a -&gt; t) -&gt; Decode ('Closed w) a -&gt; Decode w1 t
+</span><span class="hs-operator hs-var">&lt;!</span></span><span> </span><span class="annot"><span class="annottext">(forall s. Decoder s (VerKeyVRF (VRF crypto)))
+-&gt; Decode ('Closed 'Dense) (VerKeyVRF (VRF crypto))
+forall t. (forall s. Decoder s t) -&gt; Decode ('Closed 'Dense) t
+</span><span class="hs-identifier hs-var">D</span></span><span> </span><span class="annot"><span class="annottext">forall s. Decoder s (VerKeyVRF (VRF crypto))
+forall v s. VRFAlgorithm v =&gt; Decoder s (VerKeyVRF v)
+</span><span class="hs-identifier hs-var">decodeVerKeyVRF</span></span><span>
+</span><span id="line-187"></span><span>        </span><span class="annot"><span class="annottext">Decode
+  ('Closed 'Dense)
+  (CertifiedVRF (VRF crypto) InputVRF
+   -&gt; Word32
+   -&gt; Hash (HASH crypto) EraIndependentBlockBody
+   -&gt; OCert crypto
+   -&gt; ProtVer
+   -&gt; HeaderBody crypto)
+-&gt; Decode ('Closed Any) (CertifiedVRF (VRF crypto) InputVRF)
+-&gt; Decode
+     ('Closed 'Dense)
+     (Word32
+      -&gt; Hash (HASH crypto) EraIndependentBlockBody
+      -&gt; OCert crypto
+      -&gt; ProtVer
+      -&gt; HeaderBody crypto)
+forall (w1 :: Wrapped) a t (w :: Density).
+Decode w1 (a -&gt; t) -&gt; Decode ('Closed w) a -&gt; Decode w1 t
+</span><span class="hs-operator hs-var">&lt;!</span></span><span> </span><span class="annot"><span class="annottext">Decode ('Closed Any) (CertifiedVRF (VRF crypto) InputVRF)
+forall t (w :: Wrapped). FromCBOR t =&gt; Decode w t
+</span><span class="hs-identifier hs-var">From</span></span><span>
+</span><span id="line-188"></span><span>        </span><span class="annot"><span class="annottext">Decode
+  ('Closed 'Dense)
+  (Word32
+   -&gt; Hash (HASH crypto) EraIndependentBlockBody
+   -&gt; OCert crypto
+   -&gt; ProtVer
+   -&gt; HeaderBody crypto)
+-&gt; Decode ('Closed Any) Word32
+-&gt; Decode
+     ('Closed 'Dense)
+     (Hash (HASH crypto) EraIndependentBlockBody
+      -&gt; OCert crypto -&gt; ProtVer -&gt; HeaderBody crypto)
+forall (w1 :: Wrapped) a t (w :: Density).
+Decode w1 (a -&gt; t) -&gt; Decode ('Closed w) a -&gt; Decode w1 t
+</span><span class="hs-operator hs-var">&lt;!</span></span><span> </span><span class="annot"><span class="annottext">Decode ('Closed Any) Word32
+forall t (w :: Wrapped). FromCBOR t =&gt; Decode w t
+</span><span class="hs-identifier hs-var">From</span></span><span>
+</span><span id="line-189"></span><span>        </span><span class="annot"><span class="annottext">Decode
+  ('Closed 'Dense)
+  (Hash (HASH crypto) EraIndependentBlockBody
+   -&gt; OCert crypto -&gt; ProtVer -&gt; HeaderBody crypto)
+-&gt; Decode
+     ('Closed Any) (Hash (HASH crypto) EraIndependentBlockBody)
+-&gt; Decode
+     ('Closed 'Dense) (OCert crypto -&gt; ProtVer -&gt; HeaderBody crypto)
+forall (w1 :: Wrapped) a t (w :: Density).
+Decode w1 (a -&gt; t) -&gt; Decode ('Closed w) a -&gt; Decode w1 t
+</span><span class="hs-operator hs-var">&lt;!</span></span><span> </span><span class="annot"><span class="annottext">Decode ('Closed Any) (Hash (HASH crypto) EraIndependentBlockBody)
+forall t (w :: Wrapped). FromCBOR t =&gt; Decode w t
+</span><span class="hs-identifier hs-var">From</span></span><span>
+</span><span id="line-190"></span><span>        </span><span class="annot"><span class="annottext">Decode
+  ('Closed 'Dense) (OCert crypto -&gt; ProtVer -&gt; HeaderBody crypto)
+-&gt; Decode ('Closed Any) (OCert crypto)
+-&gt; Decode ('Closed 'Dense) (ProtVer -&gt; HeaderBody crypto)
+forall (w1 :: Wrapped) a t (w :: Density).
+Decode w1 (a -&gt; t) -&gt; Decode ('Closed w) a -&gt; Decode w1 t
+</span><span class="hs-operator hs-var">&lt;!</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">CBORGroup (OCert crypto) -&gt; OCert crypto
+forall a. CBORGroup a -&gt; a
+</span><span class="hs-identifier hs-var hs-var">unCBORGroup</span></span><span> </span><span class="annot"><span class="annottext">(CBORGroup (OCert crypto) -&gt; OCert crypto)
+-&gt; Decode ('Closed Any) (CBORGroup (OCert crypto))
+-&gt; Decode ('Closed Any) (OCert crypto)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Decode ('Closed Any) (CBORGroup (OCert crypto))
+forall t (w :: Wrapped). FromCBOR t =&gt; Decode w t
+</span><span class="hs-identifier hs-var">From</span></span><span class="hs-special">)</span><span>
+</span><span id="line-191"></span><span>        </span><span class="annot"><span class="annottext">Decode ('Closed 'Dense) (ProtVer -&gt; HeaderBody crypto)
+-&gt; Decode ('Closed Any) ProtVer
+-&gt; Decode ('Closed 'Dense) (HeaderBody crypto)
+forall (w1 :: Wrapped) a t (w :: Density).
+Decode w1 (a -&gt; t) -&gt; Decode ('Closed w) a -&gt; Decode w1 t
+</span><span class="hs-operator hs-var">&lt;!</span></span><span> </span><span class="annot"><span class="annottext">Decode ('Closed Any) ProtVer
+forall t (w :: Wrapped). FromCBOR t =&gt; Decode w t
+</span><span class="hs-identifier hs-var">From</span></span></span><span>
+</span><span id="line-192"></span><span>
+</span><span id="line-193"></span><span id="local-6989586621679276565"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#encodeHeaderRaw"><span class="hs-identifier hs-type">encodeHeaderRaw</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-194"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">CC.Crypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679276565"><span class="hs-identifier hs-type">crypto</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-195"></span><span>  </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderRaw"><span class="hs-identifier hs-type">HeaderRaw</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276565"><span class="hs-identifier hs-type">crypto</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-196"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Encode</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">'</span><span class="annot"><span class="hs-identifier hs-type">Closed</span></span><span> </span><span class="hs-special">'</span><span class="annot"><span class="hs-identifier hs-type">Dense</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderRaw"><span class="hs-identifier hs-type">HeaderRaw</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276565"><span class="hs-identifier hs-type">crypto</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-197"></span><span id="encodeHeaderRaw"><span class="annot"><span class="annottext">encodeHeaderRaw :: HeaderRaw crypto -&gt; Encode ('Closed 'Dense) (HeaderRaw crypto)
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#encodeHeaderRaw"><span class="hs-identifier hs-var hs-var">encodeHeaderRaw</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderRaw"><span class="hs-identifier hs-type">HeaderRaw</span></a></span><span> </span><span id="local-6989586621679276336"><span class="annot"><span class="annottext">HeaderBody crypto
+</span><a href="#local-6989586621679276336"><span class="hs-identifier hs-var">body</span></a></span></span><span> </span><span id="local-6989586621679276335"><span class="annot"><span class="annottext">SignedKES crypto (HeaderBody crypto)
+</span><a href="#local-6989586621679276335"><span class="hs-identifier hs-var">sig</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-198"></span><span>  </span><span class="annot"><span class="annottext">(HeaderBody crypto
+ -&gt; SignedKES crypto (HeaderBody crypto) -&gt; HeaderRaw crypto)
+-&gt; Encode
+     ('Closed 'Dense)
+     (HeaderBody crypto
+      -&gt; SignedKES crypto (HeaderBody crypto) -&gt; HeaderRaw crypto)
+forall t. t -&gt; Encode ('Closed 'Dense) t
+</span><span class="hs-identifier hs-var">Rec</span></span><span> </span><span class="annot"><span class="annottext">HeaderBody crypto
+-&gt; SignedKES crypto (HeaderBody crypto) -&gt; HeaderRaw crypto
+forall crypto.
+HeaderBody crypto
+-&gt; SignedKES crypto (HeaderBody crypto) -&gt; HeaderRaw crypto
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderRaw"><span class="hs-identifier hs-var">HeaderRaw</span></a></span><span> </span><span class="annot"><span class="annottext">Encode
+  ('Closed 'Dense)
+  (HeaderBody crypto
+   -&gt; SignedKES crypto (HeaderBody crypto) -&gt; HeaderRaw crypto)
+-&gt; Encode ('Closed 'Dense) (HeaderBody crypto)
+-&gt; Encode
+     ('Closed 'Dense)
+     (SignedKES crypto (HeaderBody crypto) -&gt; HeaderRaw crypto)
+forall (w :: Wrapped) a t (r :: Density).
+Encode w (a -&gt; t) -&gt; Encode ('Closed r) a -&gt; Encode w t
+</span><span class="hs-operator hs-var">!&gt;</span></span><span> </span><span class="annot"><span class="annottext">HeaderBody crypto -&gt; Encode ('Closed 'Dense) (HeaderBody crypto)
+forall t. ToCBOR t =&gt; t -&gt; Encode ('Closed 'Dense) t
+</span><span class="hs-identifier hs-var">To</span></span><span> </span><span class="annot"><span class="annottext">HeaderBody crypto
+</span><a href="#local-6989586621679276336"><span class="hs-identifier hs-var">body</span></a></span><span> </span><span class="annot"><span class="annottext">Encode
+  ('Closed 'Dense)
+  (SignedKES crypto (HeaderBody crypto) -&gt; HeaderRaw crypto)
+-&gt; Encode ('Closed 'Dense) (SignedKES crypto (HeaderBody crypto))
+-&gt; Encode ('Closed 'Dense) (HeaderRaw crypto)
+forall (w :: Wrapped) a t (r :: Density).
+Encode w (a -&gt; t) -&gt; Encode ('Closed r) a -&gt; Encode w t
+</span><span class="hs-operator hs-var">!&gt;</span></span><span> </span><span class="annot"><span class="annottext">(SignedKES crypto (HeaderBody crypto) -&gt; Encoding)
+-&gt; SignedKES crypto (HeaderBody crypto)
+-&gt; Encode ('Closed 'Dense) (SignedKES crypto (HeaderBody crypto))
+forall t. (t -&gt; Encoding) -&gt; t -&gt; Encode ('Closed 'Dense) t
+</span><span class="hs-identifier hs-var">E</span></span><span> </span><span class="annot"><span class="annottext">SignedKES crypto (HeaderBody crypto) -&gt; Encoding
+forall v a. KESAlgorithm v =&gt; SignedKES v a -&gt; Encoding
+</span><span class="hs-identifier hs-var">encodeSignedKES</span></span><span> </span><span class="annot"><span class="annottext">SignedKES crypto (HeaderBody crypto)
+</span><a href="#local-6989586621679276335"><span class="hs-identifier hs-var">sig</span></a></span><span>
+</span><span id="line-199"></span><span>
+</span><span id="line-200"></span><span id="local-6989586621679276334"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679276328"><span id="local-6989586621679276330"><span class="annot"><span class="hs-identifier hs-type">CC.Crypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679276334"><span class="hs-identifier hs-type">crypto</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ToCBOR</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderRaw"><span class="hs-identifier hs-type">HeaderRaw</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276334"><span class="hs-identifier hs-type">crypto</span></a></span><span class="hs-special">)</span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-201"></span><span>  </span><span id="local-6989586621679276327"><span class="annot"><span class="annottext">toCBOR :: HeaderRaw crypto -&gt; Encoding
+</span><a href="#local-6989586621679276327"><span class="hs-identifier hs-var hs-var hs-var hs-var">toCBOR</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Encode ('Closed 'Dense) (HeaderRaw crypto) -&gt; Encoding
+forall (w :: Wrapped) t. Encode w t -&gt; Encoding
+</span><span class="hs-identifier hs-var">encode</span></span><span> </span><span class="annot"><span class="annottext">(Encode ('Closed 'Dense) (HeaderRaw crypto) -&gt; Encoding)
+-&gt; (HeaderRaw crypto -&gt; Encode ('Closed 'Dense) (HeaderRaw crypto))
+-&gt; HeaderRaw crypto
+-&gt; Encoding
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">HeaderRaw crypto -&gt; Encode ('Closed 'Dense) (HeaderRaw crypto)
+forall crypto.
+Crypto crypto =&gt;
+HeaderRaw crypto -&gt; Encode ('Closed 'Dense) (HeaderRaw crypto)
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#encodeHeaderRaw"><span class="hs-identifier hs-var">encodeHeaderRaw</span></a></span></span><span>
+</span><span id="line-202"></span><span>
+</span><span id="line-203"></span><span id="local-6989586621679276326"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679276322"><span class="annot"><span class="hs-identifier hs-type">CC.Crypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679276326"><span class="hs-identifier hs-type">crypto</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FromCBOR</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderRaw"><span class="hs-identifier hs-type">HeaderRaw</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276326"><span class="hs-identifier hs-type">crypto</span></a></span><span class="hs-special">)</span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-204"></span><span>  </span><span id="local-6989586621679276321"><span class="annot"><span class="annottext">fromCBOR :: Decoder s (HeaderRaw crypto)
+</span><a href="#local-6989586621679276321"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromCBOR</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Decode ('Closed 'Dense) (HeaderRaw crypto)
+-&gt; Decoder s (HeaderRaw crypto)
+forall (w :: Wrapped) t s. Decode w t -&gt; Decoder s t
+</span><span class="hs-identifier hs-var">decode</span></span><span> </span><span class="annot"><span class="annottext">(Decode ('Closed 'Dense) (HeaderRaw crypto)
+ -&gt; Decoder s (HeaderRaw crypto))
+-&gt; Decode ('Closed 'Dense) (HeaderRaw crypto)
+-&gt; Decoder s (HeaderRaw crypto)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">(HeaderBody crypto
+ -&gt; SignedKES (KES crypto) (HeaderBody crypto) -&gt; HeaderRaw crypto)
+-&gt; Decode
+     ('Closed 'Dense)
+     (HeaderBody crypto
+      -&gt; SignedKES (KES crypto) (HeaderBody crypto) -&gt; HeaderRaw crypto)
+forall t. t -&gt; Decode ('Closed 'Dense) t
+</span><span class="hs-identifier hs-var">RecD</span></span><span> </span><span class="annot"><span class="annottext">HeaderBody crypto
+-&gt; SignedKES (KES crypto) (HeaderBody crypto) -&gt; HeaderRaw crypto
+forall crypto.
+HeaderBody crypto
+-&gt; SignedKES crypto (HeaderBody crypto) -&gt; HeaderRaw crypto
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderRaw"><span class="hs-identifier hs-var">HeaderRaw</span></a></span><span> </span><span class="annot"><span class="annottext">Decode
+  ('Closed 'Dense)
+  (HeaderBody crypto
+   -&gt; SignedKES (KES crypto) (HeaderBody crypto) -&gt; HeaderRaw crypto)
+-&gt; Decode ('Closed Any) (HeaderBody crypto)
+-&gt; Decode
+     ('Closed 'Dense)
+     (SignedKES (KES crypto) (HeaderBody crypto) -&gt; HeaderRaw crypto)
+forall (w1 :: Wrapped) a t (w :: Density).
+Decode w1 (a -&gt; t) -&gt; Decode ('Closed w) a -&gt; Decode w1 t
+</span><span class="hs-operator hs-var">&lt;!</span></span><span> </span><span class="annot"><span class="annottext">Decode ('Closed Any) (HeaderBody crypto)
+forall t (w :: Wrapped). FromCBOR t =&gt; Decode w t
+</span><span class="hs-identifier hs-var">From</span></span><span> </span><span class="annot"><span class="annottext">Decode
+  ('Closed 'Dense)
+  (SignedKES (KES crypto) (HeaderBody crypto) -&gt; HeaderRaw crypto)
+-&gt; Decode
+     ('Closed 'Dense) (SignedKES (KES crypto) (HeaderBody crypto))
+-&gt; Decode ('Closed 'Dense) (HeaderRaw crypto)
+forall (w1 :: Wrapped) a t (w :: Density).
+Decode w1 (a -&gt; t) -&gt; Decode ('Closed w) a -&gt; Decode w1 t
+</span><span class="hs-operator hs-var">&lt;!</span></span><span> </span><span class="annot"><span class="annottext">(forall s. Decoder s (SignedKES (KES crypto) (HeaderBody crypto)))
+-&gt; Decode
+     ('Closed 'Dense) (SignedKES (KES crypto) (HeaderBody crypto))
+forall t. (forall s. Decoder s t) -&gt; Decode ('Closed 'Dense) t
+</span><span class="hs-identifier hs-var">D</span></span><span> </span><span class="annot"><span class="annottext">forall s. Decoder s (SignedKES (KES crypto) (HeaderBody crypto))
+forall v s a. KESAlgorithm v =&gt; Decoder s (SignedKES v a)
+</span><span class="hs-identifier hs-var">decodeSignedKES</span></span></span><span>
+</span><span id="line-205"></span><span>
+</span><span id="line-206"></span><span id="local-6989586621679276320"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679276316"><span class="annot"><span class="hs-identifier hs-type">CC.Crypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679276320"><span class="hs-identifier hs-type">crypto</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FromCBOR</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Annotator</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Header.html#HeaderRaw"><span class="hs-identifier hs-type">HeaderRaw</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276320"><span class="hs-identifier hs-type">crypto</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-207"></span><span>  </span><span id="local-6989586621679276315"><span class="annot"><span class="annottext">fromCBOR :: Decoder s (Annotator (HeaderRaw crypto))
+</span><a href="#local-6989586621679276315"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromCBOR</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">HeaderRaw crypto -&gt; Annotator (HeaderRaw crypto)
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">(HeaderRaw crypto -&gt; Annotator (HeaderRaw crypto))
+-&gt; Decoder s (HeaderRaw crypto)
+-&gt; Decoder s (Annotator (HeaderRaw crypto))
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Decoder s (HeaderRaw crypto)
+forall a s. FromCBOR a =&gt; Decoder s a
+</span><span class="hs-identifier hs-var">fromCBOR</span></span></span><span>
+</span><span id="line-208"></span></pre></body></html>

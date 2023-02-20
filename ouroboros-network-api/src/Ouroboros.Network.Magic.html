@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DeriveGeneric              #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE GeneralizedNewtypeDeriving #-}</span><span>
+</span><span id="line-3"></span><span>
+</span><span id="line-4"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.Magic</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-5"></span><span>
+</span><span id="line-6"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Word</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Word32</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">GHC.Generics</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Generic</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">NoThunks.Class</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NoThunks</span></span><span class="hs-special">)</span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- | NetworkMagic is used to differentiate between different networks during the initial handshake.</span><span>
+</span><span id="line-12"></span><span id="local-6989586621679127788"><span id="local-6989586621679127789"></span></span><span class="hs-keyword">newtype</span><span> </span><span id="NetworkMagic"><span class="annot"><a href="Ouroboros.Network.Magic.html#NetworkMagic"><span class="hs-identifier hs-var">NetworkMagic</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="NetworkMagic"><span class="annot"><a href="Ouroboros.Network.Magic.html#NetworkMagic"><span class="hs-identifier hs-var">NetworkMagic</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="unNetworkMagic"><span class="annot"><span class="annottext">NetworkMagic -&gt; Word32
+</span><a href="Ouroboros.Network.Magic.html#unNetworkMagic"><span class="hs-identifier hs-var hs-var">unNetworkMagic</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679127780"><span id="local-6989586621679127782"><span id="local-6989586621679127784"><span class="annot"><span class="annottext">Int -&gt; NetworkMagic -&gt; ShowS
+[NetworkMagic] -&gt; ShowS
+NetworkMagic -&gt; String
+(Int -&gt; NetworkMagic -&gt; ShowS)
+-&gt; (NetworkMagic -&gt; String)
+-&gt; ([NetworkMagic] -&gt; ShowS)
+-&gt; Show NetworkMagic
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [NetworkMagic] -&gt; ShowS
+$cshowList :: [NetworkMagic] -&gt; ShowS
+show :: NetworkMagic -&gt; String
+$cshow :: NetworkMagic -&gt; String
+showsPrec :: Int -&gt; NetworkMagic -&gt; ShowS
+$cshowsPrec :: Int -&gt; NetworkMagic -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127775"><span id="local-6989586621679127777"><span class="annot"><span class="annottext">NetworkMagic -&gt; NetworkMagic -&gt; Bool
+(NetworkMagic -&gt; NetworkMagic -&gt; Bool)
+-&gt; (NetworkMagic -&gt; NetworkMagic -&gt; Bool) -&gt; Eq NetworkMagic
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: NetworkMagic -&gt; NetworkMagic -&gt; Bool
+$c/= :: NetworkMagic -&gt; NetworkMagic -&gt; Bool
+== :: NetworkMagic -&gt; NetworkMagic -&gt; Bool
+$c== :: NetworkMagic -&gt; NetworkMagic -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. NetworkMagic -&gt; Rep NetworkMagic x)
+-&gt; (forall x. Rep NetworkMagic x -&gt; NetworkMagic)
+-&gt; Generic NetworkMagic
+forall x. Rep NetworkMagic x -&gt; NetworkMagic
+forall x. NetworkMagic -&gt; Rep NetworkMagic x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cto :: forall x. Rep NetworkMagic x -&gt; NetworkMagic
+$cfrom :: forall x. NetworkMagic -&gt; Rep NetworkMagic x
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127765"><span id="local-6989586621679127767"><span id="local-6989586621679127769"><span class="annot"><span class="annottext">Context -&gt; NetworkMagic -&gt; IO (Maybe ThunkInfo)
+Proxy NetworkMagic -&gt; String
+(Context -&gt; NetworkMagic -&gt; IO (Maybe ThunkInfo))
+-&gt; (Context -&gt; NetworkMagic -&gt; IO (Maybe ThunkInfo))
+-&gt; (Proxy NetworkMagic -&gt; String)
+-&gt; NoThunks NetworkMagic
+forall a.
+(Context -&gt; a -&gt; IO (Maybe ThunkInfo))
+-&gt; (Context -&gt; a -&gt; IO (Maybe ThunkInfo))
+-&gt; (Proxy a -&gt; String)
+-&gt; NoThunks a
+showTypeOf :: Proxy NetworkMagic -&gt; String
+$cshowTypeOf :: Proxy NetworkMagic -&gt; String
+wNoThunks :: Context -&gt; NetworkMagic -&gt; IO (Maybe ThunkInfo)
+$cwNoThunks :: Context -&gt; NetworkMagic -&gt; IO (Maybe ThunkInfo)
+noThunks :: Context -&gt; NetworkMagic -&gt; IO (Maybe ThunkInfo)
+$cnoThunks :: Context -&gt; NetworkMagic -&gt; IO (Maybe ThunkInfo)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">NoThunks</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-14"></span></pre></body></html>

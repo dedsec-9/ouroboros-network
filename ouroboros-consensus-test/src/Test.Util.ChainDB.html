@@ -1,0 +1,476 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DeriveTraversable #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE FlexibleContexts  #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE RecordWildCards   #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE TypeFamilies      #-}</span><span>
+</span><span id="line-5"></span><span>
+</span><span id="line-6"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Test.Util.ChainDB</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-7"></span><span>    </span><span class="annot"><a href="Test.Util.ChainDB.html#MinimalChainDbArgs"><span class="hs-identifier">MinimalChainDbArgs</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-8"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Test.Util.ChainDB.html#NodeDBs"><span class="hs-identifier">NodeDBs</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-9"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Test.Util.ChainDB.html#emptyNodeDBs"><span class="hs-identifier">emptyNodeDBs</span></a></span><span>
+</span><span id="line-10"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Test.Util.ChainDB.html#fromMinimalChainDbArgs"><span class="hs-identifier">fromMinimalChainDbArgs</span></a></span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Test.Util.ChainDB.html#mkTestChunkInfo"><span class="hs-identifier">mkTestChunkInfo</span></a></span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Tracer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">nullTracer</span></span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Functor.Identity</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Identity</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Block.Abstract</span></a></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Config</span></a></span><span>
+</span><span id="line-20"></span><span>                     </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">TopLevelConfig</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">topLevelConfigLedger</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-21"></span><span>                     </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">configSecurityParam</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Fragment.InFuture</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">CheckInFuture</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Fragment.Validated</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">VF</span></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.HardFork.History.EraParams</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">EraParams</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-25"></span><span>                     </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">eraEpochSize</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Ledger.Basics</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">LedgerConfig</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Ledger.Extended</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">ExtLedgerState</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Protocol.Abstract</span></a></span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Storage.ChainDB</span></a></span><span> </span><span class="hs-keyword">hiding</span><span>
+</span><span id="line-30"></span><span>                     </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">TraceFollowerEvent</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Storage.FS.API</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">SomeHasFS</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Storage.ImmutableDB</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">ImmutableDB</span></span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Storage.ImmutableDB.Chunks.Internal</span></a></span><span>
+</span><span id="line-34"></span><span>                     </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">simpleChunkInfo</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Storage.LedgerDB</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">LedgerDB</span></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Storage.VolatileDB</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">VolatileDB</span></span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Util.IOLike</span></a></span><span> </span><span class="hs-keyword">hiding</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">invariant</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Util.ResourceRegistry</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">ResourceRegistry</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-39"></span><span>
+</span><span id="line-40"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Test.Util.FS.Sim.MockFS.html"><span class="hs-identifier">Test.Util.FS.Sim.MockFS</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Mock</span></span><span>
+</span><span id="line-41"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Test.Util.FS.Sim.MockFS.html"><span class="hs-identifier">Test.Util.FS.Sim.MockFS</span></a></span><span>
+</span><span id="line-42"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Test.Util.FS.Sim.STM.html"><span class="hs-identifier">Test.Util.FS.Sim.STM</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Util.FS.Sim.STM.html#simHasFS"><span class="hs-identifier">simHasFS</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span>
+</span><span id="line-46"></span><span class="hs-comment">-- | A vector with an element for each database of a node</span><span>
+</span><span id="line-47"></span><span class="hs-comment">--</span><span>
+</span><span id="line-48"></span><span class="hs-comment">-- The @db@ type parameter is instantiated by this module at types for mock</span><span>
+</span><span id="line-49"></span><span class="hs-comment">-- filesystems; either the 'MockFS' type or reference cells thereof.</span><span>
+</span><span id="line-50"></span><span class="hs-keyword">data</span><span> </span><span id="NodeDBs"><span class="annot"><a href="Test.Util.ChainDB.html#NodeDBs"><span class="hs-identifier hs-var">NodeDBs</span></a></span></span><span> </span><span id="local-6989586621679274867"><span class="annot"><a href="#local-6989586621679274867"><span class="hs-identifier hs-type">db</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="NodeDBs"><span class="annot"><a href="Test.Util.ChainDB.html#NodeDBs"><span class="hs-identifier hs-var">NodeDBs</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-51"></span><span>    </span><span id="nodeDBsImm"><span class="annot"><span class="annottext">NodeDBs db -&gt; db
+</span><a href="Test.Util.ChainDB.html#nodeDBsImm"><span class="hs-identifier hs-var hs-var">nodeDBsImm</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679274867"><span class="hs-identifier hs-type">db</span></a></span><span>
+</span><span id="line-52"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="nodeDBsVol"><span class="annot"><span class="annottext">NodeDBs db -&gt; db
+</span><a href="Test.Util.ChainDB.html#nodeDBsVol"><span class="hs-identifier hs-var hs-var">nodeDBsVol</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679274867"><span class="hs-identifier hs-type">db</span></a></span><span>
+</span><span id="line-53"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="nodeDBsLgr"><span class="annot"><span class="annottext">NodeDBs db -&gt; db
+</span><a href="Test.Util.ChainDB.html#nodeDBsLgr"><span class="hs-identifier hs-var hs-var">nodeDBsLgr</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679274867"><span class="hs-identifier hs-type">db</span></a></span><span>
+</span><span id="line-54"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679274764"><span id="local-6989586621679274766"><span class="annot"><span class="annottext">a -&gt; NodeDBs b -&gt; NodeDBs a
+(a -&gt; b) -&gt; NodeDBs a -&gt; NodeDBs b
+(forall a b. (a -&gt; b) -&gt; NodeDBs a -&gt; NodeDBs b)
+-&gt; (forall a b. a -&gt; NodeDBs b -&gt; NodeDBs a) -&gt; Functor NodeDBs
+forall a b. a -&gt; NodeDBs b -&gt; NodeDBs a
+forall a b. (a -&gt; b) -&gt; NodeDBs a -&gt; NodeDBs b
+forall (f :: * -&gt; *).
+(forall a b. (a -&gt; b) -&gt; f a -&gt; f b)
+-&gt; (forall a b. a -&gt; f b -&gt; f a) -&gt; Functor f
+&lt;$ :: a -&gt; NodeDBs b -&gt; NodeDBs a
+$c&lt;$ :: forall a b. a -&gt; NodeDBs b -&gt; NodeDBs a
+fmap :: (a -&gt; b) -&gt; NodeDBs a -&gt; NodeDBs b
+$cfmap :: forall a b. (a -&gt; b) -&gt; NodeDBs a -&gt; NodeDBs b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Functor</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679274729"><span id="local-6989586621679274731"><span id="local-6989586621679274733"><span id="local-6989586621679274735"><span id="local-6989586621679274737"><span id="local-6989586621679274739"><span id="local-6989586621679274741"><span id="local-6989586621679274743"><span id="local-6989586621679274745"><span id="local-6989586621679274747"><span id="local-6989586621679274749"><span id="local-6989586621679274751"><span id="local-6989586621679274753"><span id="local-6989586621679274755"><span id="local-6989586621679274757"><span id="local-6989586621679274759"><span id="local-6989586621679274761"><span class="annot"><span class="annottext">NodeDBs a -&gt; Bool
+(a -&gt; m) -&gt; NodeDBs a -&gt; m
+(a -&gt; b -&gt; b) -&gt; b -&gt; NodeDBs a -&gt; b
+(forall m. Monoid m =&gt; NodeDBs m -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; NodeDBs a -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; NodeDBs a -&gt; m)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; NodeDBs a -&gt; b)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; NodeDBs a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; NodeDBs a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; NodeDBs a -&gt; b)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; NodeDBs a -&gt; a)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; NodeDBs a -&gt; a)
+-&gt; (forall a. NodeDBs a -&gt; [a])
+-&gt; (forall a. NodeDBs a -&gt; Bool)
+-&gt; (forall a. NodeDBs a -&gt; Int)
+-&gt; (forall a. Eq a =&gt; a -&gt; NodeDBs a -&gt; Bool)
+-&gt; (forall a. Ord a =&gt; NodeDBs a -&gt; a)
+-&gt; (forall a. Ord a =&gt; NodeDBs a -&gt; a)
+-&gt; (forall a. Num a =&gt; NodeDBs a -&gt; a)
+-&gt; (forall a. Num a =&gt; NodeDBs a -&gt; a)
+-&gt; Foldable NodeDBs
+forall a. Eq a =&gt; a -&gt; NodeDBs a -&gt; Bool
+forall a. Num a =&gt; NodeDBs a -&gt; a
+forall a. Ord a =&gt; NodeDBs a -&gt; a
+forall m. Monoid m =&gt; NodeDBs m -&gt; m
+forall a. NodeDBs a -&gt; Bool
+forall a. NodeDBs a -&gt; Int
+forall a. NodeDBs a -&gt; [a]
+forall a. (a -&gt; a -&gt; a) -&gt; NodeDBs a -&gt; a
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; NodeDBs a -&gt; m
+forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; NodeDBs a -&gt; b
+forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; NodeDBs a -&gt; b
+forall (t :: * -&gt; *).
+(forall m. Monoid m =&gt; t m -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; t a -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; t a -&gt; m)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; t a -&gt; a)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; t a -&gt; a)
+-&gt; (forall a. t a -&gt; [a])
+-&gt; (forall a. t a -&gt; Bool)
+-&gt; (forall a. t a -&gt; Int)
+-&gt; (forall a. Eq a =&gt; a -&gt; t a -&gt; Bool)
+-&gt; (forall a. Ord a =&gt; t a -&gt; a)
+-&gt; (forall a. Ord a =&gt; t a -&gt; a)
+-&gt; (forall a. Num a =&gt; t a -&gt; a)
+-&gt; (forall a. Num a =&gt; t a -&gt; a)
+-&gt; Foldable t
+product :: NodeDBs a -&gt; a
+$cproduct :: forall a. Num a =&gt; NodeDBs a -&gt; a
+sum :: NodeDBs a -&gt; a
+$csum :: forall a. Num a =&gt; NodeDBs a -&gt; a
+minimum :: NodeDBs a -&gt; a
+$cminimum :: forall a. Ord a =&gt; NodeDBs a -&gt; a
+maximum :: NodeDBs a -&gt; a
+$cmaximum :: forall a. Ord a =&gt; NodeDBs a -&gt; a
+elem :: a -&gt; NodeDBs a -&gt; Bool
+$celem :: forall a. Eq a =&gt; a -&gt; NodeDBs a -&gt; Bool
+length :: NodeDBs a -&gt; Int
+$clength :: forall a. NodeDBs a -&gt; Int
+null :: NodeDBs a -&gt; Bool
+$cnull :: forall a. NodeDBs a -&gt; Bool
+toList :: NodeDBs a -&gt; [a]
+$ctoList :: forall a. NodeDBs a -&gt; [a]
+foldl1 :: (a -&gt; a -&gt; a) -&gt; NodeDBs a -&gt; a
+$cfoldl1 :: forall a. (a -&gt; a -&gt; a) -&gt; NodeDBs a -&gt; a
+foldr1 :: (a -&gt; a -&gt; a) -&gt; NodeDBs a -&gt; a
+$cfoldr1 :: forall a. (a -&gt; a -&gt; a) -&gt; NodeDBs a -&gt; a
+foldl' :: (b -&gt; a -&gt; b) -&gt; b -&gt; NodeDBs a -&gt; b
+$cfoldl' :: forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; NodeDBs a -&gt; b
+foldl :: (b -&gt; a -&gt; b) -&gt; b -&gt; NodeDBs a -&gt; b
+$cfoldl :: forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; NodeDBs a -&gt; b
+foldr' :: (a -&gt; b -&gt; b) -&gt; b -&gt; NodeDBs a -&gt; b
+$cfoldr' :: forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; NodeDBs a -&gt; b
+foldr :: (a -&gt; b -&gt; b) -&gt; b -&gt; NodeDBs a -&gt; b
+$cfoldr :: forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; NodeDBs a -&gt; b
+foldMap' :: (a -&gt; m) -&gt; NodeDBs a -&gt; m
+$cfoldMap' :: forall m a. Monoid m =&gt; (a -&gt; m) -&gt; NodeDBs a -&gt; m
+foldMap :: (a -&gt; m) -&gt; NodeDBs a -&gt; m
+$cfoldMap :: forall m a. Monoid m =&gt; (a -&gt; m) -&gt; NodeDBs a -&gt; m
+fold :: NodeDBs m -&gt; m
+$cfold :: forall m. Monoid m =&gt; NodeDBs m -&gt; m
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Foldable</span></a></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679274718"><span id="local-6989586621679274720"><span id="local-6989586621679274722"><span id="local-6989586621679274724"><span class="annot"><span class="annottext">Functor NodeDBs
+Foldable NodeDBs
+Functor NodeDBs
+-&gt; Foldable NodeDBs
+-&gt; (forall (f :: * -&gt; *) a b.
+    Applicative f =&gt;
+    (a -&gt; f b) -&gt; NodeDBs a -&gt; f (NodeDBs b))
+-&gt; (forall (f :: * -&gt; *) a.
+    Applicative f =&gt;
+    NodeDBs (f a) -&gt; f (NodeDBs a))
+-&gt; (forall (m :: * -&gt; *) a b.
+    Monad m =&gt;
+    (a -&gt; m b) -&gt; NodeDBs a -&gt; m (NodeDBs b))
+-&gt; (forall (m :: * -&gt; *) a.
+    Monad m =&gt;
+    NodeDBs (m a) -&gt; m (NodeDBs a))
+-&gt; Traversable NodeDBs
+(a -&gt; f b) -&gt; NodeDBs a -&gt; f (NodeDBs b)
+forall (t :: * -&gt; *).
+Functor t
+-&gt; Foldable t
+-&gt; (forall (f :: * -&gt; *) a b.
+    Applicative f =&gt;
+    (a -&gt; f b) -&gt; t a -&gt; f (t b))
+-&gt; (forall (f :: * -&gt; *) a. Applicative f =&gt; t (f a) -&gt; f (t a))
+-&gt; (forall (m :: * -&gt; *) a b.
+    Monad m =&gt;
+    (a -&gt; m b) -&gt; t a -&gt; m (t b))
+-&gt; (forall (m :: * -&gt; *) a. Monad m =&gt; t (m a) -&gt; m (t a))
+-&gt; Traversable t
+forall (m :: * -&gt; *) a. Monad m =&gt; NodeDBs (m a) -&gt; m (NodeDBs a)
+forall (f :: * -&gt; *) a.
+Applicative f =&gt;
+NodeDBs (f a) -&gt; f (NodeDBs a)
+forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+(a -&gt; m b) -&gt; NodeDBs a -&gt; m (NodeDBs b)
+forall (f :: * -&gt; *) a b.
+Applicative f =&gt;
+(a -&gt; f b) -&gt; NodeDBs a -&gt; f (NodeDBs b)
+sequence :: NodeDBs (m a) -&gt; m (NodeDBs a)
+$csequence :: forall (m :: * -&gt; *) a. Monad m =&gt; NodeDBs (m a) -&gt; m (NodeDBs a)
+mapM :: (a -&gt; m b) -&gt; NodeDBs a -&gt; m (NodeDBs b)
+$cmapM :: forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+(a -&gt; m b) -&gt; NodeDBs a -&gt; m (NodeDBs b)
+sequenceA :: NodeDBs (f a) -&gt; f (NodeDBs a)
+$csequenceA :: forall (f :: * -&gt; *) a.
+Applicative f =&gt;
+NodeDBs (f a) -&gt; f (NodeDBs a)
+traverse :: (a -&gt; f b) -&gt; NodeDBs a -&gt; f (NodeDBs b)
+$ctraverse :: forall (f :: * -&gt; *) a b.
+Applicative f =&gt;
+(a -&gt; f b) -&gt; NodeDBs a -&gt; f (NodeDBs b)
+$cp2Traversable :: Foldable NodeDBs
+$cp1Traversable :: Functor NodeDBs
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Traversable</span></a></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-56"></span><span>
+</span><span id="line-57"></span><span id="local-6989586621679274716"><span class="annot"><a href="Test.Util.ChainDB.html#emptyNodeDBs"><span class="hs-identifier hs-type">emptyNodeDBs</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MonadSTM</span></span><span> </span><span class="annot"><a href="#local-6989586621679274716"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679274716"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Util.ChainDB.html#NodeDBs"><span class="hs-identifier hs-type">NodeDBs</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">StrictTVar</span></span><span> </span><span class="annot"><a href="#local-6989586621679274716"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="Test.Util.FS.Sim.MockFS.html#MockFS"><span class="hs-identifier hs-type">MockFS</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span></span><span>
+</span><span id="line-58"></span><span id="emptyNodeDBs"><span class="annot"><span class="annottext">emptyNodeDBs :: m (NodeDBs (StrictTVar m MockFS))
+</span><a href="Test.Util.ChainDB.html#emptyNodeDBs"><span class="hs-identifier hs-var hs-var">emptyNodeDBs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StrictTVar m MockFS
+-&gt; StrictTVar m MockFS
+-&gt; StrictTVar m MockFS
+-&gt; NodeDBs (StrictTVar m MockFS)
+forall db. db -&gt; db -&gt; db -&gt; NodeDBs db
+</span><a href="Test.Util.ChainDB.html#NodeDBs"><span class="hs-identifier hs-var">NodeDBs</span></a></span><span>
+</span><span id="line-59"></span><span>  </span><span class="annot"><span class="annottext">(StrictTVar m MockFS
+ -&gt; StrictTVar m MockFS
+ -&gt; StrictTVar m MockFS
+ -&gt; NodeDBs (StrictTVar m MockFS))
+-&gt; m (StrictTVar m MockFS)
+-&gt; m (StrictTVar m MockFS
+      -&gt; StrictTVar m MockFS -&gt; NodeDBs (StrictTVar m MockFS))
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">MockFS -&gt; m (StrictTVar m MockFS)
+forall (m :: * -&gt; *) a. MonadSTM m =&gt; a -&gt; m (StrictTVar m a)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">uncheckedNewTVarM</span></a></span><span> </span><span class="annot"><span class="annottext">MockFS
+</span><a href="Test.Util.FS.Sim.MockFS.html#empty"><span class="hs-identifier hs-var">Mock.empty</span></a></span><span>
+</span><span id="line-60"></span><span>  </span><span class="annot"><span class="annottext">m (StrictTVar m MockFS
+   -&gt; StrictTVar m MockFS -&gt; NodeDBs (StrictTVar m MockFS))
+-&gt; m (StrictTVar m MockFS)
+-&gt; m (StrictTVar m MockFS -&gt; NodeDBs (StrictTVar m MockFS))
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;*&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">MockFS -&gt; m (StrictTVar m MockFS)
+forall (m :: * -&gt; *) a. MonadSTM m =&gt; a -&gt; m (StrictTVar m a)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">uncheckedNewTVarM</span></a></span><span> </span><span class="annot"><span class="annottext">MockFS
+</span><a href="Test.Util.FS.Sim.MockFS.html#empty"><span class="hs-identifier hs-var">Mock.empty</span></a></span><span>
+</span><span id="line-61"></span><span>  </span><span class="annot"><span class="annottext">m (StrictTVar m MockFS -&gt; NodeDBs (StrictTVar m MockFS))
+-&gt; m (StrictTVar m MockFS) -&gt; m (NodeDBs (StrictTVar m MockFS))
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;*&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">MockFS -&gt; m (StrictTVar m MockFS)
+forall (m :: * -&gt; *) a. MonadSTM m =&gt; a -&gt; m (StrictTVar m a)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">uncheckedNewTVarM</span></a></span><span> </span><span class="annot"><span class="annottext">MockFS
+</span><a href="Test.Util.FS.Sim.MockFS.html#empty"><span class="hs-identifier hs-var">Mock.empty</span></a></span><span>
+</span><span id="line-62"></span><span>
+</span><span id="line-63"></span><span class="hs-comment">-- | Minimal set of arguments for creating a ChainDB instance for testing purposes.</span><span>
+</span><span id="line-64"></span><span class="hs-keyword">data</span><span> </span><span id="MinimalChainDbArgs"><span class="annot"><a href="Test.Util.ChainDB.html#MinimalChainDbArgs"><span class="hs-identifier hs-var">MinimalChainDbArgs</span></a></span></span><span> </span><span id="local-6989586621679274830"><span class="annot"><a href="#local-6989586621679274830"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679274829"><span class="annot"><a href="#local-6989586621679274829"><span class="hs-identifier hs-type">blk</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="MinimalChainDbArgs"><span class="annot"><a href="Test.Util.ChainDB.html#MinimalChainDbArgs"><span class="hs-identifier hs-var">MinimalChainDbArgs</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-65"></span><span>    </span><span id="mcdbTopLevelConfig"><span class="annot"><span class="annottext">MinimalChainDbArgs m blk -&gt; TopLevelConfig blk
+</span><a href="Test.Util.ChainDB.html#mcdbTopLevelConfig"><span class="hs-identifier hs-var hs-var">mcdbTopLevelConfig</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">TopLevelConfig</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679274829"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-66"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="mcdbChunkInfo"><span class="annot"><span class="annottext">MinimalChainDbArgs m blk -&gt; ChunkInfo
+</span><a href="Test.Util.ChainDB.html#mcdbChunkInfo"><span class="hs-identifier hs-var hs-var">mcdbChunkInfo</span></a></span></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">ImmutableDB.ChunkInfo</span></a></span><span>
+</span><span id="line-67"></span><span>  </span><span class="hs-comment">-- ^ Specifies the layout of the ImmutableDB on disk.</span><span>
+</span><span id="line-68"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="mcdbInitLedger"><span class="annot"><span class="annottext">MinimalChainDbArgs m blk -&gt; ExtLedgerState blk
+</span><a href="Test.Util.ChainDB.html#mcdbInitLedger"><span class="hs-identifier hs-var hs-var">mcdbInitLedger</span></a></span></span><span>     </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">ExtLedgerState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679274829"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-69"></span><span>  </span><span class="hs-comment">-- ^ The initial ledger state.</span><span>
+</span><span id="line-70"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="mcdbRegistry"><span class="annot"><span class="annottext">MinimalChainDbArgs m blk -&gt; ResourceRegistry m
+</span><a href="Test.Util.ChainDB.html#mcdbRegistry"><span class="hs-identifier hs-var hs-var">mcdbRegistry</span></a></span></span><span>       </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">ResourceRegistry</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679274830"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-71"></span><span>  </span><span class="hs-comment">-- ^ Keeps track of non-lexically scoped resources.</span><span>
+</span><span id="line-72"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="mcdbNodeDBs"><span class="annot"><span class="annottext">MinimalChainDbArgs m blk -&gt; NodeDBs (StrictTVar m MockFS)
+</span><a href="Test.Util.ChainDB.html#mcdbNodeDBs"><span class="hs-identifier hs-var hs-var">mcdbNodeDBs</span></a></span></span><span>        </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Test.Util.ChainDB.html#NodeDBs"><span class="hs-identifier hs-type">NodeDBs</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">StrictTVar</span></span><span> </span><span class="annot"><a href="#local-6989586621679274830"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="Test.Util.FS.Sim.MockFS.html#MockFS"><span class="hs-identifier hs-type">MockFS</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-73"></span><span>  </span><span class="hs-comment">-- ^ File systems underlying the immutable, volatile and ledger databases.</span><span>
+</span><span id="line-74"></span><span>  </span><span class="hs-comment">-- Would be useful to default this to StrictTVar's containing empty MockFS's.</span><span>
+</span><span id="line-75"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-76"></span><span>
+</span><span id="line-77"></span><span class="hs-comment">-- | Utility function to get a default chunk info in case we have EraParams available.</span><span>
+</span><span id="line-78"></span><span id="local-6989586621679274706"><span class="annot"><a href="Test.Util.ChainDB.html#mkTestChunkInfo"><span class="hs-identifier hs-type">mkTestChunkInfo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerConfig</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679274706"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">~</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">EraParams</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">TopLevelConfig</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679274706"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">ImmutableDB.ChunkInfo</span></a></span></span><span>
+</span><span id="line-79"></span><span id="mkTestChunkInfo"><span class="annot"><span class="annottext">mkTestChunkInfo :: TopLevelConfig blk -&gt; ChunkInfo
+</span><a href="Test.Util.ChainDB.html#mkTestChunkInfo"><span class="hs-identifier hs-var hs-var">mkTestChunkInfo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">EpochSize -&gt; ChunkInfo
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">simpleChunkInfo</span></a></span><span> </span><span class="annot"><span class="annottext">(EpochSize -&gt; ChunkInfo)
+-&gt; (TopLevelConfig blk -&gt; EpochSize)
+-&gt; TopLevelConfig blk
+-&gt; ChunkInfo
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">EraParams -&gt; EpochSize
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var">eraEpochSize</span></a></span><span> </span><span class="annot"><span class="annottext">(EraParams -&gt; EpochSize)
+-&gt; (TopLevelConfig blk -&gt; EraParams)
+-&gt; TopLevelConfig blk
+-&gt; EpochSize
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">TopLevelConfig blk -&gt; EraParams
+forall blk. TopLevelConfig blk -&gt; LedgerConfig blk
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var">topLevelConfigLedger</span></a></span><span>
+</span><span id="line-80"></span><span>
+</span><span id="line-81"></span><span class="hs-comment">-- | Creates a default set of of arguments for ChainDB tests.</span><span>
+</span><span id="line-82"></span><span id="local-6989586621679274703"><span id="local-6989586621679274704"><span class="annot"><a href="Test.Util.ChainDB.html#fromMinimalChainDbArgs"><span class="hs-identifier hs-type">fromMinimalChainDbArgs</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-83"></span><span>     </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MonadThrow</span></span><span> </span><span class="annot"><a href="#local-6989586621679274704"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-84"></span><span>     </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MonadSTM</span></span><span> </span><span class="annot"><a href="#local-6989586621679274704"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-85"></span><span>     </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">ConsensusProtocol</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">BlockProtocol</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679274703"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-86"></span><span>     </span><span class="hs-special">)</span><span>
+</span><span id="line-87"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Test.Util.ChainDB.html#MinimalChainDbArgs"><span class="hs-identifier hs-type">MinimalChainDbArgs</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679274704"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679274703"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">ChainDbArgs</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Identity</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679274704"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679274703"><span class="hs-identifier hs-type">blk</span></a></span></span></span><span>
+</span><span id="line-88"></span><span id="fromMinimalChainDbArgs"><span class="annot"><span class="annottext">fromMinimalChainDbArgs :: MinimalChainDbArgs m blk -&gt; ChainDbArgs Identity m blk
+</span><a href="Test.Util.ChainDB.html#fromMinimalChainDbArgs"><span class="hs-identifier hs-var hs-var">fromMinimalChainDbArgs</span></a></span></span><span> </span><span class="annot"><a href="Test.Util.ChainDB.html#MinimalChainDbArgs"><span class="hs-identifier hs-type">MinimalChainDbArgs</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679274698"><span id="local-6989586621679274699"><span id="local-6989586621679274700"><span id="local-6989586621679274701"><span id="local-6989586621679274702"><span class="annot"><span class="annottext">ResourceRegistry m
+ExtLedgerState blk
+ChunkInfo
+TopLevelConfig blk
+NodeDBs (StrictTVar m MockFS)
+mcdbNodeDBs :: NodeDBs (StrictTVar m MockFS)
+mcdbRegistry :: ResourceRegistry m
+mcdbInitLedger :: ExtLedgerState blk
+mcdbChunkInfo :: ChunkInfo
+mcdbTopLevelConfig :: TopLevelConfig blk
+mcdbNodeDBs :: forall (m :: * -&gt; *) blk.
+MinimalChainDbArgs m blk -&gt; NodeDBs (StrictTVar m MockFS)
+mcdbRegistry :: forall (m :: * -&gt; *) blk.
+MinimalChainDbArgs m blk -&gt; ResourceRegistry m
+mcdbInitLedger :: forall (m :: * -&gt; *) blk.
+MinimalChainDbArgs m blk -&gt; ExtLedgerState blk
+mcdbChunkInfo :: forall (m :: * -&gt; *) blk. MinimalChainDbArgs m blk -&gt; ChunkInfo
+mcdbTopLevelConfig :: forall (m :: * -&gt; *) blk.
+MinimalChainDbArgs m blk -&gt; TopLevelConfig blk
+</span><a href="#local-6989586621679274698"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ChainDbArgs :: forall (f :: * -&gt; *) (m :: * -&gt; *) blk.
+SomeHasFS m
+-&gt; SomeHasFS m
+-&gt; SomeHasFS m
+-&gt; ValidationPolicy
+-&gt; BlockValidationPolicy
+-&gt; BlocksPerFile
+-&gt; DiskPolicy
+-&gt; HKD f (TopLevelConfig blk)
+-&gt; HKD f ChunkInfo
+-&gt; HKD f (blk -&gt; Bool)
+-&gt; HKD f (m (ExtLedgerState blk))
+-&gt; HKD f (CheckInFuture m blk)
+-&gt; CacheConfig
+-&gt; Tracer m (TraceEvent blk)
+-&gt; Tracer m (LedgerDB' blk)
+-&gt; HKD f (ResourceRegistry m)
+-&gt; DiffTime
+-&gt; DiffTime
+-&gt; Word
+-&gt; ChainDbArgs f m blk
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">ChainDbArgs</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-89"></span><span>    </span><span class="annot"><span class="annottext">cdbHasFSImmutableDB :: SomeHasFS m
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">cdbHasFSImmutableDB</span></a></span><span>       </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">HasFS m HandleMock -&gt; SomeHasFS m
+forall h (m :: * -&gt; *). Eq h =&gt; HasFS m h -&gt; SomeHasFS m
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">SomeHasFS</span></a></span><span> </span><span class="annot"><span class="annottext">(HasFS m HandleMock -&gt; SomeHasFS m)
+-&gt; HasFS m HandleMock -&gt; SomeHasFS m
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">StrictTVar m MockFS -&gt; HasFS m HandleMock
+forall (m :: * -&gt; *).
+(MonadSTM m, MonadThrow m) =&gt;
+StrictTVar m MockFS -&gt; HasFS m HandleMock
+</span><a href="Test.Util.FS.Sim.STM.html#simHasFS"><span class="hs-identifier hs-var">simHasFS</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NodeDBs (StrictTVar m MockFS) -&gt; StrictTVar m MockFS
+forall db. NodeDBs db -&gt; db
+</span><a href="Test.Util.ChainDB.html#nodeDBsImm"><span class="hs-identifier hs-var hs-var">nodeDBsImm</span></a></span><span> </span><span class="annot"><span class="annottext">NodeDBs (StrictTVar m MockFS)
+</span><a href="#local-6989586621679274698"><span class="hs-identifier hs-var">mcdbNodeDBs</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-90"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">cdbHasFSVolatileDB :: SomeHasFS m
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">cdbHasFSVolatileDB</span></a></span><span>        </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">HasFS m HandleMock -&gt; SomeHasFS m
+forall h (m :: * -&gt; *). Eq h =&gt; HasFS m h -&gt; SomeHasFS m
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">SomeHasFS</span></a></span><span> </span><span class="annot"><span class="annottext">(HasFS m HandleMock -&gt; SomeHasFS m)
+-&gt; HasFS m HandleMock -&gt; SomeHasFS m
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">StrictTVar m MockFS -&gt; HasFS m HandleMock
+forall (m :: * -&gt; *).
+(MonadSTM m, MonadThrow m) =&gt;
+StrictTVar m MockFS -&gt; HasFS m HandleMock
+</span><a href="Test.Util.FS.Sim.STM.html#simHasFS"><span class="hs-identifier hs-var">simHasFS</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NodeDBs (StrictTVar m MockFS) -&gt; StrictTVar m MockFS
+forall db. NodeDBs db -&gt; db
+</span><a href="Test.Util.ChainDB.html#nodeDBsVol"><span class="hs-identifier hs-var hs-var">nodeDBsVol</span></a></span><span> </span><span class="annot"><span class="annottext">NodeDBs (StrictTVar m MockFS)
+</span><a href="#local-6989586621679274698"><span class="hs-identifier hs-var">mcdbNodeDBs</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-91"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">cdbHasFSLgrDB :: SomeHasFS m
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">cdbHasFSLgrDB</span></a></span><span>             </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">HasFS m HandleMock -&gt; SomeHasFS m
+forall h (m :: * -&gt; *). Eq h =&gt; HasFS m h -&gt; SomeHasFS m
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">SomeHasFS</span></a></span><span> </span><span class="annot"><span class="annottext">(HasFS m HandleMock -&gt; SomeHasFS m)
+-&gt; HasFS m HandleMock -&gt; SomeHasFS m
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">StrictTVar m MockFS -&gt; HasFS m HandleMock
+forall (m :: * -&gt; *).
+(MonadSTM m, MonadThrow m) =&gt;
+StrictTVar m MockFS -&gt; HasFS m HandleMock
+</span><a href="Test.Util.FS.Sim.STM.html#simHasFS"><span class="hs-identifier hs-var">simHasFS</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NodeDBs (StrictTVar m MockFS) -&gt; StrictTVar m MockFS
+forall db. NodeDBs db -&gt; db
+</span><a href="Test.Util.ChainDB.html#nodeDBsLgr"><span class="hs-identifier hs-var hs-var">nodeDBsLgr</span></a></span><span> </span><span class="annot"><span class="annottext">NodeDBs (StrictTVar m MockFS)
+</span><a href="#local-6989586621679274698"><span class="hs-identifier hs-var">mcdbNodeDBs</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-92"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">cdbImmutableDbValidation :: ValidationPolicy
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">cdbImmutableDbValidation</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ValidationPolicy
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">ImmutableDB.ValidateAllChunks</span></a></span><span>
+</span><span id="line-93"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">cdbVolatileDbValidation :: BlockValidationPolicy
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">cdbVolatileDbValidation</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BlockValidationPolicy
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">VolatileDB.ValidateAll</span></a></span><span>
+</span><span id="line-94"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">cdbMaxBlocksPerFile :: BlocksPerFile
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">cdbMaxBlocksPerFile</span></a></span><span>       </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; BlocksPerFile
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">VolatileDB.mkBlocksPerFile</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><span class="hs-number">4</span></span><span>
+</span><span id="line-95"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">cdbDiskPolicy :: DiskPolicy
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">cdbDiskPolicy</span></a></span><span>             </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SecurityParam -&gt; SnapshotInterval -&gt; DiskPolicy
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">LedgerDB.defaultDiskPolicy</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TopLevelConfig blk -&gt; SecurityParam
+forall blk.
+ConsensusProtocol (BlockProtocol blk) =&gt;
+TopLevelConfig blk -&gt; SecurityParam
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">configSecurityParam</span></a></span><span> </span><span class="annot"><span class="annottext">TopLevelConfig blk
+</span><a href="#local-6989586621679274702"><span class="hs-identifier hs-var">mcdbTopLevelConfig</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-96"></span><span>                                  </span><span class="annot"><span class="annottext">SnapshotInterval
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">LedgerDB.DefaultSnapshotInterval</span></a></span><span>
+</span><span id="line-97"></span><span>  </span><span class="hs-comment">-- Keep 2 ledger snapshots, and take a new snapshot at least every 2 * k seconds, where k is the</span><span>
+</span><span id="line-98"></span><span>  </span><span class="hs-comment">-- security parameter.</span><span>
+</span><span id="line-99"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">cdbTopLevelConfig :: HKD Identity (TopLevelConfig blk)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">cdbTopLevelConfig</span></a></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TopLevelConfig blk
+HKD Identity (TopLevelConfig blk)
+</span><a href="#local-6989586621679274702"><span class="hs-identifier hs-var">mcdbTopLevelConfig</span></a></span><span>
+</span><span id="line-100"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">cdbChunkInfo :: HKD Identity ChunkInfo
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">cdbChunkInfo</span></a></span><span>              </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ChunkInfo
+HKD Identity ChunkInfo
+</span><a href="#local-6989586621679274701"><span class="hs-identifier hs-var">mcdbChunkInfo</span></a></span><span>
+</span><span id="line-101"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">cdbCheckIntegrity :: HKD Identity (blk -&gt; Bool)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">cdbCheckIntegrity</span></a></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; blk -&gt; Bool
+forall a b. a -&gt; b -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">const</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">True</span></a></span><span>
+</span><span id="line-102"></span><span>  </span><span class="hs-comment">-- Getting a verified block component does not do any integrity checking, both for the</span><span>
+</span><span id="line-103"></span><span>  </span><span class="hs-comment">-- ImmutableDB, as the VolatileDB. This is done in @extractBlockComponent@ in the iterator for the</span><span>
+</span><span id="line-104"></span><span>  </span><span class="hs-comment">-- ImmutableDB, and in @getBlockComponent@ for the VolatileDB.</span><span>
+</span><span id="line-105"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">cdbGenesis :: HKD Identity (m (ExtLedgerState blk))
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">cdbGenesis</span></a></span><span>                </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ExtLedgerState blk -&gt; m (ExtLedgerState blk)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">ExtLedgerState blk
+</span><a href="#local-6989586621679274700"><span class="hs-identifier hs-var">mcdbInitLedger</span></a></span><span>
+</span><span id="line-106"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">cdbCheckInFuture :: HKD Identity (CheckInFuture m blk)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">cdbCheckInFuture</span></a></span><span>          </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(ValidatedFragment (Header blk) (LedgerState blk)
+ -&gt; m (AnchoredFragment (Header blk), [InFuture m blk]))
+-&gt; CheckInFuture m blk
+forall (m :: * -&gt; *) blk.
+(ValidatedFragment (Header blk) (LedgerState blk)
+ -&gt; m (AnchoredFragment (Header blk), [InFuture m blk]))
+-&gt; CheckInFuture m blk
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">CheckInFuture</span></a></span><span> </span><span class="annot"><span class="annottext">((ValidatedFragment (Header blk) (LedgerState blk)
+  -&gt; m (AnchoredFragment (Header blk), [InFuture m blk]))
+ -&gt; CheckInFuture m blk)
+-&gt; (ValidatedFragment (Header blk) (LedgerState blk)
+    -&gt; m (AnchoredFragment (Header blk), [InFuture m blk]))
+-&gt; CheckInFuture m blk
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679274676"><span class="annot"><span class="annottext">ValidatedFragment (Header blk) (LedgerState blk)
+</span><a href="#local-6989586621679274676"><span class="hs-identifier hs-var">vf</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(AnchoredFragment (Header blk), [InFuture m blk])
+-&gt; m (AnchoredFragment (Header blk), [InFuture m blk])
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ValidatedFragment (Header blk) (LedgerState blk)
+-&gt; AnchoredFragment (Header blk)
+forall b l. ValidatedFragment b l -&gt; AnchoredFragment b
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var">VF.validatedFragment</span></a></span><span> </span><span class="annot"><span class="annottext">ValidatedFragment (Header blk) (LedgerState blk)
+</span><a href="#local-6989586621679274676"><span class="hs-identifier hs-var">vf</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">)</span><span>
+</span><span id="line-107"></span><span>  </span><span class="hs-comment">-- Blocks are never in the future.</span><span>
+</span><span id="line-108"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">cdbImmutableDbCacheConfig :: CacheConfig
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">cdbImmutableDbCacheConfig</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; DiffTime -&gt; CacheConfig
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">ImmutableDB.CacheConfig</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><span class="hs-number">2</span></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-number">60</span></span><span>
+</span><span id="line-109"></span><span>  </span><span class="hs-comment">-- Cache at most 2 chunks and expire each chunk after 60 seconds of being unused.</span><span>
+</span><span id="line-110"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">cdbTracer :: Tracer m (TraceEvent blk)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">cdbTracer</span></a></span><span>                 </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m (TraceEvent blk)
+forall (m :: * -&gt; *) a. Applicative m =&gt; Tracer m a
+</span><span class="hs-identifier hs-var">nullTracer</span></span><span>
+</span><span id="line-111"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">cdbTraceLedger :: Tracer m (LedgerDB' blk)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">cdbTraceLedger</span></a></span><span>            </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m (LedgerDB' blk)
+forall (m :: * -&gt; *) a. Applicative m =&gt; Tracer m a
+</span><span class="hs-identifier hs-var">nullTracer</span></span><span>
+</span><span id="line-112"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">cdbRegistry :: HKD Identity (ResourceRegistry m)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">cdbRegistry</span></a></span><span>               </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ResourceRegistry m
+HKD Identity (ResourceRegistry m)
+</span><a href="#local-6989586621679274699"><span class="hs-identifier hs-var">mcdbRegistry</span></a></span><span>
+</span><span id="line-113"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">cdbGcDelay :: DiffTime
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">cdbGcDelay</span></a></span><span>                </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-114"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">cdbGcInterval :: DiffTime
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">cdbGcInterval</span></a></span><span>             </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-115"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">cdbBlocksToAddSize :: Word
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">cdbBlocksToAddSize</span></a></span><span>        </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-116"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-117"></span></pre></body></html>

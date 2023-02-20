@@ -1,0 +1,546 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DataKinds           #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE GADTs               #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE NamedFieldPuns      #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables #-}</span><span>
+</span><span id="line-5"></span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# OPTIONS_GHC -Wno-unticked-promoted-constructors #-}</span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- | A view of the chain synchronisation protocol from the point of view of the</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- server.</span><span>
+</span><span id="line-10"></span><span class="hs-comment">--</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- This provides a view that uses less complex types and should be easier to</span><span>
+</span><span id="line-12"></span><span class="hs-comment">-- use than the underlying typed protocol itself.</span><span>
+</span><span id="line-13"></span><span class="hs-comment">--</span><span>
+</span><span id="line-14"></span><span class="hs-comment">-- For execution, a conversion into the typed protocol is provided.</span><span>
+</span><span id="line-15"></span><span class="hs-comment">--</span><span>
+</span><span id="line-16"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.Protocol.ChainSync.Server</span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Protocol type for the server</span></span><span>
+</span><span id="line-18"></span><span>    </span><span class="annot"><span class="hs-comment">-- | The protocol states from the point of view of the server.</span></span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ChainSyncServer"><span class="hs-identifier">ChainSyncServer</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ServerStIdle"><span class="hs-identifier">ServerStIdle</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ServerStNext"><span class="hs-identifier">ServerStNext</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ServerStIntersect"><span class="hs-identifier">ServerStIntersect</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Execution as a typed protocol</span></span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#chainSyncServerPeer"><span class="hs-identifier">chainSyncServerPeer</span></a></span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Network.TypedProtocol.Core</span></span><span>
+</span><span id="line-28"></span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Type.html"><span class="hs-identifier">Ouroboros.Network.Protocol.ChainSync.Type</span></a></span><span>
+</span><span id="line-30"></span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="hs-comment">-- | A chain sync protocol server, on top of some effect 'm'.</span><span>
+</span><span id="line-33"></span><span class="hs-comment">--</span><span>
+</span><span id="line-34"></span><span class="hs-keyword">newtype</span><span> </span><span id="ChainSyncServer"><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ChainSyncServer"><span class="hs-identifier hs-var">ChainSyncServer</span></a></span></span><span> </span><span id="local-6989586621679110695"><span class="annot"><a href="#local-6989586621679110695"><span class="hs-identifier hs-type">header</span></a></span></span><span> </span><span id="local-6989586621679110694"><span class="annot"><a href="#local-6989586621679110694"><span class="hs-identifier hs-type">point</span></a></span></span><span> </span><span id="local-6989586621679110693"><span class="annot"><a href="#local-6989586621679110693"><span class="hs-identifier hs-type">tip</span></a></span></span><span> </span><span id="local-6989586621679110692"><span class="annot"><a href="#local-6989586621679110692"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679110691"><span class="annot"><a href="#local-6989586621679110691"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ChainSyncServer"><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ChainSyncServer"><span class="hs-identifier hs-var">ChainSyncServer</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-35"></span><span>    </span><span id="runChainSyncServer"><span class="annot"><span class="annottext">ChainSyncServer header point tip m a
+-&gt; m (ServerStIdle header point tip m a)
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#runChainSyncServer"><span class="hs-identifier hs-var hs-var">runChainSyncServer</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679110692"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ServerStIdle"><span class="hs-identifier hs-type">ServerStIdle</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110695"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110694"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110693"><span class="hs-identifier hs-type">tip</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110692"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110691"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-36"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="hs-comment">-- | In the 'StIdle' protocol state, the server does not have agency. Instead</span><span>
+</span><span id="line-40"></span><span class="hs-comment">-- it is waiting for:</span><span>
+</span><span id="line-41"></span><span class="hs-comment">--</span><span>
+</span><span id="line-42"></span><span class="hs-comment">--  * a next update request</span><span>
+</span><span id="line-43"></span><span class="hs-comment">--  * a find intersection request</span><span>
+</span><span id="line-44"></span><span class="hs-comment">--  * a termination messge</span><span>
+</span><span id="line-45"></span><span class="hs-comment">--</span><span>
+</span><span id="line-46"></span><span class="hs-comment">-- It must be prepared to handle either.</span><span>
+</span><span id="line-47"></span><span class="hs-comment">--</span><span>
+</span><span id="line-48"></span><span class="hs-keyword">data</span><span> </span><span id="ServerStIdle"><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ServerStIdle"><span class="hs-identifier hs-var">ServerStIdle</span></a></span></span><span> </span><span id="local-6989586621679110784"><span class="annot"><a href="#local-6989586621679110784"><span class="hs-identifier hs-type">header</span></a></span></span><span> </span><span id="local-6989586621679110783"><span class="annot"><a href="#local-6989586621679110783"><span class="hs-identifier hs-type">point</span></a></span></span><span> </span><span id="local-6989586621679110782"><span class="annot"><a href="#local-6989586621679110782"><span class="hs-identifier hs-type">tip</span></a></span></span><span> </span><span id="local-6989586621679110781"><span class="annot"><a href="#local-6989586621679110781"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679110780"><span class="annot"><a href="#local-6989586621679110780"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ServerStIdle"><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ServerStIdle"><span class="hs-identifier hs-var">ServerStIdle</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span>       </span><span id="recvMsgRequestNext"><span class="annot"><span class="annottext">ServerStIdle header point tip m a
+-&gt; m (Either
+        (ServerStNext header point tip m a)
+        (m (ServerStNext header point tip m a)))
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#recvMsgRequestNext"><span class="hs-identifier hs-var hs-var">recvMsgRequestNext</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679110781"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Either</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ServerStNext"><span class="hs-identifier hs-type">ServerStNext</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110784"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110783"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110782"><span class="hs-identifier hs-type">tip</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110781"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110780"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-51"></span><span>                                      </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679110781"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ServerStNext"><span class="hs-identifier hs-type">ServerStNext</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110784"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110783"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110782"><span class="hs-identifier hs-type">tip</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110781"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110780"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-52"></span><span>
+</span><span id="line-53"></span><span>       </span><span id="recvMsgFindIntersect"><span class="annot"><span class="annottext">ServerStIdle header point tip m a
+-&gt; [point] -&gt; m (ServerStIntersect header point tip m a)
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#recvMsgFindIntersect"><span class="hs-identifier hs-var hs-var">recvMsgFindIntersect</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679110783"><span class="hs-identifier hs-type">point</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-54"></span><span>                            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679110781"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ServerStIntersect"><span class="hs-identifier hs-type">ServerStIntersect</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110784"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110783"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110782"><span class="hs-identifier hs-type">tip</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110781"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110780"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span>       </span><span id="recvMsgDoneClient"><span class="annot"><span class="annottext">ServerStIdle header point tip m a -&gt; m a
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#recvMsgDoneClient"><span class="hs-identifier hs-var hs-var">recvMsgDoneClient</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679110781"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110780"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-57"></span><span>     </span><span class="hs-special">}</span><span>
+</span><span id="line-58"></span><span>
+</span><span id="line-59"></span><span class="hs-comment">-- | In the 'StNext' protocol state, the server has agency and must send either:</span><span>
+</span><span id="line-60"></span><span class="hs-comment">--</span><span>
+</span><span id="line-61"></span><span class="hs-comment">--  * a roll forward</span><span>
+</span><span id="line-62"></span><span class="hs-comment">--  * a roll back message</span><span>
+</span><span id="line-63"></span><span class="hs-comment">--  * a termination message</span><span>
+</span><span id="line-64"></span><span class="hs-comment">--</span><span>
+</span><span id="line-65"></span><span class="hs-keyword">data</span><span> </span><span id="ServerStNext"><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ServerStNext"><span class="hs-identifier hs-var">ServerStNext</span></a></span></span><span> </span><span id="local-6989586621679110684"><span class="annot"><a href="#local-6989586621679110684"><span class="hs-identifier hs-type">header</span></a></span></span><span> </span><span id="local-6989586621679110683"><span class="annot"><a href="#local-6989586621679110683"><span class="hs-identifier hs-type">point</span></a></span></span><span> </span><span id="local-6989586621679110682"><span class="annot"><a href="#local-6989586621679110682"><span class="hs-identifier hs-type">tip</span></a></span></span><span> </span><span id="local-6989586621679110681"><span class="annot"><a href="#local-6989586621679110681"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679110680"><span class="annot"><a href="#local-6989586621679110680"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-66"></span><span>  </span><span id="local-6989586621679110675"><span id="local-6989586621679110676"><span id="local-6989586621679110677"><span id="local-6989586621679110678"><span id="local-6989586621679110679"><span id="SendMsgRollForward"><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#SendMsgRollForward"><span class="hs-identifier hs-var">SendMsgRollForward</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679110679"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679110678"><span class="hs-identifier hs-type">tip</span></a></span><span>
+</span><span id="line-67"></span><span>                      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ChainSyncServer"><span class="hs-identifier hs-type">ChainSyncServer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110679"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110677"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110678"><span class="hs-identifier hs-type">tip</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110676"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110675"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-68"></span><span>                      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ServerStNext"><span class="hs-identifier hs-type">ServerStNext</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110679"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110677"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110678"><span class="hs-identifier hs-type">tip</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110676"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110675"><span class="hs-identifier hs-type">a</span></a></span></span></span></span></span></span><span>
+</span><span id="line-69"></span><span>
+</span><span id="line-70"></span><span>  </span><span id="local-6989586621679110669"><span id="local-6989586621679110670"><span id="local-6989586621679110671"><span id="local-6989586621679110672"><span id="local-6989586621679110673"><span id="SendMsgRollBackward"><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#SendMsgRollBackward"><span class="hs-identifier hs-var">SendMsgRollBackward</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679110673"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679110672"><span class="hs-identifier hs-type">tip</span></a></span><span>
+</span><span id="line-71"></span><span>                      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ChainSyncServer"><span class="hs-identifier hs-type">ChainSyncServer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110671"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110673"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110672"><span class="hs-identifier hs-type">tip</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110670"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110669"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-72"></span><span>                      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ServerStNext"><span class="hs-identifier hs-type">ServerStNext</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110671"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110673"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110672"><span class="hs-identifier hs-type">tip</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110670"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110669"><span class="hs-identifier hs-type">a</span></a></span></span></span></span></span></span><span>
+</span><span id="line-73"></span><span>
+</span><span id="line-74"></span><span class="hs-comment">-- | In the 'StIntersect' protocol state, the server has agency and must send</span><span>
+</span><span id="line-75"></span><span class="hs-comment">-- either:</span><span>
+</span><span id="line-76"></span><span class="hs-comment">--</span><span>
+</span><span id="line-77"></span><span class="hs-comment">--  * an intersection improved,</span><span>
+</span><span id="line-78"></span><span class="hs-comment">--  * unchanged message,</span><span>
+</span><span id="line-79"></span><span class="hs-comment">--  * termination message</span><span>
+</span><span id="line-80"></span><span class="hs-comment">--</span><span>
+</span><span id="line-81"></span><span class="hs-keyword">data</span><span> </span><span id="ServerStIntersect"><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ServerStIntersect"><span class="hs-identifier hs-var">ServerStIntersect</span></a></span></span><span> </span><span id="local-6989586621679110667"><span class="annot"><a href="#local-6989586621679110667"><span class="hs-identifier hs-type">header</span></a></span></span><span> </span><span id="local-6989586621679110666"><span class="annot"><a href="#local-6989586621679110666"><span class="hs-identifier hs-type">point</span></a></span></span><span> </span><span id="local-6989586621679110665"><span class="annot"><a href="#local-6989586621679110665"><span class="hs-identifier hs-type">tip</span></a></span></span><span> </span><span id="local-6989586621679110664"><span class="annot"><a href="#local-6989586621679110664"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679110663"><span class="annot"><a href="#local-6989586621679110663"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-82"></span><span>  </span><span id="local-6989586621679110658"><span id="local-6989586621679110659"><span id="local-6989586621679110660"><span id="local-6989586621679110661"><span id="local-6989586621679110662"><span id="SendMsgIntersectFound"><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#SendMsgIntersectFound"><span class="hs-identifier hs-var">SendMsgIntersectFound</span></a></span></span><span>     </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679110662"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679110661"><span class="hs-identifier hs-type">tip</span></a></span><span>
+</span><span id="line-83"></span><span>                            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ChainSyncServer"><span class="hs-identifier hs-type">ChainSyncServer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110660"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110662"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110661"><span class="hs-identifier hs-type">tip</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110659"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110658"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-84"></span><span>                            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ServerStIntersect"><span class="hs-identifier hs-type">ServerStIntersect</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110660"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110662"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110661"><span class="hs-identifier hs-type">tip</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110659"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110658"><span class="hs-identifier hs-type">a</span></a></span></span></span></span></span></span><span>
+</span><span id="line-85"></span><span>
+</span><span id="line-86"></span><span>  </span><span id="local-6989586621679110652"><span id="local-6989586621679110653"><span id="local-6989586621679110654"><span id="local-6989586621679110655"><span id="local-6989586621679110656"><span id="SendMsgIntersectNotFound"><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#SendMsgIntersectNotFound"><span class="hs-identifier hs-var">SendMsgIntersectNotFound</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679110656"><span class="hs-identifier hs-type">tip</span></a></span><span>
+</span><span id="line-87"></span><span>                            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ChainSyncServer"><span class="hs-identifier hs-type">ChainSyncServer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110655"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110654"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110656"><span class="hs-identifier hs-type">tip</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110653"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110652"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-88"></span><span>                            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ServerStIntersect"><span class="hs-identifier hs-type">ServerStIntersect</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110655"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110654"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110656"><span class="hs-identifier hs-type">tip</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110653"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110652"><span class="hs-identifier hs-type">a</span></a></span></span></span></span></span></span><span>
+</span><span id="line-89"></span><span>
+</span><span id="line-90"></span><span>
+</span><span id="line-91"></span><span class="hs-comment">-- | Interpret a 'ChainSyncServer' action sequence as a 'Peer' on the server</span><span>
+</span><span id="line-92"></span><span class="hs-comment">-- side of the 'ChainSyncProtocol'.</span><span>
+</span><span id="line-93"></span><span class="hs-comment">--</span><span>
+</span><span id="line-94"></span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#chainSyncServerPeer"><span class="hs-identifier hs-type">chainSyncServerPeer</span></a></span><span>
+</span><span id="line-95"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679110720"><span class="annot"><a href="#local-6989586621679110720"><span class="hs-identifier hs-type">header</span></a></span></span><span> </span><span id="local-6989586621679110719"><span class="annot"><a href="#local-6989586621679110719"><span class="hs-identifier hs-type">point</span></a></span></span><span> </span><span id="local-6989586621679110718"><span class="annot"><a href="#local-6989586621679110718"><span class="hs-identifier hs-type">tip</span></a></span></span><span> </span><span id="local-6989586621679110721"><span class="annot"><a href="#local-6989586621679110721"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679110717"><span class="annot"><a href="#local-6989586621679110717"><span class="hs-identifier hs-type">a</span></a></span></span><span class="hs-operator">.</span><span>
+</span><span id="line-96"></span><span>     </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Monad</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110721"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-97"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ChainSyncServer"><span class="hs-identifier hs-type">ChainSyncServer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110720"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110719"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110718"><span class="hs-identifier hs-type">tip</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110721"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110717"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-98"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Peer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#ChainSync"><span class="hs-identifier hs-type">ChainSync</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110720"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110719"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110718"><span class="hs-identifier hs-type">tip</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AsServer</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#StIdle"><span class="hs-identifier hs-type">StIdle</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110721"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110717"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-99"></span><span id="chainSyncServerPeer"><span class="annot"><span class="annottext">chainSyncServerPeer :: ChainSyncServer header point tip m a
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIdle m a
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#chainSyncServerPeer"><span class="hs-identifier hs-var hs-var">chainSyncServerPeer</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ChainSyncServer"><span class="hs-identifier hs-type">ChainSyncServer</span></a></span><span> </span><span id="local-6989586621679110650"><span class="annot"><span class="annottext">m (ServerStIdle header point tip m a)
+</span><a href="#local-6989586621679110650"><span class="hs-identifier hs-var">mterm</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">m (Peer (ChainSync header point tip) 'AsServer 'StIdle m a)
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIdle m a
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) a.
+m (Peer ps pr st m a) -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Effect</span></span><span> </span><span class="annot"><span class="annottext">(m (Peer (ChainSync header point tip) 'AsServer 'StIdle m a)
+ -&gt; Peer (ChainSync header point tip) 'AsServer 'StIdle m a)
+-&gt; m (Peer (ChainSync header point tip) 'AsServer 'StIdle m a)
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIdle m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">m (ServerStIdle header point tip m a)
+</span><a href="#local-6989586621679110650"><span class="hs-identifier hs-var">mterm</span></a></span><span> </span><span class="annot"><span class="annottext">m (ServerStIdle header point tip m a)
+-&gt; (ServerStIdle header point tip m a
+    -&gt; m (Peer (ChainSync header point tip) 'AsServer 'StIdle m a))
+-&gt; m (Peer (ChainSync header point tip) 'AsServer 'StIdle m a)
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&gt;&gt;=</span></a></span><span>
+</span><span id="line-100"></span><span>    </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ServerStIdle"><span class="hs-identifier hs-type">ServerStIdle</span></a></span><span class="hs-special">{</span><span id="local-6989586621679110648"><span class="annot"><span class="annottext">m (Either
+     (ServerStNext header point tip m a)
+     (m (ServerStNext header point tip m a)))
+recvMsgRequestNext :: m (Either
+     (ServerStNext header point tip m a)
+     (m (ServerStNext header point tip m a)))
+recvMsgRequestNext :: forall header point tip (m :: * -&gt; *) a.
+ServerStIdle header point tip m a
+-&gt; m (Either
+        (ServerStNext header point tip m a)
+        (m (ServerStNext header point tip m a)))
+</span><a href="#local-6989586621679110648"><span class="hs-identifier hs-var hs-var">recvMsgRequestNext</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679110647"><span class="annot"><span class="annottext">[point] -&gt; m (ServerStIntersect header point tip m a)
+recvMsgFindIntersect :: [point] -&gt; m (ServerStIntersect header point tip m a)
+recvMsgFindIntersect :: forall header point tip (m :: * -&gt; *) a.
+ServerStIdle header point tip m a
+-&gt; [point] -&gt; m (ServerStIntersect header point tip m a)
+</span><a href="#local-6989586621679110647"><span class="hs-identifier hs-var hs-var">recvMsgFindIntersect</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679110646"><span class="annot"><span class="annottext">m a
+recvMsgDoneClient :: m a
+recvMsgDoneClient :: forall header point tip (m :: * -&gt; *) a.
+ServerStIdle header point tip m a -&gt; m a
+</span><a href="#local-6989586621679110646"><span class="hs-identifier hs-var hs-var">recvMsgDoneClient</span></a></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-101"></span><span>
+</span><span id="line-102"></span><span>    </span><span class="annot"><span class="annottext">Peer (ChainSync header point tip) 'AsServer 'StIdle m a
+-&gt; m (Peer (ChainSync header point tip) 'AsServer 'StIdle m a)
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">(Peer (ChainSync header point tip) 'AsServer 'StIdle m a
+ -&gt; m (Peer (ChainSync header point tip) 'AsServer 'StIdle m a))
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIdle m a
+-&gt; m (Peer (ChainSync header point tip) 'AsServer 'StIdle m a)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">TheyHaveAgency 'AsServer 'StIdle
+-&gt; (forall (st' :: ChainSync header point tip).
+    Message (ChainSync header point tip) 'StIdle st'
+    -&gt; Peer (ChainSync header point tip) 'AsServer st' m a)
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIdle m a
+forall (pr :: PeerRole) ps (st :: ps) (m :: * -&gt; *) a.
+TheyHaveAgency pr st
+-&gt; (forall (st' :: ps). Message ps st st' -&gt; Peer ps pr st' m a)
+-&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Await</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ClientHasAgency 'StIdle -&gt; PeerHasAgency 'AsClient 'StIdle
+forall ps (st :: ps).
+ClientHasAgency st -&gt; PeerHasAgency 'AsClient st
+</span><span class="hs-identifier hs-var">ClientAgency</span></span><span> </span><span class="annot"><span class="annottext">ClientHasAgency 'StIdle
+forall k k k (header :: k) (point :: k) (tip :: k).
+ClientHasAgency 'StIdle
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#TokIdle"><span class="hs-identifier hs-var">TokIdle</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">((forall (st' :: ChainSync header point tip).
+  Message (ChainSync header point tip) 'StIdle st'
+  -&gt; Peer (ChainSync header point tip) 'AsServer st' m a)
+ -&gt; Peer (ChainSync header point tip) 'AsServer 'StIdle m a)
+-&gt; (forall (st' :: ChainSync header point tip).
+    Message (ChainSync header point tip) 'StIdle st'
+    -&gt; Peer (ChainSync header point tip) 'AsServer st' m a)
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIdle m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679110642"><span class="annot"><span class="annottext">Message (ChainSync header point tip) 'StIdle st'
+</span><a href="#local-6989586621679110642"><span class="hs-identifier hs-var">req</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-103"></span><span>    </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Message (ChainSync header point tip) 'StIdle st'
+</span><a href="#local-6989586621679110642"><span class="hs-identifier hs-var">req</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-104"></span><span>      </span><span class="annot"><span class="annottext">Message (ChainSync header point tip) 'StIdle st'
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#MsgRequestNext"><span class="hs-identifier hs-var">MsgRequestNext</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">m (Peer
+     (ChainSync header point tip) 'AsServer ('StNext 'StCanAwait) m a)
+-&gt; Peer
+     (ChainSync header point tip) 'AsServer ('StNext 'StCanAwait) m a
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) a.
+m (Peer ps pr st m a) -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Effect</span></span><span> </span><span class="annot"><span class="annottext">(m (Peer
+      (ChainSync header point tip) 'AsServer ('StNext 'StCanAwait) m a)
+ -&gt; Peer
+      (ChainSync header point tip) 'AsServer ('StNext 'StCanAwait) m a)
+-&gt; m (Peer
+        (ChainSync header point tip) 'AsServer ('StNext 'StCanAwait) m a)
+-&gt; Peer
+     (ChainSync header point tip) 'AsServer ('StNext 'StCanAwait) m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-105"></span><span>        </span><span id="local-6989586621679110640"><span class="annot"><span class="annottext">Either
+  (ServerStNext header point tip m a)
+  (m (ServerStNext header point tip m a))
+</span><a href="#local-6989586621679110640"><span class="hs-identifier hs-var">mresp</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">m (Either
+     (ServerStNext header point tip m a)
+     (m (ServerStNext header point tip m a)))
+</span><a href="#local-6989586621679110648"><span class="hs-identifier hs-var">recvMsgRequestNext</span></a></span><span>
+</span><span id="line-106"></span><span>        </span><span class="annot"><span class="annottext">Peer
+  (ChainSync header point tip) 'AsServer ('StNext 'StCanAwait) m a
+-&gt; m (Peer
+        (ChainSync header point tip) 'AsServer ('StNext 'StCanAwait) m a)
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">(Peer
+   (ChainSync header point tip) 'AsServer ('StNext 'StCanAwait) m a
+ -&gt; m (Peer
+         (ChainSync header point tip) 'AsServer ('StNext 'StCanAwait) m a))
+-&gt; Peer
+     (ChainSync header point tip) 'AsServer ('StNext 'StCanAwait) m a
+-&gt; m (Peer
+        (ChainSync header point tip) 'AsServer ('StNext 'StCanAwait) m a)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Either
+  (ServerStNext header point tip m a)
+  (m (ServerStNext header point tip m a))
+</span><a href="#local-6989586621679110640"><span class="hs-identifier hs-var">mresp</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-107"></span><span>          </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Left</span></a></span><span>  </span><span id="local-6989586621679110639"><span class="annot"><span class="annottext">ServerStNext header point tip m a
+</span><a href="#local-6989586621679110639"><span class="hs-identifier hs-var">resp</span></a></span></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">TokNextKind 'StCanAwait
+-&gt; ServerStNext header point tip m a
+-&gt; Peer
+     (ChainSync header point tip) 'AsServer ('StNext 'StCanAwait) m a
+forall (nextKind :: StNextKind).
+TokNextKind nextKind
+-&gt; ServerStNext header point tip m a
+-&gt; Peer
+     (ChainSync header point tip) 'AsServer ('StNext nextKind) m a
+</span><a href="#local-6989586621679110638"><span class="hs-identifier hs-var">handleStNext</span></a></span><span> </span><span class="annot"><span class="annottext">TokNextKind 'StCanAwait
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#TokCanAwait"><span class="hs-identifier hs-var">TokCanAwait</span></a></span><span> </span><span class="annot"><span class="annottext">ServerStNext header point tip m a
+</span><a href="#local-6989586621679110639"><span class="hs-identifier hs-var">resp</span></a></span><span>
+</span><span id="line-108"></span><span>          </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Right</span></a></span><span> </span><span id="local-6989586621679110636"><span class="annot"><span class="annottext">m (ServerStNext header point tip m a)
+</span><a href="#local-6989586621679110636"><span class="hs-identifier hs-var">waiting</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">WeHaveAgency 'AsServer ('StNext 'StCanAwait)
+-&gt; Message
+     (ChainSync header point tip)
+     ('StNext 'StCanAwait)
+     ('StNext 'StMustReply)
+-&gt; Peer
+     (ChainSync header point tip) 'AsServer ('StNext 'StMustReply) m a
+-&gt; Peer
+     (ChainSync header point tip) 'AsServer ('StNext 'StCanAwait) m a
+forall (pr :: PeerRole) ps (st :: ps) (st' :: ps) (m :: * -&gt; *) a.
+WeHaveAgency pr st
+-&gt; Message ps st st' -&gt; Peer ps pr st' m a -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Yield</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ServerHasAgency ('StNext 'StCanAwait)
+-&gt; WeHaveAgency 'AsServer ('StNext 'StCanAwait)
+forall ps (st :: ps).
+ServerHasAgency st -&gt; PeerHasAgency 'AsServer st
+</span><span class="hs-identifier hs-var">ServerAgency</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TokNextKind 'StCanAwait -&gt; ServerHasAgency ('StNext 'StCanAwait)
+forall k k k (header :: k) (point :: k) (tip :: k)
+       (k :: StNextKind).
+TokNextKind k -&gt; ServerHasAgency ('StNext k)
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#TokNext"><span class="hs-identifier hs-var">TokNext</span></a></span><span> </span><span class="annot"><span class="annottext">TokNextKind 'StCanAwait
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#TokCanAwait"><span class="hs-identifier hs-var">TokCanAwait</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-109"></span><span>                                 </span><span class="annot"><span class="annottext">Message
+  (ChainSync header point tip)
+  ('StNext 'StCanAwait)
+  ('StNext 'StMustReply)
+forall k k k (header :: k) (point :: k) (tip :: k).
+Message
+  (ChainSync header point tip)
+  ('StNext 'StCanAwait)
+  ('StNext 'StMustReply)
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#MsgAwaitReply"><span class="hs-identifier hs-var">MsgAwaitReply</span></a></span><span> </span><span class="annot"><span class="annottext">(Peer
+   (ChainSync header point tip) 'AsServer ('StNext 'StMustReply) m a
+ -&gt; Peer
+      (ChainSync header point tip) 'AsServer ('StNext 'StCanAwait) m a)
+-&gt; Peer
+     (ChainSync header point tip) 'AsServer ('StNext 'StMustReply) m a
+-&gt; Peer
+     (ChainSync header point tip) 'AsServer ('StNext 'StCanAwait) m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">m (Peer
+     (ChainSync header point tip) 'AsServer ('StNext 'StMustReply) m a)
+-&gt; Peer
+     (ChainSync header point tip) 'AsServer ('StNext 'StMustReply) m a
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) a.
+m (Peer ps pr st m a) -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Effect</span></span><span> </span><span class="annot"><span class="annottext">(m (Peer
+      (ChainSync header point tip) 'AsServer ('StNext 'StMustReply) m a)
+ -&gt; Peer
+      (ChainSync header point tip) 'AsServer ('StNext 'StMustReply) m a)
+-&gt; m (Peer
+        (ChainSync header point tip) 'AsServer ('StNext 'StMustReply) m a)
+-&gt; Peer
+     (ChainSync header point tip) 'AsServer ('StNext 'StMustReply) m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-110"></span><span>                             </span><span id="local-6989586621679110631"><span class="annot"><span class="annottext">ServerStNext header point tip m a
+</span><a href="#local-6989586621679110631"><span class="hs-identifier hs-var">resp</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">m (ServerStNext header point tip m a)
+</span><a href="#local-6989586621679110636"><span class="hs-identifier hs-var">waiting</span></a></span><span>
+</span><span id="line-111"></span><span>                             </span><span class="annot"><span class="annottext">Peer
+  (ChainSync header point tip) 'AsServer ('StNext 'StMustReply) m a
+-&gt; m (Peer
+        (ChainSync header point tip) 'AsServer ('StNext 'StMustReply) m a)
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">(Peer
+   (ChainSync header point tip) 'AsServer ('StNext 'StMustReply) m a
+ -&gt; m (Peer
+         (ChainSync header point tip) 'AsServer ('StNext 'StMustReply) m a))
+-&gt; Peer
+     (ChainSync header point tip) 'AsServer ('StNext 'StMustReply) m a
+-&gt; m (Peer
+        (ChainSync header point tip) 'AsServer ('StNext 'StMustReply) m a)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">TokNextKind 'StMustReply
+-&gt; ServerStNext header point tip m a
+-&gt; Peer
+     (ChainSync header point tip) 'AsServer ('StNext 'StMustReply) m a
+forall (nextKind :: StNextKind).
+TokNextKind nextKind
+-&gt; ServerStNext header point tip m a
+-&gt; Peer
+     (ChainSync header point tip) 'AsServer ('StNext nextKind) m a
+</span><a href="#local-6989586621679110638"><span class="hs-identifier hs-var">handleStNext</span></a></span><span> </span><span class="annot"><span class="annottext">TokNextKind 'StMustReply
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#TokMustReply"><span class="hs-identifier hs-var">TokMustReply</span></a></span><span> </span><span class="annot"><span class="annottext">ServerStNext header point tip m a
+</span><a href="#local-6989586621679110631"><span class="hs-identifier hs-var">resp</span></a></span><span>
+</span><span id="line-112"></span><span>
+</span><span id="line-113"></span><span>      </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#MsgFindIntersect"><span class="hs-identifier hs-type">MsgFindIntersect</span></a></span><span> </span><span id="local-6989586621679110628"><span class="annot"><a href="#local-6989586621679110628"><span class="hs-identifier hs-var">points</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">m (Peer (ChainSync header point tip) 'AsServer 'StIntersect m a)
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIntersect m a
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) a.
+m (Peer ps pr st m a) -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Effect</span></span><span> </span><span class="annot"><span class="annottext">(m (Peer (ChainSync header point tip) 'AsServer 'StIntersect m a)
+ -&gt; Peer (ChainSync header point tip) 'AsServer 'StIntersect m a)
+-&gt; m (Peer (ChainSync header point tip) 'AsServer 'StIntersect m a)
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIntersect m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-114"></span><span>        </span><span id="local-6989586621679110627"><span class="annot"><span class="annottext">ServerStIntersect header point tip m a
+</span><a href="#local-6989586621679110627"><span class="hs-identifier hs-var">resp</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[point] -&gt; m (ServerStIntersect header point tip m a)
+</span><a href="#local-6989586621679110647"><span class="hs-identifier hs-var">recvMsgFindIntersect</span></a></span><span> </span><span class="annot"><span class="annottext">[point]
+[point]
+</span><a href="#local-6989586621679110628"><span class="hs-identifier hs-var">points</span></a></span><span>
+</span><span id="line-115"></span><span>        </span><span class="annot"><span class="annottext">Peer (ChainSync header point tip) 'AsServer 'StIntersect m a
+-&gt; m (Peer (ChainSync header point tip) 'AsServer 'StIntersect m a)
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">(Peer (ChainSync header point tip) 'AsServer 'StIntersect m a
+ -&gt; m (Peer
+         (ChainSync header point tip) 'AsServer 'StIntersect m a))
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIntersect m a
+-&gt; m (Peer (ChainSync header point tip) 'AsServer 'StIntersect m a)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ServerStIntersect header point tip m a
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIntersect m a
+</span><a href="#local-6989586621679110626"><span class="hs-identifier hs-var">handleStIntersect</span></a></span><span> </span><span class="annot"><span class="annottext">ServerStIntersect header point tip m a
+</span><a href="#local-6989586621679110627"><span class="hs-identifier hs-var">resp</span></a></span><span>
+</span><span id="line-116"></span><span>
+</span><span id="line-117"></span><span>      </span><span class="annot"><span class="annottext">Message (ChainSync header point tip) 'StIdle st'
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#MsgDone"><span class="hs-identifier hs-var">MsgDone</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">m (Peer (ChainSync header point tip) 'AsServer 'StDone m a)
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StDone m a
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) a.
+m (Peer ps pr st m a) -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Effect</span></span><span> </span><span class="annot"><span class="annottext">(m (Peer (ChainSync header point tip) 'AsServer 'StDone m a)
+ -&gt; Peer (ChainSync header point tip) 'AsServer 'StDone m a)
+-&gt; m (Peer (ChainSync header point tip) 'AsServer 'StDone m a)
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StDone m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">(a -&gt; Peer (ChainSync header point tip) 'AsServer 'StDone m a)
+-&gt; m a
+-&gt; m (Peer (ChainSync header point tip) 'AsServer 'StDone m a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fmap</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NobodyHasAgency 'StDone
+-&gt; a -&gt; Peer (ChainSync header point tip) 'AsServer 'StDone m a
+forall ps (st :: ps) a (pr :: PeerRole) (m :: * -&gt; *).
+NobodyHasAgency st -&gt; a -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Done</span></span><span> </span><span class="annot"><span class="annottext">NobodyHasAgency 'StDone
+forall k k k (header :: k) (point :: k) (tip :: k).
+NobodyHasAgency 'StDone
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#TokDone"><span class="hs-identifier hs-var">TokDone</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">m a
+</span><a href="#local-6989586621679110646"><span class="hs-identifier hs-var">recvMsgDoneClient</span></a></span><span>
+</span><span id="line-118"></span><span>
+</span><span id="line-119"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-120"></span><span>    </span><span id="local-6989586621679110758"><span class="annot"><a href="#local-6989586621679110638"><span class="hs-identifier hs-type">handleStNext</span></a></span><span>
+</span><span id="line-121"></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#TokNextKind"><span class="hs-identifier hs-type">TokNextKind</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110758"><span class="hs-identifier hs-type">nextKind</span></a></span><span>
+</span><span id="line-122"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ServerStNext"><span class="hs-identifier hs-type">ServerStNext</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110720"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110719"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110718"><span class="hs-identifier hs-type">tip</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110721"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110717"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-123"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Peer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#ChainSync"><span class="hs-identifier hs-type">ChainSync</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110720"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110719"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110718"><span class="hs-identifier hs-type">tip</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AsServer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#StNext"><span class="hs-identifier hs-type">StNext</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110758"><span class="hs-identifier hs-type">nextKind</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="#local-6989586621679110721"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110717"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-124"></span><span>
+</span><span id="line-125"></span><span>    </span><span id="local-6989586621679110638"><span class="annot"><span class="annottext">handleStNext :: TokNextKind nextKind
+-&gt; ServerStNext header point tip m a
+-&gt; Peer
+     (ChainSync header point tip) 'AsServer ('StNext nextKind) m a
+</span><a href="#local-6989586621679110638"><span class="hs-identifier hs-var hs-var">handleStNext</span></a></span></span><span> </span><span id="local-6989586621679110622"><span class="annot"><span class="annottext">TokNextKind nextKind
+</span><a href="#local-6989586621679110622"><span class="hs-identifier hs-var">toknextkind</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#SendMsgRollForward"><span class="hs-identifier hs-type">SendMsgRollForward</span></a></span><span>  </span><span id="local-6989586621679110621"><span class="annot"><span class="annottext">header
+</span><a href="#local-6989586621679110621"><span class="hs-identifier hs-var">header</span></a></span></span><span> </span><span id="local-6989586621679110620"><span class="annot"><span class="annottext">tip
+</span><a href="#local-6989586621679110620"><span class="hs-identifier hs-var">tip</span></a></span></span><span> </span><span id="local-6989586621679110619"><span class="annot"><span class="annottext">ChainSyncServer header point tip m a
+</span><a href="#local-6989586621679110619"><span class="hs-identifier hs-var">next</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-126"></span><span>      </span><span class="annot"><span class="annottext">WeHaveAgency 'AsServer ('StNext nextKind)
+-&gt; Message (ChainSync header point tip) ('StNext nextKind) 'StIdle
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIdle m a
+-&gt; Peer
+     (ChainSync header point tip) 'AsServer ('StNext nextKind) m a
+forall (pr :: PeerRole) ps (st :: ps) (st' :: ps) (m :: * -&gt; *) a.
+WeHaveAgency pr st
+-&gt; Message ps st st' -&gt; Peer ps pr st' m a -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Yield</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ServerHasAgency ('StNext nextKind)
+-&gt; WeHaveAgency 'AsServer ('StNext nextKind)
+forall ps (st :: ps).
+ServerHasAgency st -&gt; PeerHasAgency 'AsServer st
+</span><span class="hs-identifier hs-var">ServerAgency</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TokNextKind nextKind -&gt; ServerHasAgency ('StNext nextKind)
+forall k k k (header :: k) (point :: k) (tip :: k)
+       (k :: StNextKind).
+TokNextKind k -&gt; ServerHasAgency ('StNext k)
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#TokNext"><span class="hs-identifier hs-var">TokNext</span></a></span><span> </span><span class="annot"><span class="annottext">TokNextKind nextKind
+</span><a href="#local-6989586621679110622"><span class="hs-identifier hs-var">toknextkind</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-127"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">header
+-&gt; tip
+-&gt; Message (ChainSync header point tip) ('StNext nextKind) 'StIdle
+forall k header tip (point :: k) (any :: StNextKind).
+header
+-&gt; tip
+-&gt; Message (ChainSync header point tip) ('StNext any) 'StIdle
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#MsgRollForward"><span class="hs-identifier hs-var">MsgRollForward</span></a></span><span> </span><span class="annot"><span class="annottext">header
+</span><a href="#local-6989586621679110621"><span class="hs-identifier hs-var">header</span></a></span><span> </span><span class="annot"><span class="annottext">tip
+</span><a href="#local-6989586621679110620"><span class="hs-identifier hs-var">tip</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-128"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ChainSyncServer header point tip m a
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIdle m a
+forall header point tip (m :: * -&gt; *) a.
+Monad m =&gt;
+ChainSyncServer header point tip m a
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIdle m a
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#chainSyncServerPeer"><span class="hs-identifier hs-var">chainSyncServerPeer</span></a></span><span> </span><span class="annot"><span class="annottext">ChainSyncServer header point tip m a
+</span><a href="#local-6989586621679110619"><span class="hs-identifier hs-var">next</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-129"></span><span>
+</span><span id="line-130"></span><span>    </span><span class="annot"><a href="#local-6989586621679110638"><span class="hs-identifier hs-var">handleStNext</span></a></span><span> </span><span id="local-6989586621679110617"><span class="annot"><span class="annottext">TokNextKind nextKind
+</span><a href="#local-6989586621679110617"><span class="hs-identifier hs-var">toknextkind</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#SendMsgRollBackward"><span class="hs-identifier hs-type">SendMsgRollBackward</span></a></span><span> </span><span id="local-6989586621679110616"><span class="annot"><span class="annottext">point
+</span><a href="#local-6989586621679110616"><span class="hs-identifier hs-var">pIntersect</span></a></span></span><span> </span><span id="local-6989586621679110615"><span class="annot"><span class="annottext">tip
+</span><a href="#local-6989586621679110615"><span class="hs-identifier hs-var">tip</span></a></span></span><span> </span><span id="local-6989586621679110614"><span class="annot"><span class="annottext">ChainSyncServer header point tip m a
+</span><a href="#local-6989586621679110614"><span class="hs-identifier hs-var">next</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-131"></span><span>      </span><span class="annot"><span class="annottext">WeHaveAgency 'AsServer ('StNext nextKind)
+-&gt; Message (ChainSync header point tip) ('StNext nextKind) 'StIdle
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIdle m a
+-&gt; Peer
+     (ChainSync header point tip) 'AsServer ('StNext nextKind) m a
+forall (pr :: PeerRole) ps (st :: ps) (st' :: ps) (m :: * -&gt; *) a.
+WeHaveAgency pr st
+-&gt; Message ps st st' -&gt; Peer ps pr st' m a -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Yield</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ServerHasAgency ('StNext nextKind)
+-&gt; WeHaveAgency 'AsServer ('StNext nextKind)
+forall ps (st :: ps).
+ServerHasAgency st -&gt; PeerHasAgency 'AsServer st
+</span><span class="hs-identifier hs-var">ServerAgency</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TokNextKind nextKind -&gt; ServerHasAgency ('StNext nextKind)
+forall k k k (header :: k) (point :: k) (tip :: k)
+       (k :: StNextKind).
+TokNextKind k -&gt; ServerHasAgency ('StNext k)
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#TokNext"><span class="hs-identifier hs-var">TokNext</span></a></span><span> </span><span class="annot"><span class="annottext">TokNextKind nextKind
+</span><a href="#local-6989586621679110617"><span class="hs-identifier hs-var">toknextkind</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-132"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">point
+-&gt; tip
+-&gt; Message (ChainSync header point tip) ('StNext nextKind) 'StIdle
+forall k point tip (header :: k) (any :: StNextKind).
+point
+-&gt; tip
+-&gt; Message (ChainSync header point tip) ('StNext any) 'StIdle
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#MsgRollBackward"><span class="hs-identifier hs-var">MsgRollBackward</span></a></span><span> </span><span class="annot"><span class="annottext">point
+</span><a href="#local-6989586621679110616"><span class="hs-identifier hs-var">pIntersect</span></a></span><span> </span><span class="annot"><span class="annottext">tip
+</span><a href="#local-6989586621679110615"><span class="hs-identifier hs-var">tip</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-133"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ChainSyncServer header point tip m a
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIdle m a
+forall header point tip (m :: * -&gt; *) a.
+Monad m =&gt;
+ChainSyncServer header point tip m a
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIdle m a
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#chainSyncServerPeer"><span class="hs-identifier hs-var">chainSyncServerPeer</span></a></span><span> </span><span class="annot"><span class="annottext">ChainSyncServer header point tip m a
+</span><a href="#local-6989586621679110614"><span class="hs-identifier hs-var">next</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-134"></span><span>
+</span><span id="line-135"></span><span>
+</span><span id="line-136"></span><span>    </span><span class="annot"><a href="#local-6989586621679110626"><span class="hs-identifier hs-type">handleStIntersect</span></a></span><span>
+</span><span id="line-137"></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#ServerStIntersect"><span class="hs-identifier hs-type">ServerStIntersect</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110720"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110719"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110718"><span class="hs-identifier hs-type">tip</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110721"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110717"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-138"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Peer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#ChainSync"><span class="hs-identifier hs-type">ChainSync</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110720"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110719"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110718"><span class="hs-identifier hs-type">tip</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AsServer</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#StIntersect"><span class="hs-identifier hs-type">StIntersect</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110721"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110717"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-139"></span><span>
+</span><span id="line-140"></span><span>    </span><span id="local-6989586621679110626"><span class="annot"><span class="annottext">handleStIntersect :: ServerStIntersect header point tip m a
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIntersect m a
+</span><a href="#local-6989586621679110626"><span class="hs-identifier hs-var hs-var">handleStIntersect</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#SendMsgIntersectFound"><span class="hs-identifier hs-type">SendMsgIntersectFound</span></a></span><span> </span><span id="local-6989586621679110612"><span class="annot"><span class="annottext">point
+</span><a href="#local-6989586621679110612"><span class="hs-identifier hs-var">pIntersect</span></a></span></span><span> </span><span id="local-6989586621679110611"><span class="annot"><span class="annottext">tip
+</span><a href="#local-6989586621679110611"><span class="hs-identifier hs-var">tip</span></a></span></span><span> </span><span id="local-6989586621679110610"><span class="annot"><span class="annottext">ChainSyncServer header point tip m a
+</span><a href="#local-6989586621679110610"><span class="hs-identifier hs-var">next</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-141"></span><span>      </span><span class="annot"><span class="annottext">WeHaveAgency 'AsServer 'StIntersect
+-&gt; Message (ChainSync header point tip) 'StIntersect 'StIdle
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIdle m a
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIntersect m a
+forall (pr :: PeerRole) ps (st :: ps) (st' :: ps) (m :: * -&gt; *) a.
+WeHaveAgency pr st
+-&gt; Message ps st st' -&gt; Peer ps pr st' m a -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Yield</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ServerHasAgency 'StIntersect -&gt; WeHaveAgency 'AsServer 'StIntersect
+forall ps (st :: ps).
+ServerHasAgency st -&gt; PeerHasAgency 'AsServer st
+</span><span class="hs-identifier hs-var">ServerAgency</span></span><span> </span><span class="annot"><span class="annottext">ServerHasAgency 'StIntersect
+forall k k k (header :: k) (point :: k) (tip :: k).
+ServerHasAgency 'StIntersect
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#TokIntersect"><span class="hs-identifier hs-var">TokIntersect</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-142"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">point
+-&gt; tip -&gt; Message (ChainSync header point tip) 'StIntersect 'StIdle
+forall k point tip (header :: k).
+point
+-&gt; tip -&gt; Message (ChainSync header point tip) 'StIntersect 'StIdle
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#MsgIntersectFound"><span class="hs-identifier hs-var">MsgIntersectFound</span></a></span><span> </span><span class="annot"><span class="annottext">point
+</span><a href="#local-6989586621679110612"><span class="hs-identifier hs-var">pIntersect</span></a></span><span> </span><span class="annot"><span class="annottext">tip
+</span><a href="#local-6989586621679110611"><span class="hs-identifier hs-var">tip</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-143"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ChainSyncServer header point tip m a
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIdle m a
+forall header point tip (m :: * -&gt; *) a.
+Monad m =&gt;
+ChainSyncServer header point tip m a
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIdle m a
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#chainSyncServerPeer"><span class="hs-identifier hs-var">chainSyncServerPeer</span></a></span><span> </span><span class="annot"><span class="annottext">ChainSyncServer header point tip m a
+</span><a href="#local-6989586621679110610"><span class="hs-identifier hs-var">next</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-144"></span><span>
+</span><span id="line-145"></span><span>    </span><span class="annot"><a href="#local-6989586621679110626"><span class="hs-identifier hs-var">handleStIntersect</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#SendMsgIntersectNotFound"><span class="hs-identifier hs-type">SendMsgIntersectNotFound</span></a></span><span> </span><span id="local-6989586621679110607"><span class="annot"><span class="annottext">tip
+</span><a href="#local-6989586621679110607"><span class="hs-identifier hs-var">tip</span></a></span></span><span> </span><span id="local-6989586621679110606"><span class="annot"><span class="annottext">ChainSyncServer header point tip m a
+</span><a href="#local-6989586621679110606"><span class="hs-identifier hs-var">next</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-146"></span><span>      </span><span class="annot"><span class="annottext">WeHaveAgency 'AsServer 'StIntersect
+-&gt; Message (ChainSync header point tip) 'StIntersect 'StIdle
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIdle m a
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIntersect m a
+forall (pr :: PeerRole) ps (st :: ps) (st' :: ps) (m :: * -&gt; *) a.
+WeHaveAgency pr st
+-&gt; Message ps st st' -&gt; Peer ps pr st' m a -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Yield</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ServerHasAgency 'StIntersect -&gt; WeHaveAgency 'AsServer 'StIntersect
+forall ps (st :: ps).
+ServerHasAgency st -&gt; PeerHasAgency 'AsServer st
+</span><span class="hs-identifier hs-var">ServerAgency</span></span><span> </span><span class="annot"><span class="annottext">ServerHasAgency 'StIntersect
+forall k k k (header :: k) (point :: k) (tip :: k).
+ServerHasAgency 'StIntersect
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#TokIntersect"><span class="hs-identifier hs-var">TokIntersect</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-147"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">tip -&gt; Message (ChainSync header point tip) 'StIntersect 'StIdle
+forall k k tip (header :: k) (point :: k).
+tip -&gt; Message (ChainSync header point tip) 'StIntersect 'StIdle
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Type.html#MsgIntersectNotFound"><span class="hs-identifier hs-var">MsgIntersectNotFound</span></a></span><span> </span><span class="annot"><span class="annottext">tip
+</span><a href="#local-6989586621679110607"><span class="hs-identifier hs-var">tip</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-148"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ChainSyncServer header point tip m a
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIdle m a
+forall header point tip (m :: * -&gt; *) a.
+Monad m =&gt;
+ChainSyncServer header point tip m a
+-&gt; Peer (ChainSync header point tip) 'AsServer 'StIdle m a
+</span><a href="Ouroboros.Network.Protocol.ChainSync.Server.html#chainSyncServerPeer"><span class="hs-identifier hs-var">chainSyncServerPeer</span></a></span><span> </span><span class="annot"><span class="annottext">ChainSyncServer header point tip m a
+</span><a href="#local-6989586621679110606"><span class="hs-identifier hs-var">next</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-149"></span></pre></body></html>

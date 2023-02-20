@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DerivingStrategies         #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE GeneralizedNewtypeDeriving #-}</span><span>
+</span><span id="line-3"></span><span>
+</span><span id="line-4"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.PeerSelection.LedgerPeers.Type</span><span>
+</span><span id="line-5"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.LedgerPeers.Type.html#PoolStake"><span class="hs-identifier">PoolStake</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-6"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.PeerSelection.LedgerPeers.Type.html#AccPoolStake"><span class="hs-identifier">AccPoolStake</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-7"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/deepseq-1.4.4.0/src"><span class="hs-identifier">Control.DeepSeq</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/deepseq-1.4.4.0/src"><span class="hs-identifier">NFData</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-10"></span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- | The relative stake of a stakepool in relation to the total amount staked.</span><span>
+</span><span id="line-12"></span><span class="hs-comment">-- A value in the [0, 1] range.</span><span>
+</span><span id="line-13"></span><span class="hs-comment">--</span><span>
+</span><span id="line-14"></span><span class="hs-keyword">newtype</span><span> </span><span id="PoolStake"><span class="annot"><a href="Ouroboros.Network.PeerSelection.LedgerPeers.Type.html#PoolStake"><span class="hs-identifier hs-var">PoolStake</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="PoolStake"><span class="annot"><a href="Ouroboros.Network.PeerSelection.LedgerPeers.Type.html#PoolStake"><span class="hs-identifier hs-var">PoolStake</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="unPoolStake"><span class="annot"><span class="annottext">PoolStake -&gt; Rational
+</span><a href="Ouroboros.Network.PeerSelection.LedgerPeers.Type.html#unPoolStake"><span class="hs-identifier hs-var hs-var">unPoolStake</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Rational</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679128026"><span id="local-6989586621679128028"><span class="annot"><span class="annottext">PoolStake -&gt; PoolStake -&gt; Bool
+(PoolStake -&gt; PoolStake -&gt; Bool)
+-&gt; (PoolStake -&gt; PoolStake -&gt; Bool) -&gt; Eq PoolStake
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: PoolStake -&gt; PoolStake -&gt; Bool
+$c/= :: PoolStake -&gt; PoolStake -&gt; Bool
+== :: PoolStake -&gt; PoolStake -&gt; Bool
+$c== :: PoolStake -&gt; PoolStake -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679128018"><span id="local-6989586621679128020"><span id="local-6989586621679128022"><span class="annot"><span class="annottext">Num PoolStake
+Num PoolStake
+-&gt; (PoolStake -&gt; PoolStake -&gt; PoolStake)
+-&gt; (PoolStake -&gt; PoolStake)
+-&gt; (Rational -&gt; PoolStake)
+-&gt; Fractional PoolStake
+Rational -&gt; PoolStake
+PoolStake -&gt; PoolStake
+PoolStake -&gt; PoolStake -&gt; PoolStake
+forall a.
+Num a
+-&gt; (a -&gt; a -&gt; a) -&gt; (a -&gt; a) -&gt; (Rational -&gt; a) -&gt; Fractional a
+fromRational :: Rational -&gt; PoolStake
+$cfromRational :: Rational -&gt; PoolStake
+recip :: PoolStake -&gt; PoolStake
+$crecip :: PoolStake -&gt; PoolStake
+/ :: PoolStake -&gt; PoolStake -&gt; PoolStake
+$c/ :: PoolStake -&gt; PoolStake -&gt; PoolStake
+$cp1Fractional :: Num PoolStake
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Fractional</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679128003"><span id="local-6989586621679128005"><span id="local-6989586621679128007"><span id="local-6989586621679128009"><span id="local-6989586621679128011"><span id="local-6989586621679128013"><span id="local-6989586621679128015"><span class="annot"><span class="annottext">Integer -&gt; PoolStake
+PoolStake -&gt; PoolStake
+PoolStake -&gt; PoolStake -&gt; PoolStake
+(PoolStake -&gt; PoolStake -&gt; PoolStake)
+-&gt; (PoolStake -&gt; PoolStake -&gt; PoolStake)
+-&gt; (PoolStake -&gt; PoolStake -&gt; PoolStake)
+-&gt; (PoolStake -&gt; PoolStake)
+-&gt; (PoolStake -&gt; PoolStake)
+-&gt; (PoolStake -&gt; PoolStake)
+-&gt; (Integer -&gt; PoolStake)
+-&gt; Num PoolStake
+forall a.
+(a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Integer -&gt; a)
+-&gt; Num a
+fromInteger :: Integer -&gt; PoolStake
+$cfromInteger :: Integer -&gt; PoolStake
+signum :: PoolStake -&gt; PoolStake
+$csignum :: PoolStake -&gt; PoolStake
+abs :: PoolStake -&gt; PoolStake
+$cabs :: PoolStake -&gt; PoolStake
+negate :: PoolStake -&gt; PoolStake
+$cnegate :: PoolStake -&gt; PoolStake
+* :: PoolStake -&gt; PoolStake -&gt; PoolStake
+$c* :: PoolStake -&gt; PoolStake -&gt; PoolStake
+- :: PoolStake -&gt; PoolStake -&gt; PoolStake
+$c- :: PoolStake -&gt; PoolStake -&gt; PoolStake
++ :: PoolStake -&gt; PoolStake -&gt; PoolStake
+$c+ :: PoolStake -&gt; PoolStake -&gt; PoolStake
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Num</span></a></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127987"><span id="local-6989586621679127989"><span id="local-6989586621679127991"><span id="local-6989586621679127993"><span id="local-6989586621679127995"><span id="local-6989586621679127997"><span id="local-6989586621679127999"><span class="annot"><span class="annottext">Eq PoolStake
+Eq PoolStake
+-&gt; (PoolStake -&gt; PoolStake -&gt; Ordering)
+-&gt; (PoolStake -&gt; PoolStake -&gt; Bool)
+-&gt; (PoolStake -&gt; PoolStake -&gt; Bool)
+-&gt; (PoolStake -&gt; PoolStake -&gt; Bool)
+-&gt; (PoolStake -&gt; PoolStake -&gt; Bool)
+-&gt; (PoolStake -&gt; PoolStake -&gt; PoolStake)
+-&gt; (PoolStake -&gt; PoolStake -&gt; PoolStake)
+-&gt; Ord PoolStake
+PoolStake -&gt; PoolStake -&gt; Bool
+PoolStake -&gt; PoolStake -&gt; Ordering
+PoolStake -&gt; PoolStake -&gt; PoolStake
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: PoolStake -&gt; PoolStake -&gt; PoolStake
+$cmin :: PoolStake -&gt; PoolStake -&gt; PoolStake
+max :: PoolStake -&gt; PoolStake -&gt; PoolStake
+$cmax :: PoolStake -&gt; PoolStake -&gt; PoolStake
+&gt;= :: PoolStake -&gt; PoolStake -&gt; Bool
+$c&gt;= :: PoolStake -&gt; PoolStake -&gt; Bool
+&gt; :: PoolStake -&gt; PoolStake -&gt; Bool
+$c&gt; :: PoolStake -&gt; PoolStake -&gt; Bool
+&lt;= :: PoolStake -&gt; PoolStake -&gt; Bool
+$c&lt;= :: PoolStake -&gt; PoolStake -&gt; Bool
+&lt; :: PoolStake -&gt; PoolStake -&gt; Bool
+$c&lt; :: PoolStake -&gt; PoolStake -&gt; Bool
+compare :: PoolStake -&gt; PoolStake -&gt; Ordering
+$ccompare :: PoolStake -&gt; PoolStake -&gt; Ordering
+$cp1Ord :: Eq PoolStake
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></a></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127980"><span id="local-6989586621679127982"><span id="local-6989586621679127984"><span class="annot"><span class="annottext">Int -&gt; PoolStake -&gt; ShowS
+[PoolStake] -&gt; ShowS
+PoolStake -&gt; String
+(Int -&gt; PoolStake -&gt; ShowS)
+-&gt; (PoolStake -&gt; String)
+-&gt; ([PoolStake] -&gt; ShowS)
+-&gt; Show PoolStake
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [PoolStake] -&gt; ShowS
+$cshowList :: [PoolStake] -&gt; ShowS
+show :: PoolStake -&gt; String
+$cshow :: PoolStake -&gt; String
+showsPrec :: Int -&gt; PoolStake -&gt; ShowS
+$cshowsPrec :: Int -&gt; PoolStake -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span id="local-6989586621679127977"><span class="annot"><span class="annottext">PoolStake -&gt; ()
+(PoolStake -&gt; ()) -&gt; NFData PoolStake
+forall a. (a -&gt; ()) -&gt; NFData a
+rnf :: PoolStake -&gt; ()
+$crnf :: PoolStake -&gt; ()
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/deepseq-1.4.4.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">NFData</span></a></span></span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="hs-comment">-- | The accumulated relative stake of a stake pool, like PoolStake but it also includes the</span><span>
+</span><span id="line-20"></span><span class="hs-comment">-- relative stake of all preceding pools. A value in the range [0, 1].</span><span>
+</span><span id="line-21"></span><span class="hs-comment">--</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">newtype</span><span> </span><span id="AccPoolStake"><span class="annot"><a href="Ouroboros.Network.PeerSelection.LedgerPeers.Type.html#AccPoolStake"><span class="hs-identifier hs-var">AccPoolStake</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="AccPoolStake"><span class="annot"><a href="Ouroboros.Network.PeerSelection.LedgerPeers.Type.html#AccPoolStake"><span class="hs-identifier hs-var">AccPoolStake</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="unAccPoolStake"><span class="annot"><span class="annottext">AccPoolStake -&gt; Rational
+</span><a href="Ouroboros.Network.PeerSelection.LedgerPeers.Type.html#unAccPoolStake"><span class="hs-identifier hs-var hs-var">unAccPoolStake</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Rational</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-23"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679127970"><span id="local-6989586621679127972"><span class="annot"><span class="annottext">AccPoolStake -&gt; AccPoolStake -&gt; Bool
+(AccPoolStake -&gt; AccPoolStake -&gt; Bool)
+-&gt; (AccPoolStake -&gt; AccPoolStake -&gt; Bool) -&gt; Eq AccPoolStake
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: AccPoolStake -&gt; AccPoolStake -&gt; Bool
+$c/= :: AccPoolStake -&gt; AccPoolStake -&gt; Bool
+== :: AccPoolStake -&gt; AccPoolStake -&gt; Bool
+$c== :: AccPoolStake -&gt; AccPoolStake -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127956"><span id="local-6989586621679127958"><span id="local-6989586621679127960"><span id="local-6989586621679127962"><span id="local-6989586621679127964"><span id="local-6989586621679127966"><span id="local-6989586621679127968"><span class="annot"><span class="annottext">Integer -&gt; AccPoolStake
+AccPoolStake -&gt; AccPoolStake
+AccPoolStake -&gt; AccPoolStake -&gt; AccPoolStake
+(AccPoolStake -&gt; AccPoolStake -&gt; AccPoolStake)
+-&gt; (AccPoolStake -&gt; AccPoolStake -&gt; AccPoolStake)
+-&gt; (AccPoolStake -&gt; AccPoolStake -&gt; AccPoolStake)
+-&gt; (AccPoolStake -&gt; AccPoolStake)
+-&gt; (AccPoolStake -&gt; AccPoolStake)
+-&gt; (AccPoolStake -&gt; AccPoolStake)
+-&gt; (Integer -&gt; AccPoolStake)
+-&gt; Num AccPoolStake
+forall a.
+(a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Integer -&gt; a)
+-&gt; Num a
+fromInteger :: Integer -&gt; AccPoolStake
+$cfromInteger :: Integer -&gt; AccPoolStake
+signum :: AccPoolStake -&gt; AccPoolStake
+$csignum :: AccPoolStake -&gt; AccPoolStake
+abs :: AccPoolStake -&gt; AccPoolStake
+$cabs :: AccPoolStake -&gt; AccPoolStake
+negate :: AccPoolStake -&gt; AccPoolStake
+$cnegate :: AccPoolStake -&gt; AccPoolStake
+* :: AccPoolStake -&gt; AccPoolStake -&gt; AccPoolStake
+$c* :: AccPoolStake -&gt; AccPoolStake -&gt; AccPoolStake
+- :: AccPoolStake -&gt; AccPoolStake -&gt; AccPoolStake
+$c- :: AccPoolStake -&gt; AccPoolStake -&gt; AccPoolStake
++ :: AccPoolStake -&gt; AccPoolStake -&gt; AccPoolStake
+$c+ :: AccPoolStake -&gt; AccPoolStake -&gt; AccPoolStake
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Num</span></a></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127941"><span id="local-6989586621679127943"><span id="local-6989586621679127945"><span id="local-6989586621679127947"><span id="local-6989586621679127949"><span id="local-6989586621679127951"><span id="local-6989586621679127953"><span class="annot"><span class="annottext">Eq AccPoolStake
+Eq AccPoolStake
+-&gt; (AccPoolStake -&gt; AccPoolStake -&gt; Ordering)
+-&gt; (AccPoolStake -&gt; AccPoolStake -&gt; Bool)
+-&gt; (AccPoolStake -&gt; AccPoolStake -&gt; Bool)
+-&gt; (AccPoolStake -&gt; AccPoolStake -&gt; Bool)
+-&gt; (AccPoolStake -&gt; AccPoolStake -&gt; Bool)
+-&gt; (AccPoolStake -&gt; AccPoolStake -&gt; AccPoolStake)
+-&gt; (AccPoolStake -&gt; AccPoolStake -&gt; AccPoolStake)
+-&gt; Ord AccPoolStake
+AccPoolStake -&gt; AccPoolStake -&gt; Bool
+AccPoolStake -&gt; AccPoolStake -&gt; Ordering
+AccPoolStake -&gt; AccPoolStake -&gt; AccPoolStake
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: AccPoolStake -&gt; AccPoolStake -&gt; AccPoolStake
+$cmin :: AccPoolStake -&gt; AccPoolStake -&gt; AccPoolStake
+max :: AccPoolStake -&gt; AccPoolStake -&gt; AccPoolStake
+$cmax :: AccPoolStake -&gt; AccPoolStake -&gt; AccPoolStake
+&gt;= :: AccPoolStake -&gt; AccPoolStake -&gt; Bool
+$c&gt;= :: AccPoolStake -&gt; AccPoolStake -&gt; Bool
+&gt; :: AccPoolStake -&gt; AccPoolStake -&gt; Bool
+$c&gt; :: AccPoolStake -&gt; AccPoolStake -&gt; Bool
+&lt;= :: AccPoolStake -&gt; AccPoolStake -&gt; Bool
+$c&lt;= :: AccPoolStake -&gt; AccPoolStake -&gt; Bool
+&lt; :: AccPoolStake -&gt; AccPoolStake -&gt; Bool
+$c&lt; :: AccPoolStake -&gt; AccPoolStake -&gt; Bool
+compare :: AccPoolStake -&gt; AccPoolStake -&gt; Ordering
+$ccompare :: AccPoolStake -&gt; AccPoolStake -&gt; Ordering
+$cp1Ord :: Eq AccPoolStake
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></a></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span></pre></body></html>

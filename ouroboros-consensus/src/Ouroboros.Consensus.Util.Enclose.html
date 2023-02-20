@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="%24con2tag_DE0GxWaVSamAWIhOPlG6zq"></span><span class="hs-pragma">{-# LANGUAGE PatternSynonyms #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- | Utility functions for enclosing a code segment with tracing events.</span><span>
+</span><span id="line-4"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Consensus.Util.Enclose</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-5"></span><span>    </span><span class="annot"><a href="Ouroboros.Consensus.Util.Enclose.html#Enclosing"><span class="hs-identifier">Enclosing</span></a></span><span>
+</span><span id="line-6"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Util.Enclose.html#Enclosing%27"><span class="hs-identifier">Enclosing'</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-7"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Util.Enclose.html#encloseWith"><span class="hs-identifier">encloseWith</span></a></span><span>
+</span><span id="line-8"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Util.Enclose.html#FallingEdge"><span class="hs-identifier">FallingEdge</span></a></span><span>
+</span><span id="line-9"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-10"></span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Tracer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Tracer</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">traceWith</span></span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span class="hs-keyword">data</span><span> </span><span id="Enclosing%27"><span class="annot"><a href="Ouroboros.Consensus.Util.Enclose.html#Enclosing%27"><span class="hs-identifier hs-var">Enclosing'</span></a></span></span><span> </span><span id="local-6989586621679955195"><span class="annot"><a href="#local-6989586621679955195"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-14"></span><span>    </span><span class="hs-comment">-- | Preceding a specific code segment.</span><span>
+</span><span id="line-15"></span><span>    </span><span id="RisingEdge"><span class="annot"><a href="Ouroboros.Consensus.Util.Enclose.html#RisingEdge"><span class="hs-identifier hs-var">RisingEdge</span></a></span></span><span>
+</span><span id="line-16"></span><span>    </span><span class="hs-comment">-- | Succeeding a specific code segment, with extra information.</span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="FallingEdgeWith"><span class="annot"><a href="Ouroboros.Consensus.Util.Enclose.html#FallingEdgeWith"><span class="hs-identifier hs-var">FallingEdgeWith</span></a></span></span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="#local-6989586621679955195"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679955177"><span id="local-6989586621679955179"><span id="local-6989586621679955181"><span class="annot"><span class="annottext">Int -&gt; Enclosing' a -&gt; ShowS
+[Enclosing' a] -&gt; ShowS
+Enclosing' a -&gt; String
+(Int -&gt; Enclosing' a -&gt; ShowS)
+-&gt; (Enclosing' a -&gt; String)
+-&gt; ([Enclosing' a] -&gt; ShowS)
+-&gt; Show (Enclosing' a)
+forall a. Show a =&gt; Int -&gt; Enclosing' a -&gt; ShowS
+forall a. Show a =&gt; [Enclosing' a] -&gt; ShowS
+forall a. Show a =&gt; Enclosing' a -&gt; String
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Enclosing' a] -&gt; ShowS
+$cshowList :: forall a. Show a =&gt; [Enclosing' a] -&gt; ShowS
+show :: Enclosing' a -&gt; String
+$cshow :: forall a. Show a =&gt; Enclosing' a -&gt; String
+showsPrec :: Int -&gt; Enclosing' a -&gt; ShowS
+$cshowsPrec :: forall a. Show a =&gt; Int -&gt; Enclosing' a -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679955172"><span id="local-6989586621679955174"><span class="annot"><span class="annottext">Enclosing' a -&gt; Enclosing' a -&gt; Bool
+(Enclosing' a -&gt; Enclosing' a -&gt; Bool)
+-&gt; (Enclosing' a -&gt; Enclosing' a -&gt; Bool) -&gt; Eq (Enclosing' a)
+forall a. Eq a =&gt; Enclosing' a -&gt; Enclosing' a -&gt; Bool
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Enclosing' a -&gt; Enclosing' a -&gt; Bool
+$c/= :: forall a. Eq a =&gt; Enclosing' a -&gt; Enclosing' a -&gt; Bool
+== :: Enclosing' a -&gt; Enclosing' a -&gt; Bool
+$c== :: forall a. Eq a =&gt; Enclosing' a -&gt; Enclosing' a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679955156"><span id="local-6989586621679955158"><span id="local-6989586621679955160"><span id="local-6989586621679955162"><span id="local-6989586621679955164"><span id="local-6989586621679955166"><span id="local-6989586621679955168"><span class="annot"><span class="annottext">Eq (Enclosing' a)
+Eq (Enclosing' a)
+-&gt; (Enclosing' a -&gt; Enclosing' a -&gt; Ordering)
+-&gt; (Enclosing' a -&gt; Enclosing' a -&gt; Bool)
+-&gt; (Enclosing' a -&gt; Enclosing' a -&gt; Bool)
+-&gt; (Enclosing' a -&gt; Enclosing' a -&gt; Bool)
+-&gt; (Enclosing' a -&gt; Enclosing' a -&gt; Bool)
+-&gt; (Enclosing' a -&gt; Enclosing' a -&gt; Enclosing' a)
+-&gt; (Enclosing' a -&gt; Enclosing' a -&gt; Enclosing' a)
+-&gt; Ord (Enclosing' a)
+Enclosing' a -&gt; Enclosing' a -&gt; Bool
+Enclosing' a -&gt; Enclosing' a -&gt; Ordering
+Enclosing' a -&gt; Enclosing' a -&gt; Enclosing' a
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+forall a. Ord a =&gt; Eq (Enclosing' a)
+forall a. Ord a =&gt; Enclosing' a -&gt; Enclosing' a -&gt; Bool
+forall a. Ord a =&gt; Enclosing' a -&gt; Enclosing' a -&gt; Ordering
+forall a. Ord a =&gt; Enclosing' a -&gt; Enclosing' a -&gt; Enclosing' a
+min :: Enclosing' a -&gt; Enclosing' a -&gt; Enclosing' a
+$cmin :: forall a. Ord a =&gt; Enclosing' a -&gt; Enclosing' a -&gt; Enclosing' a
+max :: Enclosing' a -&gt; Enclosing' a -&gt; Enclosing' a
+$cmax :: forall a. Ord a =&gt; Enclosing' a -&gt; Enclosing' a -&gt; Enclosing' a
+&gt;= :: Enclosing' a -&gt; Enclosing' a -&gt; Bool
+$c&gt;= :: forall a. Ord a =&gt; Enclosing' a -&gt; Enclosing' a -&gt; Bool
+&gt; :: Enclosing' a -&gt; Enclosing' a -&gt; Bool
+$c&gt; :: forall a. Ord a =&gt; Enclosing' a -&gt; Enclosing' a -&gt; Bool
+&lt;= :: Enclosing' a -&gt; Enclosing' a -&gt; Bool
+$c&lt;= :: forall a. Ord a =&gt; Enclosing' a -&gt; Enclosing' a -&gt; Bool
+&lt; :: Enclosing' a -&gt; Enclosing' a -&gt; Bool
+$c&lt; :: forall a. Ord a =&gt; Enclosing' a -&gt; Enclosing' a -&gt; Bool
+compare :: Enclosing' a -&gt; Enclosing' a -&gt; Ordering
+$ccompare :: forall a. Ord a =&gt; Enclosing' a -&gt; Enclosing' a -&gt; Ordering
+$cp1Ord :: forall a. Ord a =&gt; Eq (Enclosing' a)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></a></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span>
+</span><span id="line-20"></span><span class="hs-keyword">type</span><span> </span><span id="Enclosing"><span class="annot"><a href="Ouroboros.Consensus.Util.Enclose.html#Enclosing"><span class="hs-identifier hs-var">Enclosing</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Util.Enclose.html#Enclosing%27"><span class="hs-identifier hs-type">Enclosing'</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Util.Enclose.html#FallingEdge"><span class="hs-identifier hs-type">FallingEdge</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Util.Enclose.html#Enclosing%27"><span class="hs-identifier hs-type">Enclosing'</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bFallingEdge"><span id="%24mFallingEdge"><span id="FallingEdge"><span class="annot"><span class="annottext">$bFallingEdge :: Enclosing' ()
+$mFallingEdge :: forall r. Enclosing' () -&gt; (Void# -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="Ouroboros.Consensus.Util.Enclose.html#%24bFallingEdge"><span class="hs-identifier hs-var hs-var hs-var">FallingEdge</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Util.Enclose.html#FallingEdgeWith"><span class="hs-identifier hs-type">FallingEdgeWith</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="hs-pragma">{-# COMPLETE</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Util.Enclose.html#RisingEdge"><span class="hs-pragma hs-type">RisingEdge</span></a></span><span class="hs-pragma">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Util.Enclose.html#FallingEdge"><span class="hs-pragma hs-type">FallingEdge</span></a></span><span> </span><span class="hs-pragma">#-}</span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span class="hs-comment">-- | Enclose an action using the given 'Tracer'.</span><span>
+</span><span id="line-28"></span><span id="local-6989586621679955151"><span id="local-6989586621679955152"><span class="annot"><a href="Ouroboros.Consensus.Util.Enclose.html#encloseWith"><span class="hs-identifier hs-type">encloseWith</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-29"></span><span>     </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Applicative</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679955152"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-30"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Tracer</span></span><span> </span><span class="annot"><a href="#local-6989586621679955152"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Util.Enclose.html#Enclosing"><span class="hs-identifier hs-type">Enclosing</span></a></span><span>
+</span><span id="line-31"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679955152"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679955151"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-32"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679955152"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679955151"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-33"></span><span id="encloseWith"><span class="annot"><span class="annottext">encloseWith :: Tracer m (Enclosing' ()) -&gt; m a -&gt; m a
+</span><a href="Ouroboros.Consensus.Util.Enclose.html#encloseWith"><span class="hs-identifier hs-var hs-var">encloseWith</span></a></span></span><span> </span><span id="local-6989586621679955150"><span class="annot"><span class="annottext">Tracer m (Enclosing' ())
+</span><a href="#local-6989586621679955150"><span class="hs-identifier hs-var">tracer</span></a></span></span><span> </span><span id="local-6989586621679955149"><span class="annot"><span class="annottext">m a
+</span><a href="#local-6989586621679955149"><span class="hs-identifier hs-var">action</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-34"></span><span>    </span><span class="annot"><span class="annottext">Tracer m (Enclosing' ()) -&gt; Enclosing' () -&gt; m ()
+forall (m :: * -&gt; *) a. Tracer m a -&gt; a -&gt; m ()
+</span><span class="hs-identifier hs-var">traceWith</span></span><span> </span><span class="annot"><span class="annottext">Tracer m (Enclosing' ())
+</span><a href="#local-6989586621679955150"><span class="hs-identifier hs-var">tracer</span></a></span><span> </span><span class="annot"><span class="annottext">Enclosing' ()
+forall a. Enclosing' a
+</span><a href="Ouroboros.Consensus.Util.Enclose.html#RisingEdge"><span class="hs-identifier hs-var">RisingEdge</span></a></span><span> </span><span class="annot"><span class="annottext">m () -&gt; m a -&gt; m a
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">*&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">m a
+</span><a href="#local-6989586621679955149"><span class="hs-identifier hs-var">action</span></a></span><span> </span><span class="annot"><span class="annottext">m a -&gt; m () -&gt; m a
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;*</span></a></span><span> </span><span class="annot"><span class="annottext">Tracer m (Enclosing' ()) -&gt; Enclosing' () -&gt; m ()
+forall (m :: * -&gt; *) a. Tracer m a -&gt; a -&gt; m ()
+</span><span class="hs-identifier hs-var">traceWith</span></span><span> </span><span class="annot"><span class="annottext">Tracer m (Enclosing' ())
+</span><a href="#local-6989586621679955150"><span class="hs-identifier hs-var">tracer</span></a></span><span> </span><span class="annot"><span class="annottext">Enclosing' ()
+</span><a href="Ouroboros.Consensus.Util.Enclose.html#FallingEdge"><span class="hs-identifier hs-var">FallingEdge</span></a></span><span>
+</span><span id="line-35"></span></pre></body></html>

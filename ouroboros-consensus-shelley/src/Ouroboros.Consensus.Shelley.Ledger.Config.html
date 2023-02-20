@@ -8,9 +8,9 @@
 </span><span id="line-8"></span><span class="hs-pragma">{-# LANGUAGE TypeFamilies               #-}</span><span>
 </span><span id="line-9"></span><span class="hs-pragma">{-# OPTIONS_GHC -Wno-orphans #-}</span><span>
 </span><span id="line-10"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Consensus.Shelley.Ledger.Config</span><span> </span><span class="hs-special">(</span><span>
-</span><span id="line-11"></span><span>    </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">BlockConfig</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
-</span><span id="line-12"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">CodecConfig</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
-</span><span id="line-13"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">StorageConfig</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-11"></span><span>    </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">BlockConfig</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">CodecConfig</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">StorageConfig</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
 </span><span id="line-14"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#compactGenesis"><span class="hs-identifier">compactGenesis</span></a></span><span>
 </span><span id="line-15"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#getCompactGenesis"><span class="hs-identifier">getCompactGenesis</span></a></span><span>
 </span><span id="line-16"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#mkShelleyBlockConfig"><span class="hs-identifier">mkShelleyBlockConfig</span></a></span><span>
@@ -18,19 +18,19 @@
 </span><span id="line-18"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#CompactGenesis"><span class="hs-identifier">CompactGenesis</span></a></span><span>
 </span><span id="line-19"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-20"></span><span>
-</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Data.Map.Strict</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Map</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier">Data.Map.Strict</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Map</span></span><span>
-</span><span id="line-23"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Word</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Word64</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-24"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">GHC.Generics</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Generic</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier">Data.Map.Strict</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier">Map</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier">Data.Map.Strict</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Map</span></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Word</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Word64</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">GHC.Generics</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Generic</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-25"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">NoThunks.Class</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NoThunks</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-26"></span><span>
 </span><span id="line-27"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Binary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">FromCBOR</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">ToCBOR</span></span><span class="hs-special">)</span><span>
 </span><span id="line-28"></span><span>
-</span><span id="line-29"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier">Ouroboros.Network.Magic</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier">NetworkMagic</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier">Ouroboros.Network.Magic</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier">NetworkMagic</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-30"></span><span>
-</span><span id="line-31"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Block</span></a></span><span>
-</span><span id="line-32"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.BlockchainTime</span></a></span><span>
-</span><span id="line-33"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Config</span></a></span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Block</span></a></span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.BlockchainTime</span></a></span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Config</span></a></span><span>
 </span><span id="line-34"></span><span>
 </span><span id="line-35"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Shelley.API</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
 </span><span id="line-36"></span><span>
@@ -41,103 +41,99 @@
   Additional node configuration
 -------------------------------------------------------------------------------}</span><span>
 </span><span id="line-43"></span><span>
-</span><span id="line-44"></span><span class="hs-keyword">data</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="BlockConfig"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">BlockConfig</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyBlock"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span id="local-6989586621679727863"><span class="annot"><a href="#local-6989586621679727863"><span class="hs-identifier hs-type hs-type">era</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ShelleyConfig"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#ShelleyConfig"><span class="hs-identifier hs-var">ShelleyConfig</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-44"></span><span class="hs-keyword">data</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="BlockConfig"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">BlockConfig</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyBlock"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span id="local-6989586621679721383"><span class="annot"><a href="#local-6989586621679721383"><span class="hs-identifier hs-type hs-type">proto</span></a></span></span><span> </span><span id="local-6989586621679721384"><span class="annot"><a href="#local-6989586621679721384"><span class="hs-identifier hs-type hs-type">era</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ShelleyConfig"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#ShelleyConfig"><span class="hs-identifier hs-var">ShelleyConfig</span></a></span></span><span> </span><span class="hs-special">{</span><span>
 </span><span id="line-45"></span><span>      </span><span class="hs-comment">-- | The highest protocol version this node supports. It will be stored</span><span>
 </span><span id="line-46"></span><span>      </span><span class="hs-comment">-- the headers of produced blocks.</span><span>
-</span><span id="line-47"></span><span>      </span><span id="shelleyProtocolVersion"><span class="annot"><span class="annottext">BlockConfig (ShelleyBlock era) -&gt; ProtVer
+</span><span id="line-47"></span><span>      </span><span id="shelleyProtocolVersion"><span class="annot"><span class="annottext">BlockConfig (ShelleyBlock proto era) -&gt; ProtVer
 </span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#shelleyProtocolVersion"><span class="hs-identifier hs-var hs-var">shelleyProtocolVersion</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><span class="hs-identifier hs-type">SL.ProtVer</span></span><span>
-</span><span id="line-48"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="shelleySystemStart"><span class="annot"><span class="annottext">BlockConfig (ShelleyBlock era) -&gt; SystemStart
+</span><span id="line-48"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="shelleySystemStart"><span class="annot"><span class="annottext">BlockConfig (ShelleyBlock proto era) -&gt; SystemStart
 </span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#shelleySystemStart"><span class="hs-identifier hs-var hs-var">shelleySystemStart</span></a></span></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><span class="hs-identifier hs-type">SystemStart</span></span><span>
-</span><span id="line-49"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="shelleyNetworkMagic"><span class="annot"><span class="annottext">BlockConfig (ShelleyBlock era) -&gt; NetworkMagic
-</span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#shelleyNetworkMagic"><span class="hs-identifier hs-var hs-var">shelleyNetworkMagic</span></a></span></span><span>     </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">NetworkMagic</span></a></span><span>
-</span><span id="line-50"></span><span>      </span><span class="hs-comment">-- | When chain selection is comparing two fragments, it will prefer the</span><span>
-</span><span id="line-51"></span><span>      </span><span class="hs-comment">-- fragment with a tip signed by (one of) its own key(s) (provided that</span><span>
-</span><span id="line-52"></span><span>      </span><span class="hs-comment">-- the 'BlockNo's and 'SlotNo's of the two tips are equal). For nodes that</span><span>
-</span><span id="line-53"></span><span>      </span><span class="hs-comment">-- can produce blocks, this should be set to the verification key(s)</span><span>
-</span><span id="line-54"></span><span>      </span><span class="hs-comment">-- corresponding to the node's signing key(s), to make sure we prefer</span><span>
-</span><span id="line-55"></span><span>      </span><span class="hs-comment">-- self-issued blocks. For non block producing nodes, this can be set to</span><span>
-</span><span id="line-56"></span><span>      </span><span class="hs-comment">-- the empty map.</span><span>
-</span><span id="line-57"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="shelleyBlockIssuerVKeys"><span class="annot"><span class="annottext">BlockConfig (ShelleyBlock era)
+</span><span id="line-49"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="shelleyNetworkMagic"><span class="annot"><span class="annottext">BlockConfig (ShelleyBlock proto era) -&gt; NetworkMagic
+</span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#shelleyNetworkMagic"><span class="hs-identifier hs-var hs-var">shelleyNetworkMagic</span></a></span></span><span>     </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">NetworkMagic</span></a></span><span>
+</span><span id="line-50"></span><span>      </span><span class="hs-comment">-- | For nodes that can produce blocks, this should be set to the</span><span>
+</span><span id="line-51"></span><span>      </span><span class="hs-comment">-- verification key(s) corresponding to the node's signing key(s). For non</span><span>
+</span><span id="line-52"></span><span>      </span><span class="hs-comment">-- block producing nodes, this can be set to the empty map.</span><span>
+</span><span id="line-53"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="shelleyBlockIssuerVKeys"><span class="annot"><span class="annottext">BlockConfig (ShelleyBlock proto era)
 -&gt; Map
      (KeyHash 'BlockIssuer (EraCrypto era))
      (VKey 'BlockIssuer (EraCrypto era))
-</span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#shelleyBlockIssuerVKeys"><span class="hs-identifier hs-var hs-var">shelleyBlockIssuerVKeys</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-type">Map</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.KeyHash</span></span><span> </span><span class="hs-special">'</span><span class="annot"><span class="hs-identifier hs-type">SL.BlockIssuer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier hs-type">EraCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679727863"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-58"></span><span>                                       </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.VKey</span></span><span> </span><span class="hs-special">'</span><span class="annot"><span class="hs-identifier hs-type">SL.BlockIssuer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier hs-type">EraCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679727863"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-59"></span><span>    </span><span class="hs-special">}</span><span>
-</span><span id="line-60"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(forall x.
- BlockConfig (ShelleyBlock era)
- -&gt; Rep (BlockConfig (ShelleyBlock era)) x)
+</span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#shelleyBlockIssuerVKeys"><span class="hs-identifier hs-var hs-var">shelleyBlockIssuerVKeys</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier hs-type">Map</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.KeyHash</span></span><span> </span><span class="hs-special">'</span><span class="annot"><span class="hs-identifier hs-type">SL.BlockIssuer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier hs-type">EraCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679721384"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-54"></span><span>                                       </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.VKey</span></span><span> </span><span class="hs-special">'</span><span class="annot"><span class="hs-identifier hs-type">SL.BlockIssuer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier hs-type">EraCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679721384"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-55"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-56"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(forall x.
+ BlockConfig (ShelleyBlock proto era)
+ -&gt; Rep (BlockConfig (ShelleyBlock proto era)) x)
 -&gt; (forall x.
-    Rep (BlockConfig (ShelleyBlock era)) x
-    -&gt; BlockConfig (ShelleyBlock era))
--&gt; Generic (BlockConfig (ShelleyBlock era))
+    Rep (BlockConfig (ShelleyBlock proto era)) x
+    -&gt; BlockConfig (ShelleyBlock proto era))
+-&gt; Generic (BlockConfig (ShelleyBlock proto era))
 forall x.
-Rep (BlockConfig (ShelleyBlock era)) x
--&gt; BlockConfig (ShelleyBlock era)
+Rep (BlockConfig (ShelleyBlock proto era)) x
+-&gt; BlockConfig (ShelleyBlock proto era)
 forall x.
-BlockConfig (ShelleyBlock era)
--&gt; Rep (BlockConfig (ShelleyBlock era)) x
+BlockConfig (ShelleyBlock proto era)
+-&gt; Rep (BlockConfig (ShelleyBlock proto era)) x
 forall a.
 (forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
-forall era x.
-Rep (BlockConfig (ShelleyBlock era)) x
--&gt; BlockConfig (ShelleyBlock era)
-forall era x.
-BlockConfig (ShelleyBlock era)
--&gt; Rep (BlockConfig (ShelleyBlock era)) x
-$cto :: forall era x.
-Rep (BlockConfig (ShelleyBlock era)) x
--&gt; BlockConfig (ShelleyBlock era)
-$cfrom :: forall era x.
-BlockConfig (ShelleyBlock era)
--&gt; Rep (BlockConfig (ShelleyBlock era)) x
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-61"></span><span>
-</span><span id="line-62"></span><span id="local-6989586621679727787"><span id="local-6989586621679727789"><span id="local-6989586621679727791"><span id="local-6989586621679727793"><span class="hs-keyword">deriving</span><span> </span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679727793"><span class="hs-identifier hs-type">era</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span>     </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">BlockConfig</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyBlock"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679727793"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span></span></span></span></span><span>
-</span><span id="line-63"></span><span id="local-6989586621679727779"><span id="local-6989586621679727781"><span id="local-6989586621679727783"><span id="local-6989586621679727785"><span class="hs-keyword">deriving</span><span> </span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679727785"><span class="hs-identifier hs-type">era</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NoThunks</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">BlockConfig</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyBlock"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679727785"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span></span></span></span></span><span>
-</span><span id="line-64"></span><span>
-</span><span id="line-65"></span><span id="local-6989586621679727777"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#mkShelleyBlockConfig"><span class="hs-identifier hs-type">mkShelleyBlockConfig</span></a></span><span> </span><span class="hs-glyph">::</span><span>
-</span><span id="line-66"></span><span>     </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679727777"><span class="hs-identifier hs-type">era</span></a></span><span>
-</span><span id="line-67"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.ProtVer</span></span><span>
-</span><span id="line-68"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.ShelleyGenesis</span></span><span> </span><span class="annot"><a href="#local-6989586621679727777"><span class="hs-identifier hs-type">era</span></a></span><span>
-</span><span id="line-69"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">SL.VKey</span></span><span> </span><span class="hs-special">'</span><span class="annot"><span class="hs-identifier hs-type">SL.BlockIssuer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier hs-type">EraCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679727777"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
-</span><span id="line-70"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">BlockConfig</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyBlock"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679727777"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span></span><span>
-</span><span id="line-71"></span><span id="mkShelleyBlockConfig"><span class="annot"><span class="annottext">mkShelleyBlockConfig :: ProtVer
+forall proto era x.
+Rep (BlockConfig (ShelleyBlock proto era)) x
+-&gt; BlockConfig (ShelleyBlock proto era)
+forall proto era x.
+BlockConfig (ShelleyBlock proto era)
+-&gt; Rep (BlockConfig (ShelleyBlock proto era)) x
+$cto :: forall proto era x.
+Rep (BlockConfig (ShelleyBlock proto era)) x
+-&gt; BlockConfig (ShelleyBlock proto era)
+$cfrom :: forall proto era x.
+BlockConfig (ShelleyBlock proto era)
+-&gt; Rep (BlockConfig (ShelleyBlock proto era)) x
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-57"></span><span>
+</span><span id="line-58"></span><span id="local-6989586621679721299"><span id="local-6989586621679721301"><span id="local-6989586621679721303"><span id="local-6989586621679721305"><span id="local-6989586621679721306"><span class="hs-keyword">deriving</span><span> </span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679721306"><span class="hs-identifier hs-type">era</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span>     </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">BlockConfig</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyBlock"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679721305"><span class="hs-identifier hs-type">proto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679721306"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span></span></span></span></span></span><span>
+</span><span id="line-59"></span><span id="local-6989586621679721290"><span id="local-6989586621679721292"><span id="local-6989586621679721294"><span id="local-6989586621679721296"><span id="local-6989586621679721297"><span class="hs-keyword">deriving</span><span> </span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679721297"><span class="hs-identifier hs-type">era</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NoThunks</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">BlockConfig</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyBlock"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679721296"><span class="hs-identifier hs-type">proto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679721297"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span></span></span></span></span></span><span>
+</span><span id="line-60"></span><span>
+</span><span id="line-61"></span><span id="local-6989586621679721287"><span id="local-6989586621679721288"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#mkShelleyBlockConfig"><span class="hs-identifier hs-type">mkShelleyBlockConfig</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-62"></span><span>     </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679721288"><span class="hs-identifier hs-type">era</span></a></span><span>
+</span><span id="line-63"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.ProtVer</span></span><span>
+</span><span id="line-64"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.ShelleyGenesis</span></span><span> </span><span class="annot"><a href="#local-6989586621679721288"><span class="hs-identifier hs-type">era</span></a></span><span>
+</span><span id="line-65"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">SL.VKey</span></span><span> </span><span class="hs-special">'</span><span class="annot"><span class="hs-identifier hs-type">SL.BlockIssuer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#EraCrypto"><span class="hs-identifier hs-type">EraCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679721288"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-66"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">BlockConfig</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyBlock"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679721287"><span class="hs-identifier hs-type">proto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679721288"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-67"></span><span id="mkShelleyBlockConfig"><span class="annot"><span class="annottext">mkShelleyBlockConfig :: ProtVer
 -&gt; ShelleyGenesis era
 -&gt; [VKey 'BlockIssuer (EraCrypto era)]
--&gt; BlockConfig (ShelleyBlock era)
-</span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#mkShelleyBlockConfig"><span class="hs-identifier hs-var hs-var">mkShelleyBlockConfig</span></a></span></span><span> </span><span id="local-6989586621679727776"><span class="annot"><span class="annottext">ProtVer
-</span><a href="#local-6989586621679727776"><span class="hs-identifier hs-var">protVer</span></a></span></span><span> </span><span id="local-6989586621679727775"><span class="annot"><span class="annottext">ShelleyGenesis era
-</span><a href="#local-6989586621679727775"><span class="hs-identifier hs-var">genesis</span></a></span></span><span> </span><span id="local-6989586621679727774"><span class="annot"><span class="annottext">[VKey 'BlockIssuer (EraCrypto era)]
-</span><a href="#local-6989586621679727774"><span class="hs-identifier hs-var">blockIssuerVKeys</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ShelleyConfig :: forall era.
+-&gt; BlockConfig (ShelleyBlock proto era)
+</span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#mkShelleyBlockConfig"><span class="hs-identifier hs-var hs-var">mkShelleyBlockConfig</span></a></span></span><span> </span><span id="local-6989586621679721286"><span class="annot"><span class="annottext">ProtVer
+</span><a href="#local-6989586621679721286"><span class="hs-identifier hs-var">protVer</span></a></span></span><span> </span><span id="local-6989586621679721285"><span class="annot"><span class="annottext">ShelleyGenesis era
+</span><a href="#local-6989586621679721285"><span class="hs-identifier hs-var">genesis</span></a></span></span><span> </span><span id="local-6989586621679721284"><span class="annot"><span class="annottext">[VKey 'BlockIssuer (EraCrypto era)]
+</span><a href="#local-6989586621679721284"><span class="hs-identifier hs-var">blockIssuerVKeys</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ShelleyConfig :: forall proto era.
 ProtVer
 -&gt; SystemStart
 -&gt; NetworkMagic
 -&gt; Map
      (KeyHash 'BlockIssuer (EraCrypto era))
      (VKey 'BlockIssuer (EraCrypto era))
--&gt; BlockConfig (ShelleyBlock era)
+-&gt; BlockConfig (ShelleyBlock proto era)
 </span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#ShelleyConfig"><span class="hs-identifier hs-type">ShelleyConfig</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-72"></span><span>      </span><span class="annot"><span class="annottext">shelleyProtocolVersion :: ProtVer
+</span><span id="line-68"></span><span>      </span><span class="annot"><span class="annottext">shelleyProtocolVersion :: ProtVer
 </span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#shelleyProtocolVersion"><span class="hs-identifier hs-var">shelleyProtocolVersion</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ProtVer
-</span><a href="#local-6989586621679727776"><span class="hs-identifier hs-var">protVer</span></a></span><span>
-</span><span id="line-73"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">shelleySystemStart :: SystemStart
+</span><a href="#local-6989586621679721286"><span class="hs-identifier hs-var">protVer</span></a></span><span>
+</span><span id="line-69"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">shelleySystemStart :: SystemStart
 </span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#shelleySystemStart"><span class="hs-identifier hs-var">shelleySystemStart</span></a></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">UTCTime -&gt; SystemStart
 </span><span class="hs-identifier hs-var">SystemStart</span></span><span>  </span><span class="annot"><span class="annottext">(UTCTime -&gt; SystemStart) -&gt; UTCTime -&gt; SystemStart
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ShelleyGenesis era -&gt; UTCTime
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ShelleyGenesis era -&gt; UTCTime
 forall era. ShelleyGenesis era -&gt; UTCTime
 </span><span class="hs-identifier hs-var hs-var">SL.sgSystemStart</span></span><span>  </span><span class="annot"><span class="annottext">ShelleyGenesis era
-</span><a href="#local-6989586621679727775"><span class="hs-identifier hs-var">genesis</span></a></span><span>
-</span><span id="line-74"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">shelleyNetworkMagic :: NetworkMagic
+</span><a href="#local-6989586621679721285"><span class="hs-identifier hs-var">genesis</span></a></span><span>
+</span><span id="line-70"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">shelleyNetworkMagic :: NetworkMagic
 </span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#shelleyNetworkMagic"><span class="hs-identifier hs-var">shelleyNetworkMagic</span></a></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; NetworkMagic
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">NetworkMagic</span></a></span><span> </span><span class="annot"><span class="annottext">(Word32 -&gt; NetworkMagic) -&gt; Word32 -&gt; NetworkMagic
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">NetworkMagic</span></a></span><span> </span><span class="annot"><span class="annottext">(Word32 -&gt; NetworkMagic) -&gt; Word32 -&gt; NetworkMagic
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ShelleyGenesis era -&gt; Word32
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ShelleyGenesis era -&gt; Word32
 forall era. ShelleyGenesis era -&gt; Word32
 </span><span class="hs-identifier hs-var hs-var">SL.sgNetworkMagic</span></span><span> </span><span class="annot"><span class="annottext">ShelleyGenesis era
-</span><a href="#local-6989586621679727775"><span class="hs-identifier hs-var">genesis</span></a></span><span>
-</span><span id="line-75"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">shelleyBlockIssuerVKeys :: Map
+</span><a href="#local-6989586621679721285"><span class="hs-identifier hs-var">genesis</span></a></span><span>
+</span><span id="line-71"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">shelleyBlockIssuerVKeys :: Map
   (KeyHash 'BlockIssuer (EraCrypto era))
   (VKey 'BlockIssuer (EraCrypto era))
 </span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#shelleyBlockIssuerVKeys"><span class="hs-identifier hs-var">shelleyBlockIssuerVKeys</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(KeyHash 'BlockIssuer (EraCrypto era),
@@ -146,163 +142,180 @@ forall era. ShelleyGenesis era -&gt; Word32
      (KeyHash 'BlockIssuer (EraCrypto era))
      (VKey 'BlockIssuer (EraCrypto era))
 forall k a. Ord k =&gt; [(k, a)] -&gt; Map k a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/containers-0.6.2.1/src"><span class="hs-identifier hs-var">Map.fromList</span></a></span><span>
-</span><span id="line-76"></span><span>        </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">VKey 'BlockIssuer (EraCrypto era)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier hs-var">Map.fromList</span></a></span><span>
+</span><span id="line-72"></span><span>        </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">VKey 'BlockIssuer (EraCrypto era)
 -&gt; KeyHash 'BlockIssuer (EraCrypto era)
 forall crypto (kd :: KeyRole).
 Crypto crypto =&gt;
 VKey kd crypto -&gt; KeyHash kd crypto
 </span><span class="hs-identifier hs-var">SL.hashKey</span></span><span> </span><span class="annot"><span class="annottext">VKey 'BlockIssuer (EraCrypto era)
-</span><a href="#local-6989586621679727767"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">VKey 'BlockIssuer (EraCrypto era)
-</span><a href="#local-6989586621679727767"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-77"></span><span>        </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679727767"><span class="annot"><span class="annottext">VKey 'BlockIssuer (EraCrypto era)
-</span><a href="#local-6989586621679727767"><span class="hs-identifier hs-var">k</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[VKey 'BlockIssuer (EraCrypto era)]
-</span><a href="#local-6989586621679727774"><span class="hs-identifier hs-var">blockIssuerVKeys</span></a></span><span>
-</span><span id="line-78"></span><span>        </span><span class="hs-special">]</span><span>
-</span><span id="line-79"></span><span>    </span><span class="hs-special">}</span><span>
-</span><span id="line-80"></span><span>
-</span><span id="line-81"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+</span><a href="#local-6989586621679721277"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">VKey 'BlockIssuer (EraCrypto era)
+</span><a href="#local-6989586621679721277"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-73"></span><span>        </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679721277"><span class="annot"><span class="annottext">VKey 'BlockIssuer (EraCrypto era)
+</span><a href="#local-6989586621679721277"><span class="hs-identifier hs-var">k</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[VKey 'BlockIssuer (EraCrypto era)]
+</span><a href="#local-6989586621679721284"><span class="hs-identifier hs-var">blockIssuerVKeys</span></a></span><span>
+</span><span id="line-74"></span><span>        </span><span class="hs-special">]</span><span>
+</span><span id="line-75"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-76"></span><span>
+</span><span id="line-77"></span><span class="hs-comment">{-------------------------------------------------------------------------------
   Codec config
 -------------------------------------------------------------------------------}</span><span>
-</span><span id="line-84"></span><span>
-</span><span id="line-85"></span><span class="hs-comment">-- | No particular codec configuration is needed for Shelley</span><span>
-</span><span id="line-86"></span><span class="hs-keyword">data</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="CodecConfig"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">CodecConfig</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyBlock"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span id="local-6989586621679727764"><span class="annot"><a href="#local-6989586621679727764"><span class="hs-identifier hs-type hs-type">era</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ShelleyCodecConfig"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#ShelleyCodecConfig"><span class="hs-identifier hs-var">ShelleyCodecConfig</span></a></span></span><span>
-</span><span id="line-87"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(forall x.
- CodecConfig (ShelleyBlock era)
- -&gt; Rep (CodecConfig (ShelleyBlock era)) x)
+</span><span id="line-80"></span><span>
+</span><span id="line-81"></span><span class="hs-comment">-- | No particular codec configuration is needed for Shelley</span><span>
+</span><span id="line-82"></span><span class="hs-keyword">data</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="CodecConfig"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">CodecConfig</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyBlock"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span id="local-6989586621679721274"><span class="annot"><a href="#local-6989586621679721274"><span class="hs-identifier hs-type hs-type">proto</span></a></span></span><span> </span><span id="local-6989586621679721273"><span class="annot"><a href="#local-6989586621679721273"><span class="hs-identifier hs-type hs-type">era</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ShelleyCodecConfig"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#ShelleyCodecConfig"><span class="hs-identifier hs-var">ShelleyCodecConfig</span></a></span></span><span>
+</span><span id="line-83"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(forall x.
+ CodecConfig (ShelleyBlock proto era)
+ -&gt; Rep (CodecConfig (ShelleyBlock proto era)) x)
 -&gt; (forall x.
-    Rep (CodecConfig (ShelleyBlock era)) x
-    -&gt; CodecConfig (ShelleyBlock era))
--&gt; Generic (CodecConfig (ShelleyBlock era))
+    Rep (CodecConfig (ShelleyBlock proto era)) x
+    -&gt; CodecConfig (ShelleyBlock proto era))
+-&gt; Generic (CodecConfig (ShelleyBlock proto era))
 forall x.
-Rep (CodecConfig (ShelleyBlock era)) x
--&gt; CodecConfig (ShelleyBlock era)
+Rep (CodecConfig (ShelleyBlock proto era)) x
+-&gt; CodecConfig (ShelleyBlock proto era)
 forall x.
-CodecConfig (ShelleyBlock era)
--&gt; Rep (CodecConfig (ShelleyBlock era)) x
+CodecConfig (ShelleyBlock proto era)
+-&gt; Rep (CodecConfig (ShelleyBlock proto era)) x
 forall a.
 (forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
-forall era x.
-Rep (CodecConfig (ShelleyBlock era)) x
--&gt; CodecConfig (ShelleyBlock era)
-forall era x.
-CodecConfig (ShelleyBlock era)
--&gt; Rep (CodecConfig (ShelleyBlock era)) x
-$cto :: forall era x.
-Rep (CodecConfig (ShelleyBlock era)) x
--&gt; CodecConfig (ShelleyBlock era)
-$cfrom :: forall era x.
-CodecConfig (ShelleyBlock era)
--&gt; Rep (CodecConfig (ShelleyBlock era)) x
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679727755"><span id="local-6989586621679727757"><span id="local-6989586621679727759"><span class="annot"><span class="annottext">Context -&gt; CodecConfig (ShelleyBlock era) -&gt; IO (Maybe ThunkInfo)
-Proxy (CodecConfig (ShelleyBlock era)) -&gt; String
-(Context -&gt; CodecConfig (ShelleyBlock era) -&gt; IO (Maybe ThunkInfo))
+forall proto era x.
+Rep (CodecConfig (ShelleyBlock proto era)) x
+-&gt; CodecConfig (ShelleyBlock proto era)
+forall proto era x.
+CodecConfig (ShelleyBlock proto era)
+-&gt; Rep (CodecConfig (ShelleyBlock proto era)) x
+$cto :: forall proto era x.
+Rep (CodecConfig (ShelleyBlock proto era)) x
+-&gt; CodecConfig (ShelleyBlock proto era)
+$cfrom :: forall proto era x.
+CodecConfig (ShelleyBlock proto era)
+-&gt; Rep (CodecConfig (ShelleyBlock proto era)) x
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679721264"><span id="local-6989586621679721266"><span id="local-6989586621679721268"><span class="annot"><span class="annottext">Context
+-&gt; CodecConfig (ShelleyBlock proto era) -&gt; IO (Maybe ThunkInfo)
+Proxy (CodecConfig (ShelleyBlock proto era)) -&gt; String
+(Context
+ -&gt; CodecConfig (ShelleyBlock proto era) -&gt; IO (Maybe ThunkInfo))
 -&gt; (Context
-    -&gt; CodecConfig (ShelleyBlock era) -&gt; IO (Maybe ThunkInfo))
--&gt; (Proxy (CodecConfig (ShelleyBlock era)) -&gt; String)
--&gt; NoThunks (CodecConfig (ShelleyBlock era))
-forall era.
-Context -&gt; CodecConfig (ShelleyBlock era) -&gt; IO (Maybe ThunkInfo)
-forall era. Proxy (CodecConfig (ShelleyBlock era)) -&gt; String
+    -&gt; CodecConfig (ShelleyBlock proto era) -&gt; IO (Maybe ThunkInfo))
+-&gt; (Proxy (CodecConfig (ShelleyBlock proto era)) -&gt; String)
+-&gt; NoThunks (CodecConfig (ShelleyBlock proto era))
 forall a.
 (Context -&gt; a -&gt; IO (Maybe ThunkInfo))
 -&gt; (Context -&gt; a -&gt; IO (Maybe ThunkInfo))
 -&gt; (Proxy a -&gt; String)
 -&gt; NoThunks a
-showTypeOf :: Proxy (CodecConfig (ShelleyBlock era)) -&gt; String
-$cshowTypeOf :: forall era. Proxy (CodecConfig (ShelleyBlock era)) -&gt; String
-wNoThunks :: Context -&gt; CodecConfig (ShelleyBlock era) -&gt; IO (Maybe ThunkInfo)
-$cwNoThunks :: forall era.
-Context -&gt; CodecConfig (ShelleyBlock era) -&gt; IO (Maybe ThunkInfo)
-noThunks :: Context -&gt; CodecConfig (ShelleyBlock era) -&gt; IO (Maybe ThunkInfo)
-$cnoThunks :: forall era.
-Context -&gt; CodecConfig (ShelleyBlock era) -&gt; IO (Maybe ThunkInfo)
-</span><a href="#local-6989586621679727755"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">NoThunks</span></a></span></span></span></span><span class="hs-special">)</span><span>
-</span><span id="line-88"></span><span>
-</span><span id="line-89"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+forall proto era.
+Context
+-&gt; CodecConfig (ShelleyBlock proto era) -&gt; IO (Maybe ThunkInfo)
+forall proto era.
+Proxy (CodecConfig (ShelleyBlock proto era)) -&gt; String
+showTypeOf :: Proxy (CodecConfig (ShelleyBlock proto era)) -&gt; String
+$cshowTypeOf :: forall proto era.
+Proxy (CodecConfig (ShelleyBlock proto era)) -&gt; String
+wNoThunks :: Context
+-&gt; CodecConfig (ShelleyBlock proto era) -&gt; IO (Maybe ThunkInfo)
+$cwNoThunks :: forall proto era.
+Context
+-&gt; CodecConfig (ShelleyBlock proto era) -&gt; IO (Maybe ThunkInfo)
+noThunks :: Context
+-&gt; CodecConfig (ShelleyBlock proto era) -&gt; IO (Maybe ThunkInfo)
+$cnoThunks :: forall proto era.
+Context
+-&gt; CodecConfig (ShelleyBlock proto era) -&gt; IO (Maybe ThunkInfo)
+</span><a href="#local-6989586621679721264"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">NoThunks</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-84"></span><span>
+</span><span id="line-85"></span><span class="hs-comment">{-------------------------------------------------------------------------------
   Storage config
 -------------------------------------------------------------------------------}</span><span>
-</span><span id="line-92"></span><span>
-</span><span id="line-93"></span><span class="hs-keyword">data</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="StorageConfig"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">StorageConfig</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyBlock"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span id="local-6989586621679727752"><span class="annot"><a href="#local-6989586621679727752"><span class="hs-identifier hs-type hs-type">era</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ShelleyStorageConfig"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#ShelleyStorageConfig"><span class="hs-identifier hs-var">ShelleyStorageConfig</span></a></span></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-94"></span><span>      </span><span class="hs-comment">-- | Needed for 'nodeCheckIntegrity'</span><span>
-</span><span id="line-95"></span><span>      </span><span id="shelleyStorageConfigSlotsPerKESPeriod"><span class="annot"><span class="annottext">StorageConfig (ShelleyBlock era) -&gt; Word64
-</span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#shelleyStorageConfigSlotsPerKESPeriod"><span class="hs-identifier hs-var hs-var">shelleyStorageConfigSlotsPerKESPeriod</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Word64</span></a></span><span>
-</span><span id="line-96"></span><span>      </span><span class="hs-comment">-- | Needed for 'nodeImmutableDbChunkInfo'</span><span>
-</span><span id="line-97"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="shelleyStorageConfigSecurityParam"><span class="annot"><span class="annottext">StorageConfig (ShelleyBlock era) -&gt; SecurityParam
-</span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#shelleyStorageConfigSecurityParam"><span class="hs-identifier hs-var hs-var">shelleyStorageConfigSecurityParam</span></a></span></span><span>     </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-consensus-0.1.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">SecurityParam</span></a></span><span>
-</span><span id="line-98"></span><span>    </span><span class="hs-special">}</span><span>
-</span><span id="line-99"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(forall x.
- StorageConfig (ShelleyBlock era)
- -&gt; Rep (StorageConfig (ShelleyBlock era)) x)
+</span><span id="line-88"></span><span>
+</span><span id="line-89"></span><span class="hs-keyword">data</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="StorageConfig"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">StorageConfig</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Block.html#ShelleyBlock"><span class="hs-identifier hs-type">ShelleyBlock</span></a></span><span> </span><span id="local-6989586621679721261"><span class="annot"><a href="#local-6989586621679721261"><span class="hs-identifier hs-type hs-type">proto</span></a></span></span><span> </span><span id="local-6989586621679721260"><span class="annot"><a href="#local-6989586621679721260"><span class="hs-identifier hs-type hs-type">era</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ShelleyStorageConfig"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#ShelleyStorageConfig"><span class="hs-identifier hs-var">ShelleyStorageConfig</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-90"></span><span>      </span><span class="hs-comment">-- | Needed for 'nodeCheckIntegrity'</span><span>
+</span><span id="line-91"></span><span>      </span><span id="shelleyStorageConfigSlotsPerKESPeriod"><span class="annot"><span class="annottext">StorageConfig (ShelleyBlock proto era) -&gt; Word64
+</span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#shelleyStorageConfigSlotsPerKESPeriod"><span class="hs-identifier hs-var hs-var">shelleyStorageConfigSlotsPerKESPeriod</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Word64</span></a></span><span>
+</span><span id="line-92"></span><span>      </span><span class="hs-comment">-- | Needed for 'nodeImmutableDbChunkInfo'</span><span>
+</span><span id="line-93"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="shelleyStorageConfigSecurityParam"><span class="annot"><span class="annottext">StorageConfig (ShelleyBlock proto era) -&gt; SecurityParam
+</span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#shelleyStorageConfigSecurityParam"><span class="hs-identifier hs-var hs-var">shelleyStorageConfigSecurityParam</span></a></span></span><span>     </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">SecurityParam</span></a></span><span>
+</span><span id="line-94"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-95"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(forall x.
+ StorageConfig (ShelleyBlock proto era)
+ -&gt; Rep (StorageConfig (ShelleyBlock proto era)) x)
 -&gt; (forall x.
-    Rep (StorageConfig (ShelleyBlock era)) x
-    -&gt; StorageConfig (ShelleyBlock era))
--&gt; Generic (StorageConfig (ShelleyBlock era))
+    Rep (StorageConfig (ShelleyBlock proto era)) x
+    -&gt; StorageConfig (ShelleyBlock proto era))
+-&gt; Generic (StorageConfig (ShelleyBlock proto era))
 forall x.
-Rep (StorageConfig (ShelleyBlock era)) x
--&gt; StorageConfig (ShelleyBlock era)
+Rep (StorageConfig (ShelleyBlock proto era)) x
+-&gt; StorageConfig (ShelleyBlock proto era)
 forall x.
-StorageConfig (ShelleyBlock era)
--&gt; Rep (StorageConfig (ShelleyBlock era)) x
+StorageConfig (ShelleyBlock proto era)
+-&gt; Rep (StorageConfig (ShelleyBlock proto era)) x
 forall a.
 (forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
-forall era x.
-Rep (StorageConfig (ShelleyBlock era)) x
--&gt; StorageConfig (ShelleyBlock era)
-forall era x.
-StorageConfig (ShelleyBlock era)
--&gt; Rep (StorageConfig (ShelleyBlock era)) x
-$cto :: forall era x.
-Rep (StorageConfig (ShelleyBlock era)) x
--&gt; StorageConfig (ShelleyBlock era)
-$cfrom :: forall era x.
-StorageConfig (ShelleyBlock era)
--&gt; Rep (StorageConfig (ShelleyBlock era)) x
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679727741"><span id="local-6989586621679727743"><span id="local-6989586621679727745"><span class="annot"><span class="annottext">Context -&gt; StorageConfig (ShelleyBlock era) -&gt; IO (Maybe ThunkInfo)
-Proxy (StorageConfig (ShelleyBlock era)) -&gt; String
+forall proto era x.
+Rep (StorageConfig (ShelleyBlock proto era)) x
+-&gt; StorageConfig (ShelleyBlock proto era)
+forall proto era x.
+StorageConfig (ShelleyBlock proto era)
+-&gt; Rep (StorageConfig (ShelleyBlock proto era)) x
+$cto :: forall proto era x.
+Rep (StorageConfig (ShelleyBlock proto era)) x
+-&gt; StorageConfig (ShelleyBlock proto era)
+$cfrom :: forall proto era x.
+StorageConfig (ShelleyBlock proto era)
+-&gt; Rep (StorageConfig (ShelleyBlock proto era)) x
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679721249"><span id="local-6989586621679721251"><span id="local-6989586621679721253"><span class="annot"><span class="annottext">Context
+-&gt; StorageConfig (ShelleyBlock proto era) -&gt; IO (Maybe ThunkInfo)
+Proxy (StorageConfig (ShelleyBlock proto era)) -&gt; String
 (Context
- -&gt; StorageConfig (ShelleyBlock era) -&gt; IO (Maybe ThunkInfo))
+ -&gt; StorageConfig (ShelleyBlock proto era) -&gt; IO (Maybe ThunkInfo))
 -&gt; (Context
-    -&gt; StorageConfig (ShelleyBlock era) -&gt; IO (Maybe ThunkInfo))
--&gt; (Proxy (StorageConfig (ShelleyBlock era)) -&gt; String)
--&gt; NoThunks (StorageConfig (ShelleyBlock era))
-forall era.
-Context -&gt; StorageConfig (ShelleyBlock era) -&gt; IO (Maybe ThunkInfo)
-forall era. Proxy (StorageConfig (ShelleyBlock era)) -&gt; String
+    -&gt; StorageConfig (ShelleyBlock proto era) -&gt; IO (Maybe ThunkInfo))
+-&gt; (Proxy (StorageConfig (ShelleyBlock proto era)) -&gt; String)
+-&gt; NoThunks (StorageConfig (ShelleyBlock proto era))
 forall a.
 (Context -&gt; a -&gt; IO (Maybe ThunkInfo))
 -&gt; (Context -&gt; a -&gt; IO (Maybe ThunkInfo))
 -&gt; (Proxy a -&gt; String)
 -&gt; NoThunks a
-showTypeOf :: Proxy (StorageConfig (ShelleyBlock era)) -&gt; String
-$cshowTypeOf :: forall era. Proxy (StorageConfig (ShelleyBlock era)) -&gt; String
-wNoThunks :: Context -&gt; StorageConfig (ShelleyBlock era) -&gt; IO (Maybe ThunkInfo)
-$cwNoThunks :: forall era.
-Context -&gt; StorageConfig (ShelleyBlock era) -&gt; IO (Maybe ThunkInfo)
-noThunks :: Context -&gt; StorageConfig (ShelleyBlock era) -&gt; IO (Maybe ThunkInfo)
-$cnoThunks :: forall era.
-Context -&gt; StorageConfig (ShelleyBlock era) -&gt; IO (Maybe ThunkInfo)
-</span><a href="#local-6989586621679727741"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">NoThunks</span></a></span></span></span></span><span class="hs-special">)</span><span>
-</span><span id="line-100"></span><span>
-</span><span id="line-101"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+forall proto era.
+Context
+-&gt; StorageConfig (ShelleyBlock proto era) -&gt; IO (Maybe ThunkInfo)
+forall proto era.
+Proxy (StorageConfig (ShelleyBlock proto era)) -&gt; String
+showTypeOf :: Proxy (StorageConfig (ShelleyBlock proto era)) -&gt; String
+$cshowTypeOf :: forall proto era.
+Proxy (StorageConfig (ShelleyBlock proto era)) -&gt; String
+wNoThunks :: Context
+-&gt; StorageConfig (ShelleyBlock proto era) -&gt; IO (Maybe ThunkInfo)
+$cwNoThunks :: forall proto era.
+Context
+-&gt; StorageConfig (ShelleyBlock proto era) -&gt; IO (Maybe ThunkInfo)
+noThunks :: Context
+-&gt; StorageConfig (ShelleyBlock proto era) -&gt; IO (Maybe ThunkInfo)
+$cnoThunks :: forall proto era.
+Context
+-&gt; StorageConfig (ShelleyBlock proto era) -&gt; IO (Maybe ThunkInfo)
+</span><a href="#local-6989586621679721249"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">NoThunks</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-96"></span><span>
+</span><span id="line-97"></span><span class="hs-comment">{-------------------------------------------------------------------------------
   Compact genesis
 -------------------------------------------------------------------------------}</span><span>
-</span><span id="line-104"></span><span>
-</span><span id="line-105"></span><span class="hs-comment">-- | Compact variant of 'SL.ShelleyGenesis' with some fields erased that are</span><span>
-</span><span id="line-106"></span><span class="hs-comment">-- only used on start-up and that should not be kept in memory forever.</span><span>
-</span><span id="line-107"></span><span class="hs-comment">--</span><span>
-</span><span id="line-108"></span><span class="hs-comment">-- Concretely:</span><span>
-</span><span id="line-109"></span><span class="hs-comment">--</span><span>
-</span><span id="line-110"></span><span class="hs-comment">-- * The 'sgInitialFunds' field is erased. It is only used to set up the initial</span><span>
-</span><span id="line-111"></span><span class="hs-comment">--   UTxO in tests and testnets.</span><span>
-</span><span id="line-112"></span><span class="hs-comment">--</span><span>
-</span><span id="line-113"></span><span class="hs-comment">-- * The 'sgStaking' field is erased. It is only used to register initial stake</span><span>
-</span><span id="line-114"></span><span class="hs-comment">--   pools in tests and benchmarks.</span><span>
-</span><span id="line-115"></span><span id="local-6989586621679727739"><span id="local-6989586621679727740"></span></span><span class="hs-keyword">newtype</span><span> </span><span id="CompactGenesis"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#CompactGenesis"><span class="hs-identifier hs-var">CompactGenesis</span></a></span></span><span> </span><span id="local-6989586621679727813"><span class="annot"><a href="#local-6989586621679727813"><span class="hs-identifier hs-type">era</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="CompactGenesis"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#CompactGenesis"><span class="hs-identifier hs-var">CompactGenesis</span></a></span></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-116"></span><span>      </span><span id="getCompactGenesis"><span class="annot"><span class="annottext">CompactGenesis era -&gt; ShelleyGenesis era
-</span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#getCompactGenesis"><span class="hs-identifier hs-var hs-var">getCompactGenesis</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.ShelleyGenesis</span></span><span> </span><span class="annot"><a href="#local-6989586621679727813"><span class="hs-identifier hs-type">era</span></a></span><span>
-</span><span id="line-117"></span><span>    </span><span class="hs-special">}</span><span>
-</span><span id="line-118"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679727734"><span id="local-6989586621679727736"><span class="annot"><span class="annottext">CompactGenesis era -&gt; CompactGenesis era -&gt; Bool
+</span><span id="line-100"></span><span>
+</span><span id="line-101"></span><span class="hs-comment">-- | Compact variant of 'SL.ShelleyGenesis' with some fields erased that are</span><span>
+</span><span id="line-102"></span><span class="hs-comment">-- only used on start-up and that should not be kept in memory forever.</span><span>
+</span><span id="line-103"></span><span class="hs-comment">--</span><span>
+</span><span id="line-104"></span><span class="hs-comment">-- Concretely:</span><span>
+</span><span id="line-105"></span><span class="hs-comment">--</span><span>
+</span><span id="line-106"></span><span class="hs-comment">-- * The 'sgInitialFunds' field is erased. It is only used to set up the initial</span><span>
+</span><span id="line-107"></span><span class="hs-comment">--   UTxO in tests and testnets.</span><span>
+</span><span id="line-108"></span><span class="hs-comment">--</span><span>
+</span><span id="line-109"></span><span class="hs-comment">-- * The 'sgStaking' field is erased. It is only used to register initial stake</span><span>
+</span><span id="line-110"></span><span class="hs-comment">--   pools in tests and benchmarks.</span><span>
+</span><span id="line-111"></span><span id="local-6989586621679721247"><span id="local-6989586621679721248"></span></span><span class="hs-keyword">newtype</span><span> </span><span id="CompactGenesis"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#CompactGenesis"><span class="hs-identifier hs-var">CompactGenesis</span></a></span></span><span> </span><span id="local-6989586621679721327"><span class="annot"><a href="#local-6989586621679721327"><span class="hs-identifier hs-type">era</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="CompactGenesis"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#CompactGenesis"><span class="hs-identifier hs-var">CompactGenesis</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-112"></span><span>      </span><span id="getCompactGenesis"><span class="annot"><span class="annottext">CompactGenesis era -&gt; ShelleyGenesis era
+</span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#getCompactGenesis"><span class="hs-identifier hs-var hs-var">getCompactGenesis</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.ShelleyGenesis</span></span><span> </span><span class="annot"><a href="#local-6989586621679721327"><span class="hs-identifier hs-type">era</span></a></span><span>
+</span><span id="line-113"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-114"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679721242"><span id="local-6989586621679721244"><span class="annot"><span class="annottext">CompactGenesis era -&gt; CompactGenesis era -&gt; Bool
 (CompactGenesis era -&gt; CompactGenesis era -&gt; Bool)
 -&gt; (CompactGenesis era -&gt; CompactGenesis era -&gt; Bool)
 -&gt; Eq (CompactGenesis era)
@@ -312,7 +325,7 @@ forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 $c/= :: forall era. CompactGenesis era -&gt; CompactGenesis era -&gt; Bool
 == :: CompactGenesis era -&gt; CompactGenesis era -&gt; Bool
 $c== :: forall era. CompactGenesis era -&gt; CompactGenesis era -&gt; Bool
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679727727"><span id="local-6989586621679727729"><span id="local-6989586621679727731"><span class="annot"><span class="annottext">Int -&gt; CompactGenesis era -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679721235"><span id="local-6989586621679721237"><span id="local-6989586621679721239"><span class="annot"><span class="annottext">Int -&gt; CompactGenesis era -&gt; ShowS
 [CompactGenesis era] -&gt; ShowS
 CompactGenesis era -&gt; String
 (Int -&gt; CompactGenesis era -&gt; ShowS)
@@ -330,7 +343,7 @@ show :: CompactGenesis era -&gt; String
 $cshow :: forall era. CompactGenesis era -&gt; String
 showsPrec :: Int -&gt; CompactGenesis era -&gt; ShowS
 $cshowsPrec :: forall era. Int -&gt; CompactGenesis era -&gt; ShowS
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. CompactGenesis era -&gt; Rep (CompactGenesis era) x)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. CompactGenesis era -&gt; Rep (CompactGenesis era) x)
 -&gt; (forall x. Rep (CompactGenesis era) x -&gt; CompactGenesis era)
 -&gt; Generic (CompactGenesis era)
 forall x. Rep (CompactGenesis era) x -&gt; CompactGenesis era
@@ -341,8 +354,8 @@ forall era x. Rep (CompactGenesis era) x -&gt; CompactGenesis era
 forall era x. CompactGenesis era -&gt; Rep (CompactGenesis era) x
 $cto :: forall era x. Rep (CompactGenesis era) x -&gt; CompactGenesis era
 $cfrom :: forall era x. CompactGenesis era -&gt; Rep (CompactGenesis era) x
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-119"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679727720"><span id="local-6989586621679727722"><span class="annot"><span class="annottext">Typeable (CompactGenesis era)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-115"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679721228"><span id="local-6989586621679721230"><span class="annot"><span class="annottext">Typeable (CompactGenesis era)
 Decoder s (CompactGenesis era)
 Typeable (CompactGenesis era)
 -&gt; (forall s. Decoder s (CompactGenesis era))
@@ -361,7 +374,7 @@ $clabel :: forall era. Era era =&gt; Proxy (CompactGenesis era) -&gt; Text
 fromCBOR :: Decoder s (CompactGenesis era)
 $cfromCBOR :: forall era s. Era era =&gt; Decoder s (CompactGenesis era)
 $cp1FromCBOR :: forall era. Era era =&gt; Typeable (CompactGenesis era)
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var">FromCBOR</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679727712"><span id="local-6989586621679727714"><span id="local-6989586621679727716"><span class="annot"><span class="annottext">Typeable (CompactGenesis era)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var">FromCBOR</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679721220"><span id="local-6989586621679721222"><span id="local-6989586621679721224"><span class="annot"><span class="annottext">Typeable (CompactGenesis era)
 Typeable (CompactGenesis era)
 -&gt; (CompactGenesis era -&gt; Encoding)
 -&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
@@ -406,28 +419,28 @@ toCBOR :: CompactGenesis era -&gt; Encoding
 $ctoCBOR :: forall era. Era era =&gt; CompactGenesis era -&gt; Encoding
 $cp1ToCBOR :: forall era. Era era =&gt; Typeable (CompactGenesis era)
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">ToCBOR</span></span></span></span></span><span class="hs-special">)</span><span>
-</span><span id="line-120"></span><span>
-</span><span id="line-121"></span><span id="local-6989586621679727705"><span id="local-6989586621679727707"><span id="local-6989586621679727709"><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679727704"><span class="annot"><a href="#local-6989586621679727704"><span class="hs-keyword hs-type">anyclass</span></a></span></span><span> </span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679727704"><span class="hs-identifier hs-type">era</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NoThunks</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#CompactGenesis"><span class="hs-identifier hs-type">CompactGenesis</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679727704"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span></span></span></span><span>
-</span><span id="line-122"></span><span>
-</span><span id="line-123"></span><span class="hs-comment">-- | Compacts the given 'SL.ShelleyGenesis'.</span><span>
-</span><span id="line-124"></span><span id="local-6989586621679727703"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#compactGenesis"><span class="hs-identifier hs-type">compactGenesis</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.ShelleyGenesis</span></span><span> </span><span class="annot"><a href="#local-6989586621679727703"><span class="hs-identifier hs-type">era</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#CompactGenesis"><span class="hs-identifier hs-type">CompactGenesis</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679727703"><span class="hs-identifier hs-type">era</span></a></span></span><span>
-</span><span id="line-125"></span><span id="compactGenesis"><span class="annot"><span class="annottext">compactGenesis :: ShelleyGenesis era -&gt; CompactGenesis era
-</span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#compactGenesis"><span class="hs-identifier hs-var hs-var">compactGenesis</span></a></span></span><span> </span><span id="local-6989586621679727702"><span class="annot"><span class="annottext">ShelleyGenesis era
-</span><a href="#local-6989586621679727702"><span class="hs-identifier hs-var">genesis</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ShelleyGenesis era -&gt; CompactGenesis era
+</span><span id="line-116"></span><span>
+</span><span id="line-117"></span><span id="local-6989586621679721213"><span id="local-6989586621679721215"><span id="local-6989586621679721217"><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679721212"><span class="annot"><a href="#local-6989586621679721212"><span class="hs-keyword hs-type">anyclass</span></a></span></span><span> </span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Eras.html#ShelleyBasedEra"><span class="hs-identifier hs-type">ShelleyBasedEra</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679721212"><span class="hs-identifier hs-type">era</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NoThunks</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#CompactGenesis"><span class="hs-identifier hs-type">CompactGenesis</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679721212"><span class="hs-identifier hs-type">era</span></a></span><span class="hs-special">)</span></span></span></span><span>
+</span><span id="line-118"></span><span>
+</span><span id="line-119"></span><span class="hs-comment">-- | Compacts the given 'SL.ShelleyGenesis'.</span><span>
+</span><span id="line-120"></span><span id="local-6989586621679721211"><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#compactGenesis"><span class="hs-identifier hs-type">compactGenesis</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.ShelleyGenesis</span></span><span> </span><span class="annot"><a href="#local-6989586621679721211"><span class="hs-identifier hs-type">era</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#CompactGenesis"><span class="hs-identifier hs-type">CompactGenesis</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679721211"><span class="hs-identifier hs-type">era</span></a></span></span><span>
+</span><span id="line-121"></span><span id="compactGenesis"><span class="annot"><span class="annottext">compactGenesis :: ShelleyGenesis era -&gt; CompactGenesis era
+</span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#compactGenesis"><span class="hs-identifier hs-var hs-var">compactGenesis</span></a></span></span><span> </span><span id="local-6989586621679721210"><span class="annot"><span class="annottext">ShelleyGenesis era
+</span><a href="#local-6989586621679721210"><span class="hs-identifier hs-var">genesis</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ShelleyGenesis era -&gt; CompactGenesis era
 forall era. ShelleyGenesis era -&gt; CompactGenesis era
 </span><a href="Ouroboros.Consensus.Shelley.Ledger.Config.html#CompactGenesis"><span class="hs-identifier hs-var">CompactGenesis</span></a></span><span> </span><span class="annot"><span class="annottext">(ShelleyGenesis era -&gt; CompactGenesis era)
 -&gt; ShelleyGenesis era -&gt; CompactGenesis era
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
-</span><span id="line-126"></span><span>    </span><span class="annot"><span class="annottext">ShelleyGenesis era
-</span><a href="#local-6989586621679727702"><span class="hs-identifier hs-var">genesis</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-127"></span><span>        </span><span class="annot"><span class="annottext">sgInitialFunds :: Map (Addr (Crypto era)) Coin
-</span><span class="hs-identifier hs-var">SL.sgInitialFunds</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map (Addr (Crypto era)) Coin
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-122"></span><span>    </span><span class="annot"><span class="annottext">ShelleyGenesis era
+</span><a href="#local-6989586621679721210"><span class="hs-identifier hs-var">genesis</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-123"></span><span>        </span><span class="annot"><span class="annottext">sgInitialFunds :: ListMap (Addr (Crypto era)) Coin
+</span><span class="hs-identifier hs-var">SL.sgInitialFunds</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ListMap (Addr (Crypto era)) Coin
 forall a. Monoid a =&gt; a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">mempty</span></a></span><span>
-</span><span id="line-128"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">sgStaking :: ShelleyGenesisStaking (Crypto era)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">mempty</span></a></span><span>
+</span><span id="line-124"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">sgStaking :: ShelleyGenesisStaking (Crypto era)
 </span><span class="hs-identifier hs-var">SL.sgStaking</span></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ShelleyGenesisStaking (Crypto era)
 forall crypto. ShelleyGenesisStaking crypto
 </span><span class="hs-identifier hs-var">SL.emptyGenesisStaking</span></span><span>
-</span><span id="line-129"></span><span>      </span><span class="hs-special">}</span><span>
-</span><span id="line-130"></span></pre></body></html>
+</span><span id="line-125"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-126"></span></pre></body></html>

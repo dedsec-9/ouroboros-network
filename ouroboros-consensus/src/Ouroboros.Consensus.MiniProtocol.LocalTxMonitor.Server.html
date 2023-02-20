@@ -5,404 +5,422 @@
 </span><span id="line-5"></span><span>
 </span><span id="line-6"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Consensus.MiniProtocol.LocalTxMonitor.Server</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.MiniProtocol.LocalTxMonitor.Server.html#localTxMonitorServer"><span class="hs-identifier">localTxMonitorServer</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-7"></span><span>
-</span><span id="line-8"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier">Ouroboros.Network.Protocol.LocalTxMonitor.Server</span></a></span><span>
-</span><span id="line-9"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier">Ouroboros.Network.Protocol.LocalTxMonitor.Type</span></a></span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-protocols-0.2.0.0/noopt/doc/html/ouroboros-network-protocols/src"><span class="hs-identifier">Ouroboros.Network.Protocol.LocalTxMonitor.Server</span></a></span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-protocols-0.2.0.0/noopt/doc/html/ouroboros-network-protocols/src"><span class="hs-identifier">Ouroboros.Network.Protocol.LocalTxMonitor.Type</span></a></span><span>
 </span><span id="line-10"></span><span>
 </span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Block.html"><span class="hs-identifier">Ouroboros.Consensus.Block</span></a></span><span>
 </span><span id="line-12"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html"><span class="hs-identifier">Ouroboros.Consensus.Ledger.SupportsMempool</span></a></span><span>
-</span><span id="line-13"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.API.html"><span class="hs-identifier">Ouroboros.Consensus.Mempool.API</span></a></span><span>
+</span><span id="line-13"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.html"><span class="hs-identifier">Ouroboros.Consensus.Mempool</span></a></span><span>
 </span><span id="line-14"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Util.IOLike.html"><span class="hs-identifier">Ouroboros.Consensus.Util.IOLike</span></a></span><span>
 </span><span id="line-15"></span><span>
 </span><span id="line-16"></span><span class="hs-comment">-- | Local transaction monitoring server, for inspecting the mempool.</span><span>
 </span><span id="line-17"></span><span class="hs-comment">--</span><span>
 </span><span id="line-18"></span><span class="annot"><a href="Ouroboros.Consensus.MiniProtocol.LocalTxMonitor.Server.html#localTxMonitorServer"><span class="hs-identifier hs-type">localTxMonitorServer</span></a></span><span> </span><span class="hs-glyph">::</span><span>
-</span><span id="line-19"></span><span>     </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679983954"><span class="annot"><a href="#local-6989586621679983954"><span class="hs-identifier hs-type">blk</span></a></span></span><span> </span><span id="local-6989586621679983953"><span class="annot"><a href="#local-6989586621679983953"><span class="hs-identifier hs-type">idx</span></a></span></span><span> </span><span id="local-6989586621679983952"><span class="annot"><a href="#local-6989586621679983952"><span class="hs-identifier hs-type">m</span></a></span></span><span class="hs-operator">.</span><span>
-</span><span id="line-20"></span><span>     </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-type">MonadSTM</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983952"><span class="hs-identifier hs-type">m</span></a></span><span>
-</span><span id="line-21"></span><span>     </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#LedgerSupportsMempool"><span class="hs-identifier hs-type">LedgerSupportsMempool</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983954"><span class="hs-identifier hs-type">blk</span></a></span><span>
-</span><span id="line-22"></span><span>     </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Eq</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983953"><span class="hs-identifier hs-type">idx</span></a></span><span>
-</span><span id="line-23"></span><span>     </span><span class="hs-special">)</span><span>
-</span><span id="line-24"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.API.html#Mempool"><span class="hs-identifier hs-type">Mempool</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983952"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983954"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983953"><span class="hs-identifier hs-type">idx</span></a></span><span>
-</span><span id="line-25"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">LocalTxMonitorServer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#GenTxId"><span class="hs-identifier hs-type">GenTxId</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983954"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#GenTx"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983954"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="annot"><a href="#local-6989586621679983952"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
-</span><span id="line-26"></span><span id="localTxMonitorServer"><span class="annot"><span class="annottext">localTxMonitorServer :: Mempool m blk idx
+</span><span id="line-19"></span><span>     </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621680009105"><span class="annot"><a href="#local-6989586621680009105"><span class="hs-identifier hs-type">blk</span></a></span></span><span> </span><span id="local-6989586621680009104"><span class="annot"><a href="#local-6989586621680009104"><span class="hs-identifier hs-type">m</span></a></span></span><span class="hs-operator">.</span><span>
+</span><span id="line-20"></span><span>     </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MonadSTM</span></span><span> </span><span class="annot"><a href="#local-6989586621680009104"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-21"></span><span>     </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#LedgerSupportsMempool"><span class="hs-identifier hs-type">LedgerSupportsMempool</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680009105"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-22"></span><span>     </span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.API.html#Mempool"><span class="hs-identifier hs-type">Mempool</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680009104"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680009105"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-protocols-0.2.0.0/noopt/doc/html/ouroboros-network-protocols/src"><span class="hs-identifier hs-type">LocalTxMonitorServer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#GenTxId"><span class="hs-identifier hs-type">GenTxId</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680009105"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#GenTx"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680009105"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="annot"><a href="#local-6989586621680009104"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-25"></span><span id="localTxMonitorServer"><span class="annot"><span class="annottext">localTxMonitorServer :: Mempool m blk
 -&gt; LocalTxMonitorServer (GenTxId blk) (GenTx blk) SlotNo m ()
-</span><a href="Ouroboros.Consensus.MiniProtocol.LocalTxMonitor.Server.html#localTxMonitorServer"><span class="hs-identifier hs-var hs-var">localTxMonitorServer</span></a></span></span><span> </span><span id="local-6989586621679983951"><span class="annot"><span class="annottext">Mempool m blk idx
-</span><a href="#local-6989586621679983951"><span class="hs-identifier hs-var">mempool</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-27"></span><span>    </span><span class="annot"><span class="annottext">m (ServerStIdle (GenTxId blk) (GenTx blk) SlotNo m ())
+</span><a href="Ouroboros.Consensus.MiniProtocol.LocalTxMonitor.Server.html#localTxMonitorServer"><span class="hs-identifier hs-var hs-var">localTxMonitorServer</span></a></span></span><span> </span><span id="local-6989586621680009103"><span class="annot"><span class="annottext">Mempool m blk
+</span><a href="#local-6989586621680009103"><span class="hs-identifier hs-var">mempool</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-26"></span><span>    </span><span class="annot"><span class="annottext">m (ServerStIdle (GenTxId blk) (GenTx blk) SlotNo m ())
 -&gt; LocalTxMonitorServer (GenTxId blk) (GenTx blk) SlotNo m ()
 forall txid tx slot (m :: * -&gt; *) a.
 m (ServerStIdle txid tx slot m a)
 -&gt; LocalTxMonitorServer txid tx slot m a
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">LocalTxMonitorServer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ServerStIdle (GenTxId blk) (GenTx blk) SlotNo m ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-protocols-0.2.0.0/noopt/doc/html/ouroboros-network-protocols/src"><span class="hs-identifier hs-var">LocalTxMonitorServer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ServerStIdle (GenTxId blk) (GenTx blk) SlotNo m ()
 -&gt; m (ServerStIdle (GenTxId blk) (GenTx blk) SlotNo m ())
 forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">ServerStIdle (GenTxId blk) (GenTx blk) SlotNo m ()
-</span><a href="#local-6989586621679983949"><span class="hs-identifier hs-var">serverStIdle</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-28"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-29"></span><span>    </span><span class="annot"><a href="#local-6989586621679983949"><span class="hs-identifier hs-type">serverStIdle</span></a></span><span>
-</span><span id="line-30"></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">ServerStIdle</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#GenTxId"><span class="hs-identifier hs-type">GenTxId</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983954"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#GenTx"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983954"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="annot"><a href="#local-6989586621679983952"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
-</span><span id="line-31"></span><span>    </span><span id="local-6989586621679983949"><span class="annot"><span class="annottext">serverStIdle :: ServerStIdle (GenTxId blk) (GenTx blk) SlotNo m ()
-</span><a href="#local-6989586621679983949"><span class="hs-identifier hs-var hs-var">serverStIdle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-32"></span><span>      </span><span class="annot"><span class="annottext">ServerStIdle :: forall txid tx slot (m :: * -&gt; *) a.
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">ServerStIdle (GenTxId blk) (GenTx blk) SlotNo m ()
+</span><a href="#local-6989586621680009101"><span class="hs-identifier hs-var">serverStIdle</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-28"></span><span>    </span><span class="annot"><a href="#local-6989586621680009101"><span class="hs-identifier hs-type">serverStIdle</span></a></span><span>
+</span><span id="line-29"></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-protocols-0.2.0.0/noopt/doc/html/ouroboros-network-protocols/src"><span class="hs-identifier hs-type">ServerStIdle</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#GenTxId"><span class="hs-identifier hs-type">GenTxId</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680009105"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#GenTx"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680009105"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="annot"><a href="#local-6989586621680009104"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span>    </span><span id="local-6989586621680009101"><span class="annot"><span class="annottext">serverStIdle :: ServerStIdle (GenTxId blk) (GenTx blk) SlotNo m ()
+</span><a href="#local-6989586621680009101"><span class="hs-identifier hs-var hs-var">serverStIdle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-31"></span><span>      </span><span class="annot"><span class="annottext">ServerStIdle :: forall txid tx slot (m :: * -&gt; *) a.
 m (ServerStAcquiring txid tx slot m a)
 -&gt; m a -&gt; ServerStIdle txid tx slot m a
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">ServerStIdle</span></a></span><span>
-</span><span id="line-33"></span><span>      </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">recvMsgDone :: m ()
-</span><a href="#local-6989586621679983947"><span class="hs-identifier hs-var">recvMsgDone</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-34"></span><span>          </span><span class="annot"><span class="annottext">() -&gt; m ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-protocols-0.2.0.0/noopt/doc/html/ouroboros-network-protocols/src"><span class="hs-identifier hs-type">ServerStIdle</span></a></span><span>
+</span><span id="line-32"></span><span>      </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">recvMsgDone :: m ()
+</span><a href="#local-6989586621680009099"><span class="hs-identifier hs-var">recvMsgDone</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-33"></span><span>          </span><span class="annot"><span class="annottext">() -&gt; m ()
 forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
-</span><span id="line-35"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">recvMsgAcquire :: m (ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ())
-</span><a href="#local-6989586621679983946"><span class="hs-identifier hs-var">recvMsgAcquire</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-36"></span><span>          </span><span id="local-6989586621679983945"><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk idx)
-</span><a href="#local-6989586621679983945"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">STM m (MempoolCapacityBytes, MempoolSnapshot blk idx)
--&gt; m (MempoolCapacityBytes, MempoolSnapshot blk idx)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">recvMsgAcquire :: m (ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ())
+</span><a href="#local-6989586621680009098"><span class="hs-identifier hs-var">recvMsgAcquire</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-35"></span><span>          </span><span id="local-6989586621680009097"><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk)
+</span><a href="#local-6989586621680009097"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">STM m (MempoolCapacityBytes, MempoolSnapshot blk)
+-&gt; m (MempoolCapacityBytes, MempoolSnapshot blk)
 forall (m :: * -&gt; *) a.
 (MonadSTM m, HasCallStack) =&gt;
 STM m a -&gt; m a
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">atomically</span></a></span><span> </span><span class="annot"><span class="annottext">(STM m (MempoolCapacityBytes, MempoolSnapshot blk idx)
- -&gt; m (MempoolCapacityBytes, MempoolSnapshot blk idx))
--&gt; STM m (MempoolCapacityBytes, MempoolSnapshot blk idx)
--&gt; m (MempoolCapacityBytes, MempoolSnapshot blk idx)
+</span><span class="hs-identifier hs-var">atomically</span></span><span> </span><span class="annot"><span class="annottext">(STM m (MempoolCapacityBytes, MempoolSnapshot blk)
+ -&gt; m (MempoolCapacityBytes, MempoolSnapshot blk))
+-&gt; STM m (MempoolCapacityBytes, MempoolSnapshot blk)
+-&gt; m (MempoolCapacityBytes, MempoolSnapshot blk)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes
- -&gt; MempoolSnapshot blk idx
- -&gt; (MempoolCapacityBytes, MempoolSnapshot blk idx))
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes
+ -&gt; MempoolSnapshot blk
+ -&gt; (MempoolCapacityBytes, MempoolSnapshot blk))
 -&gt; STM m MempoolCapacityBytes
 -&gt; STM
      m
-     (MempoolSnapshot blk idx
-      -&gt; (MempoolCapacityBytes, MempoolSnapshot blk idx))
+     (MempoolSnapshot blk
+      -&gt; (MempoolCapacityBytes, MempoolSnapshot blk))
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Mempool m blk idx -&gt; STM m MempoolCapacityBytes
-forall (m :: * -&gt; *) blk idx.
-Mempool m blk idx -&gt; STM m MempoolCapacityBytes
-</span><a href="Ouroboros.Consensus.Mempool.API.html#getCapacity"><span class="hs-identifier hs-var hs-var">getCapacity</span></a></span><span> </span><span class="annot"><span class="annottext">Mempool m blk idx
-</span><a href="#local-6989586621679983951"><span class="hs-identifier hs-var">mempool</span></a></span><span> </span><span class="annot"><span class="annottext">STM
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Mempool m blk -&gt; STM m MempoolCapacityBytes
+forall (m :: * -&gt; *) blk.
+Mempool m blk -&gt; STM m MempoolCapacityBytes
+</span><a href="Ouroboros.Consensus.Mempool.API.html#getCapacity"><span class="hs-identifier hs-var hs-var">getCapacity</span></a></span><span> </span><span class="annot"><span class="annottext">Mempool m blk
+</span><a href="#local-6989586621680009103"><span class="hs-identifier hs-var">mempool</span></a></span><span> </span><span class="annot"><span class="annottext">STM
   m
-  (MempoolSnapshot blk idx
-   -&gt; (MempoolCapacityBytes, MempoolSnapshot blk idx))
--&gt; STM m (MempoolSnapshot blk idx)
--&gt; STM m (MempoolCapacityBytes, MempoolSnapshot blk idx)
+  (MempoolSnapshot blk
+   -&gt; (MempoolCapacityBytes, MempoolSnapshot blk))
+-&gt; STM m (MempoolSnapshot blk)
+-&gt; STM m (MempoolCapacityBytes, MempoolSnapshot blk)
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;*&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Mempool m blk idx -&gt; STM m (MempoolSnapshot blk idx)
-forall (m :: * -&gt; *) blk idx.
-Mempool m blk idx -&gt; STM m (MempoolSnapshot blk idx)
-</span><a href="Ouroboros.Consensus.Mempool.API.html#getSnapshot"><span class="hs-identifier hs-var hs-var">getSnapshot</span></a></span><span> </span><span class="annot"><span class="annottext">Mempool m blk idx
-</span><a href="#local-6989586621679983951"><span class="hs-identifier hs-var">mempool</span></a></span><span>
-</span><span id="line-37"></span><span>          </span><span class="annot"><span class="annottext">ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ()
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;*&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Mempool m blk -&gt; STM m (MempoolSnapshot blk)
+forall (m :: * -&gt; *) blk.
+Mempool m blk -&gt; STM m (MempoolSnapshot blk)
+</span><a href="Ouroboros.Consensus.Mempool.API.html#getSnapshot"><span class="hs-identifier hs-var hs-var">getSnapshot</span></a></span><span> </span><span class="annot"><span class="annottext">Mempool m blk
+</span><a href="#local-6989586621680009103"><span class="hs-identifier hs-var">mempool</span></a></span><span>
+</span><span id="line-36"></span><span>          </span><span class="annot"><span class="annottext">ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ()
 -&gt; m (ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ())
 forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">(ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ()
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">(ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ()
  -&gt; m (ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ()))
 -&gt; ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ()
 -&gt; m (ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ())
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk idx)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk)
 -&gt; ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ()
-</span><a href="#local-6989586621679983940"><span class="hs-identifier hs-var">serverStAcquiring</span></a></span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk idx)
-</span><a href="#local-6989586621679983945"><span class="hs-identifier hs-var">s</span></a></span><span>
-</span><span id="line-38"></span><span>      </span><span class="hs-special">}</span><span>
-</span><span id="line-39"></span><span>
-</span><span id="line-40"></span><span>    </span><span class="annot"><a href="#local-6989586621679983940"><span class="hs-identifier hs-type">serverStAcquiring</span></a></span><span>
-</span><span id="line-41"></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Mempool.API.html#MempoolCapacityBytes"><span class="hs-identifier hs-type">MempoolCapacityBytes</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.API.html#MempoolSnapshot"><span class="hs-identifier hs-type">MempoolSnapshot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983954"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983953"><span class="hs-identifier hs-type">idx</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-42"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">ServerStAcquiring</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#GenTxId"><span class="hs-identifier hs-type">GenTxId</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983954"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#GenTx"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983954"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="annot"><a href="#local-6989586621679983952"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
-</span><span id="line-43"></span><span>    </span><span id="local-6989586621679983940"><span class="annot"><span class="annottext">serverStAcquiring :: (MempoolCapacityBytes, MempoolSnapshot blk idx)
+</span><a href="#local-6989586621680009092"><span class="hs-identifier hs-var">serverStAcquiring</span></a></span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk)
+</span><a href="#local-6989586621680009097"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-37"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span>    </span><span class="annot"><a href="#local-6989586621680009092"><span class="hs-identifier hs-type">serverStAcquiring</span></a></span><span>
+</span><span id="line-40"></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolCapacityBytes"><span class="hs-identifier hs-type">MempoolCapacityBytes</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.API.html#MempoolSnapshot"><span class="hs-identifier hs-type">MempoolSnapshot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680009105"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-41"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-protocols-0.2.0.0/noopt/doc/html/ouroboros-network-protocols/src"><span class="hs-identifier hs-type">ServerStAcquiring</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#GenTxId"><span class="hs-identifier hs-type">GenTxId</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680009105"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#GenTx"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680009105"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="annot"><a href="#local-6989586621680009104"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-42"></span><span>    </span><span id="local-6989586621680009092"><span class="annot"><span class="annottext">serverStAcquiring :: (MempoolCapacityBytes, MempoolSnapshot blk)
 -&gt; ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ()
-</span><a href="#local-6989586621679983940"><span class="hs-identifier hs-var hs-var">serverStAcquiring</span></a></span></span><span> </span><span id="local-6989586621679983939"><span class="annot"><span class="annottext">s :: (MempoolCapacityBytes, MempoolSnapshot blk idx)
-</span><a href="#local-6989586621679983939"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><span class="annottext">MempoolCapacityBytes
-</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679983938"><span class="annot"><span class="annottext">MempoolSnapshot blk idx
-</span><a href="#local-6989586621679983938"><span class="hs-identifier hs-var">snapshot</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-44"></span><span>      </span><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621680009092"><span class="hs-identifier hs-var hs-var">serverStAcquiring</span></a></span></span><span> </span><span id="local-6989586621680009091"><span class="annot"><span class="annottext">s :: (MempoolCapacityBytes, MempoolSnapshot blk)
+</span><a href="#local-6989586621680009091"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><span class="annottext">MempoolCapacityBytes
+</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621680009090"><span class="annot"><span class="annottext">MempoolSnapshot blk
+</span><a href="#local-6989586621680009090"><span class="hs-identifier hs-var">snapshot</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-43"></span><span>      </span><span class="annot"><span class="annottext">SlotNo
 -&gt; ServerStAcquired (GenTxId blk) (GenTx blk) SlotNo m ()
 -&gt; ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ()
 forall slot txid tx (m :: * -&gt; *) a.
 slot
 -&gt; ServerStAcquired txid tx slot m a
 -&gt; ServerStAcquiring txid tx slot m a
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">SendMsgAcquired</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">MempoolSnapshot blk idx -&gt; SlotNo
-forall blk idx. MempoolSnapshot blk idx -&gt; SlotNo
-</span><a href="Ouroboros.Consensus.Mempool.API.html#snapshotSlotNo"><span class="hs-identifier hs-var hs-var">snapshotSlotNo</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk idx
-</span><a href="#local-6989586621679983938"><span class="hs-identifier hs-var">snapshot</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk idx)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-protocols-0.2.0.0/noopt/doc/html/ouroboros-network-protocols/src"><span class="hs-identifier hs-var">SendMsgAcquired</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">MempoolSnapshot blk -&gt; SlotNo
+forall blk. MempoolSnapshot blk -&gt; SlotNo
+</span><a href="Ouroboros.Consensus.Mempool.API.html#snapshotSlotNo"><span class="hs-identifier hs-var hs-var">snapshotSlotNo</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk
+</span><a href="#local-6989586621680009090"><span class="hs-identifier hs-var">snapshot</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk)
+-&gt; [(Validated (GenTx blk), TicketNo)]
+-&gt; ServerStAcquired (GenTxId blk) (GenTx blk) SlotNo m ()
+forall idx.
+(MempoolCapacityBytes, MempoolSnapshot blk)
 -&gt; [(Validated (GenTx blk), idx)]
 -&gt; ServerStAcquired (GenTxId blk) (GenTx blk) SlotNo m ()
-</span><a href="#local-6989586621679983935"><span class="hs-identifier hs-var">serverStAcquired</span></a></span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk idx)
-</span><a href="#local-6989586621679983939"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">MempoolSnapshot blk idx -&gt; [(Validated (GenTx blk), idx)]
-forall blk idx.
-MempoolSnapshot blk idx -&gt; [(Validated (GenTx blk), idx)]
-</span><a href="Ouroboros.Consensus.Mempool.API.html#snapshotTxs"><span class="hs-identifier hs-var hs-var">snapshotTxs</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk idx
-</span><a href="#local-6989586621679983938"><span class="hs-identifier hs-var">snapshot</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-45"></span><span>
-</span><span id="line-46"></span><span>    </span><span class="annot"><a href="#local-6989586621679983935"><span class="hs-identifier hs-type">serverStAcquired</span></a></span><span>
-</span><span id="line-47"></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Mempool.API.html#MempoolCapacityBytes"><span class="hs-identifier hs-type">MempoolCapacityBytes</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.API.html#MempoolSnapshot"><span class="hs-identifier hs-type">MempoolSnapshot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983954"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983953"><span class="hs-identifier hs-type">idx</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-48"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Abstract.html#Validated"><span class="hs-identifier hs-type">Validated</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#GenTx"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983954"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679983953"><span class="hs-identifier hs-type">idx</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
-</span><span id="line-49"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">ServerStAcquired</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#GenTxId"><span class="hs-identifier hs-type">GenTxId</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983954"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#GenTx"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983954"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="annot"><a href="#local-6989586621679983952"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
-</span><span id="line-50"></span><span>    </span><span id="local-6989586621679983935"><span class="annot"><span class="annottext">serverStAcquired :: (MempoolCapacityBytes, MempoolSnapshot blk idx)
+</span><a href="#local-6989586621680009087"><span class="hs-identifier hs-var">serverStAcquired</span></a></span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk)
+</span><a href="#local-6989586621680009091"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">MempoolSnapshot blk -&gt; [(Validated (GenTx blk), TicketNo)]
+forall blk.
+MempoolSnapshot blk -&gt; [(Validated (GenTx blk), TicketNo)]
+</span><a href="Ouroboros.Consensus.Mempool.API.html#snapshotTxs"><span class="hs-identifier hs-var hs-var">snapshotTxs</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk
+</span><a href="#local-6989586621680009090"><span class="hs-identifier hs-var">snapshot</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span>    </span><span id="local-6989586621680009132"><span class="annot"><a href="#local-6989586621680009087"><span class="hs-identifier hs-type">serverStAcquired</span></a></span><span>
+</span><span id="line-46"></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolCapacityBytes"><span class="hs-identifier hs-type">MempoolCapacityBytes</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.API.html#MempoolSnapshot"><span class="hs-identifier hs-type">MempoolSnapshot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680009105"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Abstract.html#Validated"><span class="hs-identifier hs-type">Validated</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#GenTx"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680009105"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621680009132"><span class="hs-identifier hs-type">idx</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-48"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-protocols-0.2.0.0/noopt/doc/html/ouroboros-network-protocols/src"><span class="hs-identifier hs-type">ServerStAcquired</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#GenTxId"><span class="hs-identifier hs-type">GenTxId</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680009105"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#GenTx"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680009105"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="annot"><a href="#local-6989586621680009104"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span></span><span>
+</span><span id="line-49"></span><span>    </span><span id="local-6989586621680009087"><span class="annot"><span class="annottext">serverStAcquired :: (MempoolCapacityBytes, MempoolSnapshot blk)
 -&gt; [(Validated (GenTx blk), idx)]
 -&gt; ServerStAcquired (GenTxId blk) (GenTx blk) SlotNo m ()
-</span><a href="#local-6989586621679983935"><span class="hs-identifier hs-var hs-var">serverStAcquired</span></a></span></span><span> </span><span id="local-6989586621679983933"><span class="annot"><span class="annottext">s :: (MempoolCapacityBytes, MempoolSnapshot blk idx)
-</span><a href="#local-6989586621679983933"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span id="local-6989586621679983932"><span class="annot"><span class="annottext">MempoolCapacityBytes
-</span><a href="#local-6989586621679983932"><span class="hs-identifier hs-var">capacity</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679983931"><span class="annot"><span class="annottext">MempoolSnapshot blk idx
-</span><a href="#local-6989586621679983931"><span class="hs-identifier hs-var">snapshot</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679983930"><span class="annot"><span class="annottext">[(Validated (GenTx blk), idx)]
-</span><a href="#local-6989586621679983930"><span class="hs-identifier hs-var">txs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-51"></span><span>      </span><span class="annot"><span class="annottext">ServerStAcquired :: forall txid tx slot (m :: * -&gt; *) a.
+</span><a href="#local-6989586621680009087"><span class="hs-identifier hs-var hs-var">serverStAcquired</span></a></span></span><span> </span><span id="local-6989586621680009085"><span class="annot"><span class="annottext">s :: (MempoolCapacityBytes, MempoolSnapshot blk)
+</span><a href="#local-6989586621680009085"><span class="hs-identifier hs-var">s</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span id="local-6989586621680009084"><span class="annot"><span class="annottext">MempoolCapacityBytes
+</span><a href="#local-6989586621680009084"><span class="hs-identifier hs-var">capacity</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621680009083"><span class="annot"><span class="annottext">MempoolSnapshot blk
+</span><a href="#local-6989586621680009083"><span class="hs-identifier hs-var">snapshot</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621680009082"><span class="annot"><span class="annottext">[(Validated (GenTx blk), idx)]
+</span><a href="#local-6989586621680009082"><span class="hs-identifier hs-var">txs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-50"></span><span>      </span><span class="annot"><span class="annottext">ServerStAcquired :: forall txid tx slot (m :: * -&gt; *) a.
 m (ServerStBusy 'NextTx txid tx slot m a)
 -&gt; (txid -&gt; m (ServerStBusy 'HasTx txid tx slot m a))
 -&gt; m (ServerStBusy 'GetSizes txid tx slot m a)
 -&gt; m (ServerStAcquiring txid tx slot m a)
 -&gt; m (ServerStIdle txid tx slot m a)
 -&gt; ServerStAcquired txid tx slot m a
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">ServerStAcquired</span></a></span><span>
-</span><span id="line-52"></span><span>      </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">recvMsgNextTx :: m (ServerStBusy 'NextTx (GenTxId blk) (GenTx blk) SlotNo m ())
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">recvMsgNextTx</span></a></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-53"></span><span>          </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">[(Validated (GenTx blk), idx)]
-</span><a href="#local-6989586621679983930"><span class="hs-identifier hs-var">txs</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-54"></span><span>            </span><span class="hs-special">[</span><span class="hs-special">]</span><span>  </span><span class="hs-glyph">-&gt;</span><span>
-</span><span id="line-55"></span><span>              </span><span class="annot"><span class="annottext">ServerStBusy 'NextTx (GenTxId blk) (GenTx blk) SlotNo m ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-protocols-0.2.0.0/noopt/doc/html/ouroboros-network-protocols/src"><span class="hs-identifier hs-type">ServerStAcquired</span></a></span><span>
+</span><span id="line-51"></span><span>      </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">recvMsgNextTx :: m (ServerStBusy 'NextTx (GenTxId blk) (GenTx blk) SlotNo m ())
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-protocols-0.2.0.0/noopt/doc/html/ouroboros-network-protocols/src"><span class="hs-identifier hs-var">recvMsgNextTx</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-52"></span><span>          </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">[(Validated (GenTx blk), idx)]
+</span><a href="#local-6989586621680009082"><span class="hs-identifier hs-var">txs</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-53"></span><span>            </span><span class="hs-special">[</span><span class="hs-special">]</span><span>  </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-54"></span><span>              </span><span class="annot"><span class="annottext">ServerStBusy 'NextTx (GenTxId blk) (GenTx blk) SlotNo m ()
 -&gt; m (ServerStBusy 'NextTx (GenTxId blk) (GenTx blk) SlotNo m ())
 forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">(ServerStBusy 'NextTx (GenTxId blk) (GenTx blk) SlotNo m ()
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">(ServerStBusy 'NextTx (GenTxId blk) (GenTx blk) SlotNo m ()
  -&gt; m (ServerStBusy 'NextTx (GenTxId blk) (GenTx blk) SlotNo m ()))
 -&gt; ServerStBusy 'NextTx (GenTxId blk) (GenTx blk) SlotNo m ()
 -&gt; m (ServerStBusy 'NextTx (GenTxId blk) (GenTx blk) SlotNo m ())
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe (GenTx blk)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe (GenTx blk)
 -&gt; ServerStAcquired (GenTxId blk) (GenTx blk) SlotNo m ()
 -&gt; ServerStBusy 'NextTx (GenTxId blk) (GenTx blk) SlotNo m ()
 forall tx txid slot (m :: * -&gt; *) a.
 Maybe tx
 -&gt; ServerStAcquired txid tx slot m a
 -&gt; ServerStBusy 'NextTx txid tx slot m a
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">SendMsgReplyNextTx</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe (GenTx blk)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-protocols-0.2.0.0/noopt/doc/html/ouroboros-network-protocols/src"><span class="hs-identifier hs-var">SendMsgReplyNextTx</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe (GenTx blk)
 forall a. Maybe a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk idx)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk)
+-&gt; [(Validated (GenTx blk), Any)]
+-&gt; ServerStAcquired (GenTxId blk) (GenTx blk) SlotNo m ()
+forall idx.
+(MempoolCapacityBytes, MempoolSnapshot blk)
 -&gt; [(Validated (GenTx blk), idx)]
 -&gt; ServerStAcquired (GenTxId blk) (GenTx blk) SlotNo m ()
-</span><a href="#local-6989586621679983935"><span class="hs-identifier hs-var">serverStAcquired</span></a></span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk idx)
-</span><a href="#local-6989586621679983933"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">)</span><span>
-</span><span id="line-56"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Validated (GenTx blk) -&gt; GenTx blk
+</span><a href="#local-6989586621680009087"><span class="hs-identifier hs-var">serverStAcquired</span></a></span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk)
+</span><a href="#local-6989586621680009085"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">)</span><span>
+</span><span id="line-55"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Validated (GenTx blk) -&gt; GenTx blk
 forall blk.
 LedgerSupportsMempool blk =&gt;
 Validated (GenTx blk) -&gt; GenTx blk
-</span><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#txForgetValidated"><span class="hs-identifier hs-var">txForgetValidated</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span id="local-6989586621679983925"><span class="annot"><span class="annottext">GenTx blk
-</span><a href="#local-6989586621679983925"><span class="hs-identifier hs-var">h</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">idx
-</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">:</span></a></span><span id="local-6989586621679983924"><span class="annot"><span class="annottext">[(Validated (GenTx blk), idx)]
-</span><a href="#local-6989586621679983924"><span class="hs-identifier hs-var">q</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
-</span><span id="line-57"></span><span>              </span><span class="annot"><span class="annottext">ServerStBusy 'NextTx (GenTxId blk) (GenTx blk) SlotNo m ()
+</span><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#txForgetValidated"><span class="hs-identifier hs-var">txForgetValidated</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span id="local-6989586621680009077"><span class="annot"><span class="annottext">GenTx blk
+</span><a href="#local-6989586621680009077"><span class="hs-identifier hs-var">h</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">idx
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">:</span></a></span><span id="local-6989586621680009076"><span class="annot"><span class="annottext">[(Validated (GenTx blk), idx)]
+</span><a href="#local-6989586621680009076"><span class="hs-identifier hs-var">q</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-56"></span><span>              </span><span class="annot"><span class="annottext">ServerStBusy 'NextTx (GenTxId blk) (GenTx blk) SlotNo m ()
 -&gt; m (ServerStBusy 'NextTx (GenTxId blk) (GenTx blk) SlotNo m ())
 forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">(ServerStBusy 'NextTx (GenTxId blk) (GenTx blk) SlotNo m ()
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">(ServerStBusy 'NextTx (GenTxId blk) (GenTx blk) SlotNo m ()
  -&gt; m (ServerStBusy 'NextTx (GenTxId blk) (GenTx blk) SlotNo m ()))
 -&gt; ServerStBusy 'NextTx (GenTxId blk) (GenTx blk) SlotNo m ()
 -&gt; m (ServerStBusy 'NextTx (GenTxId blk) (GenTx blk) SlotNo m ())
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe (GenTx blk)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe (GenTx blk)
 -&gt; ServerStAcquired (GenTxId blk) (GenTx blk) SlotNo m ()
 -&gt; ServerStBusy 'NextTx (GenTxId blk) (GenTx blk) SlotNo m ()
 forall tx txid slot (m :: * -&gt; *) a.
 Maybe tx
 -&gt; ServerStAcquired txid tx slot m a
 -&gt; ServerStBusy 'NextTx txid tx slot m a
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">SendMsgReplyNextTx</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">GenTx blk -&gt; Maybe (GenTx blk)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-protocols-0.2.0.0/noopt/doc/html/ouroboros-network-protocols/src"><span class="hs-identifier hs-var">SendMsgReplyNextTx</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">GenTx blk -&gt; Maybe (GenTx blk)
 forall a. a -&gt; Maybe a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">GenTx blk
-</span><a href="#local-6989586621679983925"><span class="hs-identifier hs-var">h</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk idx)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">GenTx blk
+</span><a href="#local-6989586621680009077"><span class="hs-identifier hs-var">h</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk)
 -&gt; [(Validated (GenTx blk), idx)]
 -&gt; ServerStAcquired (GenTxId blk) (GenTx blk) SlotNo m ()
-</span><a href="#local-6989586621679983935"><span class="hs-identifier hs-var">serverStAcquired</span></a></span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk idx)
-</span><a href="#local-6989586621679983933"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">[(Validated (GenTx blk), idx)]
-</span><a href="#local-6989586621679983924"><span class="hs-identifier hs-var">q</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-58"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">recvMsgHasTx :: GenTxId blk
+forall idx.
+(MempoolCapacityBytes, MempoolSnapshot blk)
+-&gt; [(Validated (GenTx blk), idx)]
+-&gt; ServerStAcquired (GenTxId blk) (GenTx blk) SlotNo m ()
+</span><a href="#local-6989586621680009087"><span class="hs-identifier hs-var">serverStAcquired</span></a></span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk)
+</span><a href="#local-6989586621680009085"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">[(Validated (GenTx blk), idx)]
+</span><a href="#local-6989586621680009076"><span class="hs-identifier hs-var">q</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-57"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">recvMsgHasTx :: GenTxId blk
 -&gt; m (ServerStBusy 'HasTx (GenTxId blk) (GenTx blk) SlotNo m ())
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">recvMsgHasTx</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679983922"><span class="annot"><span class="annottext">GenTxId blk
-</span><a href="#local-6989586621679983922"><span class="hs-identifier hs-var">txid</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
-</span><span id="line-59"></span><span>          </span><span class="annot"><span class="annottext">ServerStBusy 'HasTx (GenTxId blk) (GenTx blk) SlotNo m ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-protocols-0.2.0.0/noopt/doc/html/ouroboros-network-protocols/src"><span class="hs-identifier hs-var">recvMsgHasTx</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621680009074"><span class="annot"><span class="annottext">GenTxId blk
+</span><a href="#local-6989586621680009074"><span class="hs-identifier hs-var">txid</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-58"></span><span>          </span><span class="annot"><span class="annottext">ServerStBusy 'HasTx (GenTxId blk) (GenTx blk) SlotNo m ()
 -&gt; m (ServerStBusy 'HasTx (GenTxId blk) (GenTx blk) SlotNo m ())
 forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">(ServerStBusy 'HasTx (GenTxId blk) (GenTx blk) SlotNo m ()
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">(ServerStBusy 'HasTx (GenTxId blk) (GenTx blk) SlotNo m ()
  -&gt; m (ServerStBusy 'HasTx (GenTxId blk) (GenTx blk) SlotNo m ()))
 -&gt; ServerStBusy 'HasTx (GenTxId blk) (GenTx blk) SlotNo m ()
 -&gt; m (ServerStBusy 'HasTx (GenTxId blk) (GenTx blk) SlotNo m ())
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
 -&gt; ServerStAcquired (GenTxId blk) (GenTx blk) SlotNo m ()
 -&gt; ServerStBusy 'HasTx (GenTxId blk) (GenTx blk) SlotNo m ()
 forall txid tx slot (m :: * -&gt; *) a.
 Bool
 -&gt; ServerStAcquired txid tx slot m a
 -&gt; ServerStBusy 'HasTx txid tx slot m a
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">SendMsgReplyHasTx</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">MempoolSnapshot blk idx -&gt; GenTxId blk -&gt; Bool
-forall blk idx. MempoolSnapshot blk idx -&gt; GenTxId blk -&gt; Bool
-</span><a href="Ouroboros.Consensus.Mempool.API.html#snapshotHasTx"><span class="hs-identifier hs-var hs-var">snapshotHasTx</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk idx
-</span><a href="#local-6989586621679983931"><span class="hs-identifier hs-var">snapshot</span></a></span><span> </span><span class="annot"><span class="annottext">GenTxId blk
-</span><a href="#local-6989586621679983922"><span class="hs-identifier hs-var">txid</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk idx)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-protocols-0.2.0.0/noopt/doc/html/ouroboros-network-protocols/src"><span class="hs-identifier hs-var">SendMsgReplyHasTx</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">MempoolSnapshot blk -&gt; GenTxId blk -&gt; Bool
+forall blk. MempoolSnapshot blk -&gt; GenTxId blk -&gt; Bool
+</span><a href="Ouroboros.Consensus.Mempool.API.html#snapshotHasTx"><span class="hs-identifier hs-var hs-var">snapshotHasTx</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk
+</span><a href="#local-6989586621680009083"><span class="hs-identifier hs-var">snapshot</span></a></span><span> </span><span class="annot"><span class="annottext">GenTxId blk
+</span><a href="#local-6989586621680009074"><span class="hs-identifier hs-var">txid</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk)
 -&gt; [(Validated (GenTx blk), idx)]
 -&gt; ServerStAcquired (GenTxId blk) (GenTx blk) SlotNo m ()
-</span><a href="#local-6989586621679983935"><span class="hs-identifier hs-var">serverStAcquired</span></a></span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk idx)
-</span><a href="#local-6989586621679983933"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">[(Validated (GenTx blk), idx)]
-</span><a href="#local-6989586621679983930"><span class="hs-identifier hs-var">txs</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-60"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">recvMsgGetSizes :: m (ServerStBusy 'GetSizes (GenTxId blk) (GenTx blk) SlotNo m ())
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">recvMsgGetSizes</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-61"></span><span>          </span><span class="hs-keyword">let</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.API.html#MempoolSize"><span class="hs-identifier hs-type">MempoolSize</span></a></span><span class="hs-special">{</span><span id="local-6989586621679983917"><span class="annot"><span class="annottext">Word32
+forall idx.
+(MempoolCapacityBytes, MempoolSnapshot blk)
+-&gt; [(Validated (GenTx blk), idx)]
+-&gt; ServerStAcquired (GenTxId blk) (GenTx blk) SlotNo m ()
+</span><a href="#local-6989586621680009087"><span class="hs-identifier hs-var">serverStAcquired</span></a></span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk)
+</span><a href="#local-6989586621680009085"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">[(Validated (GenTx blk), idx)]
+</span><a href="#local-6989586621680009082"><span class="hs-identifier hs-var">txs</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-59"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">recvMsgGetSizes :: m (ServerStBusy 'GetSizes (GenTxId blk) (GenTx blk) SlotNo m ())
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-protocols-0.2.0.0/noopt/doc/html/ouroboros-network-protocols/src"><span class="hs-identifier hs-var">recvMsgGetSizes</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-60"></span><span>          </span><span class="hs-keyword">let</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolSize"><span class="hs-identifier hs-type">MempoolSize</span></a></span><span class="hs-special">{</span><span id="local-6989586621680009069"><span class="annot"><span class="annottext">Word32
 msNumTxs :: MempoolSize -&gt; Word32
 msNumTxs :: Word32
-</span><a href="Ouroboros.Consensus.Mempool.API.html#msNumTxs"><span class="hs-identifier hs-var hs-var">msNumTxs</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679983915"><span class="annot"><span class="annottext">Word32
+</span><a href="Ouroboros.Consensus.Mempool.Capacity.html#msNumTxs"><span class="hs-identifier hs-var hs-var">msNumTxs</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621680009067"><span class="annot"><span class="annottext">Word32
 msNumBytes :: MempoolSize -&gt; Word32
 msNumBytes :: Word32
-</span><a href="Ouroboros.Consensus.Mempool.API.html#msNumBytes"><span class="hs-identifier hs-var hs-var">msNumBytes</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk idx -&gt; MempoolSize
-forall blk idx. MempoolSnapshot blk idx -&gt; MempoolSize
-</span><a href="Ouroboros.Consensus.Mempool.API.html#snapshotMempoolSize"><span class="hs-identifier hs-var hs-var">snapshotMempoolSize</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk idx
-</span><a href="#local-6989586621679983931"><span class="hs-identifier hs-var">snapshot</span></a></span><span>
-</span><span id="line-62"></span><span>          </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679983912"><span class="annot"><span class="annottext">sizes :: MempoolSizeAndCapacity
-</span><a href="#local-6989586621679983912"><span class="hs-identifier hs-var hs-var">sizes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MempoolSizeAndCapacity :: Word32 -&gt; Word32 -&gt; Word32 -&gt; MempoolSizeAndCapacity
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">MempoolSizeAndCapacity</span></a></span><span>
-</span><span id="line-63"></span><span>                </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">capacityInBytes :: Word32
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">capacityInBytes</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MempoolCapacityBytes -&gt; Word32
-</span><a href="Ouroboros.Consensus.Mempool.API.html#getMempoolCapacityBytes"><span class="hs-identifier hs-var hs-var">getMempoolCapacityBytes</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolCapacityBytes
-</span><a href="#local-6989586621679983932"><span class="hs-identifier hs-var">capacity</span></a></span><span>
-</span><span id="line-64"></span><span>                </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">sizeInBytes :: Word32
-</span><a href="#local-6989586621679983908"><span class="hs-identifier hs-var">sizeInBytes</span></a></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word32
-</span><a href="#local-6989586621679983915"><span class="hs-identifier hs-var">msNumBytes</span></a></span><span>
-</span><span id="line-65"></span><span>                </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">numberOfTxs :: Word32
-</span><a href="#local-6989586621679983907"><span class="hs-identifier hs-var">numberOfTxs</span></a></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word32
-</span><a href="#local-6989586621679983917"><span class="hs-identifier hs-var">msNumTxs</span></a></span><span>
-</span><span id="line-66"></span><span>                </span><span class="hs-special">}</span><span>
-</span><span id="line-67"></span><span>          </span><span class="annot"><span class="annottext">ServerStBusy 'GetSizes (GenTxId blk) (GenTx blk) SlotNo m ()
+</span><a href="Ouroboros.Consensus.Mempool.Capacity.html#msNumBytes"><span class="hs-identifier hs-var hs-var">msNumBytes</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk -&gt; MempoolSize
+forall blk. MempoolSnapshot blk -&gt; MempoolSize
+</span><a href="Ouroboros.Consensus.Mempool.API.html#snapshotMempoolSize"><span class="hs-identifier hs-var hs-var">snapshotMempoolSize</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk
+</span><a href="#local-6989586621680009083"><span class="hs-identifier hs-var">snapshot</span></a></span><span>
+</span><span id="line-61"></span><span>          </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621680009064"><span class="annot"><span class="annottext">sizes :: MempoolSizeAndCapacity
+</span><a href="#local-6989586621680009064"><span class="hs-identifier hs-var hs-var">sizes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MempoolSizeAndCapacity :: Word32 -&gt; Word32 -&gt; Word32 -&gt; MempoolSizeAndCapacity
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-protocols-0.2.0.0/noopt/doc/html/ouroboros-network-protocols/src"><span class="hs-identifier hs-type">MempoolSizeAndCapacity</span></a></span><span>
+</span><span id="line-62"></span><span>                </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">capacityInBytes :: Word32
+</span><a href="#local-6989586621680009062"><span class="hs-identifier hs-var">capacityInBytes</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MempoolCapacityBytes -&gt; Word32
+</span><a href="Ouroboros.Consensus.Mempool.Capacity.html#getMempoolCapacityBytes"><span class="hs-identifier hs-var hs-var">getMempoolCapacityBytes</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolCapacityBytes
+</span><a href="#local-6989586621680009084"><span class="hs-identifier hs-var">capacity</span></a></span><span>
+</span><span id="line-63"></span><span>                </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">sizeInBytes :: Word32
+</span><a href="#local-6989586621680009060"><span class="hs-identifier hs-var">sizeInBytes</span></a></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621680009067"><span class="hs-identifier hs-var">msNumBytes</span></a></span><span>
+</span><span id="line-64"></span><span>                </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">numberOfTxs :: Word32
+</span><a href="#local-6989586621680009059"><span class="hs-identifier hs-var">numberOfTxs</span></a></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621680009069"><span class="hs-identifier hs-var">msNumTxs</span></a></span><span>
+</span><span id="line-65"></span><span>                </span><span class="hs-special">}</span><span>
+</span><span id="line-66"></span><span>          </span><span class="annot"><span class="annottext">ServerStBusy 'GetSizes (GenTxId blk) (GenTx blk) SlotNo m ()
 -&gt; m (ServerStBusy 'GetSizes (GenTxId blk) (GenTx blk) SlotNo m ())
 forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">(ServerStBusy 'GetSizes (GenTxId blk) (GenTx blk) SlotNo m ()
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">(ServerStBusy 'GetSizes (GenTxId blk) (GenTx blk) SlotNo m ()
  -&gt; m (ServerStBusy
          'GetSizes (GenTxId blk) (GenTx blk) SlotNo m ()))
 -&gt; ServerStBusy 'GetSizes (GenTxId blk) (GenTx blk) SlotNo m ()
 -&gt; m (ServerStBusy 'GetSizes (GenTxId blk) (GenTx blk) SlotNo m ())
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSizeAndCapacity
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSizeAndCapacity
 -&gt; ServerStAcquired (GenTxId blk) (GenTx blk) SlotNo m ()
 -&gt; ServerStBusy 'GetSizes (GenTxId blk) (GenTx blk) SlotNo m ()
 forall txid tx slot (m :: * -&gt; *) a.
 MempoolSizeAndCapacity
 -&gt; ServerStAcquired txid tx slot m a
 -&gt; ServerStBusy 'GetSizes txid tx slot m a
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">SendMsgReplyGetSizes</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSizeAndCapacity
-</span><a href="#local-6989586621679983912"><span class="hs-identifier hs-var">sizes</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk idx)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-protocols-0.2.0.0/noopt/doc/html/ouroboros-network-protocols/src"><span class="hs-identifier hs-var">SendMsgReplyGetSizes</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSizeAndCapacity
+</span><a href="#local-6989586621680009064"><span class="hs-identifier hs-var">sizes</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk)
 -&gt; [(Validated (GenTx blk), idx)]
 -&gt; ServerStAcquired (GenTxId blk) (GenTx blk) SlotNo m ()
-</span><a href="#local-6989586621679983935"><span class="hs-identifier hs-var">serverStAcquired</span></a></span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk idx)
-</span><a href="#local-6989586621679983933"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">[(Validated (GenTx blk), idx)]
-</span><a href="#local-6989586621679983930"><span class="hs-identifier hs-var">txs</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-68"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">recvMsgAwaitAcquire :: m (ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ())
-</span><a href="#local-6989586621679983905"><span class="hs-identifier hs-var">recvMsgAwaitAcquire</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-69"></span><span>          </span><span id="local-6989586621679983904"><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk idx)
-</span><a href="#local-6989586621679983904"><span class="hs-identifier hs-var">s'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">STM m (MempoolCapacityBytes, MempoolSnapshot blk idx)
--&gt; m (MempoolCapacityBytes, MempoolSnapshot blk idx)
+forall idx.
+(MempoolCapacityBytes, MempoolSnapshot blk)
+-&gt; [(Validated (GenTx blk), idx)]
+-&gt; ServerStAcquired (GenTxId blk) (GenTx blk) SlotNo m ()
+</span><a href="#local-6989586621680009087"><span class="hs-identifier hs-var">serverStAcquired</span></a></span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk)
+</span><a href="#local-6989586621680009085"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">[(Validated (GenTx blk), idx)]
+</span><a href="#local-6989586621680009082"><span class="hs-identifier hs-var">txs</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-67"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">recvMsgAwaitAcquire :: m (ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ())
+</span><a href="#local-6989586621680009057"><span class="hs-identifier hs-var">recvMsgAwaitAcquire</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-68"></span><span>          </span><span id="local-6989586621680009056"><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk)
+</span><a href="#local-6989586621680009056"><span class="hs-identifier hs-var">s'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">STM m (MempoolCapacityBytes, MempoolSnapshot blk)
+-&gt; m (MempoolCapacityBytes, MempoolSnapshot blk)
 forall (m :: * -&gt; *) a.
 (MonadSTM m, HasCallStack) =&gt;
 STM m a -&gt; m a
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">atomically</span></a></span><span> </span><span class="annot"><span class="annottext">(STM m (MempoolCapacityBytes, MempoolSnapshot blk idx)
- -&gt; m (MempoolCapacityBytes, MempoolSnapshot blk idx))
--&gt; STM m (MempoolCapacityBytes, MempoolSnapshot blk idx)
--&gt; m (MempoolCapacityBytes, MempoolSnapshot blk idx)
+</span><span class="hs-identifier hs-var">atomically</span></span><span> </span><span class="annot"><span class="annottext">(STM m (MempoolCapacityBytes, MempoolSnapshot blk)
+ -&gt; m (MempoolCapacityBytes, MempoolSnapshot blk))
+-&gt; STM m (MempoolCapacityBytes, MempoolSnapshot blk)
+-&gt; m (MempoolCapacityBytes, MempoolSnapshot blk)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-70"></span><span>            </span><span id="local-6989586621679983903"><span class="annot"><span class="annottext">s' :: (MempoolCapacityBytes, MempoolSnapshot blk idx)
-</span><a href="#local-6989586621679983903"><span class="hs-identifier hs-var">s'</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><span class="annottext">MempoolCapacityBytes
-</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679983902"><span class="annot"><span class="annottext">MempoolSnapshot blk idx
-</span><a href="#local-6989586621679983902"><span class="hs-identifier hs-var">snapshot'</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes
- -&gt; MempoolSnapshot blk idx
- -&gt; (MempoolCapacityBytes, MempoolSnapshot blk idx))
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-69"></span><span>            </span><span id="local-6989586621680009055"><span class="annot"><span class="annottext">s' :: (MempoolCapacityBytes, MempoolSnapshot blk)
+</span><a href="#local-6989586621680009055"><span class="hs-identifier hs-var">s'</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><span class="annottext">MempoolCapacityBytes
+</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621680009054"><span class="annot"><span class="annottext">MempoolSnapshot blk
+</span><a href="#local-6989586621680009054"><span class="hs-identifier hs-var">snapshot'</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes
+ -&gt; MempoolSnapshot blk
+ -&gt; (MempoolCapacityBytes, MempoolSnapshot blk))
 -&gt; STM m MempoolCapacityBytes
 -&gt; STM
      m
-     (MempoolSnapshot blk idx
-      -&gt; (MempoolCapacityBytes, MempoolSnapshot blk idx))
+     (MempoolSnapshot blk
+      -&gt; (MempoolCapacityBytes, MempoolSnapshot blk))
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Mempool m blk idx -&gt; STM m MempoolCapacityBytes
-forall (m :: * -&gt; *) blk idx.
-Mempool m blk idx -&gt; STM m MempoolCapacityBytes
-</span><a href="Ouroboros.Consensus.Mempool.API.html#getCapacity"><span class="hs-identifier hs-var hs-var">getCapacity</span></a></span><span> </span><span class="annot"><span class="annottext">Mempool m blk idx
-</span><a href="#local-6989586621679983951"><span class="hs-identifier hs-var">mempool</span></a></span><span> </span><span class="annot"><span class="annottext">STM
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Mempool m blk -&gt; STM m MempoolCapacityBytes
+forall (m :: * -&gt; *) blk.
+Mempool m blk -&gt; STM m MempoolCapacityBytes
+</span><a href="Ouroboros.Consensus.Mempool.API.html#getCapacity"><span class="hs-identifier hs-var hs-var">getCapacity</span></a></span><span> </span><span class="annot"><span class="annottext">Mempool m blk
+</span><a href="#local-6989586621680009103"><span class="hs-identifier hs-var">mempool</span></a></span><span> </span><span class="annot"><span class="annottext">STM
   m
-  (MempoolSnapshot blk idx
-   -&gt; (MempoolCapacityBytes, MempoolSnapshot blk idx))
--&gt; STM m (MempoolSnapshot blk idx)
--&gt; STM m (MempoolCapacityBytes, MempoolSnapshot blk idx)
+  (MempoolSnapshot blk
+   -&gt; (MempoolCapacityBytes, MempoolSnapshot blk))
+-&gt; STM m (MempoolSnapshot blk)
+-&gt; STM m (MempoolCapacityBytes, MempoolSnapshot blk)
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;*&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Mempool m blk idx -&gt; STM m (MempoolSnapshot blk idx)
-forall (m :: * -&gt; *) blk idx.
-Mempool m blk idx -&gt; STM m (MempoolSnapshot blk idx)
-</span><a href="Ouroboros.Consensus.Mempool.API.html#getSnapshot"><span class="hs-identifier hs-var hs-var">getSnapshot</span></a></span><span> </span><span class="annot"><span class="annottext">Mempool m blk idx
-</span><a href="#local-6989586621679983951"><span class="hs-identifier hs-var">mempool</span></a></span><span>
-</span><span id="line-71"></span><span>            </span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk idx)
-</span><a href="#local-6989586621679983903"><span class="hs-identifier hs-var">s'</span></a></span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk idx)
--&gt; STM m ()
--&gt; STM m (MempoolCapacityBytes, MempoolSnapshot blk idx)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;*&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Mempool m blk -&gt; STM m (MempoolSnapshot blk)
+forall (m :: * -&gt; *) blk.
+Mempool m blk -&gt; STM m (MempoolSnapshot blk)
+</span><a href="Ouroboros.Consensus.Mempool.API.html#getSnapshot"><span class="hs-identifier hs-var hs-var">getSnapshot</span></a></span><span> </span><span class="annot"><span class="annottext">Mempool m blk
+</span><a href="#local-6989586621680009103"><span class="hs-identifier hs-var">mempool</span></a></span><span>
+</span><span id="line-70"></span><span>            </span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk)
+</span><a href="#local-6989586621680009055"><span class="hs-identifier hs-var">s'</span></a></span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk)
+-&gt; STM m () -&gt; STM m (MempoolCapacityBytes, MempoolSnapshot blk)
 forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; STM m ()
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; STM m ()
 forall (m :: * -&gt; *). MonadSTM m =&gt; Bool -&gt; STM m ()
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier hs-var">check</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">not</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">MempoolSnapshot blk idx
-</span><a href="#local-6989586621679983931"><span class="hs-identifier hs-var">snapshot</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk idx -&gt; MempoolSnapshot blk idx -&gt; Bool
-</span><a href="#local-6989586621679983898"><span class="hs-operator hs-var">`isSameSnapshot`</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk idx
-</span><a href="#local-6989586621679983902"><span class="hs-identifier hs-var">snapshot'</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-72"></span><span>          </span><span class="annot"><span class="annottext">ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ()
+</span><span class="hs-identifier hs-var">check</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">not</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">MempoolSnapshot blk
+</span><a href="#local-6989586621680009083"><span class="hs-identifier hs-var">snapshot</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk -&gt; MempoolSnapshot blk -&gt; Bool
+</span><a href="#local-6989586621680009050"><span class="hs-operator hs-var">`isSameSnapshot`</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk
+</span><a href="#local-6989586621680009054"><span class="hs-identifier hs-var">snapshot'</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-71"></span><span>          </span><span class="annot"><span class="annottext">ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ()
 -&gt; m (ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ())
 forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">(ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ()
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">(ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ()
  -&gt; m (ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ()))
 -&gt; ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ()
 -&gt; m (ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ())
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk idx)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk)
 -&gt; ServerStAcquiring (GenTxId blk) (GenTx blk) SlotNo m ()
-</span><a href="#local-6989586621679983940"><span class="hs-identifier hs-var">serverStAcquiring</span></a></span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk idx)
-</span><a href="#local-6989586621679983904"><span class="hs-identifier hs-var">s'</span></a></span><span>
-</span><span id="line-73"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">recvMsgRelease :: m (ServerStIdle (GenTxId blk) (GenTx blk) SlotNo m ())
-</span><a href="#local-6989586621679983897"><span class="hs-identifier hs-var">recvMsgRelease</span></a></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-74"></span><span>          </span><span class="annot"><span class="annottext">ServerStIdle (GenTxId blk) (GenTx blk) SlotNo m ()
+</span><a href="#local-6989586621680009092"><span class="hs-identifier hs-var">serverStAcquiring</span></a></span><span> </span><span class="annot"><span class="annottext">(MempoolCapacityBytes, MempoolSnapshot blk)
+</span><a href="#local-6989586621680009056"><span class="hs-identifier hs-var">s'</span></a></span><span>
+</span><span id="line-72"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">recvMsgRelease :: m (ServerStIdle (GenTxId blk) (GenTx blk) SlotNo m ())
+</span><a href="#local-6989586621680009049"><span class="hs-identifier hs-var">recvMsgRelease</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-73"></span><span>          </span><span class="annot"><span class="annottext">ServerStIdle (GenTxId blk) (GenTx blk) SlotNo m ()
 -&gt; m (ServerStIdle (GenTxId blk) (GenTx blk) SlotNo m ())
 forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">ServerStIdle (GenTxId blk) (GenTx blk) SlotNo m ()
-</span><a href="#local-6989586621679983949"><span class="hs-identifier hs-var">serverStIdle</span></a></span><span>
-</span><span id="line-75"></span><span>      </span><span class="hs-special">}</span><span>
-</span><span id="line-76"></span><span>
-</span><span id="line-77"></span><span>    </span><span class="hs-comment">-- Are two snapshots equal? (from the perspective of this protocol)</span><span>
-</span><span id="line-78"></span><span>    </span><span class="annot"><a href="#local-6989586621679983898"><span class="hs-identifier hs-type">isSameSnapshot</span></a></span><span>
-</span><span id="line-79"></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.API.html#MempoolSnapshot"><span class="hs-identifier hs-type">MempoolSnapshot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983954"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983953"><span class="hs-identifier hs-type">idx</span></a></span><span>
-</span><span id="line-80"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.API.html#MempoolSnapshot"><span class="hs-identifier hs-type">MempoolSnapshot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983954"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983953"><span class="hs-identifier hs-type">idx</span></a></span><span>
-</span><span id="line-81"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Bool</span></a></span><span>
-</span><span id="line-82"></span><span>    </span><span id="local-6989586621679983898"><span class="annot"><span class="annottext">isSameSnapshot :: MempoolSnapshot blk idx -&gt; MempoolSnapshot blk idx -&gt; Bool
-</span><a href="#local-6989586621679983898"><span class="hs-identifier hs-var hs-var">isSameSnapshot</span></a></span></span><span> </span><span id="local-6989586621679983896"><span class="annot"><span class="annottext">MempoolSnapshot blk idx
-</span><a href="#local-6989586621679983896"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span id="local-6989586621679983895"><span class="annot"><span class="annottext">MempoolSnapshot blk idx
-</span><a href="#local-6989586621679983895"><span class="hs-identifier hs-var">b</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-83"></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Validated (GenTx blk), idx) -&gt; idx
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">ServerStIdle (GenTxId blk) (GenTx blk) SlotNo m ()
+</span><a href="#local-6989586621680009101"><span class="hs-identifier hs-var">serverStIdle</span></a></span><span>
+</span><span id="line-74"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-75"></span><span>
+</span><span id="line-76"></span><span>    </span><span class="hs-comment">-- Are two snapshots equal? (from the perspective of this protocol)</span><span>
+</span><span id="line-77"></span><span>    </span><span class="annot"><a href="#local-6989586621680009050"><span class="hs-identifier hs-type">isSameSnapshot</span></a></span><span>
+</span><span id="line-78"></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.API.html#MempoolSnapshot"><span class="hs-identifier hs-type">MempoolSnapshot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680009105"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-79"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.API.html#MempoolSnapshot"><span class="hs-identifier hs-type">MempoolSnapshot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680009105"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-80"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Bool</span></a></span><span>
+</span><span id="line-81"></span><span>    </span><span id="local-6989586621680009050"><span class="annot"><span class="annottext">isSameSnapshot :: MempoolSnapshot blk -&gt; MempoolSnapshot blk -&gt; Bool
+</span><a href="#local-6989586621680009050"><span class="hs-identifier hs-var hs-var">isSameSnapshot</span></a></span></span><span> </span><span id="local-6989586621680009048"><span class="annot"><span class="annottext">MempoolSnapshot blk
+</span><a href="#local-6989586621680009048"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span id="local-6989586621680009047"><span class="annot"><span class="annottext">MempoolSnapshot blk
+</span><a href="#local-6989586621680009047"><span class="hs-identifier hs-var">b</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-82"></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Validated (GenTx blk), TicketNo) -&gt; TicketNo
 forall a b. (a, b) -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">snd</span></a></span><span> </span><span class="annot"><span class="annottext">((Validated (GenTx blk), idx) -&gt; idx)
--&gt; [(Validated (GenTx blk), idx)] -&gt; [idx]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">snd</span></a></span><span> </span><span class="annot"><span class="annottext">((Validated (GenTx blk), TicketNo) -&gt; TicketNo)
+-&gt; [(Validated (GenTx blk), TicketNo)] -&gt; [TicketNo]
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk idx -&gt; [(Validated (GenTx blk), idx)]
-forall blk idx.
-MempoolSnapshot blk idx -&gt; [(Validated (GenTx blk), idx)]
-</span><a href="Ouroboros.Consensus.Mempool.API.html#snapshotTxs"><span class="hs-identifier hs-var hs-var">snapshotTxs</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk idx
-</span><a href="#local-6989586621679983896"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[idx] -&gt; [idx] -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk -&gt; [(Validated (GenTx blk), TicketNo)]
+forall blk.
+MempoolSnapshot blk -&gt; [(Validated (GenTx blk), TicketNo)]
+</span><a href="Ouroboros.Consensus.Mempool.API.html#snapshotTxs"><span class="hs-identifier hs-var hs-var">snapshotTxs</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk
+</span><a href="#local-6989586621680009048"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[TicketNo] -&gt; [TicketNo] -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">==</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Validated (GenTx blk), idx) -&gt; idx
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">==</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Validated (GenTx blk), TicketNo) -&gt; TicketNo
 forall a b. (a, b) -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">snd</span></a></span><span> </span><span class="annot"><span class="annottext">((Validated (GenTx blk), idx) -&gt; idx)
--&gt; [(Validated (GenTx blk), idx)] -&gt; [idx]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">snd</span></a></span><span> </span><span class="annot"><span class="annottext">((Validated (GenTx blk), TicketNo) -&gt; TicketNo)
+-&gt; [(Validated (GenTx blk), TicketNo)] -&gt; [TicketNo]
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk idx -&gt; [(Validated (GenTx blk), idx)]
-forall blk idx.
-MempoolSnapshot blk idx -&gt; [(Validated (GenTx blk), idx)]
-</span><a href="Ouroboros.Consensus.Mempool.API.html#snapshotTxs"><span class="hs-identifier hs-var hs-var">snapshotTxs</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk idx
-</span><a href="#local-6989586621679983895"><span class="hs-identifier hs-var">b</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-84"></span><span>      </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&amp;&amp;</span></a></span><span>
-</span><span id="line-85"></span><span>      </span><span class="annot"><span class="annottext">MempoolSnapshot blk idx -&gt; SlotNo
-forall blk idx. MempoolSnapshot blk idx -&gt; SlotNo
-</span><a href="Ouroboros.Consensus.Mempool.API.html#snapshotSlotNo"><span class="hs-identifier hs-var hs-var">snapshotSlotNo</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk idx
-</span><a href="#local-6989586621679983896"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; SlotNo -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk -&gt; [(Validated (GenTx blk), TicketNo)]
+forall blk.
+MempoolSnapshot blk -&gt; [(Validated (GenTx blk), TicketNo)]
+</span><a href="Ouroboros.Consensus.Mempool.API.html#snapshotTxs"><span class="hs-identifier hs-var hs-var">snapshotTxs</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk
+</span><a href="#local-6989586621680009047"><span class="hs-identifier hs-var">b</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-83"></span><span>      </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&amp;&amp;</span></a></span><span>
+</span><span id="line-84"></span><span>      </span><span class="annot"><span class="annottext">MempoolSnapshot blk -&gt; SlotNo
+forall blk. MempoolSnapshot blk -&gt; SlotNo
+</span><a href="Ouroboros.Consensus.Mempool.API.html#snapshotSlotNo"><span class="hs-identifier hs-var hs-var">snapshotSlotNo</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk
+</span><a href="#local-6989586621680009048"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; SlotNo -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">==</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk idx -&gt; SlotNo
-forall blk idx. MempoolSnapshot blk idx -&gt; SlotNo
-</span><a href="Ouroboros.Consensus.Mempool.API.html#snapshotSlotNo"><span class="hs-identifier hs-var hs-var">snapshotSlotNo</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk idx
-</span><a href="#local-6989586621679983895"><span class="hs-identifier hs-var">b</span></a></span><span>
-</span><span id="line-86"></span></pre></body></html>
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">==</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk -&gt; SlotNo
+forall blk. MempoolSnapshot blk -&gt; SlotNo
+</span><a href="Ouroboros.Consensus.Mempool.API.html#snapshotSlotNo"><span class="hs-identifier hs-var hs-var">snapshotSlotNo</span></a></span><span> </span><span class="annot"><span class="annottext">MempoolSnapshot blk
+</span><a href="#local-6989586621680009047"><span class="hs-identifier hs-var">b</span></a></span><span>
+</span><span id="line-85"></span></pre></body></html>

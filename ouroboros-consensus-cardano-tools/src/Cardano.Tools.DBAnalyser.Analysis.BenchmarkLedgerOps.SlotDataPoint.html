@@ -1,0 +1,214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE NamedFieldPuns    #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings #-}</span><span>
+</span><span id="line-3"></span><span>
+</span><span id="line-4"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-5"></span><span>    </span><span class="annot"><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#SlotDataPoint"><span class="hs-identifier">SlotDataPoint</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-6"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#showData"><span class="hs-identifier">showData</span></a></span><span>
+</span><span id="line-7"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#showHeaders"><span class="hs-identifier">showHeaders</span></a></span><span>
+</span><span id="line-8"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Int</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Int64</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Word</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Word32</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Word64</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Text.Builder</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Builder</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">decimal</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">intercalate</span></span><span class="hs-special">)</span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Slotting.Slot</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">SlotNo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">unSlotNo</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span class="hs-comment">-- | Information about the time spent processing the block corresponding to</span><span>
+</span><span id="line-17"></span><span class="hs-comment">-- 'slot', divided into the five major operations:</span><span>
+</span><span id="line-18"></span><span class="hs-comment">--</span><span>
+</span><span id="line-19"></span><span class="hs-comment">--  0. Forecast.</span><span>
+</span><span id="line-20"></span><span class="hs-comment">--  1. Header tick.</span><span>
+</span><span id="line-21"></span><span class="hs-comment">--  2. Header application.</span><span>
+</span><span id="line-22"></span><span class="hs-comment">--  3. Block tick.</span><span>
+</span><span id="line-23"></span><span class="hs-comment">--  4. Block application.</span><span>
+</span><span id="line-24"></span><span class="hs-comment">--</span><span>
+</span><span id="line-25"></span><span class="hs-comment">-- It is up to the user of a slot data point to decide which units the data</span><span>
+</span><span id="line-26"></span><span class="hs-comment">-- represent (eg milliseconds, nanoseconds, etc)</span><span>
+</span><span id="line-27"></span><span class="hs-keyword">data</span><span> </span><span id="SlotDataPoint"><span class="annot"><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#SlotDataPoint"><span class="hs-identifier hs-var">SlotDataPoint</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-28"></span><span>    </span><span id="SlotDataPoint"><span class="annot"><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#SlotDataPoint"><span class="hs-identifier hs-var">SlotDataPoint</span></a></span></span><span>
+</span><span id="line-29"></span><span>      </span><span class="hs-special">{</span><span> </span><span class="hs-comment">-- | Slot in which the 5 ledger operations were applied.</span><span>
+</span><span id="line-30"></span><span>        </span><span id="slot"><span class="annot"><span class="annottext">SlotDataPoint -&gt; SlotNo
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#slot"><span class="hs-identifier hs-var hs-var">slot</span></a></span></span><span>            </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span>
+</span><span id="line-31"></span><span>        </span><span class="hs-comment">-- | Gap to the previous slot.</span><span>
+</span><span id="line-32"></span><span>      </span><span class="hs-special">,</span><span> </span><span id="slotGap"><span class="annot"><span class="annottext">SlotDataPoint -&gt; Word64
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#slotGap"><span class="hs-identifier hs-var hs-var">slotGap</span></a></span></span><span>         </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Word64</span></a></span><span>
+</span><span id="line-33"></span><span>        </span><span class="hs-comment">-- | Total time spent in the 5 ledger operations at 'slot'.</span><span>
+</span><span id="line-34"></span><span>      </span><span class="hs-special">,</span><span> </span><span id="totalTime"><span class="annot"><span class="annottext">SlotDataPoint -&gt; Int64
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#totalTime"><span class="hs-identifier hs-var hs-var">totalTime</span></a></span></span><span>       </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Int64</span></a></span><span>
+</span><span id="line-35"></span><span>        </span><span class="hs-comment">-- | Time spent by the mutator while performing the 5 ledger operations</span><span>
+</span><span id="line-36"></span><span>        </span><span class="hs-comment">-- at 'slot'.</span><span>
+</span><span id="line-37"></span><span>      </span><span class="hs-special">,</span><span> </span><span id="mut"><span class="annot"><span class="annottext">SlotDataPoint -&gt; Int64
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#mut"><span class="hs-identifier hs-var hs-var">mut</span></a></span></span><span>             </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Int64</span></a></span><span>
+</span><span id="line-38"></span><span>        </span><span class="hs-comment">-- | Time spent in garbage collection while performing the 5 ledger</span><span>
+</span><span id="line-39"></span><span>        </span><span class="hs-comment">-- operations at 'slot'.</span><span>
+</span><span id="line-40"></span><span>      </span><span class="hs-special">,</span><span> </span><span id="gc"><span class="annot"><span class="annottext">SlotDataPoint -&gt; Int64
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#gc"><span class="hs-identifier hs-var hs-var">gc</span></a></span></span><span>              </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Int64</span></a></span><span>
+</span><span id="line-41"></span><span>        </span><span class="hs-comment">-- | Total number of major garbage collections that took place while</span><span>
+</span><span id="line-42"></span><span>        </span><span class="hs-comment">-- performing the 5 ledger operations at 'slot'.</span><span>
+</span><span id="line-43"></span><span>      </span><span class="hs-special">,</span><span> </span><span id="majGcCount"><span class="annot"><span class="annottext">SlotDataPoint -&gt; Word32
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#majGcCount"><span class="hs-identifier hs-var hs-var">majGcCount</span></a></span></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span>
+</span><span id="line-44"></span><span>        </span><span class="hs-comment">-- | Difference of the GC.mutator_elapsed_ns field when computing the</span><span>
+</span><span id="line-45"></span><span>        </span><span class="hs-comment">-- forecast.</span><span>
+</span><span id="line-46"></span><span>      </span><span class="hs-special">,</span><span> </span><span id="mut_forecast"><span class="annot"><span class="annottext">SlotDataPoint -&gt; Int64
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#mut_forecast"><span class="hs-identifier hs-var hs-var">mut_forecast</span></a></span></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Int64</span></a></span><span>
+</span><span id="line-47"></span><span>      </span><span class="hs-special">,</span><span> </span><span id="mut_headerTick"><span class="annot"><span class="annottext">SlotDataPoint -&gt; Int64
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#mut_headerTick"><span class="hs-identifier hs-var hs-var">mut_headerTick</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Int64</span></a></span><span>
+</span><span id="line-48"></span><span>      </span><span class="hs-special">,</span><span> </span><span id="mut_headerApply"><span class="annot"><span class="annottext">SlotDataPoint -&gt; Int64
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#mut_headerApply"><span class="hs-identifier hs-var hs-var">mut_headerApply</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Int64</span></a></span><span>
+</span><span id="line-49"></span><span>      </span><span class="hs-special">,</span><span> </span><span id="mut_blockTick"><span class="annot"><span class="annottext">SlotDataPoint -&gt; Int64
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#mut_blockTick"><span class="hs-identifier hs-var hs-var">mut_blockTick</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Int64</span></a></span><span>
+</span><span id="line-50"></span><span>      </span><span class="hs-special">,</span><span> </span><span id="mut_blockApply"><span class="annot"><span class="annottext">SlotDataPoint -&gt; Int64
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#mut_blockApply"><span class="hs-identifier hs-var hs-var">mut_blockApply</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Int64</span></a></span><span>
+</span><span id="line-51"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-52"></span><span>
+</span><span id="line-53"></span><span class="hs-comment">-- | Return the headers that correspond to the fields of 'SlotDataPoint'.</span><span>
+</span><span id="line-54"></span><span class="hs-comment">--</span><span>
+</span><span id="line-55"></span><span class="hs-comment">-- The position of each header matches the position in which the corresponding</span><span>
+</span><span id="line-56"></span><span class="hs-comment">-- field value is returned in 'showData'. Eg, if show headers returns:</span><span>
+</span><span id="line-57"></span><span class="hs-comment">--</span><span>
+</span><span id="line-58"></span><span class="hs-comment">-- &gt; &quot;slot slotGap totalTime&quot; ...</span><span>
+</span><span id="line-59"></span><span class="hs-comment">--</span><span>
+</span><span id="line-60"></span><span class="hs-comment">-- then the third value returned by 'showData' will correspond to 'totalTime'.</span><span>
+</span><span id="line-61"></span><span class="annot"><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#showHeaders"><span class="hs-identifier hs-type">showHeaders</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Builder</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Builder</span></span><span>
+</span><span id="line-62"></span><span id="showHeaders"><span class="annot"><span class="annottext">showHeaders :: Builder -&gt; Builder
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#showHeaders"><span class="hs-identifier hs-var hs-var">showHeaders</span></a></span></span><span> </span><span id="local-6989586621679370544"><span class="annot"><span class="annottext">Builder
+</span><a href="#local-6989586621679370544"><span class="hs-identifier hs-var">sep</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Builder -&gt; [Builder] -&gt; Builder
+forall (foldable :: * -&gt; *).
+Foldable foldable =&gt;
+Builder -&gt; foldable Builder -&gt; Builder
+</span><span class="hs-identifier hs-var">intercalate</span></span><span> </span><span class="annot"><span class="annottext">Builder
+</span><a href="#local-6989586621679370544"><span class="hs-identifier hs-var">sep</span></a></span><span> </span><span class="annot"><span class="annottext">([Builder] -&gt; Builder) -&gt; [Builder] -&gt; Builder
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">((Builder, SlotDataPoint -&gt; Builder) -&gt; Builder)
+-&gt; [(Builder, SlotDataPoint -&gt; Builder)] -&gt; [Builder]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fmap</span></a></span><span> </span><span class="annot"><span class="annottext">(Builder, SlotDataPoint -&gt; Builder) -&gt; Builder
+forall a b. (a, b) -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fst</span></a></span><span>           </span><span class="annot"><span class="annottext">[(Builder, SlotDataPoint -&gt; Builder)]
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#showHeadersAndData"><span class="hs-identifier hs-var">showHeadersAndData</span></a></span><span>
+</span><span id="line-63"></span><span>
+</span><span id="line-64"></span><span class="annot"><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#showData"><span class="hs-identifier hs-type">showData</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#SlotDataPoint"><span class="hs-identifier hs-type">SlotDataPoint</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Builder</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Builder</span></span><span>
+</span><span id="line-65"></span><span id="showData"><span class="annot"><span class="annottext">showData :: SlotDataPoint -&gt; Builder -&gt; Builder
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#showData"><span class="hs-identifier hs-var hs-var">showData</span></a></span></span><span> </span><span id="local-6989586621679370542"><span class="annot"><span class="annottext">SlotDataPoint
+</span><a href="#local-6989586621679370542"><span class="hs-identifier hs-var">dp</span></a></span></span><span> </span><span id="local-6989586621679370541"><span class="annot"><span class="annottext">Builder
+</span><a href="#local-6989586621679370541"><span class="hs-identifier hs-var">sep</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Builder -&gt; [Builder] -&gt; Builder
+forall (foldable :: * -&gt; *).
+Foldable foldable =&gt;
+Builder -&gt; foldable Builder -&gt; Builder
+</span><span class="hs-identifier hs-var">intercalate</span></span><span> </span><span class="annot"><span class="annottext">Builder
+</span><a href="#local-6989586621679370541"><span class="hs-identifier hs-var">sep</span></a></span><span> </span><span class="annot"><span class="annottext">([Builder] -&gt; Builder) -&gt; [Builder] -&gt; Builder
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">((Builder, SlotDataPoint -&gt; Builder) -&gt; Builder)
+-&gt; [(Builder, SlotDataPoint -&gt; Builder)] -&gt; [Builder]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fmap</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">(SlotDataPoint -&gt; Builder) -&gt; SlotDataPoint -&gt; Builder
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">SlotDataPoint
+</span><a href="#local-6989586621679370542"><span class="hs-identifier hs-var">dp</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">((SlotDataPoint -&gt; Builder) -&gt; Builder)
+-&gt; ((Builder, SlotDataPoint -&gt; Builder)
+    -&gt; SlotDataPoint -&gt; Builder)
+-&gt; (Builder, SlotDataPoint -&gt; Builder)
+-&gt; Builder
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">(Builder, SlotDataPoint -&gt; Builder) -&gt; SlotDataPoint -&gt; Builder
+forall a b. (a, b) -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">snd</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[(Builder, SlotDataPoint -&gt; Builder)]
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#showHeadersAndData"><span class="hs-identifier hs-var">showHeadersAndData</span></a></span><span>
+</span><span id="line-66"></span><span>
+</span><span id="line-67"></span><span class="annot"><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#showHeadersAndData"><span class="hs-identifier hs-type">showHeadersAndData</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Builder</span></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#SlotDataPoint"><span class="hs-identifier hs-type">SlotDataPoint</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Builder</span></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-68"></span><span id="showHeadersAndData"><span class="annot"><span class="annottext">showHeadersAndData :: [(Builder, SlotDataPoint -&gt; Builder)]
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#showHeadersAndData"><span class="hs-identifier hs-var hs-var">showHeadersAndData</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-69"></span><span>    </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Builder
+</span><span class="hs-string">&quot;slot&quot;</span></span><span>           </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; Builder
+forall a. Integral a =&gt; a -&gt; Builder
+</span><span class="hs-identifier hs-var">decimal</span></span><span> </span><span class="annot"><span class="annottext">(Word64 -&gt; Builder)
+-&gt; (SlotDataPoint -&gt; Word64) -&gt; SlotDataPoint -&gt; Builder
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; Word64
+</span><span class="hs-identifier hs-var hs-var">unSlotNo</span></span><span> </span><span class="annot"><span class="annottext">(SlotNo -&gt; Word64)
+-&gt; (SlotDataPoint -&gt; SlotNo) -&gt; SlotDataPoint -&gt; Word64
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">SlotDataPoint -&gt; SlotNo
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#slot"><span class="hs-identifier hs-var hs-var">slot</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-70"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Builder
+</span><span class="hs-string">&quot;slotGap&quot;</span></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; Builder
+forall a. Integral a =&gt; a -&gt; Builder
+</span><span class="hs-identifier hs-var">decimal</span></span><span> </span><span class="annot"><span class="annottext">(Word64 -&gt; Builder)
+-&gt; (SlotDataPoint -&gt; Word64) -&gt; SlotDataPoint -&gt; Builder
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">SlotDataPoint -&gt; Word64
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#slotGap"><span class="hs-identifier hs-var hs-var">slotGap</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-71"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Builder
+</span><span class="hs-string">&quot;totalTime&quot;</span></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int64 -&gt; Builder
+forall a. Integral a =&gt; a -&gt; Builder
+</span><span class="hs-identifier hs-var">decimal</span></span><span> </span><span class="annot"><span class="annottext">(Int64 -&gt; Builder)
+-&gt; (SlotDataPoint -&gt; Int64) -&gt; SlotDataPoint -&gt; Builder
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">SlotDataPoint -&gt; Int64
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#totalTime"><span class="hs-identifier hs-var hs-var">totalTime</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-72"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Builder
+</span><span class="hs-string">&quot;mut&quot;</span></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int64 -&gt; Builder
+forall a. Integral a =&gt; a -&gt; Builder
+</span><span class="hs-identifier hs-var">decimal</span></span><span> </span><span class="annot"><span class="annottext">(Int64 -&gt; Builder)
+-&gt; (SlotDataPoint -&gt; Int64) -&gt; SlotDataPoint -&gt; Builder
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">SlotDataPoint -&gt; Int64
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#mut"><span class="hs-identifier hs-var hs-var">mut</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-73"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Builder
+</span><span class="hs-string">&quot;gc&quot;</span></span><span>             </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int64 -&gt; Builder
+forall a. Integral a =&gt; a -&gt; Builder
+</span><span class="hs-identifier hs-var">decimal</span></span><span> </span><span class="annot"><span class="annottext">(Int64 -&gt; Builder)
+-&gt; (SlotDataPoint -&gt; Int64) -&gt; SlotDataPoint -&gt; Builder
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">SlotDataPoint -&gt; Int64
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#gc"><span class="hs-identifier hs-var hs-var">gc</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-74"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Builder
+</span><span class="hs-string">&quot;majGcCount&quot;</span></span><span>     </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; Builder
+forall a. Integral a =&gt; a -&gt; Builder
+</span><span class="hs-identifier hs-var">decimal</span></span><span> </span><span class="annot"><span class="annottext">(Word32 -&gt; Builder)
+-&gt; (SlotDataPoint -&gt; Word32) -&gt; SlotDataPoint -&gt; Builder
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">SlotDataPoint -&gt; Word32
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#majGcCount"><span class="hs-identifier hs-var hs-var">majGcCount</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-75"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Builder
+</span><span class="hs-string">&quot;mut_forecast&quot;</span></span><span>   </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int64 -&gt; Builder
+forall a. Integral a =&gt; a -&gt; Builder
+</span><span class="hs-identifier hs-var">decimal</span></span><span> </span><span class="annot"><span class="annottext">(Int64 -&gt; Builder)
+-&gt; (SlotDataPoint -&gt; Int64) -&gt; SlotDataPoint -&gt; Builder
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">SlotDataPoint -&gt; Int64
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#mut_forecast"><span class="hs-identifier hs-var hs-var">mut_forecast</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-76"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Builder
+</span><span class="hs-string">&quot;mut_headerTick&quot;</span></span><span> </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int64 -&gt; Builder
+forall a. Integral a =&gt; a -&gt; Builder
+</span><span class="hs-identifier hs-var">decimal</span></span><span> </span><span class="annot"><span class="annottext">(Int64 -&gt; Builder)
+-&gt; (SlotDataPoint -&gt; Int64) -&gt; SlotDataPoint -&gt; Builder
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">SlotDataPoint -&gt; Int64
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#mut_headerTick"><span class="hs-identifier hs-var hs-var">mut_headerTick</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-77"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Builder
+</span><span class="hs-string">&quot;mut_headerApply&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int64 -&gt; Builder
+forall a. Integral a =&gt; a -&gt; Builder
+</span><span class="hs-identifier hs-var">decimal</span></span><span> </span><span class="annot"><span class="annottext">(Int64 -&gt; Builder)
+-&gt; (SlotDataPoint -&gt; Int64) -&gt; SlotDataPoint -&gt; Builder
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">SlotDataPoint -&gt; Int64
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#mut_headerApply"><span class="hs-identifier hs-var hs-var">mut_headerApply</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-78"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Builder
+</span><span class="hs-string">&quot;mut_blockTick&quot;</span></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int64 -&gt; Builder
+forall a. Integral a =&gt; a -&gt; Builder
+</span><span class="hs-identifier hs-var">decimal</span></span><span> </span><span class="annot"><span class="annottext">(Int64 -&gt; Builder)
+-&gt; (SlotDataPoint -&gt; Int64) -&gt; SlotDataPoint -&gt; Builder
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">SlotDataPoint -&gt; Int64
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#mut_blockTick"><span class="hs-identifier hs-var hs-var">mut_blockTick</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-79"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Builder
+</span><span class="hs-string">&quot;mut_blockApply&quot;</span></span><span> </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int64 -&gt; Builder
+forall a. Integral a =&gt; a -&gt; Builder
+</span><span class="hs-identifier hs-var">decimal</span></span><span> </span><span class="annot"><span class="annottext">(Int64 -&gt; Builder)
+-&gt; (SlotDataPoint -&gt; Int64) -&gt; SlotDataPoint -&gt; Builder
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">SlotDataPoint -&gt; Int64
+</span><a href="Cardano.Tools.DBAnalyser.Analysis.BenchmarkLedgerOps.SlotDataPoint.html#mut_blockApply"><span class="hs-identifier hs-var hs-var">mut_blockApply</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-80"></span><span>    </span><span class="hs-special">]</span><span>
+</span><span id="line-81"></span></pre></body></html>

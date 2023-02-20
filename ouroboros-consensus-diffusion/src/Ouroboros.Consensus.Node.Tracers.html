@@ -1,0 +1,846 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DeriveFunctor         #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE FlexibleContexts      #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE QuantifiedConstraints #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables   #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE StandaloneDeriving    #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE UndecidableInstances  #-}</span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Consensus.Node.Tracers</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-9"></span><span>    </span><span class="annot"><span class="hs-comment">-- * All tracers of a node bundled together</span></span><span>
+</span><span id="line-10"></span><span>    </span><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#Tracers"><span class="hs-identifier">Tracers</span></a></span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#Tracers%27"><span class="hs-identifier">Tracers'</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#nullTracers"><span class="hs-identifier">nullTracers</span></a></span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#showTracers"><span class="hs-identifier">showTracers</span></a></span><span>
+</span><span id="line-14"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Specific tracers</span></span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceForgeEvent"><span class="hs-identifier">TraceForgeEvent</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceLabelCreds"><span class="hs-identifier">TraceLabelCreds</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Control.Exception</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">SomeException</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Tracer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Tracer</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">nullTracer</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">showTracing</span></span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/text-1.2.4.1/src"><span class="hs-identifier">Data.Text</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/text-1.2.4.1/src"><span class="hs-identifier">Text</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/time-1.9.3/src"><span class="hs-identifier">Data.Time</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/time-1.9.3/src"><span class="hs-identifier">UTCTime</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-0.4.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier">Ouroboros.Network.BlockFetch</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-0.4.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier">FetchDecision</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-25"></span><span>                     </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-0.4.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier">TraceFetchClientState</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/network-mux-0.3.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier">TraceLabelPeer</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-0.4.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier">Ouroboros.Network.KeepAlive</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-0.4.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier">TraceKeepAliveClient</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-0.4.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier">Ouroboros.Network.TxSubmission.Inbound</span></a></span><span>
+</span><span id="line-28"></span><span>                     </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-0.4.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier">TraceTxSubmissionInbound</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-0.4.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier">Ouroboros.Network.TxSubmission.Outbound</span></a></span><span>
+</span><span id="line-30"></span><span>                     </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-0.4.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier">TraceTxSubmissionOutbound</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Block</span></a></span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.BlockchainTime</span></a></span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Forecast</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">OutsideForecastRange</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Ledger.SupportsMempool</span></a></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Ledger.SupportsProtocol</span></a></span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Mempool</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">MempoolSize</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">TraceEventMempool</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.MiniProtocol.BlockFetch.Server</span></a></span><span>
+</span><span id="line-40"></span><span>                     </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">TraceBlockFetchServerEvent</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-41"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.MiniProtocol.ChainSync.Client</span></a></span><span>
+</span><span id="line-42"></span><span>                     </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">InvalidBlockReason</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">TraceChainSyncClientEvent</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.MiniProtocol.ChainSync.Server</span></a></span><span>
+</span><span id="line-44"></span><span>                     </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">TraceChainSyncServerEvent</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-45"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.MiniProtocol.LocalTxSubmission.Server</span></a></span><span>
+</span><span id="line-46"></span><span>                     </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">TraceLocalTxSubmissionServerEvent</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+  All tracers of a node bundled together
+-------------------------------------------------------------------------------}</span><span>
+</span><span id="line-51"></span><span>
+</span><span id="line-52"></span><span class="hs-keyword">data</span><span> </span><span id="Tracers%27"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#Tracers%27"><span class="hs-identifier hs-var">Tracers'</span></a></span></span><span> </span><span id="local-6989586621679162566"><span class="annot"><a href="#local-6989586621679162566"><span class="hs-identifier hs-type">remotePeer</span></a></span></span><span> </span><span id="local-6989586621679162564"><span class="annot"><a href="#local-6989586621679162564"><span class="hs-identifier hs-type">localPeer</span></a></span></span><span> </span><span id="local-6989586621679162565"><span class="annot"><a href="#local-6989586621679162565"><span class="hs-identifier hs-type">blk</span></a></span></span><span> </span><span id="local-6989586621679162567"><span class="annot"><a href="#local-6989586621679162567"><span class="hs-identifier hs-type">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Tracers"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#Tracers"><span class="hs-identifier hs-var">Tracers</span></a></span></span><span>
+</span><span id="line-53"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="chainSyncClientTracer"><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceLabelPeer remotePeer (TraceChainSyncClientEvent blk))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#chainSyncClientTracer"><span class="hs-identifier hs-var hs-var">chainSyncClientTracer</span></a></span></span><span>         </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679162567"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/network-mux-0.3.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-type">TraceLabelPeer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162566"><span class="hs-identifier hs-type">remotePeer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">TraceChainSyncClientEvent</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162565"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-54"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="chainSyncServerHeaderTracer"><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceChainSyncServerEvent blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#chainSyncServerHeaderTracer"><span class="hs-identifier hs-var hs-var">chainSyncServerHeaderTracer</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679162567"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">TraceChainSyncServerEvent</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162565"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="chainSyncServerBlockTracer"><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceChainSyncServerEvent blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#chainSyncServerBlockTracer"><span class="hs-identifier hs-var hs-var">chainSyncServerBlockTracer</span></a></span></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679162567"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">TraceChainSyncServerEvent</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162565"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-56"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="blockFetchDecisionTracer"><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f [TraceLabelPeer
+        remotePeer (FetchDecision [Point (Header blk)])]
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#blockFetchDecisionTracer"><span class="hs-identifier hs-var hs-var">blockFetchDecisionTracer</span></a></span></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679162567"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/network-mux-0.3.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-type">TraceLabelPeer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162566"><span class="hs-identifier hs-type">remotePeer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-0.4.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">FetchDecision</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162565"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-57"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="blockFetchClientTracer"><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceLabelPeer
+        remotePeer (TraceFetchClientState (Header blk)))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#blockFetchClientTracer"><span class="hs-identifier hs-var hs-var">blockFetchClientTracer</span></a></span></span><span>        </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679162567"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/network-mux-0.3.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-type">TraceLabelPeer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162566"><span class="hs-identifier hs-type">remotePeer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-0.4.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">TraceFetchClientState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162565"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-58"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="blockFetchServerTracer"><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceBlockFetchServerEvent blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#blockFetchServerTracer"><span class="hs-identifier hs-var hs-var">blockFetchServerTracer</span></a></span></span><span>        </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679162567"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">TraceBlockFetchServerEvent</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162565"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-59"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="txInboundTracer"><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceLabelPeer
+        remotePeer (TraceTxSubmissionInbound (GenTxId blk) (GenTx blk)))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#txInboundTracer"><span class="hs-identifier hs-var hs-var">txInboundTracer</span></a></span></span><span>               </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679162567"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/network-mux-0.3.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-type">TraceLabelPeer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162566"><span class="hs-identifier hs-type">remotePeer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-0.4.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">TraceTxSubmissionInbound</span></a></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">GenTxId</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162565"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162565"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-60"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="txOutboundTracer"><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceLabelPeer
+        remotePeer (TraceTxSubmissionOutbound (GenTxId blk) (GenTx blk)))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#txOutboundTracer"><span class="hs-identifier hs-var hs-var">txOutboundTracer</span></a></span></span><span>              </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679162567"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/network-mux-0.3.0.0/noopt/doc/html/network-mux/src"><span class="hs-identifier hs-type">TraceLabelPeer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162566"><span class="hs-identifier hs-type">remotePeer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-0.4.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">TraceTxSubmissionOutbound</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">GenTxId</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162565"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162565"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-61"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="localTxSubmissionServerTracer"><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceLocalTxSubmissionServerEvent blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#localTxSubmissionServerTracer"><span class="hs-identifier hs-var hs-var">localTxSubmissionServerTracer</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679162567"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">TraceLocalTxSubmissionServerEvent</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162565"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-62"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="mempoolTracer"><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f -&gt; f (TraceEventMempool blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#mempoolTracer"><span class="hs-identifier hs-var hs-var">mempoolTracer</span></a></span></span><span>                 </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679162567"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">TraceEventMempool</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162565"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-63"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="forgeTracer"><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceLabelCreds (TraceForgeEvent blk))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#forgeTracer"><span class="hs-identifier hs-var hs-var">forgeTracer</span></a></span></span><span>                   </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679162567"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceLabelCreds"><span class="hs-identifier hs-type">TraceLabelCreds</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceForgeEvent"><span class="hs-identifier hs-type">TraceForgeEvent</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162565"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-64"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="blockchainTimeTracer"><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceBlockchainTimeEvent UTCTime)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#blockchainTimeTracer"><span class="hs-identifier hs-var hs-var">blockchainTimeTracer</span></a></span></span><span>          </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679162567"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">TraceBlockchainTimeEvent</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">UTCTime</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-65"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="forgeStateInfoTracer"><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceLabelCreds (ForgeStateInfo blk))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#forgeStateInfoTracer"><span class="hs-identifier hs-var hs-var">forgeStateInfoTracer</span></a></span></span><span>          </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679162567"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceLabelCreds"><span class="hs-identifier hs-type">TraceLabelCreds</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">ForgeStateInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162565"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-66"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="keepAliveClientTracer"><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceKeepAliveClient remotePeer)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#keepAliveClientTracer"><span class="hs-identifier hs-var hs-var">keepAliveClientTracer</span></a></span></span><span>         </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679162567"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-0.4.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">TraceKeepAliveClient</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162566"><span class="hs-identifier hs-type">remotePeer</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-67"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="consensusStartupErrorTracer"><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f -&gt; f SomeException
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#consensusStartupErrorTracer"><span class="hs-identifier hs-var hs-var">consensusStartupErrorTracer</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679162567"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">SomeException</span></a></span><span>
+</span><span id="line-68"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-69"></span><span>
+</span><span id="line-70"></span><span id="local-6989586621679162499"><span id="local-6989586621679162500"><span id="local-6989586621679162501"><span id="local-6989586621679162502"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679162494"><span id="local-6989586621679162496"><span class="hs-special">(</span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679162569"><span class="annot"><a href="#local-6989586621679162569"><span class="hs-identifier hs-type">a</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Semigroup</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679162502"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162569"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-71"></span><span>      </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Semigroup</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#Tracers%27"><span class="hs-identifier hs-type">Tracers'</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162501"><span class="hs-identifier hs-type">remotePeer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162500"><span class="hs-identifier hs-type">localPeer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162499"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162502"><span class="hs-identifier hs-type">f</span></a></span><span class="hs-special">)</span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-72"></span><span>  </span><span id="local-6989586621679162492"><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+</span><a href="#local-6989586621679162492"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679162491"><span class="annot"><span class="annottext">&lt;&gt; :: Tracers' remotePeer localPeer blk f
+-&gt; Tracers' remotePeer localPeer blk f
+-&gt; Tracers' remotePeer localPeer blk f
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var hs-var hs-var hs-var">&lt;&gt;</span></a></span></span><span> </span><span id="local-6989586621679162490"><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+</span><a href="#local-6989586621679162490"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracers :: forall remotePeer localPeer blk (f :: * -&gt; *).
+f (TraceLabelPeer remotePeer (TraceChainSyncClientEvent blk))
+-&gt; f (TraceChainSyncServerEvent blk)
+-&gt; f (TraceChainSyncServerEvent blk)
+-&gt; f [TraceLabelPeer
+        remotePeer (FetchDecision [Point (Header blk)])]
+-&gt; f (TraceLabelPeer
+        remotePeer (TraceFetchClientState (Header blk)))
+-&gt; f (TraceBlockFetchServerEvent blk)
+-&gt; f (TraceLabelPeer
+        remotePeer (TraceTxSubmissionInbound (GenTxId blk) (GenTx blk)))
+-&gt; f (TraceLabelPeer
+        remotePeer (TraceTxSubmissionOutbound (GenTxId blk) (GenTx blk)))
+-&gt; f (TraceLocalTxSubmissionServerEvent blk)
+-&gt; f (TraceEventMempool blk)
+-&gt; f (TraceLabelCreds (TraceForgeEvent blk))
+-&gt; f (TraceBlockchainTimeEvent UTCTime)
+-&gt; f (TraceLabelCreds (ForgeStateInfo blk))
+-&gt; f (TraceKeepAliveClient remotePeer)
+-&gt; f SomeException
+-&gt; Tracers' remotePeer localPeer blk f
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#Tracers"><span class="hs-identifier hs-type">Tracers</span></a></span><span>
+</span><span id="line-73"></span><span>      </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">chainSyncClientTracer :: f (TraceLabelPeer remotePeer (TraceChainSyncClientEvent blk))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#chainSyncClientTracer"><span class="hs-identifier hs-var">chainSyncClientTracer</span></a></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Tracers' remotePeer localPeer blk f
+ -&gt; f (TraceLabelPeer remotePeer (TraceChainSyncClientEvent blk)))
+-&gt; f (TraceLabelPeer remotePeer (TraceChainSyncClientEvent blk))
+forall a.
+Semigroup a =&gt;
+(Tracers' remotePeer localPeer blk f -&gt; a) -&gt; a
+</span><a href="#local-6989586621679162489"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceLabelPeer remotePeer (TraceChainSyncClientEvent blk))
+forall remotePeer localPeer blk (f :: * -&gt; *).
+Tracers' remotePeer localPeer blk f
+-&gt; f (TraceLabelPeer remotePeer (TraceChainSyncClientEvent blk))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#chainSyncClientTracer"><span class="hs-identifier hs-var hs-var">chainSyncClientTracer</span></a></span><span>
+</span><span id="line-74"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">chainSyncServerHeaderTracer :: f (TraceChainSyncServerEvent blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#chainSyncServerHeaderTracer"><span class="hs-identifier hs-var">chainSyncServerHeaderTracer</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Tracers' remotePeer localPeer blk f
+ -&gt; f (TraceChainSyncServerEvent blk))
+-&gt; f (TraceChainSyncServerEvent blk)
+forall a.
+Semigroup a =&gt;
+(Tracers' remotePeer localPeer blk f -&gt; a) -&gt; a
+</span><a href="#local-6989586621679162489"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceChainSyncServerEvent blk)
+forall remotePeer localPeer blk (f :: * -&gt; *).
+Tracers' remotePeer localPeer blk f
+-&gt; f (TraceChainSyncServerEvent blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#chainSyncServerHeaderTracer"><span class="hs-identifier hs-var hs-var">chainSyncServerHeaderTracer</span></a></span><span>
+</span><span id="line-75"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">chainSyncServerBlockTracer :: f (TraceChainSyncServerEvent blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#chainSyncServerBlockTracer"><span class="hs-identifier hs-var">chainSyncServerBlockTracer</span></a></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Tracers' remotePeer localPeer blk f
+ -&gt; f (TraceChainSyncServerEvent blk))
+-&gt; f (TraceChainSyncServerEvent blk)
+forall a.
+Semigroup a =&gt;
+(Tracers' remotePeer localPeer blk f -&gt; a) -&gt; a
+</span><a href="#local-6989586621679162489"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceChainSyncServerEvent blk)
+forall remotePeer localPeer blk (f :: * -&gt; *).
+Tracers' remotePeer localPeer blk f
+-&gt; f (TraceChainSyncServerEvent blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#chainSyncServerBlockTracer"><span class="hs-identifier hs-var hs-var">chainSyncServerBlockTracer</span></a></span><span>
+</span><span id="line-76"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">blockFetchDecisionTracer :: f [TraceLabelPeer remotePeer (FetchDecision [Point (Header blk)])]
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#blockFetchDecisionTracer"><span class="hs-identifier hs-var">blockFetchDecisionTracer</span></a></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Tracers' remotePeer localPeer blk f
+ -&gt; f [TraceLabelPeer
+         remotePeer (FetchDecision [Point (Header blk)])])
+-&gt; f [TraceLabelPeer
+        remotePeer (FetchDecision [Point (Header blk)])]
+forall a.
+Semigroup a =&gt;
+(Tracers' remotePeer localPeer blk f -&gt; a) -&gt; a
+</span><a href="#local-6989586621679162489"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f [TraceLabelPeer
+        remotePeer (FetchDecision [Point (Header blk)])]
+forall remotePeer localPeer blk (f :: * -&gt; *).
+Tracers' remotePeer localPeer blk f
+-&gt; f [TraceLabelPeer
+        remotePeer (FetchDecision [Point (Header blk)])]
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#blockFetchDecisionTracer"><span class="hs-identifier hs-var hs-var">blockFetchDecisionTracer</span></a></span><span>
+</span><span id="line-77"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">blockFetchClientTracer :: f (TraceLabelPeer remotePeer (TraceFetchClientState (Header blk)))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#blockFetchClientTracer"><span class="hs-identifier hs-var">blockFetchClientTracer</span></a></span><span>        </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Tracers' remotePeer localPeer blk f
+ -&gt; f (TraceLabelPeer
+         remotePeer (TraceFetchClientState (Header blk))))
+-&gt; f (TraceLabelPeer
+        remotePeer (TraceFetchClientState (Header blk)))
+forall a.
+Semigroup a =&gt;
+(Tracers' remotePeer localPeer blk f -&gt; a) -&gt; a
+</span><a href="#local-6989586621679162489"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceLabelPeer
+        remotePeer (TraceFetchClientState (Header blk)))
+forall remotePeer localPeer blk (f :: * -&gt; *).
+Tracers' remotePeer localPeer blk f
+-&gt; f (TraceLabelPeer
+        remotePeer (TraceFetchClientState (Header blk)))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#blockFetchClientTracer"><span class="hs-identifier hs-var hs-var">blockFetchClientTracer</span></a></span><span>
+</span><span id="line-78"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">blockFetchServerTracer :: f (TraceBlockFetchServerEvent blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#blockFetchServerTracer"><span class="hs-identifier hs-var">blockFetchServerTracer</span></a></span><span>        </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Tracers' remotePeer localPeer blk f
+ -&gt; f (TraceBlockFetchServerEvent blk))
+-&gt; f (TraceBlockFetchServerEvent blk)
+forall a.
+Semigroup a =&gt;
+(Tracers' remotePeer localPeer blk f -&gt; a) -&gt; a
+</span><a href="#local-6989586621679162489"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceBlockFetchServerEvent blk)
+forall remotePeer localPeer blk (f :: * -&gt; *).
+Tracers' remotePeer localPeer blk f
+-&gt; f (TraceBlockFetchServerEvent blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#blockFetchServerTracer"><span class="hs-identifier hs-var hs-var">blockFetchServerTracer</span></a></span><span>
+</span><span id="line-79"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">txInboundTracer :: f (TraceLabelPeer
+     remotePeer (TraceTxSubmissionInbound (GenTxId blk) (GenTx blk)))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#txInboundTracer"><span class="hs-identifier hs-var">txInboundTracer</span></a></span><span>               </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Tracers' remotePeer localPeer blk f
+ -&gt; f (TraceLabelPeer
+         remotePeer (TraceTxSubmissionInbound (GenTxId blk) (GenTx blk))))
+-&gt; f (TraceLabelPeer
+        remotePeer (TraceTxSubmissionInbound (GenTxId blk) (GenTx blk)))
+forall a.
+Semigroup a =&gt;
+(Tracers' remotePeer localPeer blk f -&gt; a) -&gt; a
+</span><a href="#local-6989586621679162489"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceLabelPeer
+        remotePeer (TraceTxSubmissionInbound (GenTxId blk) (GenTx blk)))
+forall remotePeer localPeer blk (f :: * -&gt; *).
+Tracers' remotePeer localPeer blk f
+-&gt; f (TraceLabelPeer
+        remotePeer (TraceTxSubmissionInbound (GenTxId blk) (GenTx blk)))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#txInboundTracer"><span class="hs-identifier hs-var hs-var">txInboundTracer</span></a></span><span>
+</span><span id="line-80"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">txOutboundTracer :: f (TraceLabelPeer
+     remotePeer (TraceTxSubmissionOutbound (GenTxId blk) (GenTx blk)))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#txOutboundTracer"><span class="hs-identifier hs-var">txOutboundTracer</span></a></span><span>              </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Tracers' remotePeer localPeer blk f
+ -&gt; f (TraceLabelPeer
+         remotePeer (TraceTxSubmissionOutbound (GenTxId blk) (GenTx blk))))
+-&gt; f (TraceLabelPeer
+        remotePeer (TraceTxSubmissionOutbound (GenTxId blk) (GenTx blk)))
+forall a.
+Semigroup a =&gt;
+(Tracers' remotePeer localPeer blk f -&gt; a) -&gt; a
+</span><a href="#local-6989586621679162489"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceLabelPeer
+        remotePeer (TraceTxSubmissionOutbound (GenTxId blk) (GenTx blk)))
+forall remotePeer localPeer blk (f :: * -&gt; *).
+Tracers' remotePeer localPeer blk f
+-&gt; f (TraceLabelPeer
+        remotePeer (TraceTxSubmissionOutbound (GenTxId blk) (GenTx blk)))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#txOutboundTracer"><span class="hs-identifier hs-var hs-var">txOutboundTracer</span></a></span><span>
+</span><span id="line-81"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">localTxSubmissionServerTracer :: f (TraceLocalTxSubmissionServerEvent blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#localTxSubmissionServerTracer"><span class="hs-identifier hs-var">localTxSubmissionServerTracer</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Tracers' remotePeer localPeer blk f
+ -&gt; f (TraceLocalTxSubmissionServerEvent blk))
+-&gt; f (TraceLocalTxSubmissionServerEvent blk)
+forall a.
+Semigroup a =&gt;
+(Tracers' remotePeer localPeer blk f -&gt; a) -&gt; a
+</span><a href="#local-6989586621679162489"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceLocalTxSubmissionServerEvent blk)
+forall remotePeer localPeer blk (f :: * -&gt; *).
+Tracers' remotePeer localPeer blk f
+-&gt; f (TraceLocalTxSubmissionServerEvent blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#localTxSubmissionServerTracer"><span class="hs-identifier hs-var hs-var">localTxSubmissionServerTracer</span></a></span><span>
+</span><span id="line-82"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">mempoolTracer :: f (TraceEventMempool blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#mempoolTracer"><span class="hs-identifier hs-var">mempoolTracer</span></a></span><span>                 </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Tracers' remotePeer localPeer blk f -&gt; f (TraceEventMempool blk))
+-&gt; f (TraceEventMempool blk)
+forall a.
+Semigroup a =&gt;
+(Tracers' remotePeer localPeer blk f -&gt; a) -&gt; a
+</span><a href="#local-6989586621679162489"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f -&gt; f (TraceEventMempool blk)
+forall remotePeer localPeer blk (f :: * -&gt; *).
+Tracers' remotePeer localPeer blk f -&gt; f (TraceEventMempool blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#mempoolTracer"><span class="hs-identifier hs-var hs-var">mempoolTracer</span></a></span><span>
+</span><span id="line-83"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">forgeTracer :: f (TraceLabelCreds (TraceForgeEvent blk))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#forgeTracer"><span class="hs-identifier hs-var">forgeTracer</span></a></span><span>                   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Tracers' remotePeer localPeer blk f
+ -&gt; f (TraceLabelCreds (TraceForgeEvent blk)))
+-&gt; f (TraceLabelCreds (TraceForgeEvent blk))
+forall a.
+Semigroup a =&gt;
+(Tracers' remotePeer localPeer blk f -&gt; a) -&gt; a
+</span><a href="#local-6989586621679162489"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceLabelCreds (TraceForgeEvent blk))
+forall remotePeer localPeer blk (f :: * -&gt; *).
+Tracers' remotePeer localPeer blk f
+-&gt; f (TraceLabelCreds (TraceForgeEvent blk))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#forgeTracer"><span class="hs-identifier hs-var hs-var">forgeTracer</span></a></span><span>
+</span><span id="line-84"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">blockchainTimeTracer :: f (TraceBlockchainTimeEvent UTCTime)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#blockchainTimeTracer"><span class="hs-identifier hs-var">blockchainTimeTracer</span></a></span><span>          </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Tracers' remotePeer localPeer blk f
+ -&gt; f (TraceBlockchainTimeEvent UTCTime))
+-&gt; f (TraceBlockchainTimeEvent UTCTime)
+forall a.
+Semigroup a =&gt;
+(Tracers' remotePeer localPeer blk f -&gt; a) -&gt; a
+</span><a href="#local-6989586621679162489"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceBlockchainTimeEvent UTCTime)
+forall remotePeer localPeer blk (f :: * -&gt; *).
+Tracers' remotePeer localPeer blk f
+-&gt; f (TraceBlockchainTimeEvent UTCTime)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#blockchainTimeTracer"><span class="hs-identifier hs-var hs-var">blockchainTimeTracer</span></a></span><span>
+</span><span id="line-85"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">forgeStateInfoTracer :: f (TraceLabelCreds (ForgeStateInfo blk))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#forgeStateInfoTracer"><span class="hs-identifier hs-var">forgeStateInfoTracer</span></a></span><span>          </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Tracers' remotePeer localPeer blk f
+ -&gt; f (TraceLabelCreds (ForgeStateInfo blk)))
+-&gt; f (TraceLabelCreds (ForgeStateInfo blk))
+forall a.
+Semigroup a =&gt;
+(Tracers' remotePeer localPeer blk f -&gt; a) -&gt; a
+</span><a href="#local-6989586621679162489"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceLabelCreds (ForgeStateInfo blk))
+forall remotePeer localPeer blk (f :: * -&gt; *).
+Tracers' remotePeer localPeer blk f
+-&gt; f (TraceLabelCreds (ForgeStateInfo blk))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#forgeStateInfoTracer"><span class="hs-identifier hs-var hs-var">forgeStateInfoTracer</span></a></span><span>
+</span><span id="line-86"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">keepAliveClientTracer :: f (TraceKeepAliveClient remotePeer)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#keepAliveClientTracer"><span class="hs-identifier hs-var">keepAliveClientTracer</span></a></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Tracers' remotePeer localPeer blk f
+ -&gt; f (TraceKeepAliveClient remotePeer))
+-&gt; f (TraceKeepAliveClient remotePeer)
+forall a.
+Semigroup a =&gt;
+(Tracers' remotePeer localPeer blk f -&gt; a) -&gt; a
+</span><a href="#local-6989586621679162489"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+-&gt; f (TraceKeepAliveClient remotePeer)
+forall remotePeer localPeer blk (f :: * -&gt; *).
+Tracers' remotePeer localPeer blk f
+-&gt; f (TraceKeepAliveClient remotePeer)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#keepAliveClientTracer"><span class="hs-identifier hs-var hs-var">keepAliveClientTracer</span></a></span><span>
+</span><span id="line-87"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">consensusStartupErrorTracer :: f SomeException
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#consensusStartupErrorTracer"><span class="hs-identifier hs-var">consensusStartupErrorTracer</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Tracers' remotePeer localPeer blk f -&gt; f SomeException)
+-&gt; f SomeException
+forall a.
+Semigroup a =&gt;
+(Tracers' remotePeer localPeer blk f -&gt; a) -&gt; a
+</span><a href="#local-6989586621679162489"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f -&gt; f SomeException
+forall remotePeer localPeer blk (f :: * -&gt; *).
+Tracers' remotePeer localPeer blk f -&gt; f SomeException
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#consensusStartupErrorTracer"><span class="hs-identifier hs-var hs-var">consensusStartupErrorTracer</span></a></span><span>
+</span><span id="line-88"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-89"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-90"></span><span>      </span><span class="annot"><a href="#local-6989586621679162489"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679162563"><span class="annot"><a href="#local-6989586621679162563"><span class="hs-identifier hs-type">a</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Semigroup</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162563"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-91"></span><span>        </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#Tracers%27"><span class="hs-identifier hs-type">Tracers'</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162501"><span class="hs-identifier hs-type">remotePeer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162500"><span class="hs-identifier hs-type">localPeer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162499"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162502"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679162563"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679162563"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-92"></span><span>      </span><span id="local-6989586621679162489"><span class="annot"><span class="annottext">f :: (Tracers' remotePeer localPeer blk f -&gt; a) -&gt; a
+</span><a href="#local-6989586621679162489"><span class="hs-identifier hs-var hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679162488"><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f -&gt; a
+</span><a href="#local-6989586621679162488"><span class="hs-identifier hs-var">prj</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f -&gt; a
+</span><a href="#local-6989586621679162488"><span class="hs-identifier hs-var">prj</span></a></span><span> </span><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+</span><a href="#local-6989586621679162492"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f -&gt; a
+</span><a href="#local-6989586621679162488"><span class="hs-identifier hs-var">prj</span></a></span><span> </span><span class="annot"><span class="annottext">Tracers' remotePeer localPeer blk f
+</span><a href="#local-6989586621679162490"><span class="hs-identifier hs-var">r</span></a></span></span></span></span></span><span>
+</span><span id="line-93"></span><span>
+</span><span id="line-94"></span><span class="hs-comment">-- | A record of 'Tracer's for the node.</span><span>
+</span><span id="line-95"></span><span class="hs-keyword">type</span><span> </span><span id="Tracers"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#Tracers"><span class="hs-identifier hs-var">Tracers</span></a></span></span><span> </span><span id="local-6989586621679162487"><span class="annot"><a href="#local-6989586621679162487"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679162486"><span class="annot"><a href="#local-6989586621679162486"><span class="hs-identifier hs-type">remotePeer</span></a></span></span><span> </span><span id="local-6989586621679162485"><span class="annot"><a href="#local-6989586621679162485"><span class="hs-identifier hs-type">localPeer</span></a></span></span><span> </span><span id="local-6989586621679162484"><span class="annot"><a href="#local-6989586621679162484"><span class="hs-identifier hs-type">blk</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-96"></span><span>     </span><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#Tracers%27"><span class="hs-identifier hs-type">Tracers'</span></a></span><span>  </span><span class="annot"><a href="#local-6989586621679162486"><span class="hs-identifier hs-type">remotePeer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162485"><span class="hs-identifier hs-type">localPeer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162484"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Tracer</span></span><span> </span><span class="annot"><a href="#local-6989586621679162487"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-97"></span><span>
+</span><span id="line-98"></span><span class="hs-comment">-- | Use a 'nullTracer' for each of the 'Tracer's in 'Tracers'</span><span>
+</span><span id="line-99"></span><span id="local-6989586621679162480"><span id="local-6989586621679162481"><span id="local-6989586621679162482"><span id="local-6989586621679162483"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#nullTracers"><span class="hs-identifier hs-type">nullTracers</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Monad</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162483"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#Tracers"><span class="hs-identifier hs-type">Tracers</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162483"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162482"><span class="hs-identifier hs-type">remotePeer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162481"><span class="hs-identifier hs-type">localPeer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162480"><span class="hs-identifier hs-type">blk</span></a></span></span></span></span></span><span>
+</span><span id="line-100"></span><span id="nullTracers"><span class="annot"><span class="annottext">nullTracers :: Tracers m remotePeer localPeer blk
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#nullTracers"><span class="hs-identifier hs-var hs-var">nullTracers</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracers :: forall remotePeer localPeer blk (f :: * -&gt; *).
+f (TraceLabelPeer remotePeer (TraceChainSyncClientEvent blk))
+-&gt; f (TraceChainSyncServerEvent blk)
+-&gt; f (TraceChainSyncServerEvent blk)
+-&gt; f [TraceLabelPeer
+        remotePeer (FetchDecision [Point (Header blk)])]
+-&gt; f (TraceLabelPeer
+        remotePeer (TraceFetchClientState (Header blk)))
+-&gt; f (TraceBlockFetchServerEvent blk)
+-&gt; f (TraceLabelPeer
+        remotePeer (TraceTxSubmissionInbound (GenTxId blk) (GenTx blk)))
+-&gt; f (TraceLabelPeer
+        remotePeer (TraceTxSubmissionOutbound (GenTxId blk) (GenTx blk)))
+-&gt; f (TraceLocalTxSubmissionServerEvent blk)
+-&gt; f (TraceEventMempool blk)
+-&gt; f (TraceLabelCreds (TraceForgeEvent blk))
+-&gt; f (TraceBlockchainTimeEvent UTCTime)
+-&gt; f (TraceLabelCreds (ForgeStateInfo blk))
+-&gt; f (TraceKeepAliveClient remotePeer)
+-&gt; f SomeException
+-&gt; Tracers' remotePeer localPeer blk f
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#Tracers"><span class="hs-identifier hs-type">Tracers</span></a></span><span>
+</span><span id="line-101"></span><span>    </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">chainSyncClientTracer :: Tracer
+  m (TraceLabelPeer remotePeer (TraceChainSyncClientEvent blk))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#chainSyncClientTracer"><span class="hs-identifier hs-var">chainSyncClientTracer</span></a></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer
+  m (TraceLabelPeer remotePeer (TraceChainSyncClientEvent blk))
+forall (m :: * -&gt; *) a. Applicative m =&gt; Tracer m a
+</span><span class="hs-identifier hs-var">nullTracer</span></span><span>
+</span><span id="line-102"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">chainSyncServerHeaderTracer :: Tracer m (TraceChainSyncServerEvent blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#chainSyncServerHeaderTracer"><span class="hs-identifier hs-var">chainSyncServerHeaderTracer</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m (TraceChainSyncServerEvent blk)
+forall (m :: * -&gt; *) a. Applicative m =&gt; Tracer m a
+</span><span class="hs-identifier hs-var">nullTracer</span></span><span>
+</span><span id="line-103"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">chainSyncServerBlockTracer :: Tracer m (TraceChainSyncServerEvent blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#chainSyncServerBlockTracer"><span class="hs-identifier hs-var">chainSyncServerBlockTracer</span></a></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m (TraceChainSyncServerEvent blk)
+forall (m :: * -&gt; *) a. Applicative m =&gt; Tracer m a
+</span><span class="hs-identifier hs-var">nullTracer</span></span><span>
+</span><span id="line-104"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">blockFetchDecisionTracer :: Tracer
+  m [TraceLabelPeer remotePeer (FetchDecision [Point (Header blk)])]
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#blockFetchDecisionTracer"><span class="hs-identifier hs-var">blockFetchDecisionTracer</span></a></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer
+  m [TraceLabelPeer remotePeer (FetchDecision [Point (Header blk)])]
+forall (m :: * -&gt; *) a. Applicative m =&gt; Tracer m a
+</span><span class="hs-identifier hs-var">nullTracer</span></span><span>
+</span><span id="line-105"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">blockFetchClientTracer :: Tracer
+  m (TraceLabelPeer remotePeer (TraceFetchClientState (Header blk)))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#blockFetchClientTracer"><span class="hs-identifier hs-var">blockFetchClientTracer</span></a></span><span>        </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer
+  m (TraceLabelPeer remotePeer (TraceFetchClientState (Header blk)))
+forall (m :: * -&gt; *) a. Applicative m =&gt; Tracer m a
+</span><span class="hs-identifier hs-var">nullTracer</span></span><span>
+</span><span id="line-106"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">blockFetchServerTracer :: Tracer m (TraceBlockFetchServerEvent blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#blockFetchServerTracer"><span class="hs-identifier hs-var">blockFetchServerTracer</span></a></span><span>        </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m (TraceBlockFetchServerEvent blk)
+forall (m :: * -&gt; *) a. Applicative m =&gt; Tracer m a
+</span><span class="hs-identifier hs-var">nullTracer</span></span><span>
+</span><span id="line-107"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">txInboundTracer :: Tracer
+  m
+  (TraceLabelPeer
+     remotePeer (TraceTxSubmissionInbound (GenTxId blk) (GenTx blk)))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#txInboundTracer"><span class="hs-identifier hs-var">txInboundTracer</span></a></span><span>               </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer
+  m
+  (TraceLabelPeer
+     remotePeer (TraceTxSubmissionInbound (GenTxId blk) (GenTx blk)))
+forall (m :: * -&gt; *) a. Applicative m =&gt; Tracer m a
+</span><span class="hs-identifier hs-var">nullTracer</span></span><span>
+</span><span id="line-108"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">txOutboundTracer :: Tracer
+  m
+  (TraceLabelPeer
+     remotePeer (TraceTxSubmissionOutbound (GenTxId blk) (GenTx blk)))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#txOutboundTracer"><span class="hs-identifier hs-var">txOutboundTracer</span></a></span><span>              </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer
+  m
+  (TraceLabelPeer
+     remotePeer (TraceTxSubmissionOutbound (GenTxId blk) (GenTx blk)))
+forall (m :: * -&gt; *) a. Applicative m =&gt; Tracer m a
+</span><span class="hs-identifier hs-var">nullTracer</span></span><span>
+</span><span id="line-109"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">localTxSubmissionServerTracer :: Tracer m (TraceLocalTxSubmissionServerEvent blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#localTxSubmissionServerTracer"><span class="hs-identifier hs-var">localTxSubmissionServerTracer</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m (TraceLocalTxSubmissionServerEvent blk)
+forall (m :: * -&gt; *) a. Applicative m =&gt; Tracer m a
+</span><span class="hs-identifier hs-var">nullTracer</span></span><span>
+</span><span id="line-110"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">mempoolTracer :: Tracer m (TraceEventMempool blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#mempoolTracer"><span class="hs-identifier hs-var">mempoolTracer</span></a></span><span>                 </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m (TraceEventMempool blk)
+forall (m :: * -&gt; *) a. Applicative m =&gt; Tracer m a
+</span><span class="hs-identifier hs-var">nullTracer</span></span><span>
+</span><span id="line-111"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">forgeTracer :: Tracer m (TraceLabelCreds (TraceForgeEvent blk))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#forgeTracer"><span class="hs-identifier hs-var">forgeTracer</span></a></span><span>                   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m (TraceLabelCreds (TraceForgeEvent blk))
+forall (m :: * -&gt; *) a. Applicative m =&gt; Tracer m a
+</span><span class="hs-identifier hs-var">nullTracer</span></span><span>
+</span><span id="line-112"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">blockchainTimeTracer :: Tracer m (TraceBlockchainTimeEvent UTCTime)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#blockchainTimeTracer"><span class="hs-identifier hs-var">blockchainTimeTracer</span></a></span><span>          </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m (TraceBlockchainTimeEvent UTCTime)
+forall (m :: * -&gt; *) a. Applicative m =&gt; Tracer m a
+</span><span class="hs-identifier hs-var">nullTracer</span></span><span>
+</span><span id="line-113"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">forgeStateInfoTracer :: Tracer m (TraceLabelCreds (ForgeStateInfo blk))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#forgeStateInfoTracer"><span class="hs-identifier hs-var">forgeStateInfoTracer</span></a></span><span>          </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m (TraceLabelCreds (ForgeStateInfo blk))
+forall (m :: * -&gt; *) a. Applicative m =&gt; Tracer m a
+</span><span class="hs-identifier hs-var">nullTracer</span></span><span>
+</span><span id="line-114"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">keepAliveClientTracer :: Tracer m (TraceKeepAliveClient remotePeer)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#keepAliveClientTracer"><span class="hs-identifier hs-var">keepAliveClientTracer</span></a></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m (TraceKeepAliveClient remotePeer)
+forall (m :: * -&gt; *) a. Applicative m =&gt; Tracer m a
+</span><span class="hs-identifier hs-var">nullTracer</span></span><span>
+</span><span id="line-115"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">consensusStartupErrorTracer :: Tracer m SomeException
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#consensusStartupErrorTracer"><span class="hs-identifier hs-var">consensusStartupErrorTracer</span></a></span><span>            </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m SomeException
+forall (m :: * -&gt; *) a. Applicative m =&gt; Tracer m a
+</span><span class="hs-identifier hs-var">nullTracer</span></span><span>
+</span><span id="line-116"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-117"></span><span>
+</span><span id="line-118"></span><span id="local-6989586621679162476"><span id="local-6989586621679162477"><span id="local-6989586621679162478"><span id="local-6989586621679162479"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#showTracers"><span class="hs-identifier hs-type">showTracers</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162479"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-119"></span><span>               </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162479"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-120"></span><span>               </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Validated</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162479"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-121"></span><span>               </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">GenTxId</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162479"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-122"></span><span>               </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">ApplyTxErr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162479"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-123"></span><span>               </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Header</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162479"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-124"></span><span>               </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">ForgeStateInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162479"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-125"></span><span>               </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">ForgeStateUpdateError</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162479"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-126"></span><span>               </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">CannotForge</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162479"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-127"></span><span>               </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162478"><span class="hs-identifier hs-type">remotePeer</span></a></span><span>
+</span><span id="line-128"></span><span>               </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerSupportsProtocol</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162479"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-129"></span><span>               </span><span class="hs-special">)</span><span>
+</span><span id="line-130"></span><span>            </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Tracer</span></span><span> </span><span class="annot"><a href="#local-6989586621679162477"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">String</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#Tracers"><span class="hs-identifier hs-type">Tracers</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162477"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162478"><span class="hs-identifier hs-type">remotePeer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162476"><span class="hs-identifier hs-type">localPeer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162479"><span class="hs-identifier hs-type">blk</span></a></span></span></span></span></span><span>
+</span><span id="line-131"></span><span id="showTracers"><span class="annot"><span class="annottext">showTracers :: Tracer m String -&gt; Tracers m remotePeer localPeer blk
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#showTracers"><span class="hs-identifier hs-var hs-var">showTracers</span></a></span></span><span> </span><span id="local-6989586621679162474"><span class="annot"><span class="annottext">Tracer m String
+</span><a href="#local-6989586621679162474"><span class="hs-identifier hs-var">tr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracers :: forall remotePeer localPeer blk (f :: * -&gt; *).
+f (TraceLabelPeer remotePeer (TraceChainSyncClientEvent blk))
+-&gt; f (TraceChainSyncServerEvent blk)
+-&gt; f (TraceChainSyncServerEvent blk)
+-&gt; f [TraceLabelPeer
+        remotePeer (FetchDecision [Point (Header blk)])]
+-&gt; f (TraceLabelPeer
+        remotePeer (TraceFetchClientState (Header blk)))
+-&gt; f (TraceBlockFetchServerEvent blk)
+-&gt; f (TraceLabelPeer
+        remotePeer (TraceTxSubmissionInbound (GenTxId blk) (GenTx blk)))
+-&gt; f (TraceLabelPeer
+        remotePeer (TraceTxSubmissionOutbound (GenTxId blk) (GenTx blk)))
+-&gt; f (TraceLocalTxSubmissionServerEvent blk)
+-&gt; f (TraceEventMempool blk)
+-&gt; f (TraceLabelCreds (TraceForgeEvent blk))
+-&gt; f (TraceBlockchainTimeEvent UTCTime)
+-&gt; f (TraceLabelCreds (ForgeStateInfo blk))
+-&gt; f (TraceKeepAliveClient remotePeer)
+-&gt; f SomeException
+-&gt; Tracers' remotePeer localPeer blk f
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#Tracers"><span class="hs-identifier hs-type">Tracers</span></a></span><span>
+</span><span id="line-132"></span><span>    </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">chainSyncClientTracer :: Tracer
+  m (TraceLabelPeer remotePeer (TraceChainSyncClientEvent blk))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#chainSyncClientTracer"><span class="hs-identifier hs-var">chainSyncClientTracer</span></a></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m String
+-&gt; Tracer
+     m (TraceLabelPeer remotePeer (TraceChainSyncClientEvent blk))
+forall a (m :: * -&gt; *). Show a =&gt; Tracer m String -&gt; Tracer m a
+</span><span class="hs-identifier hs-var">showTracing</span></span><span> </span><span class="annot"><span class="annottext">Tracer m String
+</span><a href="#local-6989586621679162474"><span class="hs-identifier hs-var">tr</span></a></span><span>
+</span><span id="line-133"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">chainSyncServerHeaderTracer :: Tracer m (TraceChainSyncServerEvent blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#chainSyncServerHeaderTracer"><span class="hs-identifier hs-var">chainSyncServerHeaderTracer</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m String -&gt; Tracer m (TraceChainSyncServerEvent blk)
+forall a (m :: * -&gt; *). Show a =&gt; Tracer m String -&gt; Tracer m a
+</span><span class="hs-identifier hs-var">showTracing</span></span><span> </span><span class="annot"><span class="annottext">Tracer m String
+</span><a href="#local-6989586621679162474"><span class="hs-identifier hs-var">tr</span></a></span><span>
+</span><span id="line-134"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">chainSyncServerBlockTracer :: Tracer m (TraceChainSyncServerEvent blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#chainSyncServerBlockTracer"><span class="hs-identifier hs-var">chainSyncServerBlockTracer</span></a></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m String -&gt; Tracer m (TraceChainSyncServerEvent blk)
+forall a (m :: * -&gt; *). Show a =&gt; Tracer m String -&gt; Tracer m a
+</span><span class="hs-identifier hs-var">showTracing</span></span><span> </span><span class="annot"><span class="annottext">Tracer m String
+</span><a href="#local-6989586621679162474"><span class="hs-identifier hs-var">tr</span></a></span><span>
+</span><span id="line-135"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">blockFetchDecisionTracer :: Tracer
+  m [TraceLabelPeer remotePeer (FetchDecision [Point (Header blk)])]
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#blockFetchDecisionTracer"><span class="hs-identifier hs-var">blockFetchDecisionTracer</span></a></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m String
+-&gt; Tracer
+     m [TraceLabelPeer remotePeer (FetchDecision [Point (Header blk)])]
+forall a (m :: * -&gt; *). Show a =&gt; Tracer m String -&gt; Tracer m a
+</span><span class="hs-identifier hs-var">showTracing</span></span><span> </span><span class="annot"><span class="annottext">Tracer m String
+</span><a href="#local-6989586621679162474"><span class="hs-identifier hs-var">tr</span></a></span><span>
+</span><span id="line-136"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">blockFetchClientTracer :: Tracer
+  m (TraceLabelPeer remotePeer (TraceFetchClientState (Header blk)))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#blockFetchClientTracer"><span class="hs-identifier hs-var">blockFetchClientTracer</span></a></span><span>        </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m String
+-&gt; Tracer
+     m (TraceLabelPeer remotePeer (TraceFetchClientState (Header blk)))
+forall a (m :: * -&gt; *). Show a =&gt; Tracer m String -&gt; Tracer m a
+</span><span class="hs-identifier hs-var">showTracing</span></span><span> </span><span class="annot"><span class="annottext">Tracer m String
+</span><a href="#local-6989586621679162474"><span class="hs-identifier hs-var">tr</span></a></span><span>
+</span><span id="line-137"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">blockFetchServerTracer :: Tracer m (TraceBlockFetchServerEvent blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#blockFetchServerTracer"><span class="hs-identifier hs-var">blockFetchServerTracer</span></a></span><span>        </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m String -&gt; Tracer m (TraceBlockFetchServerEvent blk)
+forall a (m :: * -&gt; *). Show a =&gt; Tracer m String -&gt; Tracer m a
+</span><span class="hs-identifier hs-var">showTracing</span></span><span> </span><span class="annot"><span class="annottext">Tracer m String
+</span><a href="#local-6989586621679162474"><span class="hs-identifier hs-var">tr</span></a></span><span>
+</span><span id="line-138"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">txInboundTracer :: Tracer
+  m
+  (TraceLabelPeer
+     remotePeer (TraceTxSubmissionInbound (GenTxId blk) (GenTx blk)))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#txInboundTracer"><span class="hs-identifier hs-var">txInboundTracer</span></a></span><span>               </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m String
+-&gt; Tracer
+     m
+     (TraceLabelPeer
+        remotePeer (TraceTxSubmissionInbound (GenTxId blk) (GenTx blk)))
+forall a (m :: * -&gt; *). Show a =&gt; Tracer m String -&gt; Tracer m a
+</span><span class="hs-identifier hs-var">showTracing</span></span><span> </span><span class="annot"><span class="annottext">Tracer m String
+</span><a href="#local-6989586621679162474"><span class="hs-identifier hs-var">tr</span></a></span><span>
+</span><span id="line-139"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">txOutboundTracer :: Tracer
+  m
+  (TraceLabelPeer
+     remotePeer (TraceTxSubmissionOutbound (GenTxId blk) (GenTx blk)))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#txOutboundTracer"><span class="hs-identifier hs-var">txOutboundTracer</span></a></span><span>              </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m String
+-&gt; Tracer
+     m
+     (TraceLabelPeer
+        remotePeer (TraceTxSubmissionOutbound (GenTxId blk) (GenTx blk)))
+forall a (m :: * -&gt; *). Show a =&gt; Tracer m String -&gt; Tracer m a
+</span><span class="hs-identifier hs-var">showTracing</span></span><span> </span><span class="annot"><span class="annottext">Tracer m String
+</span><a href="#local-6989586621679162474"><span class="hs-identifier hs-var">tr</span></a></span><span>
+</span><span id="line-140"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">localTxSubmissionServerTracer :: Tracer m (TraceLocalTxSubmissionServerEvent blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#localTxSubmissionServerTracer"><span class="hs-identifier hs-var">localTxSubmissionServerTracer</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m String -&gt; Tracer m (TraceLocalTxSubmissionServerEvent blk)
+forall a (m :: * -&gt; *). Show a =&gt; Tracer m String -&gt; Tracer m a
+</span><span class="hs-identifier hs-var">showTracing</span></span><span> </span><span class="annot"><span class="annottext">Tracer m String
+</span><a href="#local-6989586621679162474"><span class="hs-identifier hs-var">tr</span></a></span><span>
+</span><span id="line-141"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">mempoolTracer :: Tracer m (TraceEventMempool blk)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#mempoolTracer"><span class="hs-identifier hs-var">mempoolTracer</span></a></span><span>                 </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m String -&gt; Tracer m (TraceEventMempool blk)
+forall a (m :: * -&gt; *). Show a =&gt; Tracer m String -&gt; Tracer m a
+</span><span class="hs-identifier hs-var">showTracing</span></span><span> </span><span class="annot"><span class="annottext">Tracer m String
+</span><a href="#local-6989586621679162474"><span class="hs-identifier hs-var">tr</span></a></span><span>
+</span><span id="line-142"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">forgeTracer :: Tracer m (TraceLabelCreds (TraceForgeEvent blk))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#forgeTracer"><span class="hs-identifier hs-var">forgeTracer</span></a></span><span>                   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m String -&gt; Tracer m (TraceLabelCreds (TraceForgeEvent blk))
+forall a (m :: * -&gt; *). Show a =&gt; Tracer m String -&gt; Tracer m a
+</span><span class="hs-identifier hs-var">showTracing</span></span><span> </span><span class="annot"><span class="annottext">Tracer m String
+</span><a href="#local-6989586621679162474"><span class="hs-identifier hs-var">tr</span></a></span><span>
+</span><span id="line-143"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">blockchainTimeTracer :: Tracer m (TraceBlockchainTimeEvent UTCTime)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#blockchainTimeTracer"><span class="hs-identifier hs-var">blockchainTimeTracer</span></a></span><span>          </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m String -&gt; Tracer m (TraceBlockchainTimeEvent UTCTime)
+forall a (m :: * -&gt; *). Show a =&gt; Tracer m String -&gt; Tracer m a
+</span><span class="hs-identifier hs-var">showTracing</span></span><span> </span><span class="annot"><span class="annottext">Tracer m String
+</span><a href="#local-6989586621679162474"><span class="hs-identifier hs-var">tr</span></a></span><span>
+</span><span id="line-144"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">forgeStateInfoTracer :: Tracer m (TraceLabelCreds (ForgeStateInfo blk))
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#forgeStateInfoTracer"><span class="hs-identifier hs-var">forgeStateInfoTracer</span></a></span><span>          </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m String -&gt; Tracer m (TraceLabelCreds (ForgeStateInfo blk))
+forall a (m :: * -&gt; *). Show a =&gt; Tracer m String -&gt; Tracer m a
+</span><span class="hs-identifier hs-var">showTracing</span></span><span> </span><span class="annot"><span class="annottext">Tracer m String
+</span><a href="#local-6989586621679162474"><span class="hs-identifier hs-var">tr</span></a></span><span>
+</span><span id="line-145"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">keepAliveClientTracer :: Tracer m (TraceKeepAliveClient remotePeer)
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#keepAliveClientTracer"><span class="hs-identifier hs-var">keepAliveClientTracer</span></a></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m String -&gt; Tracer m (TraceKeepAliveClient remotePeer)
+forall a (m :: * -&gt; *). Show a =&gt; Tracer m String -&gt; Tracer m a
+</span><span class="hs-identifier hs-var">showTracing</span></span><span> </span><span class="annot"><span class="annottext">Tracer m String
+</span><a href="#local-6989586621679162474"><span class="hs-identifier hs-var">tr</span></a></span><span>
+</span><span id="line-146"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">consensusStartupErrorTracer :: Tracer m SomeException
+</span><a href="Ouroboros.Consensus.Node.Tracers.html#consensusStartupErrorTracer"><span class="hs-identifier hs-var">consensusStartupErrorTracer</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer m String -&gt; Tracer m SomeException
+forall a (m :: * -&gt; *). Show a =&gt; Tracer m String -&gt; Tracer m a
+</span><span class="hs-identifier hs-var">showTracing</span></span><span> </span><span class="annot"><span class="annottext">Tracer m String
+</span><a href="#local-6989586621679162474"><span class="hs-identifier hs-var">tr</span></a></span><span>
+</span><span id="line-147"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-148"></span><span>
+</span><span id="line-149"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+  Specific tracers
+-------------------------------------------------------------------------------}</span><span>
+</span><span id="line-152"></span><span>
+</span><span id="line-153"></span><span class="hs-comment">-- | Trace the forging of a block as a slot leader.</span><span>
+</span><span id="line-154"></span><span class="hs-comment">--</span><span>
+</span><span id="line-155"></span><span class="hs-comment">-- The flow of trace events here can be visualized as follows:</span><span>
+</span><span id="line-156"></span><span class="hs-comment">--</span><span>
+</span><span id="line-157"></span><span class="hs-comment">-- &gt; TraceStartLeadershipCheck</span><span>
+</span><span id="line-158"></span><span class="hs-comment">-- &gt;          |</span><span>
+</span><span id="line-159"></span><span class="hs-comment">-- &gt;          +--- TraceSlotIsImmutable (leadership check failed)</span><span>
+</span><span id="line-160"></span><span class="hs-comment">-- &gt;          |</span><span>
+</span><span id="line-161"></span><span class="hs-comment">-- &gt;          +--- TraceBlockFromFuture (leadership check failed)</span><span>
+</span><span id="line-162"></span><span class="hs-comment">-- &gt;          |</span><span>
+</span><span id="line-163"></span><span class="hs-comment">-- &gt;  TraceBlockContext</span><span>
+</span><span id="line-164"></span><span class="hs-comment">-- &gt;          |</span><span>
+</span><span id="line-165"></span><span class="hs-comment">-- &gt;          +--- TraceNoLedgerState (leadership check failed)</span><span>
+</span><span id="line-166"></span><span class="hs-comment">-- &gt;          |</span><span>
+</span><span id="line-167"></span><span class="hs-comment">-- &gt;   TraceLedgerState</span><span>
+</span><span id="line-168"></span><span class="hs-comment">-- &gt;          |</span><span>
+</span><span id="line-169"></span><span class="hs-comment">-- &gt;          +--- TraceNoLedgerView (leadership check failed)</span><span>
+</span><span id="line-170"></span><span class="hs-comment">-- &gt;          |</span><span>
+</span><span id="line-171"></span><span class="hs-comment">-- &gt;   TraceLedgerView</span><span>
+</span><span id="line-172"></span><span class="hs-comment">-- &gt;          |</span><span>
+</span><span id="line-173"></span><span class="hs-comment">-- &gt;          +--- TraceForgeStateUpdateError (leadership check failed)</span><span>
+</span><span id="line-174"></span><span class="hs-comment">-- &gt;          |</span><span>
+</span><span id="line-175"></span><span class="hs-comment">-- &gt;          +--- TraceNodeCannotForge (leadership check failed)</span><span>
+</span><span id="line-176"></span><span class="hs-comment">-- &gt;          |</span><span>
+</span><span id="line-177"></span><span class="hs-comment">-- &gt;          +--- TraceNodeNotLeader</span><span>
+</span><span id="line-178"></span><span class="hs-comment">-- &gt;          |</span><span>
+</span><span id="line-179"></span><span class="hs-comment">-- &gt;   TraceNodeIsLeader</span><span>
+</span><span id="line-180"></span><span class="hs-comment">-- &gt;          |</span><span>
+</span><span id="line-181"></span><span class="hs-comment">-- &gt;    TraceForgedBlock</span><span>
+</span><span id="line-182"></span><span class="hs-comment">-- &gt;          |</span><span>
+</span><span id="line-183"></span><span class="hs-comment">-- &gt;          +--- TraceDidntAdoptBlock</span><span>
+</span><span id="line-184"></span><span class="hs-comment">-- &gt;          |</span><span>
+</span><span id="line-185"></span><span class="hs-comment">-- &gt;          +--- TraceForgedInvalidBlock</span><span>
+</span><span id="line-186"></span><span class="hs-comment">-- &gt;          |</span><span>
+</span><span id="line-187"></span><span class="hs-comment">-- &gt;  TraceAdoptedBlock</span><span>
+</span><span id="line-188"></span><span class="hs-keyword">data</span><span> </span><span id="TraceForgeEvent"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceForgeEvent"><span class="hs-identifier hs-var">TraceForgeEvent</span></a></span></span><span> </span><span id="local-6989586621679162473"><span class="annot"><a href="#local-6989586621679162473"><span class="hs-identifier hs-type">blk</span></a></span></span><span>
+</span><span id="line-189"></span><span>    </span><span class="hs-comment">-- | Start of the leadership check</span><span>
+</span><span id="line-190"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-191"></span><span>    </span><span class="hs-comment">-- We record the current slot number.</span><span>
+</span><span id="line-192"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="TraceStartLeadershipCheck"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceStartLeadershipCheck"><span class="hs-identifier hs-var">TraceStartLeadershipCheck</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span>
+</span><span id="line-193"></span><span>
+</span><span id="line-194"></span><span>    </span><span class="hs-comment">-- | Leadership check failed: the tip of the ImmutableDB inhabits the</span><span>
+</span><span id="line-195"></span><span>    </span><span class="hs-comment">-- current slot</span><span>
+</span><span id="line-196"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-197"></span><span>    </span><span class="hs-comment">-- This might happen in two cases.</span><span>
+</span><span id="line-198"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-199"></span><span>    </span><span class="hs-comment">--  1. the clock moved backwards, on restart we ignored everything from the</span><span>
+</span><span id="line-200"></span><span>    </span><span class="hs-comment">--     VolatileDB since it's all in the future, and now the tip of the</span><span>
+</span><span id="line-201"></span><span>    </span><span class="hs-comment">--     ImmutableDB points to a block produced in the same slot we're trying</span><span>
+</span><span id="line-202"></span><span>    </span><span class="hs-comment">--     to produce a block in</span><span>
+</span><span id="line-203"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-204"></span><span>    </span><span class="hs-comment">--  2. k = 0 and we already adopted a block from another leader of the same</span><span>
+</span><span id="line-205"></span><span>    </span><span class="hs-comment">--     slot.</span><span>
+</span><span id="line-206"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-207"></span><span>    </span><span class="hs-comment">-- We record both the current slot number as well as the tip of the</span><span>
+</span><span id="line-208"></span><span>    </span><span class="hs-comment">-- ImmutableDB.</span><span>
+</span><span id="line-209"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-210"></span><span>    </span><span class="hs-comment">-- See also &lt;https://github.com/input-output-hk/ouroboros-network/issues/1462&gt;</span><span>
+</span><span id="line-211"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TraceSlotIsImmutable"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceSlotIsImmutable"><span class="hs-identifier hs-var">TraceSlotIsImmutable</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162473"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span>
+</span><span id="line-212"></span><span>
+</span><span id="line-213"></span><span>    </span><span class="hs-comment">-- | Leadership check failed: the current chain contains a block from a slot</span><span>
+</span><span id="line-214"></span><span>    </span><span class="hs-comment">-- /after/ the current slot</span><span>
+</span><span id="line-215"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-216"></span><span>    </span><span class="hs-comment">-- This can only happen if the system is under heavy load.</span><span>
+</span><span id="line-217"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-218"></span><span>    </span><span class="hs-comment">-- We record both the current slot number as well as the slot number of the</span><span>
+</span><span id="line-219"></span><span>    </span><span class="hs-comment">-- block at the tip of the chain.</span><span>
+</span><span id="line-220"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-221"></span><span>    </span><span class="hs-comment">-- See also &lt;https://github.com/input-output-hk/ouroboros-network/issues/1462&gt;</span><span>
+</span><span id="line-222"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TraceBlockFromFuture"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceBlockFromFuture"><span class="hs-identifier hs-var">TraceBlockFromFuture</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span>
+</span><span id="line-223"></span><span>
+</span><span id="line-224"></span><span>    </span><span class="hs-comment">-- | We found out to which block we are going to connect the block we are about</span><span>
+</span><span id="line-225"></span><span>    </span><span class="hs-comment">-- to forge.</span><span>
+</span><span id="line-226"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-227"></span><span>    </span><span class="hs-comment">-- We record the current slot number, the block number of the block to</span><span>
+</span><span id="line-228"></span><span>    </span><span class="hs-comment">-- connect to and its point.</span><span>
+</span><span id="line-229"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-230"></span><span>    </span><span class="hs-comment">-- Note that block number of the block we will try to forge is one more than</span><span>
+</span><span id="line-231"></span><span>    </span><span class="hs-comment">-- the recorded block number.</span><span>
+</span><span id="line-232"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TraceBlockContext"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceBlockContext"><span class="hs-identifier hs-var">TraceBlockContext</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162473"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-233"></span><span>
+</span><span id="line-234"></span><span>    </span><span class="hs-comment">-- | Leadership check failed: we were unable to get the ledger state for the</span><span>
+</span><span id="line-235"></span><span>    </span><span class="hs-comment">-- point of the block we want to connect to</span><span>
+</span><span id="line-236"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-237"></span><span>    </span><span class="hs-comment">-- This can happen if after choosing which block to connect to the node</span><span>
+</span><span id="line-238"></span><span>    </span><span class="hs-comment">-- switched to a different fork. We expect this to happen only rather</span><span>
+</span><span id="line-239"></span><span>    </span><span class="hs-comment">-- rarely, so this certainly merits a warning; if it happens a lot, that</span><span>
+</span><span id="line-240"></span><span>    </span><span class="hs-comment">-- merits an investigation.</span><span>
+</span><span id="line-241"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-242"></span><span>    </span><span class="hs-comment">-- We record both the current slot number as well as the point of the block</span><span>
+</span><span id="line-243"></span><span>    </span><span class="hs-comment">-- we attempt to connect the new block to (that we requested the ledger</span><span>
+</span><span id="line-244"></span><span>    </span><span class="hs-comment">-- state for).</span><span>
+</span><span id="line-245"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TraceNoLedgerState"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceNoLedgerState"><span class="hs-identifier hs-var">TraceNoLedgerState</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162473"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-246"></span><span>
+</span><span id="line-247"></span><span>    </span><span class="hs-comment">-- | We obtained a ledger state for the point of the block we want to</span><span>
+</span><span id="line-248"></span><span>    </span><span class="hs-comment">-- connect to</span><span>
+</span><span id="line-249"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-250"></span><span>    </span><span class="hs-comment">-- We record both the current slot number as well as the point of the block</span><span>
+</span><span id="line-251"></span><span>    </span><span class="hs-comment">-- we attempt to connect the new block to (that we requested the ledger</span><span>
+</span><span id="line-252"></span><span>    </span><span class="hs-comment">-- state for).</span><span>
+</span><span id="line-253"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TraceLedgerState"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceLedgerState"><span class="hs-identifier hs-var">TraceLedgerState</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162473"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-254"></span><span>
+</span><span id="line-255"></span><span>    </span><span class="hs-comment">-- | Leadership check failed: we were unable to get the ledger view for the</span><span>
+</span><span id="line-256"></span><span>    </span><span class="hs-comment">-- current slot number</span><span>
+</span><span id="line-257"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-258"></span><span>    </span><span class="hs-comment">-- This will only happen if there are many missing blocks between the tip of</span><span>
+</span><span id="line-259"></span><span>    </span><span class="hs-comment">-- our chain and the current slot.</span><span>
+</span><span id="line-260"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-261"></span><span>    </span><span class="hs-comment">-- We record also the failure returned by 'forecastFor'.</span><span>
+</span><span id="line-262"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TraceNoLedgerView"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceNoLedgerView"><span class="hs-identifier hs-var">TraceNoLedgerView</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">OutsideForecastRange</span></a></span><span>
+</span><span id="line-263"></span><span>
+</span><span id="line-264"></span><span>    </span><span class="hs-comment">-- | We obtained a ledger view for the current slot number</span><span>
+</span><span id="line-265"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-266"></span><span>    </span><span class="hs-comment">-- We record the current slot number.</span><span>
+</span><span id="line-267"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TraceLedgerView"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceLedgerView"><span class="hs-identifier hs-var">TraceLedgerView</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span>
+</span><span id="line-268"></span><span>
+</span><span id="line-269"></span><span>    </span><span class="hs-comment">-- | Updating the forge state failed.</span><span>
+</span><span id="line-270"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-271"></span><span>    </span><span class="hs-comment">-- For example, the KES key could not be evolved anymore.</span><span>
+</span><span id="line-272"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-273"></span><span>    </span><span class="hs-comment">-- We record the error returned by 'updateForgeState'.</span><span>
+</span><span id="line-274"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TraceForgeStateUpdateError"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceForgeStateUpdateError"><span class="hs-identifier hs-var">TraceForgeStateUpdateError</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">ForgeStateUpdateError</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162473"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-275"></span><span>
+</span><span id="line-276"></span><span>    </span><span class="hs-comment">-- | We did the leadership check and concluded that we should lead and forge</span><span>
+</span><span id="line-277"></span><span>    </span><span class="hs-comment">-- a block, but cannot.</span><span>
+</span><span id="line-278"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-279"></span><span>    </span><span class="hs-comment">-- This should only happen rarely and should be logged with warning severity.</span><span>
+</span><span id="line-280"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-281"></span><span>    </span><span class="hs-comment">-- Records why we cannot forge a block.</span><span>
+</span><span id="line-282"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TraceNodeCannotForge"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceNodeCannotForge"><span class="hs-identifier hs-var">TraceNodeCannotForge</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">CannotForge</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162473"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-283"></span><span>
+</span><span id="line-284"></span><span>    </span><span class="hs-comment">-- | We did the leadership check and concluded we are not the leader</span><span>
+</span><span id="line-285"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-286"></span><span>    </span><span class="hs-comment">-- We record the current slot number</span><span>
+</span><span id="line-287"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TraceNodeNotLeader"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceNodeNotLeader"><span class="hs-identifier hs-var">TraceNodeNotLeader</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span>
+</span><span id="line-288"></span><span>
+</span><span id="line-289"></span><span>    </span><span class="hs-comment">-- | We did the leadership check and concluded we /are/ the leader</span><span>
+</span><span id="line-290"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-291"></span><span>    </span><span class="hs-comment">-- The node will soon forge; it is about to read its transactions from the</span><span>
+</span><span id="line-292"></span><span>    </span><span class="hs-comment">-- Mempool. This will be followed by TraceForgedBlock.</span><span>
+</span><span id="line-293"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TraceNodeIsLeader"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceNodeIsLeader"><span class="hs-identifier hs-var">TraceNodeIsLeader</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span>
+</span><span id="line-294"></span><span>
+</span><span id="line-295"></span><span>    </span><span class="hs-comment">-- | We ticked the ledger state for the slot of the to-be-forged block.</span><span>
+</span><span id="line-296"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-297"></span><span>    </span><span class="hs-comment">-- We record the current slot number and the point of the block we attempt</span><span>
+</span><span id="line-298"></span><span>    </span><span class="hs-comment">-- to connect the new block to.</span><span>
+</span><span id="line-299"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TraceForgeTickedLedgerState"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceForgeTickedLedgerState"><span class="hs-identifier hs-var">TraceForgeTickedLedgerState</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162473"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-300"></span><span>
+</span><span id="line-301"></span><span>    </span><span class="hs-comment">-- | We acquired a mempool snapshot.</span><span>
+</span><span id="line-302"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-303"></span><span>    </span><span class="hs-comment">-- We record the the point of the state we are starting from (ie the point</span><span>
+</span><span id="line-304"></span><span>    </span><span class="hs-comment">-- from 'TraceLedgerState') and point the mempool had most last synced wrt.</span><span>
+</span><span id="line-305"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TraceForgingMempoolSnapshot"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceForgingMempoolSnapshot"><span class="hs-identifier hs-var">TraceForgingMempoolSnapshot</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162473"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">ChainHash</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162473"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span>
+</span><span id="line-306"></span><span>
+</span><span id="line-307"></span><span>    </span><span class="hs-comment">-- | We forged a block</span><span>
+</span><span id="line-308"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-309"></span><span>    </span><span class="hs-comment">-- We record the current slot number, the point of the predecessor, the block</span><span>
+</span><span id="line-310"></span><span>    </span><span class="hs-comment">-- itself, and the total size of the mempool snapshot at the time we produced</span><span>
+</span><span id="line-311"></span><span>    </span><span class="hs-comment">-- the block (which may be significantly larger than the block, due to</span><span>
+</span><span id="line-312"></span><span>    </span><span class="hs-comment">-- maximum block size)</span><span>
+</span><span id="line-313"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-314"></span><span>    </span><span class="hs-comment">-- This will be followed by one of three messages:</span><span>
+</span><span id="line-315"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-316"></span><span>    </span><span class="hs-comment">-- * TraceAdoptedBlock (normally)</span><span>
+</span><span id="line-317"></span><span>    </span><span class="hs-comment">-- * TraceDidntAdoptBlock (rarely)</span><span>
+</span><span id="line-318"></span><span>    </span><span class="hs-comment">-- * TraceForgedInvalidBlock (hopefully never -- this would indicate a bug)</span><span>
+</span><span id="line-319"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TraceForgedBlock"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceForgedBlock"><span class="hs-identifier hs-var">TraceForgedBlock</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162473"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="#local-6989586621679162473"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">MempoolSize</span></a></span><span>
+</span><span id="line-320"></span><span>
+</span><span id="line-321"></span><span>    </span><span class="hs-comment">-- | We did not adopt the block we produced, but the block was valid. We</span><span>
+</span><span id="line-322"></span><span>    </span><span class="hs-comment">-- must have adopted a block that another leader of the same slot produced</span><span>
+</span><span id="line-323"></span><span>    </span><span class="hs-comment">-- before we got the chance of adopting our own block. This is very rare,</span><span>
+</span><span id="line-324"></span><span>    </span><span class="hs-comment">-- this warrants a warning.</span><span>
+</span><span id="line-325"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TraceDidntAdoptBlock"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceDidntAdoptBlock"><span class="hs-identifier hs-var">TraceDidntAdoptBlock</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="annot"><a href="#local-6989586621679162473"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-326"></span><span>
+</span><span id="line-327"></span><span>    </span><span class="hs-comment">-- | We forged a block that is invalid according to the ledger in the</span><span>
+</span><span id="line-328"></span><span>    </span><span class="hs-comment">-- ChainDB. This means there is an inconsistency between the mempool</span><span>
+</span><span id="line-329"></span><span>    </span><span class="hs-comment">-- validation and the ledger validation. This is a serious error!</span><span>
+</span><span id="line-330"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TraceForgedInvalidBlock"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceForgedInvalidBlock"><span class="hs-identifier hs-var">TraceForgedInvalidBlock</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="annot"><a href="#local-6989586621679162473"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">InvalidBlockReason</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162473"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-331"></span><span>
+</span><span id="line-332"></span><span>    </span><span class="hs-comment">-- | We adopted the block we produced, we also trace the transactions</span><span>
+</span><span id="line-333"></span><span>    </span><span class="hs-comment">-- that were adopted.</span><span>
+</span><span id="line-334"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TraceAdoptedBlock"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceAdoptedBlock"><span class="hs-identifier hs-var">TraceAdoptedBlock</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="annot"><a href="#local-6989586621679162473"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Validated</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162473"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-335"></span><span>
+</span><span id="line-336"></span><span id="local-6989586621679162447"><span id="local-6989586621679162449"><span id="local-6989586621679162451"><span class="hs-keyword">deriving</span><span> </span><span class="hs-keyword">instance</span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerSupportsProtocol</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162451"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-337"></span><span>                  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Eq</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162451"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-338"></span><span>                  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Eq</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Validated</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162451"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-339"></span><span>                  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Eq</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">ForgeStateUpdateError</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162451"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-340"></span><span>                  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Eq</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">CannotForge</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162451"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-341"></span><span>                  </span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Eq</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceForgeEvent"><span class="hs-identifier hs-type">TraceForgeEvent</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162451"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span></span></span></span><span>
+</span><span id="line-342"></span><span id="local-6989586621679162439"><span id="local-6989586621679162441"><span id="local-6989586621679162443"><span id="local-6989586621679162445"><span class="hs-keyword">deriving</span><span> </span><span class="hs-keyword">instance</span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">LedgerSupportsProtocol</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162445"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-343"></span><span>                  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162445"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-344"></span><span>                  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Validated</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162445"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-345"></span><span>                  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">ForgeStateUpdateError</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162445"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-346"></span><span>                  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">CannotForge</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162445"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-347"></span><span>                  </span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceForgeEvent"><span class="hs-identifier hs-type">TraceForgeEvent</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162445"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span></span></span></span></span><span>
+</span><span id="line-348"></span><span>
+</span><span id="line-349"></span><span class="hs-comment">-- | Label a forge-related trace event with the label associated with its</span><span>
+</span><span id="line-350"></span><span class="hs-comment">-- credentials.</span><span>
+</span><span id="line-351"></span><span class="hs-comment">--</span><span>
+</span><span id="line-352"></span><span class="hs-comment">-- This is useful when a node is running with multiple sets of credentials.</span><span>
+</span><span id="line-353"></span><span class="hs-keyword">data</span><span> </span><span id="TraceLabelCreds"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceLabelCreds"><span class="hs-identifier hs-var">TraceLabelCreds</span></a></span></span><span> </span><span id="local-6989586621679162437"><span class="annot"><a href="#local-6989586621679162437"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="TraceLabelCreds"><span class="annot"><a href="Ouroboros.Consensus.Node.Tracers.html#TraceLabelCreds"><span class="hs-identifier hs-var">TraceLabelCreds</span></a></span></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-type">Text</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679162437"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-354"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679162432"><span id="local-6989586621679162434"><span class="annot"><span class="annottext">TraceLabelCreds a -&gt; TraceLabelCreds a -&gt; Bool
+(TraceLabelCreds a -&gt; TraceLabelCreds a -&gt; Bool)
+-&gt; (TraceLabelCreds a -&gt; TraceLabelCreds a -&gt; Bool)
+-&gt; Eq (TraceLabelCreds a)
+forall a. Eq a =&gt; TraceLabelCreds a -&gt; TraceLabelCreds a -&gt; Bool
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: TraceLabelCreds a -&gt; TraceLabelCreds a -&gt; Bool
+$c/= :: forall a. Eq a =&gt; TraceLabelCreds a -&gt; TraceLabelCreds a -&gt; Bool
+== :: TraceLabelCreds a -&gt; TraceLabelCreds a -&gt; Bool
+$c== :: forall a. Eq a =&gt; TraceLabelCreds a -&gt; TraceLabelCreds a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679162426"><span id="local-6989586621679162428"><span id="local-6989586621679162430"><span class="annot"><span class="annottext">Int -&gt; TraceLabelCreds a -&gt; ShowS
+[TraceLabelCreds a] -&gt; ShowS
+TraceLabelCreds a -&gt; String
+(Int -&gt; TraceLabelCreds a -&gt; ShowS)
+-&gt; (TraceLabelCreds a -&gt; String)
+-&gt; ([TraceLabelCreds a] -&gt; ShowS)
+-&gt; Show (TraceLabelCreds a)
+forall a. Show a =&gt; Int -&gt; TraceLabelCreds a -&gt; ShowS
+forall a. Show a =&gt; [TraceLabelCreds a] -&gt; ShowS
+forall a. Show a =&gt; TraceLabelCreds a -&gt; String
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [TraceLabelCreds a] -&gt; ShowS
+$cshowList :: forall a. Show a =&gt; [TraceLabelCreds a] -&gt; ShowS
+show :: TraceLabelCreds a -&gt; String
+$cshow :: forall a. Show a =&gt; TraceLabelCreds a -&gt; String
+showsPrec :: Int -&gt; TraceLabelCreds a -&gt; ShowS
+$cshowsPrec :: forall a. Show a =&gt; Int -&gt; TraceLabelCreds a -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679162422"><span id="local-6989586621679162424"><span class="annot"><span class="annottext">a -&gt; TraceLabelCreds b -&gt; TraceLabelCreds a
+(a -&gt; b) -&gt; TraceLabelCreds a -&gt; TraceLabelCreds b
+(forall a b. (a -&gt; b) -&gt; TraceLabelCreds a -&gt; TraceLabelCreds b)
+-&gt; (forall a b. a -&gt; TraceLabelCreds b -&gt; TraceLabelCreds a)
+-&gt; Functor TraceLabelCreds
+forall a b. a -&gt; TraceLabelCreds b -&gt; TraceLabelCreds a
+forall a b. (a -&gt; b) -&gt; TraceLabelCreds a -&gt; TraceLabelCreds b
+forall (f :: * -&gt; *).
+(forall a b. (a -&gt; b) -&gt; f a -&gt; f b)
+-&gt; (forall a b. a -&gt; f b -&gt; f a) -&gt; Functor f
+&lt;$ :: a -&gt; TraceLabelCreds b -&gt; TraceLabelCreds a
+$c&lt;$ :: forall a b. a -&gt; TraceLabelCreds b -&gt; TraceLabelCreds a
+fmap :: (a -&gt; b) -&gt; TraceLabelCreds a -&gt; TraceLabelCreds b
+$cfmap :: forall a b. (a -&gt; b) -&gt; TraceLabelCreds a -&gt; TraceLabelCreds b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Functor</span></a></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-355"></span></pre></body></html>

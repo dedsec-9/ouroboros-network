@@ -1,0 +1,447 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE BangPatterns        #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE CPP                 #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE LambdaCase          #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables #-}</span><span>
+</span><span id="line-5"></span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- `withLocalSocket` has some constraints that are only required on Windows.</span><span>
+</span><span id="line-7"></span><span class="hs-pragma">{-# OPTIONS_GHC -Wno-redundant-constraints #-}</span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.Diffusion.Utils</span><span>
+</span><span id="line-10"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Ouroboros.Network.Diffusion.Utils.html#withSockets"><span class="hs-identifier">withSockets</span></a></span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Diffusion.Utils.html#withLocalSocket"><span class="hs-identifier">withLocalSocket</span></a></span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Monad.Class.MonadThrow</span></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Tracer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Tracer</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">traceWith</span></span><span class="hs-special">)</span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.List.NonEmpty</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">NonEmpty</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.List.NonEmpty</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">NonEmpty</span></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Typeable</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Typeable</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-framework-0.3.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier">Ouroboros.Network.Snocket</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-framework-0.3.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier">FileDescriptor</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-framework-0.3.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier">Snocket</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-framework-0.3.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier">Ouroboros.Network.Snocket</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Snocket</span></span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.Diffusion.Common.html"><span class="hs-identifier">Ouroboros.Network.Diffusion.Common</span></a></span><span>
+</span><span id="line-25"></span><span>
+</span><span id="line-26"></span><span class="hs-comment">--</span><span>
+</span><span id="line-27"></span><span class="hs-comment">-- Socket utility functions</span><span>
+</span><span id="line-28"></span><span class="hs-comment">--</span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span class="annot"><a href="Ouroboros.Network.Diffusion.Utils.html#withSockets"><span class="hs-identifier hs-type">withSockets</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679193028"><span class="annot"><a href="#local-6989586621679193028"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679193027"><span class="annot"><a href="#local-6989586621679193027"><span class="hs-identifier hs-type">ntnFd</span></a></span></span><span> </span><span id="local-6989586621679193026"><span class="annot"><a href="#local-6989586621679193026"><span class="hs-identifier hs-type">ntnAddr</span></a></span></span><span> </span><span id="local-6989586621679193025"><span class="annot"><a href="#local-6989586621679193025"><span class="hs-identifier hs-type">ntcAddr</span></a></span></span><span> </span><span id="local-6989586621679193024"><span class="annot"><a href="#local-6989586621679193024"><span class="hs-identifier hs-type">a</span></a></span></span><span class="hs-operator">.</span><span>
+</span><span id="line-31"></span><span>               </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MonadThrow</span></span><span> </span><span class="annot"><a href="#local-6989586621679193028"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-32"></span><span>               </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Typeable</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679193026"><span class="hs-identifier hs-type">ntnAddr</span></a></span><span>
+</span><span id="line-33"></span><span>               </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span>     </span><span class="annot"><a href="#local-6989586621679193026"><span class="hs-identifier hs-type">ntnAddr</span></a></span><span>
+</span><span id="line-34"></span><span>               </span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span>            </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Tracer</span></span><span> </span><span class="annot"><a href="#local-6989586621679193028"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Diffusion.Common.html#DiffusionTracer"><span class="hs-identifier hs-type">DiffusionTracer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679193026"><span class="hs-identifier hs-type">ntnAddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679193025"><span class="hs-identifier hs-type">ntcAddr</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-36"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-framework-0.3.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-type">Snocket</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679193028"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679193027"><span class="hs-identifier hs-type">ntnFd</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679193026"><span class="hs-identifier hs-type">ntnAddr</span></a></span><span>
+</span><span id="line-37"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679193027"><span class="hs-identifier hs-type">ntnFd</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679193026"><span class="hs-identifier hs-type">ntnAddr</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679193028"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-comment">-- ^ configure a socket</span><span>
+</span><span id="line-38"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679193027"><span class="hs-identifier hs-type">ntnFd</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679193026"><span class="hs-identifier hs-type">ntnAddr</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679193028"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-comment">-- ^ configure a systemd socket</span><span>
+</span><span id="line-39"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Either</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679193027"><span class="hs-identifier hs-type">ntnFd</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679193026"><span class="hs-identifier hs-type">ntnAddr</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-40"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">NonEmpty</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679193027"><span class="hs-identifier hs-type">ntnFd</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">NonEmpty</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679193026"><span class="hs-identifier hs-type">ntnAddr</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679193028"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679193024"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-41"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679193028"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679193024"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-42"></span><span id="withSockets"><span class="annot"><span class="annottext">withSockets :: Tracer m (DiffusionTracer ntnAddr ntcAddr)
+-&gt; Snocket m ntnFd ntnAddr
+-&gt; (ntnFd -&gt; ntnAddr -&gt; m ())
+-&gt; (ntnFd -&gt; ntnAddr -&gt; m ())
+-&gt; [Either ntnFd ntnAddr]
+-&gt; (NonEmpty ntnFd -&gt; NonEmpty ntnAddr -&gt; m a)
+-&gt; m a
+</span><a href="Ouroboros.Network.Diffusion.Utils.html#withSockets"><span class="hs-identifier hs-var hs-var">withSockets</span></a></span></span><span> </span><span id="local-6989586621679193023"><span class="annot"><span class="annottext">Tracer m (DiffusionTracer ntnAddr ntcAddr)
+</span><a href="#local-6989586621679193023"><span class="hs-identifier hs-var">tracer</span></a></span></span><span> </span><span id="local-6989586621679193022"><span class="annot"><span class="annottext">Snocket m ntnFd ntnAddr
+</span><a href="#local-6989586621679193022"><span class="hs-identifier hs-var">sn</span></a></span></span><span>
+</span><span id="line-43"></span><span>            </span><span id="local-6989586621679193021"><span class="annot"><span class="annottext">ntnFd -&gt; ntnAddr -&gt; m ()
+</span><a href="#local-6989586621679193021"><span class="hs-identifier hs-var">configureSocket</span></a></span></span><span>
+</span><span id="line-44"></span><span>            </span><span id="local-6989586621679193020"><span class="annot"><span class="annottext">ntnFd -&gt; ntnAddr -&gt; m ()
+</span><a href="#local-6989586621679193020"><span class="hs-identifier hs-var">configureSystemdSocket</span></a></span></span><span>
+</span><span id="line-45"></span><span>            </span><span id="local-6989586621679193019"><span class="annot"><span class="annottext">[Either ntnFd ntnAddr]
+</span><a href="#local-6989586621679193019"><span class="hs-identifier hs-var">addresses</span></a></span></span><span> </span><span id="local-6989586621679193018"><span class="annot"><span class="annottext">NonEmpty ntnFd -&gt; NonEmpty ntnAddr -&gt; m a
+</span><a href="#local-6989586621679193018"><span class="hs-identifier hs-var">k</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(ntnFd, ntnAddr)] -&gt; [Either ntnFd ntnAddr] -&gt; m a
+</span><a href="#local-6989586621679193017"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[Either ntnFd ntnAddr]
+</span><a href="#local-6989586621679193019"><span class="hs-identifier hs-var">addresses</span></a></span><span>
+</span><span id="line-46"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-47"></span><span>    </span><span id="local-6989586621679193017"><span class="annot"><span class="annottext">go :: [(ntnFd, ntnAddr)] -&gt; [Either ntnFd ntnAddr] -&gt; m a
+</span><a href="#local-6989586621679193017"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span class="hs-glyph">!</span><span id="local-6989586621679193016"><span class="annot"><span class="annottext">[(ntnFd, ntnAddr)]
+</span><a href="#local-6989586621679193016"><span class="hs-identifier hs-var">acc</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679193015"><span class="annot"><span class="annottext">Either ntnFd ntnAddr
+</span><a href="#local-6989586621679193015"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">:</span></a></span><span> </span><span id="local-6989586621679193014"><span class="annot"><span class="annottext">[Either ntnFd ntnAddr]
+</span><a href="#local-6989586621679193014"><span class="hs-keyword hs-var">as</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Either ntnFd ntnAddr -&gt; ((ntnFd, ntnAddr) -&gt; m a) -&gt; m a
+</span><a href="#local-6989586621679193013"><span class="hs-identifier hs-var">withSocket</span></a></span><span> </span><span class="annot"><span class="annottext">Either ntnFd ntnAddr
+</span><a href="#local-6989586621679193015"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679193012"><span class="annot"><span class="annottext">(ntnFd, ntnAddr)
+</span><a href="#local-6989586621679193012"><span class="hs-identifier hs-var">sa</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[(ntnFd, ntnAddr)] -&gt; [Either ntnFd ntnAddr] -&gt; m a
+</span><a href="#local-6989586621679193017"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(ntnFd, ntnAddr)
+</span><a href="#local-6989586621679193012"><span class="hs-identifier hs-var">sa</span></a></span><span> </span><span class="annot"><span class="annottext">(ntnFd, ntnAddr) -&gt; [(ntnFd, ntnAddr)] -&gt; [(ntnFd, ntnAddr)]
+forall a. a -&gt; [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-var">:</span></a></span><span> </span><span class="annot"><span class="annottext">[(ntnFd, ntnAddr)]
+</span><a href="#local-6989586621679193016"><span class="hs-identifier hs-var">acc</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Either ntnFd ntnAddr]
+</span><a href="#local-6989586621679193014"><span class="hs-keyword hs-var">as</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-48"></span><span>    </span><span class="annot"><a href="#local-6989586621679193017"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>   </span><span class="hs-special">[</span><span class="hs-special">]</span><span>       </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Failure ntnAddr -&gt; m a
+forall (m :: * -&gt; *) e a. (MonadThrow m, Exception e) =&gt; e -&gt; m a
+</span><span class="hs-identifier hs-var">throwIO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Failure ntnAddr
+forall ntnAddr. Failure ntnAddr
+</span><a href="Ouroboros.Network.Diffusion.Common.html#NoSocket"><span class="hs-identifier hs-var">NoSocket</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Diffusion.Common.html#Failure"><span class="hs-identifier hs-type">Failure</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679193026"><span class="hs-identifier hs-type">ntnAddr</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-49"></span><span>    </span><span class="annot"><a href="#local-6989586621679193017"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-glyph">!</span><span id="local-6989586621679193009"><span class="annot"><span class="annottext">[(ntnFd, ntnAddr)]
+</span><a href="#local-6989586621679193009"><span class="hs-identifier hs-var">acc</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>       </span><span class="hs-glyph">=</span><span>
+</span><span id="line-50"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679193008"><span class="annot"><span class="annottext">acc' :: NonEmpty (ntnFd, ntnAddr)
+</span><a href="#local-6989586621679193008"><span class="hs-identifier hs-var hs-var">acc'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(ntnFd, ntnAddr)] -&gt; NonEmpty (ntnFd, ntnAddr)
+forall a. [a] -&gt; NonEmpty a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">NonEmpty.fromList</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[(ntnFd, ntnAddr)] -&gt; [(ntnFd, ntnAddr)]
+forall a. [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">reverse</span></a></span><span> </span><span class="annot"><span class="annottext">[(ntnFd, ntnAddr)]
+</span><a href="#local-6989586621679193009"><span class="hs-identifier hs-var">acc</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-51"></span><span>      </span><span class="hs-keyword">in</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NonEmpty ntnFd -&gt; NonEmpty ntnAddr -&gt; m a
+</span><a href="#local-6989586621679193018"><span class="hs-identifier hs-var">k</span></a></span><span> </span><span class="annot"><span class="annottext">(NonEmpty ntnFd -&gt; NonEmpty ntnAddr -&gt; m a)
+-&gt; NonEmpty ntnFd -&gt; NonEmpty ntnAddr -&gt; m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$!</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(ntnFd, ntnAddr) -&gt; ntnFd
+forall a b. (a, b) -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fst</span></a></span><span> </span><span class="annot"><span class="annottext">((ntnFd, ntnAddr) -&gt; ntnFd)
+-&gt; NonEmpty (ntnFd, ntnAddr) -&gt; NonEmpty ntnFd
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">NonEmpty (ntnFd, ntnAddr)
+</span><a href="#local-6989586621679193008"><span class="hs-identifier hs-var">acc'</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(NonEmpty ntnAddr -&gt; m a) -&gt; NonEmpty ntnAddr -&gt; m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$!</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(ntnFd, ntnAddr) -&gt; ntnAddr
+forall a b. (a, b) -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">snd</span></a></span><span> </span><span class="annot"><span class="annottext">((ntnFd, ntnAddr) -&gt; ntnAddr)
+-&gt; NonEmpty (ntnFd, ntnAddr) -&gt; NonEmpty ntnAddr
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">NonEmpty (ntnFd, ntnAddr)
+</span><a href="#local-6989586621679193008"><span class="hs-identifier hs-var">acc'</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-52"></span><span>
+</span><span id="line-53"></span><span>    </span><span class="annot"><a href="#local-6989586621679193013"><span class="hs-identifier hs-type">withSocket</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Either</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679193027"><span class="hs-identifier hs-type">ntnFd</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679193026"><span class="hs-identifier hs-type">ntnAddr</span></a></span><span>
+</span><span id="line-54"></span><span>               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679193027"><span class="hs-identifier hs-type">ntnFd</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679193026"><span class="hs-identifier hs-type">ntnAddr</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679193028"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679193024"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-55"></span><span>               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679193028"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679193024"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-56"></span><span>    </span><span id="local-6989586621679193013"><span class="annot"><span class="annottext">withSocket :: Either ntnFd ntnAddr -&gt; ((ntnFd, ntnAddr) -&gt; m a) -&gt; m a
+</span><a href="#local-6989586621679193013"><span class="hs-identifier hs-var hs-var">withSocket</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Left</span></a></span><span> </span><span id="local-6989586621679193003"><span class="annot"><span class="annottext">ntnFd
+</span><a href="#local-6989586621679193003"><span class="hs-identifier hs-var">sock</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679193002"><span class="annot"><span class="annottext">(ntnFd, ntnAddr) -&gt; m a
+</span><a href="#local-6989586621679193002"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-57"></span><span>      </span><span class="annot"><span class="annottext">m ntnFd -&gt; (ntnFd -&gt; m ()) -&gt; (ntnFd -&gt; m a) -&gt; m a
+forall (m :: * -&gt; *) a b c.
+MonadThrow m =&gt;
+m a -&gt; (a -&gt; m b) -&gt; (a -&gt; m c) -&gt; m c
+</span><span class="hs-identifier hs-var">bracket</span></span><span>
+</span><span id="line-58"></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ntnFd -&gt; m ntnFd
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">ntnFd
+</span><a href="#local-6989586621679193003"><span class="hs-identifier hs-var">sock</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-59"></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Snocket m ntnFd ntnAddr -&gt; ntnFd -&gt; m ()
+forall (m :: * -&gt; *) fd addr. Snocket m fd addr -&gt; fd -&gt; m ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-framework-0.3.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var hs-var">Snocket.close</span></a></span><span> </span><span class="annot"><span class="annottext">Snocket m ntnFd ntnAddr
+</span><a href="#local-6989586621679193022"><span class="hs-identifier hs-var">sn</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-60"></span><span>        </span><span class="annot"><span class="annottext">((ntnFd -&gt; m a) -&gt; m a) -&gt; (ntnFd -&gt; m a) -&gt; m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679192999"><span class="annot"><span class="annottext">ntnFd
+</span><a href="#local-6989586621679192999"><span class="hs-identifier hs-var">_sock</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-61"></span><span>          </span><span class="hs-glyph">!</span><span id="local-6989586621679192998"><span class="annot"><span class="annottext">ntnAddr
+</span><a href="#local-6989586621679192998"><span class="hs-identifier hs-var">addr</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Snocket m ntnFd ntnAddr -&gt; ntnFd -&gt; m ntnAddr
+forall (m :: * -&gt; *) fd addr. Snocket m fd addr -&gt; fd -&gt; m addr
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-framework-0.3.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var hs-var">Snocket.getLocalAddr</span></a></span><span> </span><span class="annot"><span class="annottext">Snocket m ntnFd ntnAddr
+</span><a href="#local-6989586621679193022"><span class="hs-identifier hs-var">sn</span></a></span><span> </span><span class="annot"><span class="annottext">ntnFd
+</span><a href="#local-6989586621679193003"><span class="hs-identifier hs-var">sock</span></a></span><span>
+</span><span id="line-62"></span><span>          </span><span class="annot"><span class="annottext">ntnFd -&gt; ntnAddr -&gt; m ()
+</span><a href="#local-6989586621679193020"><span class="hs-identifier hs-var">configureSystemdSocket</span></a></span><span> </span><span class="annot"><span class="annottext">ntnFd
+</span><a href="#local-6989586621679193003"><span class="hs-identifier hs-var">sock</span></a></span><span> </span><span class="annot"><span class="annottext">ntnAddr
+</span><a href="#local-6989586621679192998"><span class="hs-identifier hs-var">addr</span></a></span><span>
+</span><span id="line-63"></span><span>          </span><span class="annot"><span class="annottext">(ntnFd, ntnAddr) -&gt; m a
+</span><a href="#local-6989586621679193002"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ntnFd
+</span><a href="#local-6989586621679193003"><span class="hs-identifier hs-var">sock</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ntnAddr
+</span><a href="#local-6989586621679192998"><span class="hs-identifier hs-var">addr</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-64"></span><span>    </span><span class="annot"><a href="#local-6989586621679193013"><span class="hs-identifier hs-var">withSocket</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Right</span></a></span><span> </span><span id="local-6989586621679192996"><span class="annot"><span class="annottext">ntnAddr
+</span><a href="#local-6989586621679192996"><span class="hs-identifier hs-var">addr</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679192995"><span class="annot"><span class="annottext">(ntnFd, ntnAddr) -&gt; m a
+</span><a href="#local-6989586621679192995"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-65"></span><span>      </span><span class="annot"><span class="annottext">m ntnFd -&gt; (ntnFd -&gt; m ()) -&gt; (ntnFd -&gt; m a) -&gt; m a
+forall (m :: * -&gt; *) a b c.
+MonadThrow m =&gt;
+m a -&gt; (a -&gt; m b) -&gt; (a -&gt; m c) -&gt; m c
+</span><span class="hs-identifier hs-var">bracket</span></span><span>
+</span><span id="line-66"></span><span>        </span><span class="hs-special">(</span><span class="hs-keyword">do</span><span> </span><span class="annot"><span class="annottext">Tracer m (DiffusionTracer ntnAddr ntcAddr)
+-&gt; DiffusionTracer ntnAddr ntcAddr -&gt; m ()
+forall (m :: * -&gt; *) a. Tracer m a -&gt; a -&gt; m ()
+</span><span class="hs-identifier hs-var">traceWith</span></span><span> </span><span class="annot"><span class="annottext">Tracer m (DiffusionTracer ntnAddr ntcAddr)
+</span><a href="#local-6989586621679193023"><span class="hs-identifier hs-var">tracer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ntnAddr -&gt; DiffusionTracer ntnAddr ntcAddr
+forall ntnAddr ntcAddr. ntnAddr -&gt; DiffusionTracer ntnAddr ntcAddr
+</span><a href="Ouroboros.Network.Diffusion.Common.html#CreatingServerSocket"><span class="hs-identifier hs-var">CreatingServerSocket</span></a></span><span> </span><span class="annot"><span class="annottext">ntnAddr
+</span><a href="#local-6989586621679192996"><span class="hs-identifier hs-var">addr</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-67"></span><span>            </span><span class="annot"><span class="annottext">Snocket m ntnFd ntnAddr -&gt; AddressFamily ntnAddr -&gt; m ntnFd
+forall (m :: * -&gt; *) fd addr.
+Snocket m fd addr -&gt; AddressFamily addr -&gt; m fd
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-framework-0.3.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var hs-var">Snocket.open</span></a></span><span> </span><span class="annot"><span class="annottext">Snocket m ntnFd ntnAddr
+</span><a href="#local-6989586621679193022"><span class="hs-identifier hs-var">sn</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Snocket m ntnFd ntnAddr -&gt; ntnAddr -&gt; AddressFamily ntnAddr
+forall (m :: * -&gt; *) fd addr.
+Snocket m fd addr -&gt; addr -&gt; AddressFamily addr
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-framework-0.3.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var hs-var">Snocket.addrFamily</span></a></span><span> </span><span class="annot"><span class="annottext">Snocket m ntnFd ntnAddr
+</span><a href="#local-6989586621679193022"><span class="hs-identifier hs-var">sn</span></a></span><span> </span><span class="annot"><span class="annottext">ntnAddr
+</span><a href="#local-6989586621679192996"><span class="hs-identifier hs-var">addr</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-68"></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Snocket m ntnFd ntnAddr -&gt; ntnFd -&gt; m ()
+forall (m :: * -&gt; *) fd addr. Snocket m fd addr -&gt; fd -&gt; m ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-framework-0.3.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var hs-var">Snocket.close</span></a></span><span> </span><span class="annot"><span class="annottext">Snocket m ntnFd ntnAddr
+</span><a href="#local-6989586621679193022"><span class="hs-identifier hs-var">sn</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-69"></span><span>        </span><span class="annot"><span class="annottext">((ntnFd -&gt; m a) -&gt; m a) -&gt; (ntnFd -&gt; m a) -&gt; m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679192991"><span class="annot"><span class="annottext">ntnFd
+</span><a href="#local-6989586621679192991"><span class="hs-identifier hs-var">sock</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-70"></span><span>          </span><span class="annot"><span class="annottext">Tracer m (DiffusionTracer ntnAddr ntcAddr)
+-&gt; DiffusionTracer ntnAddr ntcAddr -&gt; m ()
+forall (m :: * -&gt; *) a. Tracer m a -&gt; a -&gt; m ()
+</span><span class="hs-identifier hs-var">traceWith</span></span><span> </span><span class="annot"><span class="annottext">Tracer m (DiffusionTracer ntnAddr ntcAddr)
+</span><a href="#local-6989586621679193023"><span class="hs-identifier hs-var">tracer</span></a></span><span> </span><span class="annot"><span class="annottext">(DiffusionTracer ntnAddr ntcAddr -&gt; m ())
+-&gt; DiffusionTracer ntnAddr ntcAddr -&gt; m ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ntnAddr -&gt; DiffusionTracer ntnAddr ntcAddr
+forall ntnAddr ntcAddr. ntnAddr -&gt; DiffusionTracer ntnAddr ntcAddr
+</span><a href="Ouroboros.Network.Diffusion.Common.html#ConfiguringServerSocket"><span class="hs-identifier hs-var">ConfiguringServerSocket</span></a></span><span> </span><span class="annot"><span class="annottext">ntnAddr
+</span><a href="#local-6989586621679192996"><span class="hs-identifier hs-var">addr</span></a></span><span>
+</span><span id="line-71"></span><span>          </span><span class="annot"><span class="annottext">ntnFd -&gt; ntnAddr -&gt; m ()
+</span><a href="#local-6989586621679193021"><span class="hs-identifier hs-var">configureSocket</span></a></span><span> </span><span class="annot"><span class="annottext">ntnFd
+</span><a href="#local-6989586621679192991"><span class="hs-identifier hs-var">sock</span></a></span><span> </span><span class="annot"><span class="annottext">ntnAddr
+</span><a href="#local-6989586621679192996"><span class="hs-identifier hs-var">addr</span></a></span><span>
+</span><span id="line-72"></span><span>          </span><span class="annot"><span class="annottext">Snocket m ntnFd ntnAddr -&gt; ntnFd -&gt; ntnAddr -&gt; m ()
+forall (m :: * -&gt; *) fd addr.
+Snocket m fd addr -&gt; fd -&gt; addr -&gt; m ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-framework-0.3.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var hs-var">Snocket.bind</span></a></span><span> </span><span class="annot"><span class="annottext">Snocket m ntnFd ntnAddr
+</span><a href="#local-6989586621679193022"><span class="hs-identifier hs-var">sn</span></a></span><span> </span><span class="annot"><span class="annottext">ntnFd
+</span><a href="#local-6989586621679192991"><span class="hs-identifier hs-var">sock</span></a></span><span> </span><span class="annot"><span class="annottext">ntnAddr
+</span><a href="#local-6989586621679192996"><span class="hs-identifier hs-var">addr</span></a></span><span>
+</span><span id="line-73"></span><span>          </span><span class="annot"><span class="annottext">Tracer m (DiffusionTracer ntnAddr ntcAddr)
+-&gt; DiffusionTracer ntnAddr ntcAddr -&gt; m ()
+forall (m :: * -&gt; *) a. Tracer m a -&gt; a -&gt; m ()
+</span><span class="hs-identifier hs-var">traceWith</span></span><span> </span><span class="annot"><span class="annottext">Tracer m (DiffusionTracer ntnAddr ntcAddr)
+</span><a href="#local-6989586621679193023"><span class="hs-identifier hs-var">tracer</span></a></span><span> </span><span class="annot"><span class="annottext">(DiffusionTracer ntnAddr ntcAddr -&gt; m ())
+-&gt; DiffusionTracer ntnAddr ntcAddr -&gt; m ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ntnAddr -&gt; DiffusionTracer ntnAddr ntcAddr
+forall ntnAddr ntcAddr. ntnAddr -&gt; DiffusionTracer ntnAddr ntcAddr
+</span><a href="Ouroboros.Network.Diffusion.Common.html#ListeningServerSocket"><span class="hs-identifier hs-var">ListeningServerSocket</span></a></span><span> </span><span class="annot"><span class="annottext">ntnAddr
+</span><a href="#local-6989586621679192996"><span class="hs-identifier hs-var">addr</span></a></span><span>
+</span><span id="line-74"></span><span>          </span><span class="annot"><span class="annottext">Snocket m ntnFd ntnAddr -&gt; ntnFd -&gt; m ()
+forall (m :: * -&gt; *) fd addr. Snocket m fd addr -&gt; fd -&gt; m ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-framework-0.3.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var hs-var">Snocket.listen</span></a></span><span> </span><span class="annot"><span class="annottext">Snocket m ntnFd ntnAddr
+</span><a href="#local-6989586621679193022"><span class="hs-identifier hs-var">sn</span></a></span><span> </span><span class="annot"><span class="annottext">ntnFd
+</span><a href="#local-6989586621679192991"><span class="hs-identifier hs-var">sock</span></a></span><span>
+</span><span id="line-75"></span><span>          </span><span class="annot"><span class="annottext">Tracer m (DiffusionTracer ntnAddr ntcAddr)
+-&gt; DiffusionTracer ntnAddr ntcAddr -&gt; m ()
+forall (m :: * -&gt; *) a. Tracer m a -&gt; a -&gt; m ()
+</span><span class="hs-identifier hs-var">traceWith</span></span><span> </span><span class="annot"><span class="annottext">Tracer m (DiffusionTracer ntnAddr ntcAddr)
+</span><a href="#local-6989586621679193023"><span class="hs-identifier hs-var">tracer</span></a></span><span> </span><span class="annot"><span class="annottext">(DiffusionTracer ntnAddr ntcAddr -&gt; m ())
+-&gt; DiffusionTracer ntnAddr ntcAddr -&gt; m ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ntnAddr -&gt; DiffusionTracer ntnAddr ntcAddr
+forall ntnAddr ntcAddr. ntnAddr -&gt; DiffusionTracer ntnAddr ntcAddr
+</span><a href="Ouroboros.Network.Diffusion.Common.html#ServerSocketUp"><span class="hs-identifier hs-var">ServerSocketUp</span></a></span><span> </span><span class="annot"><span class="annottext">ntnAddr
+</span><a href="#local-6989586621679192996"><span class="hs-identifier hs-var">addr</span></a></span><span>
+</span><span id="line-76"></span><span>          </span><span class="annot"><span class="annottext">(ntnFd, ntnAddr) -&gt; m a
+</span><a href="#local-6989586621679192995"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ntnFd
+</span><a href="#local-6989586621679192991"><span class="hs-identifier hs-var">sock</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ntnAddr
+</span><a href="#local-6989586621679192996"><span class="hs-identifier hs-var">addr</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-77"></span><span>
+</span><span id="line-78"></span><span>
+</span><span id="line-79"></span><span class="annot"><a href="Ouroboros.Network.Diffusion.Utils.html#withLocalSocket"><span class="hs-identifier hs-type">withLocalSocket</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679192985"><span class="annot"><a href="#local-6989586621679192985"><span class="hs-identifier hs-type">ntnAddr</span></a></span></span><span> </span><span id="local-6989586621679192984"><span class="annot"><a href="#local-6989586621679192984"><span class="hs-identifier hs-type">ntcFd</span></a></span></span><span> </span><span id="local-6989586621679192983"><span class="annot"><a href="#local-6989586621679192983"><span class="hs-identifier hs-type">ntcAddr</span></a></span></span><span> </span><span id="local-6989586621679192982"><span class="annot"><a href="#local-6989586621679192982"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679192981"><span class="annot"><a href="#local-6989586621679192981"><span class="hs-identifier hs-type">a</span></a></span></span><span class="hs-operator">.</span><span>
+</span><span id="line-80"></span><span>                   </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MonadThrow</span></span><span> </span><span class="annot"><a href="#local-6989586621679192982"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-81"></span><span>                     </span><span class="hs-comment">-- Win32 only constraints:</span><span>
+</span><span id="line-82"></span><span>                   </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Typeable</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679192985"><span class="hs-identifier hs-type">ntnAddr</span></a></span><span>
+</span><span id="line-83"></span><span>                   </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span>     </span><span class="annot"><a href="#local-6989586621679192985"><span class="hs-identifier hs-type">ntnAddr</span></a></span><span>
+</span><span id="line-84"></span><span>                   </span><span class="hs-special">)</span><span>
+</span><span id="line-85"></span><span>                </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Tracer</span></span><span> </span><span class="annot"><a href="#local-6989586621679192982"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Diffusion.Common.html#DiffusionTracer"><span class="hs-identifier hs-type">DiffusionTracer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679192985"><span class="hs-identifier hs-type">ntnAddr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679192983"><span class="hs-identifier hs-type">ntcAddr</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-86"></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679192984"><span class="hs-identifier hs-type">ntcFd</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679192982"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-framework-0.3.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-type">FileDescriptor</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-87"></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-framework-0.3.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-type">Snocket</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679192982"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679192984"><span class="hs-identifier hs-type">ntcFd</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679192983"><span class="hs-identifier hs-type">ntcAddr</span></a></span><span>
+</span><span id="line-88"></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Either</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679192984"><span class="hs-identifier hs-type">ntcFd</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679192983"><span class="hs-identifier hs-type">ntcAddr</span></a></span><span>
+</span><span id="line-89"></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679192984"><span class="hs-identifier hs-type">ntcFd</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679192982"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679192981"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-90"></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679192982"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679192981"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-91"></span><span id="withLocalSocket"><span class="annot"><span class="annottext">withLocalSocket :: Tracer m (DiffusionTracer ntnAddr ntcAddr)
+-&gt; (ntcFd -&gt; m FileDescriptor)
+-&gt; Snocket m ntcFd ntcAddr
+-&gt; Either ntcFd ntcAddr
+-&gt; (ntcFd -&gt; m a)
+-&gt; m a
+</span><a href="Ouroboros.Network.Diffusion.Utils.html#withLocalSocket"><span class="hs-identifier hs-var hs-var">withLocalSocket</span></a></span></span><span> </span><span id="local-6989586621679192980"><span class="annot"><span class="annottext">Tracer m (DiffusionTracer ntnAddr ntcAddr)
+</span><a href="#local-6989586621679192980"><span class="hs-identifier hs-var">tracer</span></a></span></span><span> </span><span id="local-6989586621679192979"><span class="annot"><span class="annottext">ntcFd -&gt; m FileDescriptor
+</span><a href="#local-6989586621679192979"><span class="hs-identifier hs-var">getFileDescriptor</span></a></span></span><span> </span><span id="local-6989586621679192978"><span class="annot"><span class="annottext">Snocket m ntcFd ntcAddr
+</span><a href="#local-6989586621679192978"><span class="hs-identifier hs-var">sn</span></a></span></span><span> </span><span id="local-6989586621679192977"><span class="annot"><span class="annottext">Either ntcFd ntcAddr
+</span><a href="#local-6989586621679192977"><span class="hs-identifier hs-var">localAddress</span></a></span></span><span> </span><span id="local-6989586621679192976"><span class="annot"><span class="annottext">ntcFd -&gt; m a
+</span><a href="#local-6989586621679192976"><span class="hs-identifier hs-var">k</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-92"></span><span>  </span><span class="annot"><span class="annottext">m (Either ntcFd (ntcFd, ntcAddr))
+-&gt; (Either ntcFd (ntcFd, ntcAddr) -&gt; m ())
+-&gt; (Either ntcFd (ntcFd, ntcAddr) -&gt; m a)
+-&gt; m a
+forall (m :: * -&gt; *) a b c.
+MonadThrow m =&gt;
+m a -&gt; (a -&gt; m b) -&gt; (a -&gt; m c) -&gt; m c
+</span><span class="hs-identifier hs-var">bracket</span></span><span>
+</span><span id="line-93"></span><span>    </span><span class="hs-special">(</span><span>
+</span><span id="line-94"></span><span>      </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Either ntcFd ntcAddr
+</span><a href="#local-6989586621679192977"><span class="hs-identifier hs-var">localAddress</span></a></span><span> </span><span class="hs-keyword">of</span><span class="hs-cpp">
+#if defined(mingw32_HOST_OS)
+</span><span>         </span><span class="hs-comment">-- Windows uses named pipes so can't take advantage of existing sockets</span><span>
+</span><span id="line-97"></span><span>         </span><span class="hs-identifier">Left</span><span> </span><span class="hs-identifier">_</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier">traceWith</span><span> </span><span class="hs-identifier">tracer</span><span> </span><span class="hs-special">(</span><span class="hs-identifier">UnsupportedReadySocketCase</span><span>
+</span><span id="line-98"></span><span>                                       </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier">DiffusionTracer</span><span> </span><span class="hs-identifier">ntnAddr</span><span> </span><span class="hs-identifier">ntcAddr</span><span class="hs-special">)</span><span>
+</span><span id="line-99"></span><span>                </span><span class="hs-operator">&gt;&gt;</span><span> </span><span class="hs-identifier">throwIO</span><span> </span><span class="hs-special">(</span><span class="hs-identifier">UnsupportedReadySocket</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier">Failure</span><span> </span><span class="hs-identifier">ntnAddr</span><span class="hs-special">)</span><span class="hs-cpp">
+#else
+</span><span>         </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Left</span></a></span><span> </span><span id="local-6989586621679192975"><span class="annot"><span class="annottext">ntcFd
+</span><a href="#local-6989586621679192975"><span class="hs-identifier hs-var">sd</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-102"></span><span>             </span><span id="local-6989586621679192974"><span class="annot"><span class="annottext">ntcAddr
+</span><a href="#local-6989586621679192974"><span class="hs-identifier hs-var">addr</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Snocket m ntcFd ntcAddr -&gt; ntcFd -&gt; m ntcAddr
+forall (m :: * -&gt; *) fd addr. Snocket m fd addr -&gt; fd -&gt; m addr
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-framework-0.3.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var hs-var">Snocket.getLocalAddr</span></a></span><span> </span><span class="annot"><span class="annottext">Snocket m ntcFd ntcAddr
+</span><a href="#local-6989586621679192978"><span class="hs-identifier hs-var">sn</span></a></span><span> </span><span class="annot"><span class="annottext">ntcFd
+</span><a href="#local-6989586621679192975"><span class="hs-identifier hs-var">sd</span></a></span><span>
+</span><span id="line-103"></span><span>             </span><span class="annot"><span class="annottext">Tracer m (DiffusionTracer ntnAddr ntcAddr)
+-&gt; DiffusionTracer ntnAddr ntcAddr -&gt; m ()
+forall (m :: * -&gt; *) a. Tracer m a -&gt; a -&gt; m ()
+</span><span class="hs-identifier hs-var">traceWith</span></span><span> </span><span class="annot"><span class="annottext">Tracer m (DiffusionTracer ntnAddr ntcAddr)
+</span><a href="#local-6989586621679192980"><span class="hs-identifier hs-var">tracer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ntcAddr -&gt; DiffusionTracer ntnAddr ntcAddr
+forall ntnAddr ntcAddr. ntcAddr -&gt; DiffusionTracer ntnAddr ntcAddr
+</span><a href="Ouroboros.Network.Diffusion.Common.html#UsingSystemdSocket"><span class="hs-identifier hs-var">UsingSystemdSocket</span></a></span><span> </span><span class="annot"><span class="annottext">ntcAddr
+</span><a href="#local-6989586621679192974"><span class="hs-identifier hs-var">addr</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-104"></span><span>             </span><span class="annot"><span class="annottext">Either ntcFd (ntcFd, ntcAddr) -&gt; m (Either ntcFd (ntcFd, ntcAddr))
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ntcFd -&gt; Either ntcFd (ntcFd, ntcAddr)
+forall a b. a -&gt; Either a b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Left</span></a></span><span> </span><span class="annot"><span class="annottext">ntcFd
+</span><a href="#local-6989586621679192975"><span class="hs-identifier hs-var">sd</span></a></span><span class="hs-special">)</span><span class="hs-cpp">
+#endif
+</span><span>         </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Right</span></a></span><span> </span><span id="local-6989586621679192972"><span class="annot"><span class="annottext">ntcAddr
+</span><a href="#local-6989586621679192972"><span class="hs-identifier hs-var">addr</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-107"></span><span>             </span><span class="annot"><span class="annottext">Tracer m (DiffusionTracer ntnAddr ntcAddr)
+-&gt; DiffusionTracer ntnAddr ntcAddr -&gt; m ()
+forall (m :: * -&gt; *) a. Tracer m a -&gt; a -&gt; m ()
+</span><span class="hs-identifier hs-var">traceWith</span></span><span> </span><span class="annot"><span class="annottext">Tracer m (DiffusionTracer ntnAddr ntcAddr)
+</span><a href="#local-6989586621679192980"><span class="hs-identifier hs-var">tracer</span></a></span><span> </span><span class="annot"><span class="annottext">(DiffusionTracer ntnAddr ntcAddr -&gt; m ())
+-&gt; DiffusionTracer ntnAddr ntcAddr -&gt; m ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ntcAddr -&gt; DiffusionTracer ntnAddr ntcAddr
+forall ntnAddr ntcAddr. ntcAddr -&gt; DiffusionTracer ntnAddr ntcAddr
+</span><a href="Ouroboros.Network.Diffusion.Common.html#CreateSystemdSocketForSnocketPath"><span class="hs-identifier hs-var">CreateSystemdSocketForSnocketPath</span></a></span><span> </span><span class="annot"><span class="annottext">ntcAddr
+</span><a href="#local-6989586621679192972"><span class="hs-identifier hs-var">addr</span></a></span><span>
+</span><span id="line-108"></span><span>             </span><span id="local-6989586621679192970"><span class="annot"><span class="annottext">ntcFd
+</span><a href="#local-6989586621679192970"><span class="hs-identifier hs-var">sd</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Snocket m ntcFd ntcAddr -&gt; AddressFamily ntcAddr -&gt; m ntcFd
+forall (m :: * -&gt; *) fd addr.
+Snocket m fd addr -&gt; AddressFamily addr -&gt; m fd
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-framework-0.3.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var hs-var">Snocket.open</span></a></span><span> </span><span class="annot"><span class="annottext">Snocket m ntcFd ntcAddr
+</span><a href="#local-6989586621679192978"><span class="hs-identifier hs-var">sn</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Snocket m ntcFd ntcAddr -&gt; ntcAddr -&gt; AddressFamily ntcAddr
+forall (m :: * -&gt; *) fd addr.
+Snocket m fd addr -&gt; addr -&gt; AddressFamily addr
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-framework-0.3.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var hs-var">Snocket.addrFamily</span></a></span><span> </span><span class="annot"><span class="annottext">Snocket m ntcFd ntcAddr
+</span><a href="#local-6989586621679192978"><span class="hs-identifier hs-var">sn</span></a></span><span> </span><span class="annot"><span class="annottext">ntcAddr
+</span><a href="#local-6989586621679192972"><span class="hs-identifier hs-var">addr</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-109"></span><span>             </span><span class="annot"><span class="annottext">Tracer m (DiffusionTracer ntnAddr ntcAddr)
+-&gt; DiffusionTracer ntnAddr ntcAddr -&gt; m ()
+forall (m :: * -&gt; *) a. Tracer m a -&gt; a -&gt; m ()
+</span><span class="hs-identifier hs-var">traceWith</span></span><span> </span><span class="annot"><span class="annottext">Tracer m (DiffusionTracer ntnAddr ntcAddr)
+</span><a href="#local-6989586621679192980"><span class="hs-identifier hs-var">tracer</span></a></span><span> </span><span class="annot"><span class="annottext">(DiffusionTracer ntnAddr ntcAddr -&gt; m ())
+-&gt; DiffusionTracer ntnAddr ntcAddr -&gt; m ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ntcAddr -&gt; DiffusionTracer ntnAddr ntcAddr
+forall ntnAddr ntcAddr. ntcAddr -&gt; DiffusionTracer ntnAddr ntcAddr
+</span><a href="Ouroboros.Network.Diffusion.Common.html#CreatedLocalSocket"><span class="hs-identifier hs-var">CreatedLocalSocket</span></a></span><span> </span><span class="annot"><span class="annottext">ntcAddr
+</span><a href="#local-6989586621679192972"><span class="hs-identifier hs-var">addr</span></a></span><span>
+</span><span id="line-110"></span><span>             </span><span class="annot"><span class="annottext">Either ntcFd (ntcFd, ntcAddr) -&gt; m (Either ntcFd (ntcFd, ntcAddr))
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(ntcFd, ntcAddr) -&gt; Either ntcFd (ntcFd, ntcAddr)
+forall a b. b -&gt; Either a b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Right</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ntcFd
+</span><a href="#local-6989586621679192970"><span class="hs-identifier hs-var">sd</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ntcAddr
+</span><a href="#local-6989586621679192972"><span class="hs-identifier hs-var">addr</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-111"></span><span>    </span><span class="hs-special">)</span><span>
+</span><span id="line-112"></span><span>    </span><span class="hs-comment">-- We close the socket here, even if it was provided to us.</span><span>
+</span><span id="line-113"></span><span>    </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-114"></span><span>      </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Right</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679192968"><span class="annot"><span class="annottext">ntcFd
+</span><a href="#local-6989586621679192968"><span class="hs-identifier hs-var">sd</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ntcAddr
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Snocket m ntcFd ntcAddr -&gt; ntcFd -&gt; m ()
+forall (m :: * -&gt; *) fd addr. Snocket m fd addr -&gt; fd -&gt; m ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-framework-0.3.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var hs-var">Snocket.close</span></a></span><span> </span><span class="annot"><span class="annottext">Snocket m ntcFd ntcAddr
+</span><a href="#local-6989586621679192978"><span class="hs-identifier hs-var">sn</span></a></span><span> </span><span class="annot"><span class="annottext">ntcFd
+</span><a href="#local-6989586621679192968"><span class="hs-identifier hs-var">sd</span></a></span><span>
+</span><span id="line-115"></span><span>      </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Left</span></a></span><span>   </span><span id="local-6989586621679192967"><span class="annot"><span class="annottext">ntcFd
+</span><a href="#local-6989586621679192967"><span class="hs-identifier hs-var">sd</span></a></span></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Snocket m ntcFd ntcAddr -&gt; ntcFd -&gt; m ()
+forall (m :: * -&gt; *) fd addr. Snocket m fd addr -&gt; fd -&gt; m ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-framework-0.3.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var hs-var">Snocket.close</span></a></span><span> </span><span class="annot"><span class="annottext">Snocket m ntcFd ntcAddr
+</span><a href="#local-6989586621679192978"><span class="hs-identifier hs-var">sn</span></a></span><span> </span><span class="annot"><span class="annottext">ntcFd
+</span><a href="#local-6989586621679192967"><span class="hs-identifier hs-var">sd</span></a></span><span>
+</span><span id="line-116"></span><span>    </span><span class="hs-special">)</span><span>
+</span><span id="line-117"></span><span>    </span><span class="annot"><span class="annottext">((Either ntcFd (ntcFd, ntcAddr) -&gt; m a) -&gt; m a)
+-&gt; (Either ntcFd (ntcFd, ntcAddr) -&gt; m a) -&gt; m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-118"></span><span>      </span><span class="hs-comment">-- unconfigured socket</span><span>
+</span><span id="line-119"></span><span>      </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Right</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679192966"><span class="annot"><span class="annottext">ntcFd
+</span><a href="#local-6989586621679192966"><span class="hs-identifier hs-var">sd</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679192965"><span class="annot"><span class="annottext">ntcAddr
+</span><a href="#local-6989586621679192965"><span class="hs-identifier hs-var">addr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-120"></span><span>        </span><span class="annot"><span class="annottext">Tracer m (DiffusionTracer ntnAddr ntcAddr)
+-&gt; DiffusionTracer ntnAddr ntcAddr -&gt; m ()
+forall (m :: * -&gt; *) a. Tracer m a -&gt; a -&gt; m ()
+</span><span class="hs-identifier hs-var">traceWith</span></span><span> </span><span class="annot"><span class="annottext">Tracer m (DiffusionTracer ntnAddr ntcAddr)
+</span><a href="#local-6989586621679192980"><span class="hs-identifier hs-var">tracer</span></a></span><span> </span><span class="annot"><span class="annottext">(DiffusionTracer ntnAddr ntcAddr -&gt; m ())
+-&gt; (FileDescriptor -&gt; DiffusionTracer ntnAddr ntcAddr)
+-&gt; FileDescriptor
+-&gt; m ()
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">ntcAddr -&gt; FileDescriptor -&gt; DiffusionTracer ntnAddr ntcAddr
+forall ntnAddr ntcAddr.
+ntcAddr -&gt; FileDescriptor -&gt; DiffusionTracer ntnAddr ntcAddr
+</span><a href="Ouroboros.Network.Diffusion.Common.html#ConfiguringLocalSocket"><span class="hs-identifier hs-var">ConfiguringLocalSocket</span></a></span><span> </span><span class="annot"><span class="annottext">ntcAddr
+</span><a href="#local-6989586621679192965"><span class="hs-identifier hs-var">addr</span></a></span><span>
+</span><span id="line-121"></span><span>           </span><span class="annot"><span class="annottext">(FileDescriptor -&gt; m ()) -&gt; m FileDescriptor -&gt; m ()
+forall (m :: * -&gt; *) a b. Monad m =&gt; (a -&gt; m b) -&gt; m a -&gt; m b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">=&lt;&lt;</span></a></span><span> </span><span class="annot"><span class="annottext">ntcFd -&gt; m FileDescriptor
+</span><a href="#local-6989586621679192979"><span class="hs-identifier hs-var">getFileDescriptor</span></a></span><span> </span><span class="annot"><span class="annottext">ntcFd
+</span><a href="#local-6989586621679192966"><span class="hs-identifier hs-var">sd</span></a></span><span>
+</span><span id="line-122"></span><span>        </span><span class="annot"><span class="annottext">Snocket m ntcFd ntcAddr -&gt; ntcFd -&gt; ntcAddr -&gt; m ()
+forall (m :: * -&gt; *) fd addr.
+Snocket m fd addr -&gt; fd -&gt; addr -&gt; m ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-framework-0.3.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var hs-var">Snocket.bind</span></a></span><span> </span><span class="annot"><span class="annottext">Snocket m ntcFd ntcAddr
+</span><a href="#local-6989586621679192978"><span class="hs-identifier hs-var">sn</span></a></span><span> </span><span class="annot"><span class="annottext">ntcFd
+</span><a href="#local-6989586621679192966"><span class="hs-identifier hs-var">sd</span></a></span><span> </span><span class="annot"><span class="annottext">ntcAddr
+</span><a href="#local-6989586621679192965"><span class="hs-identifier hs-var">addr</span></a></span><span>
+</span><span id="line-123"></span><span>        </span><span class="annot"><span class="annottext">Tracer m (DiffusionTracer ntnAddr ntcAddr)
+-&gt; DiffusionTracer ntnAddr ntcAddr -&gt; m ()
+forall (m :: * -&gt; *) a. Tracer m a -&gt; a -&gt; m ()
+</span><span class="hs-identifier hs-var">traceWith</span></span><span> </span><span class="annot"><span class="annottext">Tracer m (DiffusionTracer ntnAddr ntcAddr)
+</span><a href="#local-6989586621679192980"><span class="hs-identifier hs-var">tracer</span></a></span><span> </span><span class="annot"><span class="annottext">(DiffusionTracer ntnAddr ntcAddr -&gt; m ())
+-&gt; (FileDescriptor -&gt; DiffusionTracer ntnAddr ntcAddr)
+-&gt; FileDescriptor
+-&gt; m ()
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">ntcAddr -&gt; FileDescriptor -&gt; DiffusionTracer ntnAddr ntcAddr
+forall ntnAddr ntcAddr.
+ntcAddr -&gt; FileDescriptor -&gt; DiffusionTracer ntnAddr ntcAddr
+</span><a href="Ouroboros.Network.Diffusion.Common.html#ListeningLocalSocket"><span class="hs-identifier hs-var">ListeningLocalSocket</span></a></span><span> </span><span class="annot"><span class="annottext">ntcAddr
+</span><a href="#local-6989586621679192965"><span class="hs-identifier hs-var">addr</span></a></span><span>
+</span><span id="line-124"></span><span>           </span><span class="annot"><span class="annottext">(FileDescriptor -&gt; m ()) -&gt; m FileDescriptor -&gt; m ()
+forall (m :: * -&gt; *) a b. Monad m =&gt; (a -&gt; m b) -&gt; m a -&gt; m b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">=&lt;&lt;</span></a></span><span> </span><span class="annot"><span class="annottext">ntcFd -&gt; m FileDescriptor
+</span><a href="#local-6989586621679192979"><span class="hs-identifier hs-var">getFileDescriptor</span></a></span><span> </span><span class="annot"><span class="annottext">ntcFd
+</span><a href="#local-6989586621679192966"><span class="hs-identifier hs-var">sd</span></a></span><span>
+</span><span id="line-125"></span><span>        </span><span class="annot"><span class="annottext">Snocket m ntcFd ntcAddr -&gt; ntcFd -&gt; m ()
+forall (m :: * -&gt; *) fd addr. Snocket m fd addr -&gt; fd -&gt; m ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-framework-0.3.0.0/noopt/doc/html/ouroboros-network-framework/src"><span class="hs-identifier hs-var hs-var">Snocket.listen</span></a></span><span> </span><span class="annot"><span class="annottext">Snocket m ntcFd ntcAddr
+</span><a href="#local-6989586621679192978"><span class="hs-identifier hs-var">sn</span></a></span><span> </span><span class="annot"><span class="annottext">ntcFd
+</span><a href="#local-6989586621679192966"><span class="hs-identifier hs-var">sd</span></a></span><span>
+</span><span id="line-126"></span><span>        </span><span class="annot"><span class="annottext">Tracer m (DiffusionTracer ntnAddr ntcAddr)
+-&gt; DiffusionTracer ntnAddr ntcAddr -&gt; m ()
+forall (m :: * -&gt; *) a. Tracer m a -&gt; a -&gt; m ()
+</span><span class="hs-identifier hs-var">traceWith</span></span><span> </span><span class="annot"><span class="annottext">Tracer m (DiffusionTracer ntnAddr ntcAddr)
+</span><a href="#local-6989586621679192980"><span class="hs-identifier hs-var">tracer</span></a></span><span> </span><span class="annot"><span class="annottext">(DiffusionTracer ntnAddr ntcAddr -&gt; m ())
+-&gt; (FileDescriptor -&gt; DiffusionTracer ntnAddr ntcAddr)
+-&gt; FileDescriptor
+-&gt; m ()
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">ntcAddr -&gt; FileDescriptor -&gt; DiffusionTracer ntnAddr ntcAddr
+forall ntnAddr ntcAddr.
+ntcAddr -&gt; FileDescriptor -&gt; DiffusionTracer ntnAddr ntcAddr
+</span><a href="Ouroboros.Network.Diffusion.Common.html#LocalSocketUp"><span class="hs-identifier hs-var">LocalSocketUp</span></a></span><span> </span><span class="annot"><span class="annottext">ntcAddr
+</span><a href="#local-6989586621679192965"><span class="hs-identifier hs-var">addr</span></a></span><span>
+</span><span id="line-127"></span><span>           </span><span class="annot"><span class="annottext">(FileDescriptor -&gt; m ()) -&gt; m FileDescriptor -&gt; m ()
+forall (m :: * -&gt; *) a b. Monad m =&gt; (a -&gt; m b) -&gt; m a -&gt; m b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">=&lt;&lt;</span></a></span><span> </span><span class="annot"><span class="annottext">ntcFd -&gt; m FileDescriptor
+</span><a href="#local-6989586621679192979"><span class="hs-identifier hs-var">getFileDescriptor</span></a></span><span> </span><span class="annot"><span class="annottext">ntcFd
+</span><a href="#local-6989586621679192966"><span class="hs-identifier hs-var">sd</span></a></span><span>
+</span><span id="line-128"></span><span>        </span><span class="annot"><span class="annottext">ntcFd -&gt; m a
+</span><a href="#local-6989586621679192976"><span class="hs-identifier hs-var">k</span></a></span><span> </span><span class="annot"><span class="annottext">ntcFd
+</span><a href="#local-6989586621679192966"><span class="hs-identifier hs-var">sd</span></a></span><span>
+</span><span id="line-129"></span><span>
+</span><span id="line-130"></span><span>      </span><span class="hs-comment">-- pre-configured systemd socket</span><span>
+</span><span id="line-131"></span><span>      </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Left</span></a></span><span> </span><span id="local-6989586621679192959"><span class="annot"><span class="annottext">ntcFd
+</span><a href="#local-6989586621679192959"><span class="hs-identifier hs-var">sd</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">ntcFd -&gt; m a
+</span><a href="#local-6989586621679192976"><span class="hs-identifier hs-var">k</span></a></span><span> </span><span class="annot"><span class="annottext">ntcFd
+</span><a href="#local-6989586621679192959"><span class="hs-identifier hs-var">sd</span></a></span><span>
+</span><span id="line-132"></span><span>
+</span><span id="line-133"></span></pre></body></html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DerivingStrategies         #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DerivingVia                #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE GeneralisedNewtypeDeriving #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE NamedFieldPuns             #-}</span><span>
+</span><span id="line-5"></span><span>
+</span><span id="line-6"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.ExitPolicy</span><span>
+</span><span id="line-7"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Ouroboros.Network.ExitPolicy.html#ReconnectDelay"><span class="hs-identifier">ReconnectDelay</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-8"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.ExitPolicy.html#ExitPolicy"><span class="hs-identifier">ExitPolicy</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-9"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.ExitPolicy.html#stdExitPolicy"><span class="hs-identifier">stdExitPolicy</span></a></span><span>
+</span><span id="line-10"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.ExitPolicy.html#ReturnPolicy"><span class="hs-identifier">ReturnPolicy</span></a></span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.ExitPolicy.html#alwaysCleanReturnPolicy"><span class="hs-identifier">alwaysCleanReturnPolicy</span></a></span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Monad.Class.MonadTime</span></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Semigroup</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Max</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">newtype</span><span> </span><span id="ReconnectDelay"><span class="annot"><a href="Ouroboros.Network.ExitPolicy.html#ReconnectDelay"><span class="hs-identifier hs-var">ReconnectDelay</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ReconnectDelay"><span class="annot"><a href="Ouroboros.Network.ExitPolicy.html#ReconnectDelay"><span class="hs-identifier hs-var">ReconnectDelay</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="reconnectDelay"><span class="annot"><span class="annottext">ReconnectDelay -&gt; DiffTime
+</span><a href="Ouroboros.Network.ExitPolicy.html#reconnectDelay"><span class="hs-identifier hs-var hs-var">reconnectDelay</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679184527"><span id="local-6989586621679184529"><span class="annot"><span class="annottext">ReconnectDelay -&gt; ReconnectDelay -&gt; Bool
+(ReconnectDelay -&gt; ReconnectDelay -&gt; Bool)
+-&gt; (ReconnectDelay -&gt; ReconnectDelay -&gt; Bool) -&gt; Eq ReconnectDelay
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: ReconnectDelay -&gt; ReconnectDelay -&gt; Bool
+$c/= :: ReconnectDelay -&gt; ReconnectDelay -&gt; Bool
+== :: ReconnectDelay -&gt; ReconnectDelay -&gt; Bool
+$c== :: ReconnectDelay -&gt; ReconnectDelay -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679184511"><span id="local-6989586621679184513"><span id="local-6989586621679184515"><span id="local-6989586621679184517"><span id="local-6989586621679184519"><span id="local-6989586621679184521"><span id="local-6989586621679184523"><span class="annot"><span class="annottext">Eq ReconnectDelay
+Eq ReconnectDelay
+-&gt; (ReconnectDelay -&gt; ReconnectDelay -&gt; Ordering)
+-&gt; (ReconnectDelay -&gt; ReconnectDelay -&gt; Bool)
+-&gt; (ReconnectDelay -&gt; ReconnectDelay -&gt; Bool)
+-&gt; (ReconnectDelay -&gt; ReconnectDelay -&gt; Bool)
+-&gt; (ReconnectDelay -&gt; ReconnectDelay -&gt; Bool)
+-&gt; (ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay)
+-&gt; (ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay)
+-&gt; Ord ReconnectDelay
+ReconnectDelay -&gt; ReconnectDelay -&gt; Bool
+ReconnectDelay -&gt; ReconnectDelay -&gt; Ordering
+ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay
+$cmin :: ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay
+max :: ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay
+$cmax :: ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay
+&gt;= :: ReconnectDelay -&gt; ReconnectDelay -&gt; Bool
+$c&gt;= :: ReconnectDelay -&gt; ReconnectDelay -&gt; Bool
+&gt; :: ReconnectDelay -&gt; ReconnectDelay -&gt; Bool
+$c&gt; :: ReconnectDelay -&gt; ReconnectDelay -&gt; Bool
+&lt;= :: ReconnectDelay -&gt; ReconnectDelay -&gt; Bool
+$c&lt;= :: ReconnectDelay -&gt; ReconnectDelay -&gt; Bool
+&lt; :: ReconnectDelay -&gt; ReconnectDelay -&gt; Bool
+$c&lt; :: ReconnectDelay -&gt; ReconnectDelay -&gt; Bool
+compare :: ReconnectDelay -&gt; ReconnectDelay -&gt; Ordering
+$ccompare :: ReconnectDelay -&gt; ReconnectDelay -&gt; Ordering
+$cp1Ord :: Eq ReconnectDelay
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></a></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span id="local-6989586621679184496"><span id="local-6989586621679184498"><span id="local-6989586621679184500"><span id="local-6989586621679184502"><span id="local-6989586621679184504"><span id="local-6989586621679184506"><span id="local-6989586621679184508"><span class="annot"><span class="annottext">Integer -&gt; ReconnectDelay
+ReconnectDelay -&gt; ReconnectDelay
+ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay
+(ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay)
+-&gt; (ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay)
+-&gt; (ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay)
+-&gt; (ReconnectDelay -&gt; ReconnectDelay)
+-&gt; (ReconnectDelay -&gt; ReconnectDelay)
+-&gt; (ReconnectDelay -&gt; ReconnectDelay)
+-&gt; (Integer -&gt; ReconnectDelay)
+-&gt; Num ReconnectDelay
+forall a.
+(a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Integer -&gt; a)
+-&gt; Num a
+fromInteger :: Integer -&gt; ReconnectDelay
+$cfromInteger :: Integer -&gt; ReconnectDelay
+signum :: ReconnectDelay -&gt; ReconnectDelay
+$csignum :: ReconnectDelay -&gt; ReconnectDelay
+abs :: ReconnectDelay -&gt; ReconnectDelay
+$cabs :: ReconnectDelay -&gt; ReconnectDelay
+negate :: ReconnectDelay -&gt; ReconnectDelay
+$cnegate :: ReconnectDelay -&gt; ReconnectDelay
+* :: ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay
+$c* :: ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay
+- :: ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay
+$c- :: ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay
++ :: ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay
+$c+ :: ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Num</span></a></span></span></span></span></span></span></span></span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span id="local-6989586621679184488"><span id="local-6989586621679184490"><span id="local-6989586621679184492"><span class="annot"><span class="annottext">Num ReconnectDelay
+Num ReconnectDelay
+-&gt; (ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay)
+-&gt; (ReconnectDelay -&gt; ReconnectDelay)
+-&gt; (Rational -&gt; ReconnectDelay)
+-&gt; Fractional ReconnectDelay
+Rational -&gt; ReconnectDelay
+ReconnectDelay -&gt; ReconnectDelay
+ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay
+forall a.
+Num a
+-&gt; (a -&gt; a -&gt; a) -&gt; (a -&gt; a) -&gt; (Rational -&gt; a) -&gt; Fractional a
+fromRational :: Rational -&gt; ReconnectDelay
+$cfromRational :: Rational -&gt; ReconnectDelay
+recip :: ReconnectDelay -&gt; ReconnectDelay
+$crecip :: ReconnectDelay -&gt; ReconnectDelay
+/ :: ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay
+$c/ :: ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay
+$cp1Fractional :: Num ReconnectDelay
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Fractional</span></a></span></span></span></span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679184481"><span id="local-6989586621679184483"><span id="local-6989586621679184485"><span class="annot"><span class="annottext">b -&gt; ReconnectDelay -&gt; ReconnectDelay
+NonEmpty ReconnectDelay -&gt; ReconnectDelay
+ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay
+(ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay)
+-&gt; (NonEmpty ReconnectDelay -&gt; ReconnectDelay)
+-&gt; (forall b. Integral b =&gt; b -&gt; ReconnectDelay -&gt; ReconnectDelay)
+-&gt; Semigroup ReconnectDelay
+forall b. Integral b =&gt; b -&gt; ReconnectDelay -&gt; ReconnectDelay
+forall a.
+(a -&gt; a -&gt; a)
+-&gt; (NonEmpty a -&gt; a)
+-&gt; (forall b. Integral b =&gt; b -&gt; a -&gt; a)
+-&gt; Semigroup a
+stimes :: b -&gt; ReconnectDelay -&gt; ReconnectDelay
+$cstimes :: forall b. Integral b =&gt; b -&gt; ReconnectDelay -&gt; ReconnectDelay
+sconcat :: NonEmpty ReconnectDelay -&gt; ReconnectDelay
+$csconcat :: NonEmpty ReconnectDelay -&gt; ReconnectDelay
+&lt;&gt; :: ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay
+$c&lt;&gt; :: ReconnectDelay -&gt; ReconnectDelay -&gt; ReconnectDelay
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Semigroup</span></a></span></span></span></span><span> </span><span class="hs-keyword">via</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Max</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span>
+</span><span id="line-22"></span><span>
+</span><span id="line-23"></span><span class="hs-comment">-- It ought to be derived via 'Quiet' but 'Difftime' lacks 'Generic' instance.</span><span>
+</span><span id="line-24"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679184475"><span id="local-6989586621679184478"><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.ExitPolicy.html#ReconnectDelay"><span class="hs-identifier hs-type">ReconnectDelay</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-25"></span><span>    </span><span id="local-6989586621679184473"><span class="annot"><span class="annottext">show :: ReconnectDelay -&gt; String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">show</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.ExitPolicy.html#ReconnectDelay"><span class="hs-identifier hs-type">ReconnectDelay</span></a></span><span> </span><span id="local-6989586621679184471"><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679184471"><span class="hs-identifier hs-var">d</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;ReconnectDelay &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">++</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><a href="#local-6989586621679184471"><span class="hs-identifier hs-var">d</span></a></span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">type</span><span> </span><span id="ReturnPolicy"><span class="annot"><a href="Ouroboros.Network.ExitPolicy.html#ReturnPolicy"><span class="hs-identifier hs-var">ReturnPolicy</span></a></span></span><span> </span><span id="local-6989586621679184470"><span class="annot"><a href="#local-6989586621679184470"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="#local-6989586621679184470"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.ExitPolicy.html#ReconnectDelay"><span class="hs-identifier hs-type">ReconnectDelay</span></a></span><span>
+</span><span id="line-28"></span><span>
+</span><span id="line-29"></span><span class="hs-comment">-- | 'ReturnPolicy' allows to compute reconnection delay from value return by</span><span>
+</span><span id="line-30"></span><span class="hs-comment">-- a mini-protocol.  If a mini-protocol returned with an error 'epErrorDelay'</span><span>
+</span><span id="line-31"></span><span class="hs-comment">-- is used.</span><span>
+</span><span id="line-32"></span><span class="hs-keyword">data</span><span> </span><span id="ExitPolicy"><span class="annot"><a href="Ouroboros.Network.ExitPolicy.html#ExitPolicy"><span class="hs-identifier hs-var">ExitPolicy</span></a></span></span><span> </span><span id="local-6989586621679184540"><span class="annot"><a href="#local-6989586621679184540"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-33"></span><span>    </span><span id="ExitPolicy"><span class="annot"><a href="Ouroboros.Network.ExitPolicy.html#ExitPolicy"><span class="hs-identifier hs-var">ExitPolicy</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-34"></span><span>        </span><span class="hs-comment">-- | Compute 'ReturnCommand' from return value.</span><span>
+</span><span id="line-35"></span><span>        </span><span class="hs-comment">--</span><span>
+</span><span id="line-36"></span><span>        </span><span id="epReturnDelay"><span class="annot"><span class="annottext">ExitPolicy a -&gt; ReturnPolicy a
+</span><a href="Ouroboros.Network.ExitPolicy.html#epReturnDelay"><span class="hs-identifier hs-var hs-var">epReturnDelay</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.ExitPolicy.html#ReturnPolicy"><span class="hs-identifier hs-type">ReturnPolicy</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679184540"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span>        </span><span class="hs-comment">-- | The delay when a mini-protocol returned with an error.</span><span>
+</span><span id="line-39"></span><span>        </span><span class="hs-comment">--</span><span>
+</span><span id="line-40"></span><span>        </span><span id="epErrorDelay"><span class="annot"><span class="annottext">ExitPolicy a -&gt; ReconnectDelay
+</span><a href="Ouroboros.Network.ExitPolicy.html#epErrorDelay"><span class="hs-identifier hs-var hs-var">epErrorDelay</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.ExitPolicy.html#ReconnectDelay"><span class="hs-identifier hs-type">ReconnectDelay</span></a></span><span>
+</span><span id="line-41"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-42"></span><span>
+</span><span id="line-43"></span><span id="local-6989586621679184466"><span class="annot"><a href="Ouroboros.Network.ExitPolicy.html#alwaysCleanReturnPolicy"><span class="hs-identifier hs-type">alwaysCleanReturnPolicy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.ExitPolicy.html#ReconnectDelay"><span class="hs-identifier hs-type">ReconnectDelay</span></a></span><span> </span><span class="hs-comment">-- ^ reconnection delay on error</span><span>
+</span><span id="line-44"></span><span>                        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.ExitPolicy.html#ExitPolicy"><span class="hs-identifier hs-type">ExitPolicy</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679184466"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-45"></span><span id="alwaysCleanReturnPolicy"><span class="annot"><span class="annottext">alwaysCleanReturnPolicy :: ReconnectDelay -&gt; ExitPolicy a
+</span><a href="Ouroboros.Network.ExitPolicy.html#alwaysCleanReturnPolicy"><span class="hs-identifier hs-var hs-var">alwaysCleanReturnPolicy</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ReturnPolicy a -&gt; ReconnectDelay -&gt; ExitPolicy a
+forall a. ReturnPolicy a -&gt; ReconnectDelay -&gt; ExitPolicy a
+</span><a href="Ouroboros.Network.ExitPolicy.html#ExitPolicy"><span class="hs-identifier hs-var">ExitPolicy</span></a></span><span> </span><span class="annot"><span class="annottext">(ReturnPolicy a -&gt; ReconnectDelay -&gt; ExitPolicy a)
+-&gt; ReturnPolicy a -&gt; ReconnectDelay -&gt; ExitPolicy a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span class="annot"><span class="annottext">a
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">ReconnectDelay
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-46"></span><span>
+</span><span id="line-47"></span><span class="hs-comment">-- | 'ExitPolicy' with 10s error delay.</span><span>
+</span><span id="line-48"></span><span class="hs-comment">--</span><span>
+</span><span id="line-49"></span><span id="local-6989586621679184465"><span class="annot"><a href="Ouroboros.Network.ExitPolicy.html#stdExitPolicy"><span class="hs-identifier hs-type">stdExitPolicy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.ExitPolicy.html#ReturnPolicy"><span class="hs-identifier hs-type">ReturnPolicy</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679184465"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.ExitPolicy.html#ExitPolicy"><span class="hs-identifier hs-type">ExitPolicy</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679184465"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-50"></span><span id="stdExitPolicy"><span class="annot"><span class="annottext">stdExitPolicy :: ReturnPolicy a -&gt; ExitPolicy a
+</span><a href="Ouroboros.Network.ExitPolicy.html#stdExitPolicy"><span class="hs-identifier hs-var hs-var">stdExitPolicy</span></a></span></span><span> </span><span id="local-6989586621679184464"><span class="annot"><span class="annottext">ReturnPolicy a
+</span><a href="#local-6989586621679184464"><span class="hs-identifier hs-var">epReturnDelay</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-51"></span><span>    </span><span class="annot"><span class="annottext">ExitPolicy :: forall a. ReturnPolicy a -&gt; ReconnectDelay -&gt; ExitPolicy a
+</span><a href="Ouroboros.Network.ExitPolicy.html#ExitPolicy"><span class="hs-identifier hs-type">ExitPolicy</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-52"></span><span>        </span><span class="annot"><span class="annottext">ReturnPolicy a
+epReturnDelay :: ReturnPolicy a
+epReturnDelay :: ReturnPolicy a
+</span><a href="#local-6989586621679184464"><span class="hs-identifier hs-var hs-var">epReturnDelay</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-53"></span><span>        </span><span class="annot"><span class="annottext">epErrorDelay :: ReconnectDelay
+</span><a href="Ouroboros.Network.ExitPolicy.html#epErrorDelay"><span class="hs-identifier hs-var">epErrorDelay</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ReconnectDelay
+</span><span class="hs-number">10</span></span><span>
+</span><span id="line-54"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-55"></span></pre></body></html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE LambdaCase      #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE RecordWildCards #-}</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- | A @tasty@ command-line option for enabling nightly tests</span><span>
+</span><span id="line-4"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Test.Util.TestEnv</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-5"></span><span>    </span><span class="annot"><a href="Test.Util.TestEnv.html#TestEnv"><span class="hs-identifier">TestEnv</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-6"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Test.Util.TestEnv.html#askTestEnv"><span class="hs-identifier">askTestEnv</span></a></span><span>
+</span><span id="line-7"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Test.Util.TestEnv.html#defaultMainWithTestEnv"><span class="hs-identifier">defaultMainWithTestEnv</span></a></span><span>
+</span><span id="line-8"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Test.Util.TestEnv.html#defaultTestEnvConfig"><span class="hs-identifier">defaultTestEnvConfig</span></a></span><span>
+</span><span id="line-9"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-10"></span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Proxy</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Proxy</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Options.Applicative</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">metavar</span></span><span class="hs-special">)</span><span>
+</span><span id="line-13"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Test.Tasty</span></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Test.Tasty.Ingredients</span></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Test.Tasty.Options</span></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Test.Tasty.QuickCheck</span></span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span class="hs-comment">-- | 'defaultMain' extended with 'iohkTestEnvIngredient'</span><span>
+</span><span id="line-19"></span><span class="annot"><a href="Test.Util.TestEnv.html#defaultMainWithTestEnv"><span class="hs-identifier hs-type">defaultMainWithTestEnv</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Test.Util.TestEnv.html#TestEnvConfig"><span class="hs-identifier hs-type">TestEnvConfig</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TestTree</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span id="defaultMainWithTestEnv"><span class="annot"><span class="annottext">defaultMainWithTestEnv :: TestEnvConfig -&gt; TestTree -&gt; IO ()
+</span><a href="Test.Util.TestEnv.html#defaultMainWithTestEnv"><span class="hs-identifier hs-var hs-var">defaultMainWithTestEnv</span></a></span></span><span> </span><span id="local-6989586621679280182"><span class="annot"><span class="annottext">TestEnvConfig
+</span><a href="#local-6989586621679280182"><span class="hs-identifier hs-var">testConfig</span></a></span></span><span> </span><span id="local-6989586621679280181"><span class="annot"><span class="annottext">TestTree
+</span><a href="#local-6989586621679280181"><span class="hs-identifier hs-var">testTree</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-21"></span><span>    </span><span class="annot"><span class="annottext">[Ingredient] -&gt; TestTree -&gt; IO ()
+</span><span class="hs-identifier hs-var">defaultMainWithIngredients</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Ingredient
+</span><a href="#local-6989586621679280179"><span class="hs-identifier hs-var">testEnvIngredient</span></a></span><span> </span><span class="annot"><span class="annottext">Ingredient -&gt; [Ingredient] -&gt; [Ingredient]
+forall a. a -&gt; [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-var">:</span></a></span><span> </span><span class="annot"><span class="annottext">[Ingredient]
+</span><span class="hs-identifier hs-var">defaultIngredients</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(TestTree -&gt; IO ()) -&gt; TestTree -&gt; IO ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">TestEnvConfig -&gt; TestTree -&gt; TestTree
+</span><a href="Test.Util.TestEnv.html#withTestEnv"><span class="hs-identifier hs-var">withTestEnv</span></a></span><span> </span><span class="annot"><span class="annottext">TestEnvConfig
+</span><a href="#local-6989586621679280182"><span class="hs-identifier hs-var">testConfig</span></a></span><span> </span><span class="annot"><span class="annottext">TestTree
+</span><a href="#local-6989586621679280181"><span class="hs-identifier hs-var">testTree</span></a></span><span>
+</span><span id="line-22"></span><span>
+</span><span id="line-23"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-24"></span><span>      </span><span class="annot"><a href="#local-6989586621679280179"><span class="hs-identifier hs-type">testEnvIngredient</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ingredient</span></span><span>
+</span><span id="line-25"></span><span>      </span><span id="local-6989586621679280179"><span class="annot"><span class="annottext">testEnvIngredient :: Ingredient
+</span><a href="#local-6989586621679280179"><span class="hs-identifier hs-var hs-var">testEnvIngredient</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[OptionDescription] -&gt; Ingredient
+</span><span class="hs-identifier hs-var">includingOptions</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Proxy TestEnv -&gt; OptionDescription
+forall v. IsOption v =&gt; Proxy v -&gt; OptionDescription
+</span><span class="hs-identifier hs-var">Option</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Proxy TestEnv
+forall k (t :: k). Proxy t
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Proxy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Proxy</span></a></span><span> </span><span class="annot"><a href="Test.Util.TestEnv.html#TestEnv"><span class="hs-identifier hs-type">TestEnv</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span class="hs-comment">-- | Set the appropriate options for the test environment</span><span>
+</span><span id="line-28"></span><span class="annot"><a href="Test.Util.TestEnv.html#withTestEnv"><span class="hs-identifier hs-type">withTestEnv</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Test.Util.TestEnv.html#TestEnvConfig"><span class="hs-identifier hs-type">TestEnvConfig</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TestTree</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TestTree</span></span><span>
+</span><span id="line-29"></span><span id="withTestEnv"><span class="annot"><span class="annottext">withTestEnv :: TestEnvConfig -&gt; TestTree -&gt; TestTree
+</span><a href="Test.Util.TestEnv.html#withTestEnv"><span class="hs-identifier hs-var hs-var">withTestEnv</span></a></span></span><span> </span><span class="annot"><a href="Test.Util.TestEnv.html#TestEnvConfig"><span class="hs-identifier hs-type">TestEnvConfig</span></a></span><span class="hs-special">{</span><span id="local-6989586621679280170"><span id="local-6989586621679280171"><span id="local-6989586621679280172"><span class="annot"><span class="annottext">Int
+dev :: TestEnvConfig -&gt; Int
+ci :: TestEnvConfig -&gt; Int
+nightly :: TestEnvConfig -&gt; Int
+dev :: Int
+ci :: Int
+nightly :: Int
+</span><a href="Test.Util.TestEnv.html#dev"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span> </span><span id="local-6989586621679280166"><span class="annot"><span class="annottext">TestTree
+</span><a href="#local-6989586621679280166"><span class="hs-identifier hs-var">testTree</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(TestEnv -&gt; TestTree) -&gt; TestTree
+forall v. IsOption v =&gt; (v -&gt; TestTree) -&gt; TestTree
+</span><span class="hs-identifier hs-var">askOption</span></span><span> </span><span class="annot"><span class="annottext">((TestEnv -&gt; TestTree) -&gt; TestTree)
+-&gt; (TestEnv -&gt; TestTree) -&gt; TestTree
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-30"></span><span>      </span><span class="annot"><span class="annottext">TestEnv
+</span><a href="Test.Util.TestEnv.html#Nightly"><span class="hs-identifier hs-var">Nightly</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">QuickCheckTests -&gt; TestTree -&gt; TestTree
+forall v. IsOption v =&gt; v -&gt; TestTree -&gt; TestTree
+</span><span class="hs-identifier hs-var">localOption</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; QuickCheckTests
+</span><span class="hs-identifier hs-var">QuickCheckTests</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679280172"><span class="hs-identifier hs-var">nightly</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">TestTree
+</span><a href="#local-6989586621679280166"><span class="hs-identifier hs-var">testTree</span></a></span><span>
+</span><span id="line-31"></span><span>      </span><span class="annot"><span class="annottext">TestEnv
+</span><a href="Test.Util.TestEnv.html#CI"><span class="hs-identifier hs-var">CI</span></a></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">QuickCheckTests -&gt; TestTree -&gt; TestTree
+forall v. IsOption v =&gt; v -&gt; TestTree -&gt; TestTree
+</span><span class="hs-identifier hs-var">localOption</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; QuickCheckTests
+</span><span class="hs-identifier hs-var">QuickCheckTests</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679280171"><span class="hs-identifier hs-var">ci</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">TestTree
+</span><a href="#local-6989586621679280166"><span class="hs-identifier hs-var">testTree</span></a></span><span>
+</span><span id="line-32"></span><span>      </span><span class="annot"><span class="annottext">TestEnv
+</span><a href="Test.Util.TestEnv.html#Dev"><span class="hs-identifier hs-var">Dev</span></a></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">QuickCheckTests -&gt; TestTree -&gt; TestTree
+forall v. IsOption v =&gt; v -&gt; TestTree -&gt; TestTree
+</span><span class="hs-identifier hs-var">localOption</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; QuickCheckTests
+</span><span class="hs-identifier hs-var">QuickCheckTests</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679280170"><span class="hs-identifier hs-var">dev</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">TestTree
+</span><a href="#local-6989586621679280166"><span class="hs-identifier hs-var">testTree</span></a></span><span>
+</span><span id="line-33"></span><span>
+</span><span id="line-34"></span><span class="hs-comment">-- | Query and adjust options for `TestEnv`</span><span>
+</span><span id="line-35"></span><span class="annot"><a href="Test.Util.TestEnv.html#askTestEnv"><span class="hs-identifier hs-type">askTestEnv</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Util.TestEnv.html#TestEnv"><span class="hs-identifier hs-type">TestEnv</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TestTree</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TestTree</span></span><span>
+</span><span id="line-36"></span><span id="askTestEnv"><span class="annot"><span class="annottext">askTestEnv :: (TestEnv -&gt; TestTree) -&gt; TestTree
+</span><a href="Test.Util.TestEnv.html#askTestEnv"><span class="hs-identifier hs-var hs-var">askTestEnv</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(TestEnv -&gt; TestTree) -&gt; TestTree
+forall v. IsOption v =&gt; (v -&gt; TestTree) -&gt; TestTree
+</span><span class="hs-identifier hs-var">askOption</span></span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span class="hs-comment">-- | Test configurations for test environment</span><span>
+</span><span id="line-39"></span><span class="hs-keyword">data</span><span> </span><span id="TestEnvConfig"><span class="annot"><a href="Test.Util.TestEnv.html#TestEnvConfig"><span class="hs-identifier hs-var">TestEnvConfig</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="TestEnvConfig"><span class="annot"><a href="Test.Util.TestEnv.html#TestEnvConfig"><span class="hs-identifier hs-var">TestEnvConfig</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="nightly"><span class="annot"><span class="annottext">TestEnvConfig -&gt; Int
+</span><a href="Test.Util.TestEnv.html#nightly"><span class="hs-identifier hs-var hs-var">nightly</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span class="hs-special">,</span><span> </span><span id="ci"><span class="annot"><span class="annottext">TestEnvConfig -&gt; Int
+</span><a href="Test.Util.TestEnv.html#ci"><span class="hs-identifier hs-var hs-var">ci</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span class="hs-special">,</span><span> </span><span id="dev"><span class="annot"><span class="annottext">TestEnvConfig -&gt; Int
+</span><a href="Test.Util.TestEnv.html#dev"><span class="hs-identifier hs-var hs-var">dev</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-40"></span><span>
+</span><span id="line-41"></span><span class="hs-comment">-- | Default set of tests for each environment</span><span>
+</span><span id="line-42"></span><span class="annot"><a href="Test.Util.TestEnv.html#defaultTestEnvConfig"><span class="hs-identifier hs-type">defaultTestEnvConfig</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Test.Util.TestEnv.html#TestEnvConfig"><span class="hs-identifier hs-type">TestEnvConfig</span></a></span><span>
+</span><span id="line-43"></span><span id="defaultTestEnvConfig"><span class="annot"><span class="annottext">defaultTestEnvConfig :: TestEnvConfig
+</span><a href="Test.Util.TestEnv.html#defaultTestEnvConfig"><span class="hs-identifier hs-var hs-var">defaultTestEnvConfig</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TestEnvConfig :: Int -&gt; Int -&gt; Int -&gt; TestEnvConfig
+</span><a href="Test.Util.TestEnv.html#TestEnvConfig"><span class="hs-identifier hs-type">TestEnvConfig</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">nightly :: Int
+</span><a href="Test.Util.TestEnv.html#nightly"><span class="hs-identifier hs-var">nightly</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">100000</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ci :: Int
+</span><a href="Test.Util.TestEnv.html#ci"><span class="hs-identifier hs-var">ci</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">10000</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">dev :: Int
+</span><a href="Test.Util.TestEnv.html#dev"><span class="hs-identifier hs-var">dev</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">100</span></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span class="hs-comment">-- | An 'Option' that indicates the environment in which to run tests.</span><span>
+</span><span id="line-46"></span><span class="hs-keyword">data</span><span> </span><span id="TestEnv"><span class="annot"><a href="Test.Util.TestEnv.html#TestEnv"><span class="hs-identifier hs-var">TestEnv</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Nightly"><span class="annot"><a href="Test.Util.TestEnv.html#Nightly"><span class="hs-identifier hs-var">Nightly</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="CI"><span class="annot"><a href="Test.Util.TestEnv.html#CI"><span class="hs-identifier hs-var">CI</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Dev"><span class="annot"><a href="Test.Util.TestEnv.html#Dev"><span class="hs-identifier hs-var">Dev</span></a></span></span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span class="annot"><a href="Test.Util.TestEnv.html#safeReadTestEnv"><span class="hs-identifier hs-type">safeReadTestEnv</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">String</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="annot"><a href="Test.Util.TestEnv.html#TestEnv"><span class="hs-identifier hs-type">TestEnv</span></a></span><span>
+</span><span id="line-49"></span><span id="safeReadTestEnv"><span class="annot"><span class="annottext">safeReadTestEnv :: String -&gt; Maybe TestEnv
+</span><a href="Test.Util.TestEnv.html#safeReadTestEnv"><span class="hs-identifier hs-var hs-var">safeReadTestEnv</span></a></span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;nightly&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TestEnv -&gt; Maybe TestEnv
+forall a. a -&gt; Maybe a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">TestEnv
+</span><a href="Test.Util.TestEnv.html#Nightly"><span class="hs-identifier hs-var">Nightly</span></a></span><span>
+</span><span id="line-50"></span><span class="annot"><a href="Test.Util.TestEnv.html#safeReadTestEnv"><span class="hs-identifier hs-var">safeReadTestEnv</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;ci&quot;</span></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TestEnv -&gt; Maybe TestEnv
+forall a. a -&gt; Maybe a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">TestEnv
+</span><a href="Test.Util.TestEnv.html#CI"><span class="hs-identifier hs-var">CI</span></a></span><span>
+</span><span id="line-51"></span><span class="annot"><a href="Test.Util.TestEnv.html#safeReadTestEnv"><span class="hs-identifier hs-var">safeReadTestEnv</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;dev&quot;</span></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TestEnv -&gt; Maybe TestEnv
+forall a. a -&gt; Maybe a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">TestEnv
+</span><a href="Test.Util.TestEnv.html#Dev"><span class="hs-identifier hs-var">Dev</span></a></span><span>
+</span><span id="line-52"></span><span class="annot"><a href="Test.Util.TestEnv.html#safeReadTestEnv"><span class="hs-identifier hs-var">safeReadTestEnv</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-identifier">_</span></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe TestEnv
+forall a. Maybe a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span>
+</span><span id="line-53"></span><span>
+</span><span id="line-54"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679280152"><span class="annot"><span class="hs-identifier hs-type">IsOption</span></span><span> </span><span class="annot"><a href="Test.Util.TestEnv.html#TestEnv"><span class="hs-identifier hs-type">TestEnv</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-55"></span><span>  </span><span id="local-6989586621679280149"><span class="annot"><span class="annottext">defaultValue :: TestEnv
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">defaultValue</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TestEnv
+</span><a href="Test.Util.TestEnv.html#Dev"><span class="hs-identifier hs-var">Dev</span></a></span><span>
+</span><span id="line-56"></span><span>  </span><span id="local-6989586621679280147"><span class="annot"><span class="annottext">parseValue :: String -&gt; Maybe TestEnv
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">parseValue</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Maybe TestEnv
+</span><a href="Test.Util.TestEnv.html#safeReadTestEnv"><span class="hs-identifier hs-var">safeReadTestEnv</span></a></span><span>
+</span><span id="line-57"></span><span>  </span><span id="local-6989586621679280145"><span class="annot"><span class="annottext">optionName :: Tagged TestEnv String
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">optionName</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Tagged TestEnv String
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;test-env&quot;</span></span><span>
+</span><span id="line-58"></span><span>  </span><span id="local-6989586621679280143"><span class="annot"><span class="annottext">optionHelp :: Tagged TestEnv String
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">optionHelp</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Tagged TestEnv String
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Enable a test mode. \
+      \ The 'dev' env sets the default number of quickcheck tests to 100, \
+      \ 'nightly' env sets it to 100_000 quickcheck tests, and \
+      \ 'ci' env sets it to 10_000 quickcheck tests. \
+      \ Individual tests are adjusted to run a number of tests proportional to the value above depending \
+      \ on the time it takes to run them.&quot;</span></span><span>
+</span><span id="line-64"></span><span>
+</span><span id="line-65"></span><span>  </span><span class="hs-comment">-- Set of choices for test environment</span><span>
+</span><span id="line-66"></span><span>  </span><span id="local-6989586621679280141"><span class="annot"><span class="annottext">optionCLParser :: Parser TestEnv
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">optionCLParser</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Mod OptionFields TestEnv -&gt; Parser TestEnv
+forall v. IsOption v =&gt; Mod OptionFields v -&gt; Parser v
+</span><span class="hs-identifier hs-var">mkOptionCLParser</span></span><span> </span><span class="annot"><span class="annottext">(Mod OptionFields TestEnv -&gt; Parser TestEnv)
+-&gt; Mod OptionFields TestEnv -&gt; Parser TestEnv
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; Mod OptionFields TestEnv
+forall (f :: * -&gt; *) a. HasMetavar f =&gt; String -&gt; Mod f a
+</span><span class="hs-identifier hs-var">metavar</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;nightly|ci|dev&quot;</span></span><span>
+</span><span id="line-67"></span></pre></body></html>

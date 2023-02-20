@@ -1,8 +1,45 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Consensus.Storage.ChainDB</span><span> </span><span class="hs-special">(</span><span>
-</span><span id="line-2"></span><span>    </span><span class="hs-keyword">module</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.html"><span class="hs-identifier">Ouroboros.Consensus.Storage.ChainDB.API</span></a></span><span>
-</span><span id="line-3"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-keyword">module</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.Impl.html"><span class="hs-identifier">Ouroboros.Consensus.Storage.ChainDB.Impl</span></a></span><span>
-</span><span id="line-4"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-5"></span><span>
-</span><span id="line-6"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.html"><span class="hs-identifier">Ouroboros.Consensus.Storage.ChainDB.API</span></a></span><span>
-</span><span id="line-7"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.Impl.html"><span class="hs-identifier">Ouroboros.Consensus.Storage.ChainDB.Impl</span></a></span><span>
-</span><span id="line-8"></span></pre></body></html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- | The storage layer is a highly specialized database for storing the blockchain.</span><span>
+</span><span id="line-2"></span><span class="hs-comment">--   It consists of five subcomponents:</span><span>
+</span><span id="line-3"></span><span class="hs-comment">--</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- * An abstract file system API, 'Ouroboros.Consensus.Storage.FS.API.HasFS',</span><span>
+</span><span id="line-5"></span><span class="hs-comment">--   that smooths out over some differences between the file systems of</span><span>
+</span><span id="line-6"></span><span class="hs-comment">--   different operating systems and, more importantly, allows us to simulate</span><span>
+</span><span id="line-7"></span><span class="hs-comment">--   all kinds of failures. This is then used for stress-testing the other</span><span>
+</span><span id="line-8"></span><span class="hs-comment">--   components below.</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- * The __[Immutable DB](&quot;Ouroboros.Consensus.Storage.ImmutableDB&quot;)__, stores</span><span>
+</span><span id="line-10"></span><span class="hs-comment">--   the part of the chain that is immutable, that is, no longer subject to</span><span>
+</span><span id="line-11"></span><span class="hs-comment">--   rollback. It is an append-only database, providing efficient access to the</span><span>
+</span><span id="line-12"></span><span class="hs-comment">--   chain. 'Ouroboros.Consensus.Storage.ImmutableDB.API.ImmutableDB' defines the</span><span>
+</span><span id="line-13"></span><span class="hs-comment">--   immutable DB API.</span><span>
+</span><span id="line-14"></span><span class="hs-comment">-- * The __[Volatile DB](&quot;Ouroboros.Consensus.Storage.VolatileDB&quot;)__, stores the</span><span>
+</span><span id="line-15"></span><span class="hs-comment">--   part of the chain near its tip. This doesn't really store a __chain__ as</span><span>
+</span><span id="line-16"></span><span class="hs-comment">--   such, but rather simply a collection of blocks from which we might</span><span>
+</span><span id="line-17"></span><span class="hs-comment">--   __construct__ a chain. 'Ouroboros.Consensus.Storage.VolatileDB.API.VolatileDB'</span><span>
+</span><span id="line-18"></span><span class="hs-comment">--   defines the volatile DB API.</span><span>
+</span><span id="line-19"></span><span class="hs-comment">-- * The ledger DB, stores the state of the ledger. The</span><span>
+</span><span id="line-20"></span><span class="hs-comment">--   __[on disk](&quot;Ouroboros.Consensus.Storage.LedgerDB.OnDisk&quot;)__ part only stores</span><span>
+</span><span id="line-21"></span><span class="hs-comment">--   snapshots of the ledger state that correspond to immutable blocks. The</span><span>
+</span><span id="line-22"></span><span class="hs-comment">--   __[in memory](&quot;Ouroboros.Consensus.Storage.LedgerDB.InMemory&quot;)__ part</span><span>
+</span><span id="line-23"></span><span class="hs-comment">--   stores various snapshots of the ledger state corresponding to blocks near</span><span>
+</span><span id="line-24"></span><span class="hs-comment">--   the current tip of the chain, and provides an efficient way of computing</span><span>
+</span><span id="line-25"></span><span class="hs-comment">--   any ledger state for the last @k@ blocks of the chain.</span><span>
+</span><span id="line-26"></span><span class="hs-comment">-- * The Chain DB finally combines all of these components. It makes decisions</span><span>
+</span><span id="line-27"></span><span class="hs-comment">--   about which chains to adopt (chain selection), switches to forks when</span><span>
+</span><span id="line-28"></span><span class="hs-comment">--   needed, deals with clock skew, and provides various interfaces to the rest</span><span>
+</span><span id="line-29"></span><span class="hs-comment">--   of the consensus layer for things like finding out which blocks were</span><span>
+</span><span id="line-30"></span><span class="hs-comment">--   invalid (so we can disconnect from the clients who sent them), cursors that</span><span>
+</span><span id="line-31"></span><span class="hs-comment">--   follow the tip of the chain (so that we can inform our downstream peers of</span><span>
+</span><span id="line-32"></span><span class="hs-comment">--   how our chain evolves), etc. In many ways, the chain DB is the component</span><span>
+</span><span id="line-33"></span><span class="hs-comment">--   that is responsible for &quot;consensus&quot;: deciding which chain is the one true</span><span>
+</span><span id="line-34"></span><span class="hs-comment">--   chain. 'Ouroboros.Consensus.Storage.ChainDB.API.ChainDB' defines the chain</span><span>
+</span><span id="line-35"></span><span class="hs-comment">--   DB API.</span><span>
+</span><span id="line-36"></span><span class="hs-comment">--</span><span>
+</span><span id="line-37"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Consensus.Storage.ChainDB</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-38"></span><span>    </span><span class="hs-keyword">module</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.html"><span class="hs-identifier">Ouroboros.Consensus.Storage.ChainDB.API</span></a></span><span>
+</span><span id="line-39"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-keyword">module</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.Impl.html"><span class="hs-identifier">Ouroboros.Consensus.Storage.ChainDB.Impl</span></a></span><span>
+</span><span id="line-40"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-41"></span><span>
+</span><span id="line-42"></span><span>
+</span><span id="line-43"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.html"><span class="hs-identifier">Ouroboros.Consensus.Storage.ChainDB.API</span></a></span><span>
+</span><span id="line-44"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.Impl.html"><span class="hs-identifier">Ouroboros.Consensus.Storage.ChainDB.Impl</span></a></span><span>
+</span><span id="line-45"></span></pre></body></html>

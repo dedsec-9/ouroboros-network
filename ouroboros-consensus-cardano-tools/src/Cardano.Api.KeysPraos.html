@@ -1,0 +1,1128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DeriveAnyClass             #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DerivingVia                #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE FlexibleInstances          #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE GeneralizedNewtypeDeriving #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE InstanceSigs               #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE MultiParamTypeClasses      #-}</span><span>
+</span><span id="line-7"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings          #-}</span><span>
+</span><span id="line-8"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables        #-}</span><span>
+</span><span id="line-9"></span><span class="hs-pragma">{-# LANGUAGE TypeFamilies               #-}</span><span>
+</span><span id="line-10"></span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- DUPLICATE -- adapted from: cardano-api/src/Cardano/Api/KeysPraos.hs</span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span class="hs-comment">-- | Praos consensus key types and their 'Key' class instances</span><span>
+</span><span id="line-14"></span><span class="hs-comment">--</span><span>
+</span><span id="line-15"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Cardano.Api.KeysPraos</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-16"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Key types</span></span><span>
+</span><span id="line-17"></span><span>    </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier">KesKey</span></a></span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier">VrfKey</span></a></span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Data family instances</span></span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Cardano.Api.Any.html#AsType"><span class="hs-identifier">AsType</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Cardano.Api.Any.html#Hash"><span class="hs-identifier">Hash</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Cardano.Api.Key.html#SigningKey"><span class="hs-identifier">SigningKey</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Cardano.Api.Key.html#VerificationKey"><span class="hs-identifier">VerificationKey</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-25"></span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.String</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">IsString</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Crypto.DSIGN.Class</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Crypto</span></span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Crypto.Hash.Class</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Crypto</span></span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Crypto.KES.Class</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Crypto</span></span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Crypto.VRF.Class</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Crypto</span></span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Crypto</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">StandardCrypto</span></span><span class="hs-special">)</span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Crypto</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Shelley</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">KES</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">VRF</span></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Keys</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Shelley</span></span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Cardano.Api.Any.html"><span class="hs-identifier">Cardano.Api.Any</span></a></span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Cardano.Api.Key.html"><span class="hs-identifier">Cardano.Api.Key</span></a></span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Cardano.Api.SerialiseTextEnvelope.html"><span class="hs-identifier">Cardano.Api.SerialiseTextEnvelope</span></a></span><span>
+</span><span id="line-39"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Cardano.Api.SerialiseUsing.html"><span class="hs-identifier">Cardano.Api.SerialiseUsing</span></a></span><span>
+</span><span id="line-40"></span><span>
+</span><span id="line-41"></span><span class="hs-comment">--</span><span>
+</span><span id="line-42"></span><span class="hs-comment">-- KES keys</span><span>
+</span><span id="line-43"></span><span class="hs-comment">--</span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span class="hs-keyword">data</span><span> </span><span id="KesKey"><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-var">KesKey</span></a></span></span><span>
+</span><span id="line-46"></span><span>
+</span><span id="line-47"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Cardano.Api.Any.html#HasTypeProxy"><span class="hs-identifier hs-type">HasTypeProxy</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-48"></span><span>    </span><span class="hs-keyword">data</span><span> </span><span id="AsType"><span class="annot"><a href="Cardano.Api.Any.html#AsType"><span class="hs-identifier hs-var">AsType</span></a></span></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="AsKesKey"><span class="annot"><a href="Cardano.Api.KeysPraos.html#AsKesKey"><span class="hs-identifier hs-var">AsKesKey</span></a></span></span><span>
+</span><span id="line-49"></span><span>    </span><span id="local-6989586621679368247"><span class="annot"><span class="annottext">proxyToAsType :: Proxy KesKey -&gt; AsType KesKey
+</span><a href="Cardano.Api.Any.html#proxyToAsType"><span class="hs-identifier hs-var hs-var hs-var hs-var">proxyToAsType</span></a></span></span><span> </span><span class="annot"><span class="annottext">Proxy KesKey
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AsType KesKey
+</span><a href="Cardano.Api.KeysPraos.html#AsKesKey"><span class="hs-identifier hs-var">AsKesKey</span></a></span><span>
+</span><span id="line-50"></span><span>
+</span><span id="line-51"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Cardano.Api.Key.html#Key"><span class="hs-identifier hs-type">Key</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-52"></span><span>
+</span><span id="line-53"></span><span>    </span><span class="hs-keyword">newtype</span><span> </span><span id="VerificationKey"><span class="annot"><a href="Cardano.Api.Key.html#VerificationKey"><span class="hs-identifier hs-var">VerificationKey</span></a></span></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-54"></span><span>        </span><span id="KesVerificationKey"><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesVerificationKey"><span class="hs-identifier hs-var">KesVerificationKey</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Shelley.VerKeyKES</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">StandardCrypto</span></span><span class="hs-special">)</span><span>
+</span><span id="line-55"></span><span>      </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679368231"><span id="local-6989586621679368233"><span class="annot"><span class="annottext">VerificationKey KesKey -&gt; VerificationKey KesKey -&gt; Bool
+(VerificationKey KesKey -&gt; VerificationKey KesKey -&gt; Bool)
+-&gt; (VerificationKey KesKey -&gt; VerificationKey KesKey -&gt; Bool)
+-&gt; Eq (VerificationKey KesKey)
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: VerificationKey KesKey -&gt; VerificationKey KesKey -&gt; Bool
+$c/= :: VerificationKey KesKey -&gt; VerificationKey KesKey -&gt; Bool
+== :: VerificationKey KesKey -&gt; VerificationKey KesKey -&gt; Bool
+$c== :: VerificationKey KesKey -&gt; VerificationKey KesKey -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-56"></span><span>      </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679368224"><span id="local-6989586621679368226"><span id="local-6989586621679368228"><span class="annot"><span class="annottext">Int -&gt; VerificationKey KesKey -&gt; ShowS
+[VerificationKey KesKey] -&gt; ShowS
+VerificationKey KesKey -&gt; String
+(Int -&gt; VerificationKey KesKey -&gt; ShowS)
+-&gt; (VerificationKey KesKey -&gt; String)
+-&gt; ([VerificationKey KesKey] -&gt; ShowS)
+-&gt; Show (VerificationKey KesKey)
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [VerificationKey KesKey] -&gt; ShowS
+$cshowList :: [VerificationKey KesKey] -&gt; ShowS
+show :: VerificationKey KesKey -&gt; String
+$cshow :: VerificationKey KesKey -&gt; String
+showsPrec :: Int -&gt; VerificationKey KesKey -&gt; ShowS
+$cshowsPrec :: Int -&gt; VerificationKey KesKey -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679368221"><span class="annot"><span class="annottext">String -&gt; VerificationKey KesKey
+(String -&gt; VerificationKey KesKey)
+-&gt; IsString (VerificationKey KesKey)
+forall a. (String -&gt; a) -&gt; IsString a
+fromString :: String -&gt; VerificationKey KesKey
+$cfromString :: String -&gt; VerificationKey KesKey
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">IsString</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">via</span><span> </span><span class="annot"><a href="Cardano.Api.SerialiseUsing.html#UsingRawBytesHex"><span class="hs-identifier hs-type">UsingRawBytesHex</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Key.html#VerificationKey"><span class="hs-identifier hs-type">VerificationKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-57"></span><span>      </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679368212"><span id="local-6989586621679368214"><span id="local-6989586621679368216"><span class="annot"><span class="annottext">Typeable (VerificationKey KesKey)
+Typeable (VerificationKey KesKey)
+-&gt; (VerificationKey KesKey -&gt; Encoding)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+    -&gt; Proxy (VerificationKey KesKey) -&gt; Size)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+    -&gt; Proxy [VerificationKey KesKey] -&gt; Size)
+-&gt; ToCBOR (VerificationKey KesKey)
+VerificationKey KesKey -&gt; Encoding
+(forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy [VerificationKey KesKey] -&gt; Size
+(forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy (VerificationKey KesKey) -&gt; Size
+forall a.
+Typeable a
+-&gt; (a -&gt; Encoding)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size) -&gt; Proxy a -&gt; Size)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size) -&gt; Proxy [a] -&gt; Size)
+-&gt; ToCBOR a
+encodedListSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy [VerificationKey KesKey] -&gt; Size
+$cencodedListSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy [VerificationKey KesKey] -&gt; Size
+encodedSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy (VerificationKey KesKey) -&gt; Size
+$cencodedSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy (VerificationKey KesKey) -&gt; Size
+toCBOR :: VerificationKey KesKey -&gt; Encoding
+$ctoCBOR :: VerificationKey KesKey -&gt; Encoding
+$cp1ToCBOR :: Typeable (VerificationKey KesKey)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">ToCBOR</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679368206"><span id="local-6989586621679368208"><span class="annot"><span class="annottext">Typeable (VerificationKey KesKey)
+Decoder s (VerificationKey KesKey)
+Typeable (VerificationKey KesKey)
+-&gt; (forall s. Decoder s (VerificationKey KesKey))
+-&gt; (Proxy (VerificationKey KesKey) -&gt; Text)
+-&gt; FromCBOR (VerificationKey KesKey)
+Proxy (VerificationKey KesKey) -&gt; Text
+forall s. Decoder s (VerificationKey KesKey)
+forall a.
+Typeable a
+-&gt; (forall s. Decoder s a) -&gt; (Proxy a -&gt; Text) -&gt; FromCBOR a
+label :: Proxy (VerificationKey KesKey) -&gt; Text
+$clabel :: Proxy (VerificationKey KesKey) -&gt; Text
+fromCBOR :: Decoder s (VerificationKey KesKey)
+$cfromCBOR :: forall s. Decoder s (VerificationKey KesKey)
+$cp1FromCBOR :: Typeable (VerificationKey KesKey)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var">FromCBOR</span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-58"></span><span>      </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">anyclass</span></span><span> </span><span id="local-6989586621679368200"><span id="local-6989586621679368202"><span class="annot"><span class="annottext">HasTypeProxy (VerificationKey KesKey)
+HasTypeProxy (VerificationKey KesKey)
+-&gt; (VerificationKey KesKey -&gt; ByteString)
+-&gt; (AsType (VerificationKey KesKey)
+    -&gt; ByteString -&gt; Either DecoderError (VerificationKey KesKey))
+-&gt; SerialiseAsCBOR (VerificationKey KesKey)
+AsType (VerificationKey KesKey)
+-&gt; ByteString -&gt; Either DecoderError (VerificationKey KesKey)
+VerificationKey KesKey -&gt; ByteString
+forall a.
+HasTypeProxy a
+-&gt; (a -&gt; ByteString)
+-&gt; (AsType a -&gt; ByteString -&gt; Either DecoderError a)
+-&gt; SerialiseAsCBOR a
+deserialiseFromCBOR :: AsType (VerificationKey KesKey)
+-&gt; ByteString -&gt; Either DecoderError (VerificationKey KesKey)
+$cdeserialiseFromCBOR :: AsType (VerificationKey KesKey)
+-&gt; ByteString -&gt; Either DecoderError (VerificationKey KesKey)
+serialiseToCBOR :: VerificationKey KesKey -&gt; ByteString
+$cserialiseToCBOR :: VerificationKey KesKey -&gt; ByteString
+$cp1SerialiseAsCBOR :: HasTypeProxy (VerificationKey KesKey)
+</span><a href="Cardano.Api.Any.html#C%3ASerialiseAsCBOR"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var">SerialiseAsCBOR</span></a></span></span></span><span>
+</span><span id="line-59"></span><span>
+</span><span id="line-60"></span><span>    </span><span class="hs-keyword">newtype</span><span> </span><span id="SigningKey"><span class="annot"><a href="Cardano.Api.Key.html#SigningKey"><span class="hs-identifier hs-var">SigningKey</span></a></span></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-61"></span><span>        </span><span id="KesSigningKey"><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesSigningKey"><span class="hs-identifier hs-var">KesSigningKey</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Shelley.SignKeyKES</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">StandardCrypto</span></span><span class="hs-special">)</span><span>
+</span><span id="line-62"></span><span>      </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679368192"><span id="local-6989586621679368194"><span id="local-6989586621679368196"><span class="annot"><span class="annottext">Int -&gt; SigningKey KesKey -&gt; ShowS
+[SigningKey KesKey] -&gt; ShowS
+SigningKey KesKey -&gt; String
+(Int -&gt; SigningKey KesKey -&gt; ShowS)
+-&gt; (SigningKey KesKey -&gt; String)
+-&gt; ([SigningKey KesKey] -&gt; ShowS)
+-&gt; Show (SigningKey KesKey)
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [SigningKey KesKey] -&gt; ShowS
+$cshowList :: [SigningKey KesKey] -&gt; ShowS
+show :: SigningKey KesKey -&gt; String
+$cshow :: SigningKey KesKey -&gt; String
+showsPrec :: Int -&gt; SigningKey KesKey -&gt; ShowS
+$cshowsPrec :: Int -&gt; SigningKey KesKey -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679368190"><span class="annot"><span class="annottext">String -&gt; SigningKey KesKey
+(String -&gt; SigningKey KesKey) -&gt; IsString (SigningKey KesKey)
+forall a. (String -&gt; a) -&gt; IsString a
+fromString :: String -&gt; SigningKey KesKey
+$cfromString :: String -&gt; SigningKey KesKey
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">IsString</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">via</span><span> </span><span class="annot"><a href="Cardano.Api.SerialiseUsing.html#UsingRawBytesHex"><span class="hs-identifier hs-type">UsingRawBytesHex</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Key.html#SigningKey"><span class="hs-identifier hs-type">SigningKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-63"></span><span>      </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679368183"><span id="local-6989586621679368185"><span id="local-6989586621679368187"><span class="annot"><span class="annottext">Typeable (SigningKey KesKey)
+Typeable (SigningKey KesKey)
+-&gt; (SigningKey KesKey -&gt; Encoding)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+    -&gt; Proxy (SigningKey KesKey) -&gt; Size)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+    -&gt; Proxy [SigningKey KesKey] -&gt; Size)
+-&gt; ToCBOR (SigningKey KesKey)
+SigningKey KesKey -&gt; Encoding
+(forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy [SigningKey KesKey] -&gt; Size
+(forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy (SigningKey KesKey) -&gt; Size
+forall a.
+Typeable a
+-&gt; (a -&gt; Encoding)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size) -&gt; Proxy a -&gt; Size)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size) -&gt; Proxy [a] -&gt; Size)
+-&gt; ToCBOR a
+encodedListSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy [SigningKey KesKey] -&gt; Size
+$cencodedListSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy [SigningKey KesKey] -&gt; Size
+encodedSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy (SigningKey KesKey) -&gt; Size
+$cencodedSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy (SigningKey KesKey) -&gt; Size
+toCBOR :: SigningKey KesKey -&gt; Encoding
+$ctoCBOR :: SigningKey KesKey -&gt; Encoding
+$cp1ToCBOR :: Typeable (SigningKey KesKey)
+</span><a href="#local-6989586621679368183"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">ToCBOR</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679368178"><span id="local-6989586621679368180"><span class="annot"><span class="annottext">Typeable (SigningKey KesKey)
+Decoder s (SigningKey KesKey)
+Typeable (SigningKey KesKey)
+-&gt; (forall s. Decoder s (SigningKey KesKey))
+-&gt; (Proxy (SigningKey KesKey) -&gt; Text)
+-&gt; FromCBOR (SigningKey KesKey)
+Proxy (SigningKey KesKey) -&gt; Text
+forall s. Decoder s (SigningKey KesKey)
+forall a.
+Typeable a
+-&gt; (forall s. Decoder s a) -&gt; (Proxy a -&gt; Text) -&gt; FromCBOR a
+label :: Proxy (SigningKey KesKey) -&gt; Text
+$clabel :: Proxy (SigningKey KesKey) -&gt; Text
+fromCBOR :: Decoder s (SigningKey KesKey)
+$cfromCBOR :: forall s. Decoder s (SigningKey KesKey)
+$cp1FromCBOR :: Typeable (SigningKey KesKey)
+</span><a href="#local-6989586621679368178"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var">FromCBOR</span></a></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-64"></span><span>      </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">anyclass</span></span><span> </span><span id="local-6989586621679368173"><span id="local-6989586621679368175"><span class="annot"><span class="annottext">HasTypeProxy (SigningKey KesKey)
+HasTypeProxy (SigningKey KesKey)
+-&gt; (SigningKey KesKey -&gt; ByteString)
+-&gt; (AsType (SigningKey KesKey)
+    -&gt; ByteString -&gt; Either DecoderError (SigningKey KesKey))
+-&gt; SerialiseAsCBOR (SigningKey KesKey)
+AsType (SigningKey KesKey)
+-&gt; ByteString -&gt; Either DecoderError (SigningKey KesKey)
+SigningKey KesKey -&gt; ByteString
+forall a.
+HasTypeProxy a
+-&gt; (a -&gt; ByteString)
+-&gt; (AsType a -&gt; ByteString -&gt; Either DecoderError a)
+-&gt; SerialiseAsCBOR a
+deserialiseFromCBOR :: AsType (SigningKey KesKey)
+-&gt; ByteString -&gt; Either DecoderError (SigningKey KesKey)
+$cdeserialiseFromCBOR :: AsType (SigningKey KesKey)
+-&gt; ByteString -&gt; Either DecoderError (SigningKey KesKey)
+serialiseToCBOR :: SigningKey KesKey -&gt; ByteString
+$cserialiseToCBOR :: SigningKey KesKey -&gt; ByteString
+$cp1SerialiseAsCBOR :: HasTypeProxy (SigningKey KesKey)
+</span><a href="#local-6989586621679368173"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var">SerialiseAsCBOR</span></a></span></span></span><span>
+</span><span id="line-65"></span><span>
+</span><span id="line-66"></span><span>    </span><span class="hs-comment">--This loses the mlock safety of the seed, since it starts from a normal in-memory seed.</span><span>
+</span><span id="line-67"></span><span>    </span><span class="annot"><a href="Cardano.Api.Key.html#deterministicSigningKey"><span class="hs-identifier hs-type">deterministicSigningKey</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Cardano.Api.Any.html#AsType"><span class="hs-identifier hs-type">AsType</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Crypto.Seed</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Cardano.Api.Key.html#SigningKey"><span class="hs-identifier hs-type">SigningKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span>
+</span><span id="line-68"></span><span>    </span><span id="local-6989586621679368171"><span class="annot"><span class="annottext">deterministicSigningKey :: AsType KesKey -&gt; Seed -&gt; SigningKey KesKey
+</span><a href="#local-6989586621679368171"><span class="hs-identifier hs-var hs-var hs-var hs-var">deterministicSigningKey</span></a></span></span><span> </span><span class="annot"><span class="annottext">AsType KesKey
+</span><a href="Cardano.Api.KeysPraos.html#AsKesKey"><span class="hs-identifier hs-var">AsKesKey</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-69"></span><span>        </span><span class="annot"><span class="annottext">SignKeyKES StandardCrypto -&gt; SigningKey KesKey
+SignKeyKES (Sum6KES Ed25519DSIGN Blake2b_256) -&gt; SigningKey KesKey
+</span><a href="Cardano.Api.KeysPraos.html#KesSigningKey"><span class="hs-identifier hs-var">KesSigningKey</span></a></span><span> </span><span class="annot"><span class="annottext">(SignKeyKES (Sum6KES Ed25519DSIGN Blake2b_256)
+ -&gt; SigningKey KesKey)
+-&gt; (Seed -&gt; SignKeyKES (Sum6KES Ed25519DSIGN Blake2b_256))
+-&gt; Seed
+-&gt; SigningKey KesKey
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Seed -&gt; SignKeyKES (Sum6KES Ed25519DSIGN Blake2b_256)
+forall v. KESAlgorithm v =&gt; Seed -&gt; SignKeyKES v
+</span><span class="hs-identifier hs-var">Crypto.genKeyKES</span></span><span>
+</span><span id="line-70"></span><span>
+</span><span id="line-71"></span><span>    </span><span class="annot"><a href="Cardano.Api.Key.html#deterministicSigningKeySeedSize"><span class="hs-identifier hs-type">deterministicSigningKeySeedSize</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Cardano.Api.Any.html#AsType"><span class="hs-identifier hs-type">AsType</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Word</span></a></span><span>
+</span><span id="line-72"></span><span>    </span><span id="local-6989586621679368167"><span class="annot"><span class="annottext">deterministicSigningKeySeedSize :: AsType KesKey -&gt; Word
+</span><a href="#local-6989586621679368167"><span class="hs-identifier hs-var hs-var hs-var hs-var">deterministicSigningKeySeedSize</span></a></span></span><span> </span><span class="annot"><span class="annottext">AsType KesKey
+</span><a href="Cardano.Api.KeysPraos.html#AsKesKey"><span class="hs-identifier hs-var">AsKesKey</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-73"></span><span>        </span><span class="annot"><span class="annottext">Proxy (Sum6KES Ed25519DSIGN Blake2b_256) -&gt; Word
+forall v (proxy :: * -&gt; *). KESAlgorithm v =&gt; proxy v -&gt; Word
+</span><span class="hs-identifier hs-var">Crypto.seedSizeKES</span></span><span> </span><span class="annot"><span class="annottext">Proxy (KES StandardCrypto)
+Proxy (Sum6KES Ed25519DSIGN Blake2b_256)
+</span><a href="#local-6989586621679368165"><span class="hs-identifier hs-var">proxy</span></a></span><span>
+</span><span id="line-74"></span><span>      </span><span class="hs-keyword">where</span><span>
+</span><span id="line-75"></span><span>        </span><span class="annot"><a href="#local-6989586621679368165"><span class="hs-identifier hs-type">proxy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Proxy</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Shelley.KES</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">StandardCrypto</span></span><span class="hs-special">)</span><span>
+</span><span id="line-76"></span><span>        </span><span id="local-6989586621679368165"><span class="annot"><span class="annottext">proxy :: Proxy (KES StandardCrypto)
+</span><a href="#local-6989586621679368165"><span class="hs-identifier hs-var hs-var">proxy</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Proxy (KES StandardCrypto)
+forall k (t :: k). Proxy t
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Proxy</span></a></span><span>
+</span><span id="line-77"></span><span>
+</span><span id="line-78"></span><span>    </span><span class="annot"><a href="Cardano.Api.Key.html#getVerificationKey"><span class="hs-identifier hs-type">getVerificationKey</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Cardano.Api.Key.html#SigningKey"><span class="hs-identifier hs-type">SigningKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Cardano.Api.Key.html#VerificationKey"><span class="hs-identifier hs-type">VerificationKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span>
+</span><span id="line-79"></span><span>    </span><span id="local-6989586621679368162"><span class="annot"><span class="annottext">getVerificationKey :: SigningKey KesKey -&gt; VerificationKey KesKey
+</span><a href="#local-6989586621679368162"><span class="hs-identifier hs-var hs-var hs-var hs-var">getVerificationKey</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesSigningKey"><span class="hs-identifier hs-type">KesSigningKey</span></a></span><span> </span><span id="local-6989586621679368161"><span class="annot"><a href="#local-6989586621679368161"><span class="hs-identifier hs-var">sk</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-80"></span><span>        </span><span class="annot"><span class="annottext">VerKeyKES StandardCrypto -&gt; VerificationKey KesKey
+</span><a href="Cardano.Api.KeysPraos.html#KesVerificationKey"><span class="hs-identifier hs-var">KesVerificationKey</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SignKeyKES (Sum6KES Ed25519DSIGN Blake2b_256)
+-&gt; VerKeyKES (Sum6KES Ed25519DSIGN Blake2b_256)
+forall v. KESAlgorithm v =&gt; SignKeyKES v -&gt; VerKeyKES v
+</span><span class="hs-identifier hs-var">Crypto.deriveVerKeyKES</span></span><span> </span><span class="annot"><span class="annottext">SignKeyKES StandardCrypto
+SignKeyKES (Sum6KES Ed25519DSIGN Blake2b_256)
+</span><a href="#local-6989586621679368161"><span class="hs-identifier hs-var">sk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-81"></span><span>
+</span><span id="line-82"></span><span>    </span><span class="annot"><a href="Cardano.Api.Key.html#verificationKeyHash"><span class="hs-identifier hs-type">verificationKeyHash</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Cardano.Api.Key.html#VerificationKey"><span class="hs-identifier hs-type">VerificationKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Cardano.Api.Any.html#Hash"><span class="hs-identifier hs-type">Hash</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span>
+</span><span id="line-83"></span><span>    </span><span id="local-6989586621679368158"><span class="annot"><span class="annottext">verificationKeyHash :: VerificationKey KesKey -&gt; Hash KesKey
+</span><a href="#local-6989586621679368158"><span class="hs-identifier hs-var hs-var hs-var hs-var">verificationKeyHash</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesVerificationKey"><span class="hs-identifier hs-type">KesVerificationKey</span></a></span><span> </span><span id="local-6989586621679368157"><span class="annot"><a href="#local-6989586621679368157"><span class="hs-identifier hs-var">vkey</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-84"></span><span>        </span><span class="annot"><span class="annottext">Hash StandardCrypto (VerKeyKES StandardCrypto) -&gt; Hash KesKey
+</span><a href="Cardano.Api.KeysPraos.html#KesKeyHash"><span class="hs-identifier hs-var">KesKeyHash</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">VerKeyKES (Sum6KES Ed25519DSIGN Blake2b_256)
+-&gt; Hash Blake2b_256 (VerKeyKES (Sum6KES Ed25519DSIGN Blake2b_256))
+forall v h.
+(KESAlgorithm v, HashAlgorithm h) =&gt;
+VerKeyKES v -&gt; Hash h (VerKeyKES v)
+</span><span class="hs-identifier hs-var">Crypto.hashVerKeyKES</span></span><span> </span><span class="annot"><span class="annottext">VerKeyKES StandardCrypto
+VerKeyKES (Sum6KES Ed25519DSIGN Blake2b_256)
+</span><a href="#local-6989586621679368157"><span class="hs-identifier hs-var">vkey</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-85"></span><span>
+</span><span id="line-86"></span><span>
+</span><span id="line-87"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Cardano.Api.Any.html#SerialiseAsRawBytes"><span class="hs-identifier hs-type">SerialiseAsRawBytes</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Key.html#VerificationKey"><span class="hs-identifier hs-type">VerificationKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-88"></span><span>    </span><span id="local-6989586621679368150"><span class="annot"><span class="annottext">serialiseToRawBytes :: VerificationKey KesKey -&gt; ByteString
+</span><a href="Cardano.Api.Any.html#serialiseToRawBytes"><span class="hs-identifier hs-var hs-var hs-var hs-var">serialiseToRawBytes</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesVerificationKey"><span class="hs-identifier hs-type">KesVerificationKey</span></a></span><span> </span><span id="local-6989586621679368148"><span class="annot"><a href="#local-6989586621679368148"><span class="hs-identifier hs-var">vk</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-89"></span><span>      </span><span class="annot"><span class="annottext">VerKeyKES (Sum6KES Ed25519DSIGN Blake2b_256) -&gt; ByteString
+forall v. KESAlgorithm v =&gt; VerKeyKES v -&gt; ByteString
+</span><span class="hs-identifier hs-var">Crypto.rawSerialiseVerKeyKES</span></span><span> </span><span class="annot"><span class="annottext">VerKeyKES StandardCrypto
+VerKeyKES (Sum6KES Ed25519DSIGN Blake2b_256)
+</span><a href="#local-6989586621679368148"><span class="hs-identifier hs-var">vk</span></a></span><span>
+</span><span id="line-90"></span><span>
+</span><span id="line-91"></span><span>    </span><span id="local-6989586621679368146"><span class="annot"><span class="annottext">deserialiseFromRawBytes :: AsType (VerificationKey KesKey)
+-&gt; ByteString -&gt; Maybe (VerificationKey KesKey)
+</span><a href="Cardano.Api.Any.html#deserialiseFromRawBytes"><span class="hs-identifier hs-var hs-var hs-var hs-var">deserialiseFromRawBytes</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Key.html#AsVerificationKey"><span class="hs-identifier hs-type">AsVerificationKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#AsKesKey"><span class="hs-identifier hs-type">AsKesKey</span></a></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679368143"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679368143"><span class="hs-identifier hs-var">bs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-92"></span><span>      </span><span class="annot"><span class="annottext">VerKeyKES StandardCrypto -&gt; VerificationKey KesKey
+VerKeyKES (Sum6KES Ed25519DSIGN Blake2b_256)
+-&gt; VerificationKey KesKey
+</span><a href="Cardano.Api.KeysPraos.html#KesVerificationKey"><span class="hs-identifier hs-var">KesVerificationKey</span></a></span><span> </span><span class="annot"><span class="annottext">(VerKeyKES (Sum6KES Ed25519DSIGN Blake2b_256)
+ -&gt; VerificationKey KesKey)
+-&gt; Maybe (VerKeyKES (Sum6KES Ed25519DSIGN Blake2b_256))
+-&gt; Maybe (VerificationKey KesKey)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span>
+</span><span id="line-93"></span><span>        </span><span class="annot"><span class="annottext">ByteString -&gt; Maybe (VerKeyKES (Sum6KES Ed25519DSIGN Blake2b_256))
+forall v. KESAlgorithm v =&gt; ByteString -&gt; Maybe (VerKeyKES v)
+</span><span class="hs-identifier hs-var">Crypto.rawDeserialiseVerKeyKES</span></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679368143"><span class="hs-identifier hs-var">bs</span></a></span><span>
+</span><span id="line-94"></span><span>
+</span><span id="line-95"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Cardano.Api.Any.html#SerialiseAsRawBytes"><span class="hs-identifier hs-type">SerialiseAsRawBytes</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Key.html#SigningKey"><span class="hs-identifier hs-type">SigningKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-96"></span><span>    </span><span id="local-6989586621679368137"><span class="annot"><span class="annottext">serialiseToRawBytes :: SigningKey KesKey -&gt; ByteString
+</span><a href="#local-6989586621679368137"><span class="hs-identifier hs-var hs-var hs-var hs-var">serialiseToRawBytes</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesSigningKey"><span class="hs-identifier hs-type">KesSigningKey</span></a></span><span> </span><span id="local-6989586621679368136"><span class="annot"><a href="#local-6989586621679368136"><span class="hs-identifier hs-var">sk</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-97"></span><span>      </span><span class="annot"><span class="annottext">SignKeyKES (Sum6KES Ed25519DSIGN Blake2b_256) -&gt; ByteString
+forall v. KESAlgorithm v =&gt; SignKeyKES v -&gt; ByteString
+</span><span class="hs-identifier hs-var">Crypto.rawSerialiseSignKeyKES</span></span><span> </span><span class="annot"><span class="annottext">SignKeyKES StandardCrypto
+SignKeyKES (Sum6KES Ed25519DSIGN Blake2b_256)
+</span><a href="#local-6989586621679368136"><span class="hs-identifier hs-var">sk</span></a></span><span>
+</span><span id="line-98"></span><span>
+</span><span id="line-99"></span><span>    </span><span id="local-6989586621679368134"><span class="annot"><span class="annottext">deserialiseFromRawBytes :: AsType (SigningKey KesKey)
+-&gt; ByteString -&gt; Maybe (SigningKey KesKey)
+</span><a href="#local-6989586621679368134"><span class="hs-identifier hs-var hs-var hs-var hs-var">deserialiseFromRawBytes</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Key.html#AsSigningKey"><span class="hs-identifier hs-type">AsSigningKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#AsKesKey"><span class="hs-identifier hs-type">AsKesKey</span></a></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679368132"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679368132"><span class="hs-identifier hs-var">bs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-100"></span><span>      </span><span class="annot"><span class="annottext">SignKeyKES StandardCrypto -&gt; SigningKey KesKey
+SignKeyKES (Sum6KES Ed25519DSIGN Blake2b_256) -&gt; SigningKey KesKey
+</span><a href="Cardano.Api.KeysPraos.html#KesSigningKey"><span class="hs-identifier hs-var">KesSigningKey</span></a></span><span> </span><span class="annot"><span class="annottext">(SignKeyKES (Sum6KES Ed25519DSIGN Blake2b_256)
+ -&gt; SigningKey KesKey)
+-&gt; Maybe (SignKeyKES (Sum6KES Ed25519DSIGN Blake2b_256))
+-&gt; Maybe (SigningKey KesKey)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; Maybe (SignKeyKES (Sum6KES Ed25519DSIGN Blake2b_256))
+forall v. KESAlgorithm v =&gt; ByteString -&gt; Maybe (SignKeyKES v)
+</span><span class="hs-identifier hs-var">Crypto.rawDeserialiseSignKeyKES</span></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679368132"><span class="hs-identifier hs-var">bs</span></a></span><span>
+</span><span id="line-101"></span><span>
+</span><span id="line-102"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Cardano.Api.Any.html#SerialiseAsBech32"><span class="hs-identifier hs-type">SerialiseAsBech32</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Key.html#VerificationKey"><span class="hs-identifier hs-type">VerificationKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-103"></span><span>    </span><span id="local-6989586621679368125"><span class="annot"><span class="annottext">bech32PrefixFor :: VerificationKey KesKey -&gt; Text
+</span><a href="Cardano.Api.Any.html#bech32PrefixFor"><span class="hs-identifier hs-var hs-var hs-var hs-var">bech32PrefixFor</span></a></span></span><span>         </span><span class="annot"><span class="annottext">VerificationKey KesKey
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span>  </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;kes_vk&quot;</span></span><span>
+</span><span id="line-104"></span><span>    </span><span id="local-6989586621679368123"><span class="annot"><span class="annottext">bech32PrefixesPermitted :: AsType (VerificationKey KesKey) -&gt; [Text]
+</span><a href="Cardano.Api.Any.html#bech32PrefixesPermitted"><span class="hs-identifier hs-var hs-var hs-var hs-var">bech32PrefixesPermitted</span></a></span></span><span> </span><span class="annot"><span class="annottext">AsType (VerificationKey KesKey)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;kes_vk&quot;</span></span><span class="hs-special">]</span><span>
+</span><span id="line-105"></span><span>
+</span><span id="line-106"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Cardano.Api.Any.html#SerialiseAsBech32"><span class="hs-identifier hs-type">SerialiseAsBech32</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Key.html#SigningKey"><span class="hs-identifier hs-type">SigningKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-107"></span><span>    </span><span id="local-6989586621679368117"><span class="annot"><span class="annottext">bech32PrefixFor :: SigningKey KesKey -&gt; Text
+</span><a href="#local-6989586621679368117"><span class="hs-identifier hs-var hs-var hs-var hs-var">bech32PrefixFor</span></a></span></span><span>         </span><span class="annot"><span class="annottext">SigningKey KesKey
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span>  </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;kes_sk&quot;</span></span><span>
+</span><span id="line-108"></span><span>    </span><span id="local-6989586621679368116"><span class="annot"><span class="annottext">bech32PrefixesPermitted :: AsType (SigningKey KesKey) -&gt; [Text]
+</span><a href="#local-6989586621679368116"><span class="hs-identifier hs-var hs-var hs-var hs-var">bech32PrefixesPermitted</span></a></span></span><span> </span><span class="annot"><span class="annottext">AsType (SigningKey KesKey)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;kes_sk&quot;</span></span><span class="hs-special">]</span><span>
+</span><span id="line-109"></span><span>
+</span><span id="line-110"></span><span>
+</span><span id="line-111"></span><span class="hs-keyword">newtype</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="Hash"><span class="annot"><a href="Cardano.Api.Any.html#Hash"><span class="hs-identifier hs-var">Hash</span></a></span></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-112"></span><span>    </span><span id="KesKeyHash"><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKeyHash"><span class="hs-identifier hs-var">KesKeyHash</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Shelley.Hash</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">StandardCrypto</span></span><span>
+</span><span id="line-113"></span><span>                             </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Shelley.VerKeyKES</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">StandardCrypto</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-114"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679368112"><span id="local-6989586621679368114"><span class="annot"><span class="annottext">Hash KesKey -&gt; Hash KesKey -&gt; Bool
+(Hash KesKey -&gt; Hash KesKey -&gt; Bool)
+-&gt; (Hash KesKey -&gt; Hash KesKey -&gt; Bool) -&gt; Eq (Hash KesKey)
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Hash KesKey -&gt; Hash KesKey -&gt; Bool
+$c/= :: Hash KesKey -&gt; Hash KesKey -&gt; Bool
+== :: Hash KesKey -&gt; Hash KesKey -&gt; Bool
+$c== :: Hash KesKey -&gt; Hash KesKey -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679368097"><span id="local-6989586621679368099"><span id="local-6989586621679368101"><span id="local-6989586621679368103"><span id="local-6989586621679368105"><span id="local-6989586621679368107"><span id="local-6989586621679368109"><span class="annot"><span class="annottext">Eq (Hash KesKey)
+Eq (Hash KesKey)
+-&gt; (Hash KesKey -&gt; Hash KesKey -&gt; Ordering)
+-&gt; (Hash KesKey -&gt; Hash KesKey -&gt; Bool)
+-&gt; (Hash KesKey -&gt; Hash KesKey -&gt; Bool)
+-&gt; (Hash KesKey -&gt; Hash KesKey -&gt; Bool)
+-&gt; (Hash KesKey -&gt; Hash KesKey -&gt; Bool)
+-&gt; (Hash KesKey -&gt; Hash KesKey -&gt; Hash KesKey)
+-&gt; (Hash KesKey -&gt; Hash KesKey -&gt; Hash KesKey)
+-&gt; Ord (Hash KesKey)
+Hash KesKey -&gt; Hash KesKey -&gt; Bool
+Hash KesKey -&gt; Hash KesKey -&gt; Ordering
+Hash KesKey -&gt; Hash KesKey -&gt; Hash KesKey
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: Hash KesKey -&gt; Hash KesKey -&gt; Hash KesKey
+$cmin :: Hash KesKey -&gt; Hash KesKey -&gt; Hash KesKey
+max :: Hash KesKey -&gt; Hash KesKey -&gt; Hash KesKey
+$cmax :: Hash KesKey -&gt; Hash KesKey -&gt; Hash KesKey
+&gt;= :: Hash KesKey -&gt; Hash KesKey -&gt; Bool
+$c&gt;= :: Hash KesKey -&gt; Hash KesKey -&gt; Bool
+&gt; :: Hash KesKey -&gt; Hash KesKey -&gt; Bool
+$c&gt; :: Hash KesKey -&gt; Hash KesKey -&gt; Bool
+&lt;= :: Hash KesKey -&gt; Hash KesKey -&gt; Bool
+$c&lt;= :: Hash KesKey -&gt; Hash KesKey -&gt; Bool
+&lt; :: Hash KesKey -&gt; Hash KesKey -&gt; Bool
+$c&lt; :: Hash KesKey -&gt; Hash KesKey -&gt; Bool
+compare :: Hash KesKey -&gt; Hash KesKey -&gt; Ordering
+$ccompare :: Hash KesKey -&gt; Hash KesKey -&gt; Ordering
+$cp1Ord :: Eq (Hash KesKey)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></a></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-115"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679368090"><span id="local-6989586621679368092"><span id="local-6989586621679368094"><span class="annot"><span class="annottext">Int -&gt; Hash KesKey -&gt; ShowS
+[Hash KesKey] -&gt; ShowS
+Hash KesKey -&gt; String
+(Int -&gt; Hash KesKey -&gt; ShowS)
+-&gt; (Hash KesKey -&gt; String)
+-&gt; ([Hash KesKey] -&gt; ShowS)
+-&gt; Show (Hash KesKey)
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Hash KesKey] -&gt; ShowS
+$cshowList :: [Hash KesKey] -&gt; ShowS
+show :: Hash KesKey -&gt; String
+$cshow :: Hash KesKey -&gt; String
+showsPrec :: Int -&gt; Hash KesKey -&gt; ShowS
+$cshowsPrec :: Int -&gt; Hash KesKey -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679368088"><span class="annot"><span class="annottext">String -&gt; Hash KesKey
+(String -&gt; Hash KesKey) -&gt; IsString (Hash KesKey)
+forall a. (String -&gt; a) -&gt; IsString a
+fromString :: String -&gt; Hash KesKey
+$cfromString :: String -&gt; Hash KesKey
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">IsString</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">via</span><span> </span><span class="annot"><a href="Cardano.Api.SerialiseUsing.html#UsingRawBytesHex"><span class="hs-identifier hs-type">UsingRawBytesHex</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Any.html#Hash"><span class="hs-identifier hs-type">Hash</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-116"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679368081"><span id="local-6989586621679368083"><span id="local-6989586621679368085"><span class="annot"><span class="annottext">Typeable (Hash KesKey)
+Typeable (Hash KesKey)
+-&gt; (Hash KesKey -&gt; Encoding)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+    -&gt; Proxy (Hash KesKey) -&gt; Size)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+    -&gt; Proxy [Hash KesKey] -&gt; Size)
+-&gt; ToCBOR (Hash KesKey)
+Hash KesKey -&gt; Encoding
+(forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy [Hash KesKey] -&gt; Size
+(forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy (Hash KesKey) -&gt; Size
+forall a.
+Typeable a
+-&gt; (a -&gt; Encoding)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size) -&gt; Proxy a -&gt; Size)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size) -&gt; Proxy [a] -&gt; Size)
+-&gt; ToCBOR a
+encodedListSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy [Hash KesKey] -&gt; Size
+$cencodedListSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy [Hash KesKey] -&gt; Size
+encodedSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy (Hash KesKey) -&gt; Size
+$cencodedSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy (Hash KesKey) -&gt; Size
+toCBOR :: Hash KesKey -&gt; Encoding
+$ctoCBOR :: Hash KesKey -&gt; Encoding
+$cp1ToCBOR :: Typeable (Hash KesKey)
+</span><a href="#local-6989586621679368081"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">ToCBOR</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679368076"><span id="local-6989586621679368078"><span class="annot"><span class="annottext">Typeable (Hash KesKey)
+Decoder s (Hash KesKey)
+Typeable (Hash KesKey)
+-&gt; (forall s. Decoder s (Hash KesKey))
+-&gt; (Proxy (Hash KesKey) -&gt; Text)
+-&gt; FromCBOR (Hash KesKey)
+Proxy (Hash KesKey) -&gt; Text
+forall s. Decoder s (Hash KesKey)
+forall a.
+Typeable a
+-&gt; (forall s. Decoder s a) -&gt; (Proxy a -&gt; Text) -&gt; FromCBOR a
+label :: Proxy (Hash KesKey) -&gt; Text
+$clabel :: Proxy (Hash KesKey) -&gt; Text
+fromCBOR :: Decoder s (Hash KesKey)
+$cfromCBOR :: forall s. Decoder s (Hash KesKey)
+$cp1FromCBOR :: Typeable (Hash KesKey)
+</span><a href="#local-6989586621679368076"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var">FromCBOR</span></a></span></span></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">via</span><span> </span><span class="annot"><a href="Cardano.Api.SerialiseUsing.html#UsingRawBytes"><span class="hs-identifier hs-type">UsingRawBytes</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Any.html#Hash"><span class="hs-identifier hs-type">Hash</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-117"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">anyclass</span></span><span> </span><span id="local-6989586621679368070"><span id="local-6989586621679368072"><span class="annot"><span class="annottext">HasTypeProxy (Hash KesKey)
+Hash KesKey -&gt; ByteString
+HasTypeProxy (Hash KesKey)
+-&gt; (Hash KesKey -&gt; ByteString)
+-&gt; (AsType (Hash KesKey)
+    -&gt; ByteString -&gt; Either DecoderError (Hash KesKey))
+-&gt; SerialiseAsCBOR (Hash KesKey)
+AsType (Hash KesKey)
+-&gt; ByteString -&gt; Either DecoderError (Hash KesKey)
+forall a.
+HasTypeProxy a
+-&gt; (a -&gt; ByteString)
+-&gt; (AsType a -&gt; ByteString -&gt; Either DecoderError a)
+-&gt; SerialiseAsCBOR a
+deserialiseFromCBOR :: AsType (Hash KesKey)
+-&gt; ByteString -&gt; Either DecoderError (Hash KesKey)
+$cdeserialiseFromCBOR :: AsType (Hash KesKey)
+-&gt; ByteString -&gt; Either DecoderError (Hash KesKey)
+serialiseToCBOR :: Hash KesKey -&gt; ByteString
+$cserialiseToCBOR :: Hash KesKey -&gt; ByteString
+$cp1SerialiseAsCBOR :: HasTypeProxy (Hash KesKey)
+</span><a href="#local-6989586621679368070"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var">SerialiseAsCBOR</span></a></span></span></span><span>
+</span><span id="line-118"></span><span>
+</span><span id="line-119"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Cardano.Api.Any.html#SerialiseAsRawBytes"><span class="hs-identifier hs-type">SerialiseAsRawBytes</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Any.html#Hash"><span class="hs-identifier hs-type">Hash</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-120"></span><span>    </span><span id="local-6989586621679368066"><span class="annot"><span class="annottext">serialiseToRawBytes :: Hash KesKey -&gt; ByteString
+</span><a href="#local-6989586621679368066"><span class="hs-identifier hs-var hs-var hs-var hs-var">serialiseToRawBytes</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKeyHash"><span class="hs-identifier hs-type">KesKeyHash</span></a></span><span> </span><span id="local-6989586621679368065"><span class="annot"><a href="#local-6989586621679368065"><span class="hs-identifier hs-var">vkh</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-121"></span><span>      </span><span class="annot"><span class="annottext">Hash Blake2b_256 (VerKeyKES (Sum6KES Ed25519DSIGN Blake2b_256))
+-&gt; ByteString
+forall h a. Hash h a -&gt; ByteString
+</span><span class="hs-identifier hs-var">Crypto.hashToBytes</span></span><span> </span><span class="annot"><span class="annottext">Hash StandardCrypto (VerKeyKES StandardCrypto)
+Hash Blake2b_256 (VerKeyKES (Sum6KES Ed25519DSIGN Blake2b_256))
+</span><a href="#local-6989586621679368065"><span class="hs-identifier hs-var">vkh</span></a></span><span>
+</span><span id="line-122"></span><span>
+</span><span id="line-123"></span><span>    </span><span id="local-6989586621679368063"><span class="annot"><span class="annottext">deserialiseFromRawBytes :: AsType (Hash KesKey) -&gt; ByteString -&gt; Maybe (Hash KesKey)
+</span><a href="#local-6989586621679368063"><span class="hs-identifier hs-var hs-var hs-var hs-var">deserialiseFromRawBytes</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Any.html#AsHash"><span class="hs-identifier hs-type">AsHash</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#AsKesKey"><span class="hs-identifier hs-type">AsKesKey</span></a></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679368061"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679368061"><span class="hs-identifier hs-var">bs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-124"></span><span>      </span><span class="annot"><span class="annottext">Hash StandardCrypto (VerKeyKES StandardCrypto) -&gt; Hash KesKey
+Hash Blake2b_256 (VerKeyKES (Sum6KES Ed25519DSIGN Blake2b_256))
+-&gt; Hash KesKey
+</span><a href="Cardano.Api.KeysPraos.html#KesKeyHash"><span class="hs-identifier hs-var">KesKeyHash</span></a></span><span> </span><span class="annot"><span class="annottext">(Hash Blake2b_256 (VerKeyKES (Sum6KES Ed25519DSIGN Blake2b_256))
+ -&gt; Hash KesKey)
+-&gt; Maybe
+     (Hash Blake2b_256 (VerKeyKES (Sum6KES Ed25519DSIGN Blake2b_256)))
+-&gt; Maybe (Hash KesKey)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
+-&gt; Maybe
+     (Hash Blake2b_256 (VerKeyKES (Sum6KES Ed25519DSIGN Blake2b_256)))
+forall h a. HashAlgorithm h =&gt; ByteString -&gt; Maybe (Hash h a)
+</span><span class="hs-identifier hs-var">Crypto.hashFromBytes</span></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679368061"><span class="hs-identifier hs-var">bs</span></a></span><span>
+</span><span id="line-125"></span><span>
+</span><span id="line-126"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679368056"><span class="annot"><a href="Cardano.Api.SerialiseTextEnvelope.html#HasTextEnvelope"><span class="hs-identifier hs-type">HasTextEnvelope</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Key.html#VerificationKey"><span class="hs-identifier hs-type">VerificationKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span class="hs-special">)</span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-127"></span><span>    </span><span id="local-6989586621679368054"><span class="annot"><span class="annottext">textEnvelopeType :: AsType (VerificationKey KesKey) -&gt; TextEnvelopeType
+</span><a href="Cardano.Api.SerialiseTextEnvelope.html#textEnvelopeType"><span class="hs-identifier hs-var hs-var hs-var hs-var">textEnvelopeType</span></a></span></span><span> </span><span class="annot"><span class="annottext">AsType (VerificationKey KesKey)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TextEnvelopeType
+</span><span class="hs-string">&quot;KesVerificationKey_&quot;</span></span><span>
+</span><span id="line-128"></span><span>                      </span><span class="annot"><span class="annottext">TextEnvelopeType -&gt; TextEnvelopeType -&gt; TextEnvelopeType
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; TextEnvelopeType
+forall a. IsString a =&gt; String -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fromString</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Proxy (Sum6KES Ed25519DSIGN Blake2b_256) -&gt; String
+forall v (proxy :: * -&gt; *). KESAlgorithm v =&gt; proxy v -&gt; String
+</span><span class="hs-identifier hs-var">Crypto.algorithmNameKES</span></span><span> </span><span class="annot"><span class="annottext">Proxy (KES StandardCrypto)
+Proxy (Sum6KES Ed25519DSIGN Blake2b_256)
+</span><a href="#local-6989586621679368051"><span class="hs-identifier hs-var">proxy</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-129"></span><span>      </span><span class="hs-keyword">where</span><span>
+</span><span id="line-130"></span><span>        </span><span class="annot"><a href="#local-6989586621679368051"><span class="hs-identifier hs-type">proxy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Proxy</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Shelley.KES</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">StandardCrypto</span></span><span class="hs-special">)</span><span>
+</span><span id="line-131"></span><span>        </span><span id="local-6989586621679368051"><span class="annot"><span class="annottext">proxy :: Proxy (KES StandardCrypto)
+</span><a href="#local-6989586621679368051"><span class="hs-identifier hs-var hs-var">proxy</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Proxy (KES StandardCrypto)
+forall k (t :: k). Proxy t
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Proxy</span></a></span><span>
+</span><span id="line-132"></span><span>
+</span><span id="line-133"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679368047"><span class="annot"><a href="Cardano.Api.SerialiseTextEnvelope.html#HasTextEnvelope"><span class="hs-identifier hs-type">HasTextEnvelope</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Key.html#SigningKey"><span class="hs-identifier hs-type">SigningKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#KesKey"><span class="hs-identifier hs-type">KesKey</span></a></span><span class="hs-special">)</span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-134"></span><span>    </span><span id="local-6989586621679368046"><span class="annot"><span class="annottext">textEnvelopeType :: AsType (SigningKey KesKey) -&gt; TextEnvelopeType
+</span><a href="#local-6989586621679368046"><span class="hs-identifier hs-var hs-var hs-var hs-var">textEnvelopeType</span></a></span></span><span> </span><span class="annot"><span class="annottext">AsType (SigningKey KesKey)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TextEnvelopeType
+</span><span class="hs-string">&quot;KesSigningKey_&quot;</span></span><span>
+</span><span id="line-135"></span><span>                      </span><span class="annot"><span class="annottext">TextEnvelopeType -&gt; TextEnvelopeType -&gt; TextEnvelopeType
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; TextEnvelopeType
+forall a. IsString a =&gt; String -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fromString</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Proxy (Sum6KES Ed25519DSIGN Blake2b_256) -&gt; String
+forall v (proxy :: * -&gt; *). KESAlgorithm v =&gt; proxy v -&gt; String
+</span><span class="hs-identifier hs-var">Crypto.algorithmNameKES</span></span><span> </span><span class="annot"><span class="annottext">Proxy (KES StandardCrypto)
+Proxy (Sum6KES Ed25519DSIGN Blake2b_256)
+</span><a href="#local-6989586621679368045"><span class="hs-identifier hs-var">proxy</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-136"></span><span>      </span><span class="hs-keyword">where</span><span>
+</span><span id="line-137"></span><span>        </span><span class="annot"><a href="#local-6989586621679368045"><span class="hs-identifier hs-type">proxy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Proxy</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Shelley.KES</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">StandardCrypto</span></span><span class="hs-special">)</span><span>
+</span><span id="line-138"></span><span>        </span><span id="local-6989586621679368045"><span class="annot"><span class="annottext">proxy :: Proxy (KES StandardCrypto)
+</span><a href="#local-6989586621679368045"><span class="hs-identifier hs-var hs-var">proxy</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Proxy (KES StandardCrypto)
+forall k (t :: k). Proxy t
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Proxy</span></a></span><span>
+</span><span id="line-139"></span><span>
+</span><span id="line-140"></span><span>
+</span><span id="line-141"></span><span class="hs-comment">--</span><span>
+</span><span id="line-142"></span><span class="hs-comment">-- VRF keys</span><span>
+</span><span id="line-143"></span><span class="hs-comment">--</span><span>
+</span><span id="line-144"></span><span>
+</span><span id="line-145"></span><span class="hs-keyword">data</span><span> </span><span id="VrfKey"><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-var">VrfKey</span></a></span></span><span>
+</span><span id="line-146"></span><span>
+</span><span id="line-147"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Cardano.Api.Any.html#HasTypeProxy"><span class="hs-identifier hs-type">HasTypeProxy</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-148"></span><span>    </span><span class="hs-keyword">data</span><span> </span><span id="AsType"><span class="annot"><a href="Cardano.Api.Any.html#AsType"><span class="hs-identifier hs-var">AsType</span></a></span></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="AsVrfKey"><span class="annot"><a href="Cardano.Api.KeysPraos.html#AsVrfKey"><span class="hs-identifier hs-var">AsVrfKey</span></a></span></span><span>
+</span><span id="line-149"></span><span>    </span><span id="local-6989586621679368042"><span class="annot"><span class="annottext">proxyToAsType :: Proxy VrfKey -&gt; AsType VrfKey
+</span><a href="#local-6989586621679368042"><span class="hs-identifier hs-var hs-var hs-var hs-var">proxyToAsType</span></a></span></span><span> </span><span class="annot"><span class="annottext">Proxy VrfKey
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AsType VrfKey
+</span><a href="Cardano.Api.KeysPraos.html#AsVrfKey"><span class="hs-identifier hs-var">AsVrfKey</span></a></span><span>
+</span><span id="line-150"></span><span>
+</span><span id="line-151"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Cardano.Api.Key.html#Key"><span class="hs-identifier hs-type">Key</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-152"></span><span>
+</span><span id="line-153"></span><span>    </span><span class="hs-keyword">newtype</span><span> </span><span id="VerificationKey"><span class="annot"><a href="Cardano.Api.Key.html#VerificationKey"><span class="hs-identifier hs-var">VerificationKey</span></a></span></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-154"></span><span>        </span><span id="VrfVerificationKey"><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfVerificationKey"><span class="hs-identifier hs-var">VrfVerificationKey</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Shelley.VerKeyVRF</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">StandardCrypto</span></span><span class="hs-special">)</span><span>
+</span><span id="line-155"></span><span>      </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679368028"><span id="local-6989586621679368030"><span class="annot"><span class="annottext">VerificationKey VrfKey -&gt; VerificationKey VrfKey -&gt; Bool
+(VerificationKey VrfKey -&gt; VerificationKey VrfKey -&gt; Bool)
+-&gt; (VerificationKey VrfKey -&gt; VerificationKey VrfKey -&gt; Bool)
+-&gt; Eq (VerificationKey VrfKey)
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: VerificationKey VrfKey -&gt; VerificationKey VrfKey -&gt; Bool
+$c/= :: VerificationKey VrfKey -&gt; VerificationKey VrfKey -&gt; Bool
+== :: VerificationKey VrfKey -&gt; VerificationKey VrfKey -&gt; Bool
+$c== :: VerificationKey VrfKey -&gt; VerificationKey VrfKey -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-156"></span><span>      </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679368022"><span id="local-6989586621679368024"><span id="local-6989586621679368026"><span class="annot"><span class="annottext">Int -&gt; VerificationKey VrfKey -&gt; ShowS
+[VerificationKey VrfKey] -&gt; ShowS
+VerificationKey VrfKey -&gt; String
+(Int -&gt; VerificationKey VrfKey -&gt; ShowS)
+-&gt; (VerificationKey VrfKey -&gt; String)
+-&gt; ([VerificationKey VrfKey] -&gt; ShowS)
+-&gt; Show (VerificationKey VrfKey)
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [VerificationKey VrfKey] -&gt; ShowS
+$cshowList :: [VerificationKey VrfKey] -&gt; ShowS
+show :: VerificationKey VrfKey -&gt; String
+$cshow :: VerificationKey VrfKey -&gt; String
+showsPrec :: Int -&gt; VerificationKey VrfKey -&gt; ShowS
+$cshowsPrec :: Int -&gt; VerificationKey VrfKey -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679368020"><span class="annot"><span class="annottext">String -&gt; VerificationKey VrfKey
+(String -&gt; VerificationKey VrfKey)
+-&gt; IsString (VerificationKey VrfKey)
+forall a. (String -&gt; a) -&gt; IsString a
+fromString :: String -&gt; VerificationKey VrfKey
+$cfromString :: String -&gt; VerificationKey VrfKey
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">IsString</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">via</span><span> </span><span class="annot"><a href="Cardano.Api.SerialiseUsing.html#UsingRawBytesHex"><span class="hs-identifier hs-type">UsingRawBytesHex</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Key.html#VerificationKey"><span class="hs-identifier hs-type">VerificationKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-157"></span><span>      </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679368013"><span id="local-6989586621679368015"><span id="local-6989586621679368017"><span class="annot"><span class="annottext">Typeable (VerificationKey VrfKey)
+Typeable (VerificationKey VrfKey)
+-&gt; (VerificationKey VrfKey -&gt; Encoding)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+    -&gt; Proxy (VerificationKey VrfKey) -&gt; Size)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+    -&gt; Proxy [VerificationKey VrfKey] -&gt; Size)
+-&gt; ToCBOR (VerificationKey VrfKey)
+VerificationKey VrfKey -&gt; Encoding
+(forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy [VerificationKey VrfKey] -&gt; Size
+(forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy (VerificationKey VrfKey) -&gt; Size
+forall a.
+Typeable a
+-&gt; (a -&gt; Encoding)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size) -&gt; Proxy a -&gt; Size)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size) -&gt; Proxy [a] -&gt; Size)
+-&gt; ToCBOR a
+encodedListSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy [VerificationKey VrfKey] -&gt; Size
+$cencodedListSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy [VerificationKey VrfKey] -&gt; Size
+encodedSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy (VerificationKey VrfKey) -&gt; Size
+$cencodedSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy (VerificationKey VrfKey) -&gt; Size
+toCBOR :: VerificationKey VrfKey -&gt; Encoding
+$ctoCBOR :: VerificationKey VrfKey -&gt; Encoding
+$cp1ToCBOR :: Typeable (VerificationKey VrfKey)
+</span><a href="#local-6989586621679368013"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">ToCBOR</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679368008"><span id="local-6989586621679368010"><span class="annot"><span class="annottext">Typeable (VerificationKey VrfKey)
+Decoder s (VerificationKey VrfKey)
+Typeable (VerificationKey VrfKey)
+-&gt; (forall s. Decoder s (VerificationKey VrfKey))
+-&gt; (Proxy (VerificationKey VrfKey) -&gt; Text)
+-&gt; FromCBOR (VerificationKey VrfKey)
+Proxy (VerificationKey VrfKey) -&gt; Text
+forall s. Decoder s (VerificationKey VrfKey)
+forall a.
+Typeable a
+-&gt; (forall s. Decoder s a) -&gt; (Proxy a -&gt; Text) -&gt; FromCBOR a
+label :: Proxy (VerificationKey VrfKey) -&gt; Text
+$clabel :: Proxy (VerificationKey VrfKey) -&gt; Text
+fromCBOR :: Decoder s (VerificationKey VrfKey)
+$cfromCBOR :: forall s. Decoder s (VerificationKey VrfKey)
+$cp1FromCBOR :: Typeable (VerificationKey VrfKey)
+</span><a href="#local-6989586621679368008"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var">FromCBOR</span></a></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-158"></span><span>      </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">anyclass</span></span><span> </span><span id="local-6989586621679368003"><span id="local-6989586621679368005"><span class="annot"><span class="annottext">HasTypeProxy (VerificationKey VrfKey)
+HasTypeProxy (VerificationKey VrfKey)
+-&gt; (VerificationKey VrfKey -&gt; ByteString)
+-&gt; (AsType (VerificationKey VrfKey)
+    -&gt; ByteString -&gt; Either DecoderError (VerificationKey VrfKey))
+-&gt; SerialiseAsCBOR (VerificationKey VrfKey)
+AsType (VerificationKey VrfKey)
+-&gt; ByteString -&gt; Either DecoderError (VerificationKey VrfKey)
+VerificationKey VrfKey -&gt; ByteString
+forall a.
+HasTypeProxy a
+-&gt; (a -&gt; ByteString)
+-&gt; (AsType a -&gt; ByteString -&gt; Either DecoderError a)
+-&gt; SerialiseAsCBOR a
+deserialiseFromCBOR :: AsType (VerificationKey VrfKey)
+-&gt; ByteString -&gt; Either DecoderError (VerificationKey VrfKey)
+$cdeserialiseFromCBOR :: AsType (VerificationKey VrfKey)
+-&gt; ByteString -&gt; Either DecoderError (VerificationKey VrfKey)
+serialiseToCBOR :: VerificationKey VrfKey -&gt; ByteString
+$cserialiseToCBOR :: VerificationKey VrfKey -&gt; ByteString
+$cp1SerialiseAsCBOR :: HasTypeProxy (VerificationKey VrfKey)
+</span><a href="#local-6989586621679368003"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var">SerialiseAsCBOR</span></a></span></span></span><span>
+</span><span id="line-159"></span><span>
+</span><span id="line-160"></span><span>    </span><span class="hs-keyword">newtype</span><span> </span><span id="SigningKey"><span class="annot"><a href="Cardano.Api.Key.html#SigningKey"><span class="hs-identifier hs-var">SigningKey</span></a></span></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-161"></span><span>        </span><span id="VrfSigningKey"><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfSigningKey"><span class="hs-identifier hs-var">VrfSigningKey</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Shelley.SignKeyVRF</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">StandardCrypto</span></span><span class="hs-special">)</span><span>
+</span><span id="line-162"></span><span>      </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679367996"><span id="local-6989586621679367998"><span id="local-6989586621679368000"><span class="annot"><span class="annottext">Int -&gt; SigningKey VrfKey -&gt; ShowS
+[SigningKey VrfKey] -&gt; ShowS
+SigningKey VrfKey -&gt; String
+(Int -&gt; SigningKey VrfKey -&gt; ShowS)
+-&gt; (SigningKey VrfKey -&gt; String)
+-&gt; ([SigningKey VrfKey] -&gt; ShowS)
+-&gt; Show (SigningKey VrfKey)
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [SigningKey VrfKey] -&gt; ShowS
+$cshowList :: [SigningKey VrfKey] -&gt; ShowS
+show :: SigningKey VrfKey -&gt; String
+$cshow :: SigningKey VrfKey -&gt; String
+showsPrec :: Int -&gt; SigningKey VrfKey -&gt; ShowS
+$cshowsPrec :: Int -&gt; SigningKey VrfKey -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679367994"><span class="annot"><span class="annottext">String -&gt; SigningKey VrfKey
+(String -&gt; SigningKey VrfKey) -&gt; IsString (SigningKey VrfKey)
+forall a. (String -&gt; a) -&gt; IsString a
+fromString :: String -&gt; SigningKey VrfKey
+$cfromString :: String -&gt; SigningKey VrfKey
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">IsString</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">via</span><span> </span><span class="annot"><a href="Cardano.Api.SerialiseUsing.html#UsingRawBytesHex"><span class="hs-identifier hs-type">UsingRawBytesHex</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Key.html#SigningKey"><span class="hs-identifier hs-type">SigningKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-163"></span><span>      </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679367987"><span id="local-6989586621679367989"><span id="local-6989586621679367991"><span class="annot"><span class="annottext">Typeable (SigningKey VrfKey)
+Typeable (SigningKey VrfKey)
+-&gt; (SigningKey VrfKey -&gt; Encoding)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+    -&gt; Proxy (SigningKey VrfKey) -&gt; Size)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+    -&gt; Proxy [SigningKey VrfKey] -&gt; Size)
+-&gt; ToCBOR (SigningKey VrfKey)
+SigningKey VrfKey -&gt; Encoding
+(forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy [SigningKey VrfKey] -&gt; Size
+(forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy (SigningKey VrfKey) -&gt; Size
+forall a.
+Typeable a
+-&gt; (a -&gt; Encoding)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size) -&gt; Proxy a -&gt; Size)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size) -&gt; Proxy [a] -&gt; Size)
+-&gt; ToCBOR a
+encodedListSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy [SigningKey VrfKey] -&gt; Size
+$cencodedListSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy [SigningKey VrfKey] -&gt; Size
+encodedSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy (SigningKey VrfKey) -&gt; Size
+$cencodedSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy (SigningKey VrfKey) -&gt; Size
+toCBOR :: SigningKey VrfKey -&gt; Encoding
+$ctoCBOR :: SigningKey VrfKey -&gt; Encoding
+$cp1ToCBOR :: Typeable (SigningKey VrfKey)
+</span><a href="#local-6989586621679367987"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">ToCBOR</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679367982"><span id="local-6989586621679367984"><span class="annot"><span class="annottext">Typeable (SigningKey VrfKey)
+Decoder s (SigningKey VrfKey)
+Typeable (SigningKey VrfKey)
+-&gt; (forall s. Decoder s (SigningKey VrfKey))
+-&gt; (Proxy (SigningKey VrfKey) -&gt; Text)
+-&gt; FromCBOR (SigningKey VrfKey)
+Proxy (SigningKey VrfKey) -&gt; Text
+forall s. Decoder s (SigningKey VrfKey)
+forall a.
+Typeable a
+-&gt; (forall s. Decoder s a) -&gt; (Proxy a -&gt; Text) -&gt; FromCBOR a
+label :: Proxy (SigningKey VrfKey) -&gt; Text
+$clabel :: Proxy (SigningKey VrfKey) -&gt; Text
+fromCBOR :: Decoder s (SigningKey VrfKey)
+$cfromCBOR :: forall s. Decoder s (SigningKey VrfKey)
+$cp1FromCBOR :: Typeable (SigningKey VrfKey)
+</span><a href="#local-6989586621679367982"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var">FromCBOR</span></a></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-164"></span><span>      </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">anyclass</span></span><span> </span><span id="local-6989586621679367977"><span id="local-6989586621679367979"><span class="annot"><span class="annottext">HasTypeProxy (SigningKey VrfKey)
+HasTypeProxy (SigningKey VrfKey)
+-&gt; (SigningKey VrfKey -&gt; ByteString)
+-&gt; (AsType (SigningKey VrfKey)
+    -&gt; ByteString -&gt; Either DecoderError (SigningKey VrfKey))
+-&gt; SerialiseAsCBOR (SigningKey VrfKey)
+AsType (SigningKey VrfKey)
+-&gt; ByteString -&gt; Either DecoderError (SigningKey VrfKey)
+SigningKey VrfKey -&gt; ByteString
+forall a.
+HasTypeProxy a
+-&gt; (a -&gt; ByteString)
+-&gt; (AsType a -&gt; ByteString -&gt; Either DecoderError a)
+-&gt; SerialiseAsCBOR a
+deserialiseFromCBOR :: AsType (SigningKey VrfKey)
+-&gt; ByteString -&gt; Either DecoderError (SigningKey VrfKey)
+$cdeserialiseFromCBOR :: AsType (SigningKey VrfKey)
+-&gt; ByteString -&gt; Either DecoderError (SigningKey VrfKey)
+serialiseToCBOR :: SigningKey VrfKey -&gt; ByteString
+$cserialiseToCBOR :: SigningKey VrfKey -&gt; ByteString
+$cp1SerialiseAsCBOR :: HasTypeProxy (SigningKey VrfKey)
+</span><a href="#local-6989586621679367977"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var">SerialiseAsCBOR</span></a></span></span></span><span>
+</span><span id="line-165"></span><span>
+</span><span id="line-166"></span><span>    </span><span class="annot"><a href="Cardano.Api.Key.html#deterministicSigningKey"><span class="hs-identifier hs-type">deterministicSigningKey</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Cardano.Api.Any.html#AsType"><span class="hs-identifier hs-type">AsType</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Crypto.Seed</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Cardano.Api.Key.html#SigningKey"><span class="hs-identifier hs-type">SigningKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span>
+</span><span id="line-167"></span><span>    </span><span id="local-6989586621679367976"><span class="annot"><span class="annottext">deterministicSigningKey :: AsType VrfKey -&gt; Seed -&gt; SigningKey VrfKey
+</span><a href="#local-6989586621679367976"><span class="hs-identifier hs-var hs-var hs-var hs-var">deterministicSigningKey</span></a></span></span><span> </span><span class="annot"><span class="annottext">AsType VrfKey
+</span><a href="Cardano.Api.KeysPraos.html#AsVrfKey"><span class="hs-identifier hs-var">AsVrfKey</span></a></span><span> </span><span id="local-6989586621679367975"><span class="annot"><span class="annottext">Seed
+</span><a href="#local-6989586621679367975"><span class="hs-identifier hs-var">seed</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-168"></span><span>        </span><span class="annot"><span class="annottext">SignKeyVRF StandardCrypto -&gt; SigningKey VrfKey
+</span><a href="Cardano.Api.KeysPraos.html#VrfSigningKey"><span class="hs-identifier hs-var">VrfSigningKey</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Seed -&gt; SignKeyVRF PraosVRF
+forall v. VRFAlgorithm v =&gt; Seed -&gt; SignKeyVRF v
+</span><span class="hs-identifier hs-var">Crypto.genKeyVRF</span></span><span> </span><span class="annot"><span class="annottext">Seed
+</span><a href="#local-6989586621679367975"><span class="hs-identifier hs-var">seed</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-169"></span><span>
+</span><span id="line-170"></span><span>    </span><span class="annot"><a href="Cardano.Api.Key.html#deterministicSigningKeySeedSize"><span class="hs-identifier hs-type">deterministicSigningKeySeedSize</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Cardano.Api.Any.html#AsType"><span class="hs-identifier hs-type">AsType</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Word</span></a></span><span>
+</span><span id="line-171"></span><span>    </span><span id="local-6989586621679367973"><span class="annot"><span class="annottext">deterministicSigningKeySeedSize :: AsType VrfKey -&gt; Word
+</span><a href="#local-6989586621679367973"><span class="hs-identifier hs-var hs-var hs-var hs-var">deterministicSigningKeySeedSize</span></a></span></span><span> </span><span class="annot"><span class="annottext">AsType VrfKey
+</span><a href="Cardano.Api.KeysPraos.html#AsVrfKey"><span class="hs-identifier hs-var">AsVrfKey</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-172"></span><span>        </span><span class="annot"><span class="annottext">Proxy PraosVRF -&gt; Word
+forall v (proxy :: * -&gt; *). VRFAlgorithm v =&gt; proxy v -&gt; Word
+</span><span class="hs-identifier hs-var">Crypto.seedSizeVRF</span></span><span> </span><span class="annot"><span class="annottext">Proxy (VRF StandardCrypto)
+Proxy PraosVRF
+</span><a href="#local-6989586621679367971"><span class="hs-identifier hs-var">proxy</span></a></span><span>
+</span><span id="line-173"></span><span>      </span><span class="hs-keyword">where</span><span>
+</span><span id="line-174"></span><span>        </span><span class="annot"><a href="#local-6989586621679367971"><span class="hs-identifier hs-type">proxy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Proxy</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Shelley.VRF</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">StandardCrypto</span></span><span class="hs-special">)</span><span>
+</span><span id="line-175"></span><span>        </span><span id="local-6989586621679367971"><span class="annot"><span class="annottext">proxy :: Proxy (VRF StandardCrypto)
+</span><a href="#local-6989586621679367971"><span class="hs-identifier hs-var hs-var">proxy</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Proxy (VRF StandardCrypto)
+forall k (t :: k). Proxy t
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Proxy</span></a></span><span>
+</span><span id="line-176"></span><span>
+</span><span id="line-177"></span><span>    </span><span class="annot"><a href="Cardano.Api.Key.html#getVerificationKey"><span class="hs-identifier hs-type">getVerificationKey</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Cardano.Api.Key.html#SigningKey"><span class="hs-identifier hs-type">SigningKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Cardano.Api.Key.html#VerificationKey"><span class="hs-identifier hs-type">VerificationKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span>
+</span><span id="line-178"></span><span>    </span><span id="local-6989586621679367970"><span class="annot"><span class="annottext">getVerificationKey :: SigningKey VrfKey -&gt; VerificationKey VrfKey
+</span><a href="#local-6989586621679367970"><span class="hs-identifier hs-var hs-var hs-var hs-var">getVerificationKey</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfSigningKey"><span class="hs-identifier hs-type">VrfSigningKey</span></a></span><span> </span><span id="local-6989586621679367969"><span class="annot"><a href="#local-6989586621679367969"><span class="hs-identifier hs-var">sk</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-179"></span><span>        </span><span class="annot"><span class="annottext">VerKeyVRF StandardCrypto -&gt; VerificationKey VrfKey
+</span><a href="Cardano.Api.KeysPraos.html#VrfVerificationKey"><span class="hs-identifier hs-var">VrfVerificationKey</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SignKeyVRF PraosVRF -&gt; VerKeyVRF PraosVRF
+forall v. VRFAlgorithm v =&gt; SignKeyVRF v -&gt; VerKeyVRF v
+</span><span class="hs-identifier hs-var">Crypto.deriveVerKeyVRF</span></span><span> </span><span class="annot"><span class="annottext">SignKeyVRF StandardCrypto
+SignKeyVRF PraosVRF
+</span><a href="#local-6989586621679367969"><span class="hs-identifier hs-var">sk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-180"></span><span>
+</span><span id="line-181"></span><span>    </span><span class="annot"><a href="Cardano.Api.Key.html#verificationKeyHash"><span class="hs-identifier hs-type">verificationKeyHash</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Cardano.Api.Key.html#VerificationKey"><span class="hs-identifier hs-type">VerificationKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Cardano.Api.Any.html#Hash"><span class="hs-identifier hs-type">Hash</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span>
+</span><span id="line-182"></span><span>    </span><span id="local-6989586621679367967"><span class="annot"><span class="annottext">verificationKeyHash :: VerificationKey VrfKey -&gt; Hash VrfKey
+</span><a href="#local-6989586621679367967"><span class="hs-identifier hs-var hs-var hs-var hs-var">verificationKeyHash</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfVerificationKey"><span class="hs-identifier hs-type">VrfVerificationKey</span></a></span><span> </span><span id="local-6989586621679367966"><span class="annot"><a href="#local-6989586621679367966"><span class="hs-identifier hs-var">vkey</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-183"></span><span>        </span><span class="annot"><span class="annottext">Hash StandardCrypto (VerKeyVRF StandardCrypto) -&gt; Hash VrfKey
+</span><a href="Cardano.Api.KeysPraos.html#VrfKeyHash"><span class="hs-identifier hs-var">VrfKeyHash</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">VerKeyVRF PraosVRF -&gt; Hash Blake2b_256 (VerKeyVRF PraosVRF)
+forall v h.
+(VRFAlgorithm v, HashAlgorithm h) =&gt;
+VerKeyVRF v -&gt; Hash h (VerKeyVRF v)
+</span><span class="hs-identifier hs-var">Shelley.hashVerKeyVRF</span></span><span> </span><span class="annot"><span class="annottext">VerKeyVRF StandardCrypto
+VerKeyVRF PraosVRF
+</span><a href="#local-6989586621679367966"><span class="hs-identifier hs-var">vkey</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-184"></span><span>
+</span><span id="line-185"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Cardano.Api.Any.html#SerialiseAsRawBytes"><span class="hs-identifier hs-type">SerialiseAsRawBytes</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Key.html#VerificationKey"><span class="hs-identifier hs-type">VerificationKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-186"></span><span>    </span><span id="local-6989586621679367960"><span class="annot"><span class="annottext">serialiseToRawBytes :: VerificationKey VrfKey -&gt; ByteString
+</span><a href="#local-6989586621679367960"><span class="hs-identifier hs-var hs-var hs-var hs-var">serialiseToRawBytes</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfVerificationKey"><span class="hs-identifier hs-type">VrfVerificationKey</span></a></span><span> </span><span id="local-6989586621679367959"><span class="annot"><a href="#local-6989586621679367959"><span class="hs-identifier hs-var">vk</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-187"></span><span>      </span><span class="annot"><span class="annottext">VerKeyVRF PraosVRF -&gt; ByteString
+forall v. VRFAlgorithm v =&gt; VerKeyVRF v -&gt; ByteString
+</span><span class="hs-identifier hs-var">Crypto.rawSerialiseVerKeyVRF</span></span><span> </span><span class="annot"><span class="annottext">VerKeyVRF StandardCrypto
+VerKeyVRF PraosVRF
+</span><a href="#local-6989586621679367959"><span class="hs-identifier hs-var">vk</span></a></span><span>
+</span><span id="line-188"></span><span>
+</span><span id="line-189"></span><span>    </span><span id="local-6989586621679367957"><span class="annot"><span class="annottext">deserialiseFromRawBytes :: AsType (VerificationKey VrfKey)
+-&gt; ByteString -&gt; Maybe (VerificationKey VrfKey)
+</span><a href="#local-6989586621679367957"><span class="hs-identifier hs-var hs-var hs-var hs-var">deserialiseFromRawBytes</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Key.html#AsVerificationKey"><span class="hs-identifier hs-type">AsVerificationKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#AsVrfKey"><span class="hs-identifier hs-type">AsVrfKey</span></a></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679367956"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679367956"><span class="hs-identifier hs-var">bs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-190"></span><span>      </span><span class="annot"><span class="annottext">VerKeyVRF StandardCrypto -&gt; VerificationKey VrfKey
+VerKeyVRF PraosVRF -&gt; VerificationKey VrfKey
+</span><a href="Cardano.Api.KeysPraos.html#VrfVerificationKey"><span class="hs-identifier hs-var">VrfVerificationKey</span></a></span><span> </span><span class="annot"><span class="annottext">(VerKeyVRF PraosVRF -&gt; VerificationKey VrfKey)
+-&gt; Maybe (VerKeyVRF PraosVRF) -&gt; Maybe (VerificationKey VrfKey)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; Maybe (VerKeyVRF PraosVRF)
+forall v. VRFAlgorithm v =&gt; ByteString -&gt; Maybe (VerKeyVRF v)
+</span><span class="hs-identifier hs-var">Crypto.rawDeserialiseVerKeyVRF</span></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679367956"><span class="hs-identifier hs-var">bs</span></a></span><span>
+</span><span id="line-191"></span><span>
+</span><span id="line-192"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Cardano.Api.Any.html#SerialiseAsRawBytes"><span class="hs-identifier hs-type">SerialiseAsRawBytes</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Key.html#SigningKey"><span class="hs-identifier hs-type">SigningKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-193"></span><span>    </span><span id="local-6989586621679367951"><span class="annot"><span class="annottext">serialiseToRawBytes :: SigningKey VrfKey -&gt; ByteString
+</span><a href="#local-6989586621679367951"><span class="hs-identifier hs-var hs-var hs-var hs-var">serialiseToRawBytes</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfSigningKey"><span class="hs-identifier hs-type">VrfSigningKey</span></a></span><span> </span><span id="local-6989586621679367950"><span class="annot"><a href="#local-6989586621679367950"><span class="hs-identifier hs-var">sk</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-194"></span><span>      </span><span class="annot"><span class="annottext">SignKeyVRF PraosVRF -&gt; ByteString
+forall v. VRFAlgorithm v =&gt; SignKeyVRF v -&gt; ByteString
+</span><span class="hs-identifier hs-var">Crypto.rawSerialiseSignKeyVRF</span></span><span> </span><span class="annot"><span class="annottext">SignKeyVRF StandardCrypto
+SignKeyVRF PraosVRF
+</span><a href="#local-6989586621679367950"><span class="hs-identifier hs-var">sk</span></a></span><span>
+</span><span id="line-195"></span><span>
+</span><span id="line-196"></span><span>    </span><span id="local-6989586621679367948"><span class="annot"><span class="annottext">deserialiseFromRawBytes :: AsType (SigningKey VrfKey)
+-&gt; ByteString -&gt; Maybe (SigningKey VrfKey)
+</span><a href="#local-6989586621679367948"><span class="hs-identifier hs-var hs-var hs-var hs-var">deserialiseFromRawBytes</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Key.html#AsSigningKey"><span class="hs-identifier hs-type">AsSigningKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#AsVrfKey"><span class="hs-identifier hs-type">AsVrfKey</span></a></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679367947"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679367947"><span class="hs-identifier hs-var">bs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-197"></span><span>      </span><span class="annot"><span class="annottext">SignKeyVRF StandardCrypto -&gt; SigningKey VrfKey
+SignKeyVRF PraosVRF -&gt; SigningKey VrfKey
+</span><a href="Cardano.Api.KeysPraos.html#VrfSigningKey"><span class="hs-identifier hs-var">VrfSigningKey</span></a></span><span> </span><span class="annot"><span class="annottext">(SignKeyVRF PraosVRF -&gt; SigningKey VrfKey)
+-&gt; Maybe (SignKeyVRF PraosVRF) -&gt; Maybe (SigningKey VrfKey)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; Maybe (SignKeyVRF PraosVRF)
+forall v. VRFAlgorithm v =&gt; ByteString -&gt; Maybe (SignKeyVRF v)
+</span><span class="hs-identifier hs-var">Crypto.rawDeserialiseSignKeyVRF</span></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679367947"><span class="hs-identifier hs-var">bs</span></a></span><span>
+</span><span id="line-198"></span><span>
+</span><span id="line-199"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Cardano.Api.Any.html#SerialiseAsBech32"><span class="hs-identifier hs-type">SerialiseAsBech32</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Key.html#VerificationKey"><span class="hs-identifier hs-type">VerificationKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-200"></span><span>    </span><span id="local-6989586621679367941"><span class="annot"><span class="annottext">bech32PrefixFor :: VerificationKey VrfKey -&gt; Text
+</span><a href="#local-6989586621679367941"><span class="hs-identifier hs-var hs-var hs-var hs-var">bech32PrefixFor</span></a></span></span><span>         </span><span class="annot"><span class="annottext">VerificationKey VrfKey
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span>  </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;vrf_vk&quot;</span></span><span>
+</span><span id="line-201"></span><span>    </span><span id="local-6989586621679367940"><span class="annot"><span class="annottext">bech32PrefixesPermitted :: AsType (VerificationKey VrfKey) -&gt; [Text]
+</span><a href="#local-6989586621679367940"><span class="hs-identifier hs-var hs-var hs-var hs-var">bech32PrefixesPermitted</span></a></span></span><span> </span><span class="annot"><span class="annottext">AsType (VerificationKey VrfKey)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;vrf_vk&quot;</span></span><span class="hs-special">]</span><span>
+</span><span id="line-202"></span><span>
+</span><span id="line-203"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Cardano.Api.Any.html#SerialiseAsBech32"><span class="hs-identifier hs-type">SerialiseAsBech32</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Key.html#SigningKey"><span class="hs-identifier hs-type">SigningKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-204"></span><span>    </span><span id="local-6989586621679367935"><span class="annot"><span class="annottext">bech32PrefixFor :: SigningKey VrfKey -&gt; Text
+</span><a href="#local-6989586621679367935"><span class="hs-identifier hs-var hs-var hs-var hs-var">bech32PrefixFor</span></a></span></span><span>         </span><span class="annot"><span class="annottext">SigningKey VrfKey
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span>  </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;vrf_sk&quot;</span></span><span>
+</span><span id="line-205"></span><span>    </span><span id="local-6989586621679367934"><span class="annot"><span class="annottext">bech32PrefixesPermitted :: AsType (SigningKey VrfKey) -&gt; [Text]
+</span><a href="#local-6989586621679367934"><span class="hs-identifier hs-var hs-var hs-var hs-var">bech32PrefixesPermitted</span></a></span></span><span> </span><span class="annot"><span class="annottext">AsType (SigningKey VrfKey)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;vrf_sk&quot;</span></span><span class="hs-special">]</span><span>
+</span><span id="line-206"></span><span>
+</span><span id="line-207"></span><span class="hs-keyword">newtype</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="Hash"><span class="annot"><a href="Cardano.Api.Any.html#Hash"><span class="hs-identifier hs-var">Hash</span></a></span></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-208"></span><span>    </span><span id="VrfKeyHash"><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKeyHash"><span class="hs-identifier hs-var">VrfKeyHash</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Shelley.Hash</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">StandardCrypto</span></span><span>
+</span><span id="line-209"></span><span>                             </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Shelley.VerKeyVRF</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">StandardCrypto</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-210"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679367930"><span id="local-6989586621679367932"><span class="annot"><span class="annottext">Hash VrfKey -&gt; Hash VrfKey -&gt; Bool
+(Hash VrfKey -&gt; Hash VrfKey -&gt; Bool)
+-&gt; (Hash VrfKey -&gt; Hash VrfKey -&gt; Bool) -&gt; Eq (Hash VrfKey)
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Hash VrfKey -&gt; Hash VrfKey -&gt; Bool
+$c/= :: Hash VrfKey -&gt; Hash VrfKey -&gt; Bool
+== :: Hash VrfKey -&gt; Hash VrfKey -&gt; Bool
+$c== :: Hash VrfKey -&gt; Hash VrfKey -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679367915"><span id="local-6989586621679367917"><span id="local-6989586621679367919"><span id="local-6989586621679367921"><span id="local-6989586621679367923"><span id="local-6989586621679367925"><span id="local-6989586621679367927"><span class="annot"><span class="annottext">Eq (Hash VrfKey)
+Eq (Hash VrfKey)
+-&gt; (Hash VrfKey -&gt; Hash VrfKey -&gt; Ordering)
+-&gt; (Hash VrfKey -&gt; Hash VrfKey -&gt; Bool)
+-&gt; (Hash VrfKey -&gt; Hash VrfKey -&gt; Bool)
+-&gt; (Hash VrfKey -&gt; Hash VrfKey -&gt; Bool)
+-&gt; (Hash VrfKey -&gt; Hash VrfKey -&gt; Bool)
+-&gt; (Hash VrfKey -&gt; Hash VrfKey -&gt; Hash VrfKey)
+-&gt; (Hash VrfKey -&gt; Hash VrfKey -&gt; Hash VrfKey)
+-&gt; Ord (Hash VrfKey)
+Hash VrfKey -&gt; Hash VrfKey -&gt; Bool
+Hash VrfKey -&gt; Hash VrfKey -&gt; Ordering
+Hash VrfKey -&gt; Hash VrfKey -&gt; Hash VrfKey
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: Hash VrfKey -&gt; Hash VrfKey -&gt; Hash VrfKey
+$cmin :: Hash VrfKey -&gt; Hash VrfKey -&gt; Hash VrfKey
+max :: Hash VrfKey -&gt; Hash VrfKey -&gt; Hash VrfKey
+$cmax :: Hash VrfKey -&gt; Hash VrfKey -&gt; Hash VrfKey
+&gt;= :: Hash VrfKey -&gt; Hash VrfKey -&gt; Bool
+$c&gt;= :: Hash VrfKey -&gt; Hash VrfKey -&gt; Bool
+&gt; :: Hash VrfKey -&gt; Hash VrfKey -&gt; Bool
+$c&gt; :: Hash VrfKey -&gt; Hash VrfKey -&gt; Bool
+&lt;= :: Hash VrfKey -&gt; Hash VrfKey -&gt; Bool
+$c&lt;= :: Hash VrfKey -&gt; Hash VrfKey -&gt; Bool
+&lt; :: Hash VrfKey -&gt; Hash VrfKey -&gt; Bool
+$c&lt; :: Hash VrfKey -&gt; Hash VrfKey -&gt; Bool
+compare :: Hash VrfKey -&gt; Hash VrfKey -&gt; Ordering
+$ccompare :: Hash VrfKey -&gt; Hash VrfKey -&gt; Ordering
+$cp1Ord :: Eq (Hash VrfKey)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></a></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-211"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679367909"><span id="local-6989586621679367911"><span id="local-6989586621679367913"><span class="annot"><span class="annottext">Int -&gt; Hash VrfKey -&gt; ShowS
+[Hash VrfKey] -&gt; ShowS
+Hash VrfKey -&gt; String
+(Int -&gt; Hash VrfKey -&gt; ShowS)
+-&gt; (Hash VrfKey -&gt; String)
+-&gt; ([Hash VrfKey] -&gt; ShowS)
+-&gt; Show (Hash VrfKey)
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Hash VrfKey] -&gt; ShowS
+$cshowList :: [Hash VrfKey] -&gt; ShowS
+show :: Hash VrfKey -&gt; String
+$cshow :: Hash VrfKey -&gt; String
+showsPrec :: Int -&gt; Hash VrfKey -&gt; ShowS
+$cshowsPrec :: Int -&gt; Hash VrfKey -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679367907"><span class="annot"><span class="annottext">String -&gt; Hash VrfKey
+(String -&gt; Hash VrfKey) -&gt; IsString (Hash VrfKey)
+forall a. (String -&gt; a) -&gt; IsString a
+fromString :: String -&gt; Hash VrfKey
+$cfromString :: String -&gt; Hash VrfKey
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">IsString</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">via</span><span> </span><span class="annot"><a href="Cardano.Api.SerialiseUsing.html#UsingRawBytesHex"><span class="hs-identifier hs-type">UsingRawBytesHex</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Any.html#Hash"><span class="hs-identifier hs-type">Hash</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-212"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679367900"><span id="local-6989586621679367902"><span id="local-6989586621679367904"><span class="annot"><span class="annottext">Typeable (Hash VrfKey)
+Typeable (Hash VrfKey)
+-&gt; (Hash VrfKey -&gt; Encoding)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+    -&gt; Proxy (Hash VrfKey) -&gt; Size)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+    -&gt; Proxy [Hash VrfKey] -&gt; Size)
+-&gt; ToCBOR (Hash VrfKey)
+Hash VrfKey -&gt; Encoding
+(forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy [Hash VrfKey] -&gt; Size
+(forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy (Hash VrfKey) -&gt; Size
+forall a.
+Typeable a
+-&gt; (a -&gt; Encoding)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size) -&gt; Proxy a -&gt; Size)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size) -&gt; Proxy [a] -&gt; Size)
+-&gt; ToCBOR a
+encodedListSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy [Hash VrfKey] -&gt; Size
+$cencodedListSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy [Hash VrfKey] -&gt; Size
+encodedSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy (Hash VrfKey) -&gt; Size
+$cencodedSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+-&gt; Proxy (Hash VrfKey) -&gt; Size
+toCBOR :: Hash VrfKey -&gt; Encoding
+$ctoCBOR :: Hash VrfKey -&gt; Encoding
+$cp1ToCBOR :: Typeable (Hash VrfKey)
+</span><a href="#local-6989586621679367900"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">ToCBOR</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679367895"><span id="local-6989586621679367897"><span class="annot"><span class="annottext">Typeable (Hash VrfKey)
+Decoder s (Hash VrfKey)
+Typeable (Hash VrfKey)
+-&gt; (forall s. Decoder s (Hash VrfKey))
+-&gt; (Proxy (Hash VrfKey) -&gt; Text)
+-&gt; FromCBOR (Hash VrfKey)
+Proxy (Hash VrfKey) -&gt; Text
+forall s. Decoder s (Hash VrfKey)
+forall a.
+Typeable a
+-&gt; (forall s. Decoder s a) -&gt; (Proxy a -&gt; Text) -&gt; FromCBOR a
+label :: Proxy (Hash VrfKey) -&gt; Text
+$clabel :: Proxy (Hash VrfKey) -&gt; Text
+fromCBOR :: Decoder s (Hash VrfKey)
+$cfromCBOR :: forall s. Decoder s (Hash VrfKey)
+$cp1FromCBOR :: Typeable (Hash VrfKey)
+</span><a href="#local-6989586621679367895"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var">FromCBOR</span></a></span></span></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">via</span><span> </span><span class="annot"><a href="Cardano.Api.SerialiseUsing.html#UsingRawBytes"><span class="hs-identifier hs-type">UsingRawBytes</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Any.html#Hash"><span class="hs-identifier hs-type">Hash</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-213"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">anyclass</span></span><span> </span><span id="local-6989586621679367890"><span id="local-6989586621679367892"><span class="annot"><span class="annottext">HasTypeProxy (Hash VrfKey)
+Hash VrfKey -&gt; ByteString
+HasTypeProxy (Hash VrfKey)
+-&gt; (Hash VrfKey -&gt; ByteString)
+-&gt; (AsType (Hash VrfKey)
+    -&gt; ByteString -&gt; Either DecoderError (Hash VrfKey))
+-&gt; SerialiseAsCBOR (Hash VrfKey)
+AsType (Hash VrfKey)
+-&gt; ByteString -&gt; Either DecoderError (Hash VrfKey)
+forall a.
+HasTypeProxy a
+-&gt; (a -&gt; ByteString)
+-&gt; (AsType a -&gt; ByteString -&gt; Either DecoderError a)
+-&gt; SerialiseAsCBOR a
+deserialiseFromCBOR :: AsType (Hash VrfKey)
+-&gt; ByteString -&gt; Either DecoderError (Hash VrfKey)
+$cdeserialiseFromCBOR :: AsType (Hash VrfKey)
+-&gt; ByteString -&gt; Either DecoderError (Hash VrfKey)
+serialiseToCBOR :: Hash VrfKey -&gt; ByteString
+$cserialiseToCBOR :: Hash VrfKey -&gt; ByteString
+$cp1SerialiseAsCBOR :: HasTypeProxy (Hash VrfKey)
+</span><a href="#local-6989586621679367890"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var">SerialiseAsCBOR</span></a></span></span></span><span>
+</span><span id="line-214"></span><span>
+</span><span id="line-215"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Cardano.Api.Any.html#SerialiseAsRawBytes"><span class="hs-identifier hs-type">SerialiseAsRawBytes</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Any.html#Hash"><span class="hs-identifier hs-type">Hash</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-216"></span><span>    </span><span id="local-6989586621679367886"><span class="annot"><span class="annottext">serialiseToRawBytes :: Hash VrfKey -&gt; ByteString
+</span><a href="#local-6989586621679367886"><span class="hs-identifier hs-var hs-var hs-var hs-var">serialiseToRawBytes</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKeyHash"><span class="hs-identifier hs-type">VrfKeyHash</span></a></span><span> </span><span id="local-6989586621679367885"><span class="annot"><a href="#local-6989586621679367885"><span class="hs-identifier hs-var">vkh</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-217"></span><span>      </span><span class="annot"><span class="annottext">Hash Blake2b_256 (VerKeyVRF PraosVRF) -&gt; ByteString
+forall h a. Hash h a -&gt; ByteString
+</span><span class="hs-identifier hs-var">Crypto.hashToBytes</span></span><span> </span><span class="annot"><span class="annottext">Hash StandardCrypto (VerKeyVRF StandardCrypto)
+Hash Blake2b_256 (VerKeyVRF PraosVRF)
+</span><a href="#local-6989586621679367885"><span class="hs-identifier hs-var">vkh</span></a></span><span>
+</span><span id="line-218"></span><span>
+</span><span id="line-219"></span><span>    </span><span id="local-6989586621679367884"><span class="annot"><span class="annottext">deserialiseFromRawBytes :: AsType (Hash VrfKey) -&gt; ByteString -&gt; Maybe (Hash VrfKey)
+</span><a href="#local-6989586621679367884"><span class="hs-identifier hs-var hs-var hs-var hs-var">deserialiseFromRawBytes</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Any.html#AsHash"><span class="hs-identifier hs-type">AsHash</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#AsVrfKey"><span class="hs-identifier hs-type">AsVrfKey</span></a></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679367883"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679367883"><span class="hs-identifier hs-var">bs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-220"></span><span>      </span><span class="annot"><span class="annottext">Hash StandardCrypto (VerKeyVRF StandardCrypto) -&gt; Hash VrfKey
+Hash Blake2b_256 (VerKeyVRF PraosVRF) -&gt; Hash VrfKey
+</span><a href="Cardano.Api.KeysPraos.html#VrfKeyHash"><span class="hs-identifier hs-var">VrfKeyHash</span></a></span><span> </span><span class="annot"><span class="annottext">(Hash Blake2b_256 (VerKeyVRF PraosVRF) -&gt; Hash VrfKey)
+-&gt; Maybe (Hash Blake2b_256 (VerKeyVRF PraosVRF))
+-&gt; Maybe (Hash VrfKey)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; Maybe (Hash Blake2b_256 (VerKeyVRF PraosVRF))
+forall h a. HashAlgorithm h =&gt; ByteString -&gt; Maybe (Hash h a)
+</span><span class="hs-identifier hs-var">Crypto.hashFromBytes</span></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679367883"><span class="hs-identifier hs-var">bs</span></a></span><span>
+</span><span id="line-221"></span><span>
+</span><span id="line-222"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679367879"><span class="annot"><a href="Cardano.Api.SerialiseTextEnvelope.html#HasTextEnvelope"><span class="hs-identifier hs-type">HasTextEnvelope</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Key.html#VerificationKey"><span class="hs-identifier hs-type">VerificationKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span class="hs-special">)</span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-223"></span><span>    </span><span id="local-6989586621679367878"><span class="annot"><span class="annottext">textEnvelopeType :: AsType (VerificationKey VrfKey) -&gt; TextEnvelopeType
+</span><a href="#local-6989586621679367878"><span class="hs-identifier hs-var hs-var hs-var hs-var">textEnvelopeType</span></a></span></span><span> </span><span class="annot"><span class="annottext">AsType (VerificationKey VrfKey)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TextEnvelopeType
+</span><span class="hs-string">&quot;VrfVerificationKey_&quot;</span></span><span> </span><span class="annot"><span class="annottext">TextEnvelopeType -&gt; TextEnvelopeType -&gt; TextEnvelopeType
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; TextEnvelopeType
+forall a. IsString a =&gt; String -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fromString</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Proxy PraosVRF -&gt; String
+forall v (proxy :: * -&gt; *). VRFAlgorithm v =&gt; proxy v -&gt; String
+</span><span class="hs-identifier hs-var">Crypto.algorithmNameVRF</span></span><span> </span><span class="annot"><span class="annottext">Proxy (VRF StandardCrypto)
+Proxy PraosVRF
+</span><a href="#local-6989586621679367876"><span class="hs-identifier hs-var">proxy</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-224"></span><span>      </span><span class="hs-keyword">where</span><span>
+</span><span id="line-225"></span><span>        </span><span class="annot"><a href="#local-6989586621679367876"><span class="hs-identifier hs-type">proxy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Proxy</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Shelley.VRF</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">StandardCrypto</span></span><span class="hs-special">)</span><span>
+</span><span id="line-226"></span><span>        </span><span id="local-6989586621679367876"><span class="annot"><span class="annottext">proxy :: Proxy (VRF StandardCrypto)
+</span><a href="#local-6989586621679367876"><span class="hs-identifier hs-var hs-var">proxy</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Proxy (VRF StandardCrypto)
+forall k (t :: k). Proxy t
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Proxy</span></a></span><span>
+</span><span id="line-227"></span><span>
+</span><span id="line-228"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679367872"><span class="annot"><a href="Cardano.Api.SerialiseTextEnvelope.html#HasTextEnvelope"><span class="hs-identifier hs-type">HasTextEnvelope</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Key.html#SigningKey"><span class="hs-identifier hs-type">SigningKey</span></a></span><span> </span><span class="annot"><a href="Cardano.Api.KeysPraos.html#VrfKey"><span class="hs-identifier hs-type">VrfKey</span></a></span><span class="hs-special">)</span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-229"></span><span>    </span><span id="local-6989586621679367871"><span class="annot"><span class="annottext">textEnvelopeType :: AsType (SigningKey VrfKey) -&gt; TextEnvelopeType
+</span><a href="#local-6989586621679367871"><span class="hs-identifier hs-var hs-var hs-var hs-var">textEnvelopeType</span></a></span></span><span> </span><span class="annot"><span class="annottext">AsType (SigningKey VrfKey)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TextEnvelopeType
+</span><span class="hs-string">&quot;VrfSigningKey_&quot;</span></span><span> </span><span class="annot"><span class="annottext">TextEnvelopeType -&gt; TextEnvelopeType -&gt; TextEnvelopeType
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; TextEnvelopeType
+forall a. IsString a =&gt; String -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fromString</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Proxy PraosVRF -&gt; String
+forall v (proxy :: * -&gt; *). VRFAlgorithm v =&gt; proxy v -&gt; String
+</span><span class="hs-identifier hs-var">Crypto.algorithmNameVRF</span></span><span> </span><span class="annot"><span class="annottext">Proxy (VRF StandardCrypto)
+Proxy PraosVRF
+</span><a href="#local-6989586621679367870"><span class="hs-identifier hs-var">proxy</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-230"></span><span>      </span><span class="hs-keyword">where</span><span>
+</span><span id="line-231"></span><span>        </span><span class="annot"><a href="#local-6989586621679367870"><span class="hs-identifier hs-type">proxy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Proxy</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Shelley.VRF</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">StandardCrypto</span></span><span class="hs-special">)</span><span>
+</span><span id="line-232"></span><span>        </span><span id="local-6989586621679367870"><span class="annot"><span class="annottext">proxy :: Proxy (VRF StandardCrypto)
+</span><a href="#local-6989586621679367870"><span class="hs-identifier hs-var hs-var">proxy</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Proxy (VRF StandardCrypto)
+forall k (t :: k). Proxy t
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Proxy</span></a></span><span>
+</span><span id="line-233"></span><span>
+</span><span id="line-234"></span></pre></body></html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE GADTs                 #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE MultiParamTypeClasses #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE NamedFieldPuns        #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables   #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE TypeApplications      #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# OPTIONS_GHC -Wno-orphans #-}</span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Consensus.Protocol.Praos.Translate</span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Crypto.DSIGN</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">VerKeyDSIGN</span></span><span class="hs-special">)</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Crypto.VRF</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">VerKeyVRF</span></span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Chain</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
+</span><span id="line-13"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Crypto</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">ADDRHASH</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">HASH</span></span><span class="hs-special">)</span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.PoolDistr</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Protocol.TPraos.API</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Protocol.TPraos.Rules.Prtcl</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Protocol.TPraos.Rules.Tickn</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Coerce</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier">coerce</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier">Data.Map.Strict</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Map</span></span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.html"><span class="hs-identifier">Ouroboros.Consensus.Protocol.Praos</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">ConsensusConfig</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-21"></span><span>                     </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.html#Praos"><span class="hs-identifier">Praos</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.html#PraosParams"><span class="hs-identifier">PraosParams</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.html#PraosState"><span class="hs-identifier">PraosState</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-22"></span><span>                     </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ticked</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.html#TickedPraosLedgerView"><span class="hs-identifier">TickedPraosLedgerView</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Views.html"><span class="hs-identifier">Ouroboros.Consensus.Protocol.Praos.Views</span></a></span><span>
+</span><span id="line-24"></span><span>                     </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Views.html#LedgerView"><span class="hs-identifier">LedgerView</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Views.html#lvMaxBodySize"><span class="hs-identifier">lvMaxBodySize</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Views.html#lvMaxHeaderSize"><span class="hs-identifier">lvMaxHeaderSize</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Views.html#lvProtocolVersion"><span class="hs-identifier">lvProtocolVersion</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Views.html"><span class="hs-identifier">Ouroboros.Consensus.Protocol.Praos.Views</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Views</span></span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.TPraos.html"><span class="hs-identifier">Ouroboros.Consensus.Protocol.TPraos</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.TPraos.html#TPraos"><span class="hs-identifier">TPraos</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.TPraos.html#TPraosParams"><span class="hs-identifier">TPraosParams</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-27"></span><span>                     </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.TPraos.html#TPraosState"><span class="hs-identifier">TPraosState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.TPraos.html#tpraosStateChainDepState"><span class="hs-identifier">tpraosStateChainDepState</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.TPraos.html#tpraosStateLastSlot"><span class="hs-identifier">tpraosStateLastSlot</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.TPraos.html"><span class="hs-identifier">Ouroboros.Consensus.Protocol.TPraos</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">TPraos</span></span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Translate.html"><span class="hs-identifier">Ouroboros.Consensus.Protocol.Translate</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Translate.html#TranslateProto"><span class="hs-identifier">TranslateProto</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span>
+</span><span id="line-31"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+  Translation from transitional Praos
+-------------------------------------------------------------------------------}</span><span>
+</span><span id="line-34"></span><span>
+</span><span id="line-35"></span><span class="hs-comment">-- | We can translate between TPraos and Praos, provided:</span><span>
+</span><span id="line-36"></span><span class="hs-comment">--</span><span>
+</span><span id="line-37"></span><span class="hs-comment">-- - They share the same HASH algorithm</span><span>
+</span><span id="line-38"></span><span class="hs-comment">-- - They share the same ADDRHASH algorithm</span><span>
+</span><span id="line-39"></span><span class="hs-comment">-- - They share the same DSIGN verification keys</span><span>
+</span><span id="line-40"></span><span class="hs-comment">-- - They share the same VRF verification keys</span><span>
+</span><span id="line-41"></span><span id="local-6989586621679278327"><span id="local-6989586621679278328"><span class="hs-keyword">instance</span><span>
+</span><span id="line-42"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HASH</span></span><span> </span><span class="annot"><a href="#local-6989586621679278328"><span class="hs-identifier hs-type">c1</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">~</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">HASH</span></span><span> </span><span class="annot"><a href="#local-6989586621679278327"><span class="hs-identifier hs-type">c2</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-43"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">ADDRHASH</span></span><span> </span><span class="annot"><a href="#local-6989586621679278328"><span class="hs-identifier hs-type">c1</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">~</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">ADDRHASH</span></span><span> </span><span class="annot"><a href="#local-6989586621679278327"><span class="hs-identifier hs-type">c2</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-44"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">VerKeyDSIGN</span></span><span> </span><span class="annot"><a href="#local-6989586621679278328"><span class="hs-identifier hs-type">c1</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">~</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">VerKeyDSIGN</span></span><span> </span><span class="annot"><a href="#local-6989586621679278327"><span class="hs-identifier hs-type">c2</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-45"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">VerKeyVRF</span></span><span> </span><span class="annot"><a href="#local-6989586621679278328"><span class="hs-identifier hs-type">c1</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">~</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">VerKeyVRF</span></span><span> </span><span class="annot"><a href="#local-6989586621679278327"><span class="hs-identifier hs-type">c2</span></a></span><span>
+</span><span id="line-46"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-47"></span><span>  </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Translate.html#TranslateProto"><span class="hs-identifier hs-type">TranslateProto</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.TPraos.html#TPraos"><span class="hs-identifier hs-type">TPraos</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679278328"><span class="hs-identifier hs-type">c1</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.html#Praos"><span class="hs-identifier hs-type">Praos</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679278327"><span class="hs-identifier hs-type">c2</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-48"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-49"></span><span>  </span><span id="local-6989586621679278322"><span class="annot"><span class="annottext">translateConsensusConfig :: ConsensusConfig (TPraos c1) -&gt; ConsensusConfig (Praos c2)
+</span><a href="Ouroboros.Consensus.Protocol.Translate.html#translateConsensusConfig"><span class="hs-identifier hs-var hs-var hs-var hs-var">translateConsensusConfig</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.TPraos.html#TPraosConfig"><span class="hs-identifier hs-type">TPraosConfig</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679278319"><span class="annot"><a href="Ouroboros.Consensus.Protocol.TPraos.html#tpraosParams"><span class="hs-identifier hs-var hs-var">tpraosParams</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679278317"><span class="annot"><a href="Ouroboros.Consensus.Protocol.TPraos.html#tpraosEpochInfo"><span class="hs-identifier hs-var hs-var">tpraosEpochInfo</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-50"></span><span>    </span><span class="annot"><span class="annottext">PraosConfig :: forall c.
+PraosParams
+-&gt; EpochInfo (Except PastHorizonException)
+-&gt; ConsensusConfig (Praos c)
+</span><a href="Ouroboros.Consensus.Protocol.Praos.html#PraosConfig"><span class="hs-identifier hs-type">PraosConfig</span></a></span><span>
+</span><span id="line-51"></span><span>      </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">praosParams :: PraosParams
+</span><a href="#local-6989586621679278314"><span class="hs-identifier hs-var">praosParams</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-52"></span><span>          </span><span class="annot"><span class="annottext">PraosParams :: Word64
+-&gt; ActiveSlotCoeff
+-&gt; SecurityParam
+-&gt; Word64
+-&gt; Word64
+-&gt; MaxMajorProtVer
+-&gt; Word64
+-&gt; Network
+-&gt; SystemStart
+-&gt; PraosParams
+</span><a href="Ouroboros.Consensus.Protocol.Praos.html#PraosParams"><span class="hs-identifier hs-type">PraosParams</span></a></span><span>
+</span><span id="line-53"></span><span>            </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">praosSlotsPerKESPeriod :: Word64
+</span><a href="#local-6989586621679278312"><span class="hs-identifier hs-var">praosSlotsPerKESPeriod</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TPraosParams -&gt; Word64
+</span><a href="Ouroboros.Consensus.Protocol.TPraos.html#tpraosSlotsPerKESPeriod"><span class="hs-identifier hs-var hs-var">tpraosSlotsPerKESPeriod</span></a></span><span> </span><span class="annot"><span class="annottext">TPraosParams
+</span><a href="#local-6989586621679278319"><span class="hs-identifier hs-var">tpraosParams</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-54"></span><span>              </span><span class="annot"><span class="annottext">praosLeaderF :: ActiveSlotCoeff
+</span><a href="#local-6989586621679278310"><span class="hs-identifier hs-var">praosLeaderF</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TPraosParams -&gt; ActiveSlotCoeff
+</span><a href="Ouroboros.Consensus.Protocol.TPraos.html#tpraosLeaderF"><span class="hs-identifier hs-var hs-var">tpraosLeaderF</span></a></span><span> </span><span class="annot"><span class="annottext">TPraosParams
+</span><a href="#local-6989586621679278319"><span class="hs-identifier hs-var">tpraosParams</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-55"></span><span>              </span><span class="annot"><span class="annottext">praosSecurityParam :: SecurityParam
+</span><a href="#local-6989586621679278308"><span class="hs-identifier hs-var">praosSecurityParam</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TPraosParams -&gt; SecurityParam
+</span><a href="Ouroboros.Consensus.Protocol.TPraos.html#tpraosSecurityParam"><span class="hs-identifier hs-var hs-var">tpraosSecurityParam</span></a></span><span> </span><span class="annot"><span class="annottext">TPraosParams
+</span><a href="#local-6989586621679278319"><span class="hs-identifier hs-var">tpraosParams</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-56"></span><span>              </span><span class="annot"><span class="annottext">praosMaxKESEvo :: Word64
+</span><a href="#local-6989586621679278306"><span class="hs-identifier hs-var">praosMaxKESEvo</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TPraosParams -&gt; Word64
+</span><a href="Ouroboros.Consensus.Protocol.TPraos.html#tpraosMaxKESEvo"><span class="hs-identifier hs-var hs-var">tpraosMaxKESEvo</span></a></span><span> </span><span class="annot"><span class="annottext">TPraosParams
+</span><a href="#local-6989586621679278319"><span class="hs-identifier hs-var">tpraosParams</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-57"></span><span>              </span><span class="annot"><span class="annottext">praosQuorum :: Word64
+</span><a href="#local-6989586621679278304"><span class="hs-identifier hs-var">praosQuorum</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TPraosParams -&gt; Word64
+</span><a href="Ouroboros.Consensus.Protocol.TPraos.html#tpraosQuorum"><span class="hs-identifier hs-var hs-var">tpraosQuorum</span></a></span><span> </span><span class="annot"><span class="annottext">TPraosParams
+</span><a href="#local-6989586621679278319"><span class="hs-identifier hs-var">tpraosParams</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-58"></span><span>              </span><span class="annot"><span class="annottext">praosMaxMajorPV :: MaxMajorProtVer
+</span><a href="#local-6989586621679278302"><span class="hs-identifier hs-var">praosMaxMajorPV</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TPraosParams -&gt; MaxMajorProtVer
+</span><a href="Ouroboros.Consensus.Protocol.TPraos.html#tpraosMaxMajorPV"><span class="hs-identifier hs-var hs-var">tpraosMaxMajorPV</span></a></span><span> </span><span class="annot"><span class="annottext">TPraosParams
+</span><a href="#local-6989586621679278319"><span class="hs-identifier hs-var">tpraosParams</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-59"></span><span>              </span><span class="annot"><span class="annottext">praosMaxLovelaceSupply :: Word64
+</span><a href="#local-6989586621679278300"><span class="hs-identifier hs-var">praosMaxLovelaceSupply</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TPraosParams -&gt; Word64
+</span><a href="Ouroboros.Consensus.Protocol.TPraos.html#tpraosMaxLovelaceSupply"><span class="hs-identifier hs-var hs-var">tpraosMaxLovelaceSupply</span></a></span><span> </span><span class="annot"><span class="annottext">TPraosParams
+</span><a href="#local-6989586621679278319"><span class="hs-identifier hs-var">tpraosParams</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-60"></span><span>              </span><span class="annot"><span class="annottext">praosNetworkId :: Network
+</span><a href="#local-6989586621679278298"><span class="hs-identifier hs-var">praosNetworkId</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TPraosParams -&gt; Network
+</span><a href="Ouroboros.Consensus.Protocol.TPraos.html#tpraosNetworkId"><span class="hs-identifier hs-var hs-var">tpraosNetworkId</span></a></span><span> </span><span class="annot"><span class="annottext">TPraosParams
+</span><a href="#local-6989586621679278319"><span class="hs-identifier hs-var">tpraosParams</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-61"></span><span>              </span><span class="annot"><span class="annottext">praosSystemStart :: SystemStart
+</span><a href="#local-6989586621679278296"><span class="hs-identifier hs-var">praosSystemStart</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TPraosParams -&gt; SystemStart
+</span><a href="Ouroboros.Consensus.Protocol.TPraos.html#tpraosSystemStart"><span class="hs-identifier hs-var hs-var">tpraosSystemStart</span></a></span><span> </span><span class="annot"><span class="annottext">TPraosParams
+</span><a href="#local-6989586621679278319"><span class="hs-identifier hs-var">tpraosParams</span></a></span><span>
+</span><span id="line-62"></span><span>            </span><span class="hs-special">}</span><span class="hs-special">,</span><span>
+</span><span id="line-63"></span><span>        </span><span class="annot"><span class="annottext">praosEpochInfo :: EpochInfo (Except PastHorizonException)
+</span><a href="#local-6989586621679278294"><span class="hs-identifier hs-var">praosEpochInfo</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">EpochInfo (Except PastHorizonException)
+</span><a href="#local-6989586621679278317"><span class="hs-identifier hs-var">tpraosEpochInfo</span></a></span><span>
+</span><span id="line-64"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-65"></span><span>
+</span><span id="line-66"></span><span>  </span><span id="local-6989586621679278293"><span class="annot"><span class="annottext">translateTickedLedgerView :: Ticked (LedgerView (TPraos c1)) -&gt; Ticked (LedgerView (Praos c2))
+</span><a href="Ouroboros.Consensus.Protocol.Translate.html#translateTickedLedgerView"><span class="hs-identifier hs-var hs-var hs-var hs-var">translateTickedLedgerView</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.TPraos.html#TickedPraosLedgerView"><span class="hs-identifier hs-type">TPraos.TickedPraosLedgerView</span></a></span><span> </span><span id="local-6989586621679278290"><span class="annot"><a href="#local-6989586621679278290"><span class="hs-identifier hs-var">lv</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-67"></span><span>      </span><span class="annot"><span class="annottext">LedgerView c2 -&gt; Ticked (LedgerView c2)
+forall c. LedgerView c -&gt; Ticked (LedgerView c)
+</span><a href="Ouroboros.Consensus.Protocol.Praos.html#TickedPraosLedgerView"><span class="hs-identifier hs-var">TickedPraosLedgerView</span></a></span><span> </span><span class="annot"><span class="annottext">(LedgerView c2 -&gt; Ticked (LedgerView c2))
+-&gt; LedgerView c2 -&gt; Ticked (LedgerView c2)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerView c1 -&gt; LedgerView c2
+</span><a href="#local-6989586621679278289"><span class="hs-identifier hs-var">translateLedgerView</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerView c1
+</span><a href="#local-6989586621679278290"><span class="hs-identifier hs-var">lv</span></a></span><span>
+</span><span id="line-68"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-69"></span><span>      </span><span id="local-6989586621679278289"><span class="annot"><span class="annottext">translateLedgerView :: LedgerView c1 -&gt; LedgerView c2
+</span><a href="#local-6989586621679278289"><span class="hs-identifier hs-var hs-var">translateLedgerView</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.LedgerView</span></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679278287"><span class="annot"><span class="annottext">PoolDistr c1
+lvPoolDistr :: forall crypto. LedgerView crypto -&gt; PoolDistr crypto
+lvPoolDistr :: PoolDistr c1
+</span><span class="hs-identifier hs-var hs-var">SL.lvPoolDistr</span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679278285"><span class="annot"><span class="annottext">ChainChecksPParams
+lvChainChecks :: forall crypto. LedgerView crypto -&gt; ChainChecksPParams
+lvChainChecks :: ChainChecksPParams
+</span><span class="hs-identifier hs-var hs-var">SL.lvChainChecks</span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-70"></span><span>        </span><span class="annot"><span class="annottext">LedgerView :: forall crypto.
+PoolDistr crypto
+-&gt; Natural -&gt; Natural -&gt; ProtVer -&gt; LedgerView crypto
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Views.html#LedgerView"><span class="hs-identifier hs-type">Views.LedgerView</span></a></span><span>
+</span><span id="line-71"></span><span>          </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">lvPoolDistr :: PoolDistr c2
+</span><a href="#local-6989586621679278282"><span class="hs-identifier hs-var">Views.lvPoolDistr</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PoolDistr c1 -&gt; PoolDistr c2
+</span><a href="#local-6989586621679278281"><span class="hs-identifier hs-var">coercePoolDistr</span></a></span><span> </span><span class="annot"><span class="annottext">PoolDistr c1
+</span><a href="#local-6989586621679278287"><span class="hs-identifier hs-var">lvPoolDistr</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-72"></span><span>            </span><span class="annot"><span class="annottext">lvMaxHeaderSize :: Natural
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Views.html#lvMaxHeaderSize"><span class="hs-identifier hs-var">lvMaxHeaderSize</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ChainChecksPParams -&gt; Natural
+</span><span class="hs-identifier hs-var hs-var">SL.ccMaxBHSize</span></span><span> </span><span class="annot"><span class="annottext">ChainChecksPParams
+</span><a href="#local-6989586621679278285"><span class="hs-identifier hs-var">lvChainChecks</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-73"></span><span>            </span><span class="annot"><span class="annottext">lvMaxBodySize :: Natural
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Views.html#lvMaxBodySize"><span class="hs-identifier hs-var">lvMaxBodySize</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ChainChecksPParams -&gt; Natural
+</span><span class="hs-identifier hs-var hs-var">SL.ccMaxBBSize</span></span><span> </span><span class="annot"><span class="annottext">ChainChecksPParams
+</span><a href="#local-6989586621679278285"><span class="hs-identifier hs-var">lvChainChecks</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-74"></span><span>            </span><span class="annot"><span class="annottext">lvProtocolVersion :: ProtVer
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Views.html#lvProtocolVersion"><span class="hs-identifier hs-var">lvProtocolVersion</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ChainChecksPParams -&gt; ProtVer
+</span><span class="hs-identifier hs-var hs-var">SL.ccProtocolVersion</span></span><span> </span><span class="annot"><span class="annottext">ChainChecksPParams
+</span><a href="#local-6989586621679278285"><span class="hs-identifier hs-var">lvChainChecks</span></a></span><span>
+</span><span id="line-75"></span><span>          </span><span class="hs-special">}</span><span>
+</span><span id="line-76"></span><span>        </span><span class="hs-keyword">where</span><span>
+</span><span id="line-77"></span><span>          </span><span class="annot"><a href="#local-6989586621679278281"><span class="hs-identifier hs-type">coercePoolDistr</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.PoolDistr</span></span><span> </span><span class="annot"><a href="#local-6989586621679278328"><span class="hs-identifier hs-type">c1</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.PoolDistr</span></span><span> </span><span class="annot"><a href="#local-6989586621679278327"><span class="hs-identifier hs-type">c2</span></a></span><span>
+</span><span id="line-78"></span><span>          </span><span id="local-6989586621679278281"><span class="annot"><span class="annottext">coercePoolDistr :: PoolDistr c1 -&gt; PoolDistr c2
+</span><a href="#local-6989586621679278281"><span class="hs-identifier hs-var hs-var">coercePoolDistr</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.PoolDistr</span></span><span> </span><span id="local-6989586621679278276"><span class="annot"><span class="annottext">Map (KeyHash 'StakePool c1) (IndividualPoolStake c1)
+</span><a href="#local-6989586621679278276"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-79"></span><span>            </span><span class="annot"><span class="annottext">Map (KeyHash 'StakePool c2) (IndividualPoolStake c2)
+-&gt; PoolDistr c2
+forall crypto.
+Map (KeyHash 'StakePool crypto) (IndividualPoolStake crypto)
+-&gt; PoolDistr crypto
+</span><span class="hs-identifier hs-var">SL.PoolDistr</span></span><span>
+</span><span id="line-80"></span><span>              </span><span class="annot"><span class="annottext">(Map (KeyHash 'StakePool c2) (IndividualPoolStake c2)
+ -&gt; PoolDistr c2)
+-&gt; (Map (KeyHash 'StakePool c1) (IndividualPoolStake c1)
+    -&gt; Map (KeyHash 'StakePool c2) (IndividualPoolStake c2))
+-&gt; Map (KeyHash 'StakePool c1) (IndividualPoolStake c1)
+-&gt; PoolDistr c2
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">(KeyHash 'StakePool c1 -&gt; KeyHash 'StakePool c2)
+-&gt; Map (KeyHash 'StakePool c1) (IndividualPoolStake c2)
+-&gt; Map (KeyHash 'StakePool c2) (IndividualPoolStake c2)
+forall k1 k2 a. (k1 -&gt; k2) -&gt; Map k1 a -&gt; Map k2 a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier hs-var">Map.mapKeysMonotonic</span></a></span><span> </span><span class="annot"><span class="annottext">KeyHash 'StakePool c1 -&gt; KeyHash 'StakePool c2
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">coerce</span></a></span><span>
+</span><span id="line-81"></span><span>              </span><span class="annot"><span class="annottext">(Map (KeyHash 'StakePool c1) (IndividualPoolStake c2)
+ -&gt; Map (KeyHash 'StakePool c2) (IndividualPoolStake c2))
+-&gt; (Map (KeyHash 'StakePool c1) (IndividualPoolStake c1)
+    -&gt; Map (KeyHash 'StakePool c1) (IndividualPoolStake c2))
+-&gt; Map (KeyHash 'StakePool c1) (IndividualPoolStake c1)
+-&gt; Map (KeyHash 'StakePool c2) (IndividualPoolStake c2)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">(IndividualPoolStake c1 -&gt; IndividualPoolStake c2)
+-&gt; Map (KeyHash 'StakePool c1) (IndividualPoolStake c1)
+-&gt; Map (KeyHash 'StakePool c1) (IndividualPoolStake c2)
+forall a b k. (a -&gt; b) -&gt; Map k a -&gt; Map k b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier hs-var">Map.map</span></a></span><span> </span><span class="annot"><span class="annottext">IndividualPoolStake c1 -&gt; IndividualPoolStake c2
+</span><a href="#local-6989586621679278272"><span class="hs-identifier hs-var">coerceIndividualPoolStake</span></a></span><span>
+</span><span id="line-82"></span><span>              </span><span class="annot"><span class="annottext">(Map (KeyHash 'StakePool c1) (IndividualPoolStake c1)
+ -&gt; PoolDistr c2)
+-&gt; Map (KeyHash 'StakePool c1) (IndividualPoolStake c1)
+-&gt; PoolDistr c2
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Map (KeyHash 'StakePool c1) (IndividualPoolStake c1)
+</span><a href="#local-6989586621679278276"><span class="hs-identifier hs-var">m</span></a></span><span>
+</span><span id="line-83"></span><span>          </span><span class="annot"><a href="#local-6989586621679278272"><span class="hs-identifier hs-type">coerceIndividualPoolStake</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.IndividualPoolStake</span></span><span> </span><span class="annot"><a href="#local-6989586621679278328"><span class="hs-identifier hs-type">c1</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.IndividualPoolStake</span></span><span> </span><span class="annot"><a href="#local-6989586621679278327"><span class="hs-identifier hs-type">c2</span></a></span><span>
+</span><span id="line-84"></span><span>          </span><span id="local-6989586621679278272"><span class="annot"><span class="annottext">coerceIndividualPoolStake :: IndividualPoolStake c1 -&gt; IndividualPoolStake c2
+</span><a href="#local-6989586621679278272"><span class="hs-identifier hs-var hs-var">coerceIndividualPoolStake</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.IndividualPoolStake</span></span><span> </span><span id="local-6989586621679278270"><span class="annot"><span class="annottext">Rational
+</span><a href="#local-6989586621679278270"><span class="hs-identifier hs-var">stake</span></a></span></span><span> </span><span id="local-6989586621679278269"><span class="annot"><span class="annottext">Hash c1 (VerKeyVRF c1)
+</span><a href="#local-6989586621679278269"><span class="hs-identifier hs-var">vrf</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-85"></span><span>            </span><span class="annot"><span class="annottext">Rational -&gt; Hash c2 (VerKeyVRF c2) -&gt; IndividualPoolStake c2
+forall crypto.
+Rational
+-&gt; Hash crypto (VerKeyVRF crypto) -&gt; IndividualPoolStake crypto
+</span><span class="hs-identifier hs-var">SL.IndividualPoolStake</span></span><span> </span><span class="annot"><span class="annottext">Rational
+</span><a href="#local-6989586621679278270"><span class="hs-identifier hs-var">stake</span></a></span><span> </span><span class="annot"><span class="annottext">(Hash c2 (VerKeyVRF c2) -&gt; IndividualPoolStake c2)
+-&gt; Hash c2 (VerKeyVRF c2) -&gt; IndividualPoolStake c2
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Hash (HASH c1) (VerKeyVRF c2) -&gt; Hash (HASH c1) (VerKeyVRF c2)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">coerce</span></a></span><span> </span><span class="annot"><span class="annottext">Hash c1 (VerKeyVRF c1)
+Hash (HASH c1) (VerKeyVRF c2)
+</span><a href="#local-6989586621679278269"><span class="hs-identifier hs-var">vrf</span></a></span><span>
+</span><span id="line-86"></span><span>
+</span><span id="line-87"></span><span>  </span><span id="local-6989586621679278268"><span class="annot"><span class="annottext">translateChainDepState :: ChainDepState (TPraos c1) -&gt; ChainDepState (Praos c2)
+</span><a href="Ouroboros.Consensus.Protocol.Translate.html#translateChainDepState"><span class="hs-identifier hs-var hs-var hs-var hs-var">translateChainDepState</span></a></span></span><span> </span><span id="local-6989586621679278266"><span class="annot"><span class="annottext">ChainDepState (TPraos c1)
+</span><a href="#local-6989586621679278266"><span class="hs-identifier hs-var">tpState</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-88"></span><span>    </span><span class="annot"><span class="annottext">PraosState :: forall c.
+WithOrigin SlotNo
+-&gt; Map (KeyHash 'BlockIssuer c) Word64
+-&gt; Nonce
+-&gt; Nonce
+-&gt; Nonce
+-&gt; Nonce
+-&gt; Nonce
+-&gt; PraosState c
+</span><a href="Ouroboros.Consensus.Protocol.Praos.html#PraosState"><span class="hs-identifier hs-type">PraosState</span></a></span><span>
+</span><span id="line-89"></span><span>      </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">praosStateLastSlot :: WithOrigin SlotNo
+</span><a href="#local-6989586621679278264"><span class="hs-identifier hs-var">praosStateLastSlot</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TPraosState c2 -&gt; WithOrigin SlotNo
+forall c. TPraosState c -&gt; WithOrigin SlotNo
+</span><a href="Ouroboros.Consensus.Protocol.TPraos.html#tpraosStateLastSlot"><span class="hs-identifier hs-var hs-var">tpraosStateLastSlot</span></a></span><span> </span><span class="annot"><span class="annottext">ChainDepState (TPraos c1)
+TPraosState c2
+</span><a href="#local-6989586621679278266"><span class="hs-identifier hs-var">tpState</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-90"></span><span>        </span><span class="annot"><span class="annottext">praosStateOCertCounters :: Map (KeyHash 'BlockIssuer c2) Word64
+</span><a href="#local-6989586621679278263"><span class="hs-identifier hs-var">praosStateOCertCounters</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(KeyHash 'BlockIssuer c2 -&gt; KeyHash 'BlockIssuer c2)
+-&gt; Map (KeyHash 'BlockIssuer c2) Word64
+-&gt; Map (KeyHash 'BlockIssuer c2) Word64
+forall k1 k2 a. (k1 -&gt; k2) -&gt; Map k1 a -&gt; Map k2 a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier hs-var">Map.mapKeysMonotonic</span></a></span><span> </span><span class="annot"><span class="annottext">KeyHash 'BlockIssuer c2 -&gt; KeyHash 'BlockIssuer c2
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">coerce</span></a></span><span> </span><span class="annot"><span class="annottext">Map (KeyHash 'BlockIssuer c2) Word64
+</span><a href="#local-6989586621679278262"><span class="hs-identifier hs-var">certCounters</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-91"></span><span>        </span><span class="annot"><span class="annottext">praosStateEvolvingNonce :: Nonce
+</span><a href="#local-6989586621679278261"><span class="hs-identifier hs-var">praosStateEvolvingNonce</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Nonce
+</span><a href="#local-6989586621679278260"><span class="hs-identifier hs-var">evolvingNonce</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-92"></span><span>        </span><span class="annot"><span class="annottext">praosStateCandidateNonce :: Nonce
+</span><a href="#local-6989586621679278259"><span class="hs-identifier hs-var">praosStateCandidateNonce</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Nonce
+</span><a href="#local-6989586621679278258"><span class="hs-identifier hs-var">candidateNonce</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-93"></span><span>        </span><span class="annot"><span class="annottext">praosStateEpochNonce :: Nonce
+</span><a href="#local-6989586621679278257"><span class="hs-identifier hs-var">praosStateEpochNonce</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TicknState -&gt; Nonce
+</span><span class="hs-identifier hs-var hs-var">SL.ticknStateEpochNonce</span></span><span> </span><span class="annot"><span class="annottext">TicknState
+</span><a href="#local-6989586621679278255"><span class="hs-identifier hs-var">csTickn</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-94"></span><span>        </span><span class="annot"><span class="annottext">praosStateLabNonce :: Nonce
+</span><a href="#local-6989586621679278254"><span class="hs-identifier hs-var">praosStateLabNonce</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Nonce
+</span><a href="#local-6989586621679278253"><span class="hs-identifier hs-var">csLabNonce</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-95"></span><span>        </span><span class="annot"><span class="annottext">praosStateLastEpochBlockNonce :: Nonce
+</span><a href="#local-6989586621679278252"><span class="hs-identifier hs-var">praosStateLastEpochBlockNonce</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TicknState -&gt; Nonce
+</span><span class="hs-identifier hs-var hs-var">SL.ticknStatePrevHashNonce</span></span><span> </span><span class="annot"><span class="annottext">TicknState
+</span><a href="#local-6989586621679278255"><span class="hs-identifier hs-var">csTickn</span></a></span><span>
+</span><span id="line-96"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-97"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-98"></span><span>      </span><span class="annot"><span class="hs-identifier hs-type">SL.ChainDepState</span></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679278249"><span class="annot"><span class="annottext">PrtclState c2
+csProtocol :: forall crypto. ChainDepState crypto -&gt; PrtclState crypto
+csProtocol :: PrtclState c2
+</span><span class="hs-identifier hs-var hs-var">SL.csProtocol</span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679278255"><span class="annot"><span class="annottext">TicknState
+csTickn :: forall crypto. ChainDepState crypto -&gt; TicknState
+csTickn :: TicknState
+</span><span class="hs-identifier hs-var hs-var">SL.csTickn</span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679278253"><span class="annot"><span class="annottext">Nonce
+csLabNonce :: forall crypto. ChainDepState crypto -&gt; Nonce
+csLabNonce :: Nonce
+</span><span class="hs-identifier hs-var hs-var">SL.csLabNonce</span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-99"></span><span>        </span><span class="annot"><span class="annottext">TPraosState c2 -&gt; ChainDepState c2
+forall c. TPraosState c -&gt; ChainDepState c
+</span><a href="Ouroboros.Consensus.Protocol.TPraos.html#tpraosStateChainDepState"><span class="hs-identifier hs-var hs-var">tpraosStateChainDepState</span></a></span><span> </span><span class="annot"><span class="annottext">ChainDepState (TPraos c1)
+TPraosState c2
+</span><a href="#local-6989586621679278266"><span class="hs-identifier hs-var">tpState</span></a></span><span>
+</span><span id="line-100"></span><span>      </span><span class="annot"><span class="hs-identifier hs-type">SL.PrtclState</span></span><span> </span><span id="local-6989586621679278262"><span class="annot"><span class="annottext">Map (KeyHash 'BlockIssuer c2) Word64
+</span><a href="#local-6989586621679278262"><span class="hs-identifier hs-var">certCounters</span></a></span></span><span> </span><span id="local-6989586621679278260"><span class="annot"><span class="annottext">Nonce
+</span><a href="#local-6989586621679278260"><span class="hs-identifier hs-var">evolvingNonce</span></a></span></span><span> </span><span id="local-6989586621679278258"><span class="annot"><span class="annottext">Nonce
+</span><a href="#local-6989586621679278258"><span class="hs-identifier hs-var">candidateNonce</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-101"></span><span>        </span><span class="annot"><span class="annottext">PrtclState c2
+</span><a href="#local-6989586621679278249"><span class="hs-identifier hs-var">csProtocol</span></a></span></span></span><span>
+</span><span id="line-102"></span></pre></body></html>

@@ -1,0 +1,667 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DataKinds           #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE FlexibleContexts    #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE GADTs               #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE NamedFieldPuns      #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE PolyKinds           #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables #-}</span><span>
+</span><span id="line-7"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.Protocol.BlockFetch.Client</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Network.TypedProtocol.Core</span></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Network.TypedProtocol.Pipelined</span></span><span>
+</span><span id="line-11"></span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html"><span class="hs-identifier">Ouroboros.Network.Protocol.BlockFetch.Type</span></a></span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span class="hs-comment">-- | Block fetch client type for requesting ranges of blocks and handling</span><span>
+</span><span id="line-16"></span><span class="hs-comment">-- responses.</span><span>
+</span><span id="line-17"></span><span class="hs-comment">--</span><span>
+</span><span id="line-18"></span><span class="hs-keyword">newtype</span><span> </span><span id="BlockFetchClient"><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchClient"><span class="hs-identifier hs-var">BlockFetchClient</span></a></span></span><span> </span><span id="local-6989586621679110228"><span class="annot"><a href="#local-6989586621679110228"><span class="hs-identifier hs-type">block</span></a></span></span><span> </span><span id="local-6989586621679110227"><span class="annot"><a href="#local-6989586621679110227"><span class="hs-identifier hs-type">point</span></a></span></span><span> </span><span id="local-6989586621679110226"><span class="annot"><a href="#local-6989586621679110226"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679110225"><span class="annot"><a href="#local-6989586621679110225"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="BlockFetchClient"><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchClient"><span class="hs-identifier hs-var">BlockFetchClient</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-19"></span><span>    </span><span id="runBlockFetchClient"><span class="annot"><span class="annottext">BlockFetchClient block point m a
+-&gt; m (BlockFetchRequest block point m a)
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#runBlockFetchClient"><span class="hs-identifier hs-var hs-var">runBlockFetchClient</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679110226"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchRequest"><span class="hs-identifier hs-type">BlockFetchRequest</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110228"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110227"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110226"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110225"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">data</span><span> </span><span id="BlockFetchRequest"><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchRequest"><span class="hs-identifier hs-var">BlockFetchRequest</span></a></span></span><span> </span><span id="local-6989586621679110153"><span class="annot"><a href="#local-6989586621679110153"><span class="hs-identifier hs-type">block</span></a></span></span><span> </span><span id="local-6989586621679110152"><span class="annot"><a href="#local-6989586621679110152"><span class="hs-identifier hs-type">point</span></a></span></span><span> </span><span id="local-6989586621679110151"><span class="annot"><a href="#local-6989586621679110151"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679110150"><span class="annot"><a href="#local-6989586621679110150"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-comment">-- | Request a chain range, supply handler for incoming blocks and</span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-comment">-- a continuation.</span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-comment">--</span><span>
+</span><span id="line-26"></span><span>  </span><span id="local-6989586621679110146"><span id="local-6989586621679110147"><span id="local-6989586621679110148"><span id="local-6989586621679110149"><span id="SendMsgRequestRange"><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#SendMsgRequestRange"><span class="hs-identifier hs-var">SendMsgRequestRange</span></a></span></span><span>
+</span><span id="line-27"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#ChainRange"><span class="hs-identifier hs-type">ChainRange</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110149"><span class="hs-identifier hs-type">point</span></a></span><span>
+</span><span id="line-28"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchResponse"><span class="hs-identifier hs-type">BlockFetchResponse</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110148"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110147"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110146"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-29"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchClient"><span class="hs-identifier hs-type">BlockFetchClient</span></a></span><span>   </span><span class="annot"><a href="#local-6989586621679110148"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110149"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110147"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110146"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-30"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchRequest"><span class="hs-identifier hs-type">BlockFetchRequest</span></a></span><span>  </span><span class="annot"><a href="#local-6989586621679110148"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110149"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110147"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110146"><span class="hs-identifier hs-type">a</span></a></span></span></span></span></span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span>  </span><span class="hs-comment">-- | Client terminating the block-fetch protocol.</span><span>
+</span><span id="line-33"></span><span>  </span><span id="local-6989586621679110141"><span id="local-6989586621679110142"><span id="local-6989586621679110143"><span id="local-6989586621679110144"><span id="SendMsgClientDone"><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#SendMsgClientDone"><span class="hs-identifier hs-var">SendMsgClientDone</span></a></span></span><span>
+</span><span id="line-34"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679110144"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-35"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchRequest"><span class="hs-identifier hs-type">BlockFetchRequest</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110143"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110142"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110141"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110144"><span class="hs-identifier hs-type">a</span></a></span></span></span></span></span><span>
+</span><span id="line-36"></span><span>
+</span><span id="line-37"></span><span class="hs-keyword">data</span><span> </span><span id="BlockFetchResponse"><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchResponse"><span class="hs-identifier hs-var">BlockFetchResponse</span></a></span></span><span> </span><span id="local-6989586621679110244"><span class="annot"><a href="#local-6989586621679110244"><span class="hs-identifier hs-type">block</span></a></span></span><span> </span><span id="local-6989586621679110243"><span class="annot"><a href="#local-6989586621679110243"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679110242"><span class="annot"><a href="#local-6989586621679110242"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="BlockFetchResponse"><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchResponse"><span class="hs-identifier hs-var">BlockFetchResponse</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-38"></span><span>    </span><span id="handleStartBatch"><span class="annot"><span class="annottext">BlockFetchResponse block m a -&gt; m (BlockFetchReceiver block m)
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#handleStartBatch"><span class="hs-identifier hs-var hs-var">handleStartBatch</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679110243"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchReceiver"><span class="hs-identifier hs-type">BlockFetchReceiver</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110244"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110243"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-39"></span><span>    </span><span id="handleNoBlocks"><span class="annot"><span class="annottext">BlockFetchResponse block m a -&gt; m ()
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#handleNoBlocks"><span class="hs-identifier hs-var hs-var">handleNoBlocks</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679110243"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-40"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-41"></span><span>
+</span><span id="line-42"></span><span class="hs-comment">-- | Blocks are streamed and block receiver will handle each one when it comes,</span><span>
+</span><span id="line-43"></span><span class="hs-comment">-- it also needs to handle errors sent back from the server.</span><span>
+</span><span id="line-44"></span><span class="hs-comment">--</span><span>
+</span><span id="line-45"></span><span class="hs-keyword">data</span><span> </span><span id="BlockFetchReceiver"><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchReceiver"><span class="hs-identifier hs-var">BlockFetchReceiver</span></a></span></span><span> </span><span id="local-6989586621679110224"><span class="annot"><a href="#local-6989586621679110224"><span class="hs-identifier hs-type">block</span></a></span></span><span> </span><span id="local-6989586621679110223"><span class="annot"><a href="#local-6989586621679110223"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="BlockFetchReceiver"><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchReceiver"><span class="hs-identifier hs-var">BlockFetchReceiver</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-46"></span><span>    </span><span id="handleBlock"><span class="annot"><span class="annottext">BlockFetchReceiver block m
+-&gt; block -&gt; m (BlockFetchReceiver block m)
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#handleBlock"><span class="hs-identifier hs-var hs-var">handleBlock</span></a></span></span><span>     </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679110224"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679110223"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchReceiver"><span class="hs-identifier hs-type">BlockFetchReceiver</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110224"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110223"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-47"></span><span>    </span><span id="handleBatchDone"><span class="annot"><span class="annottext">BlockFetchReceiver block m -&gt; m ()
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#handleBatchDone"><span class="hs-identifier hs-var hs-var">handleBatchDone</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679110223"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-48"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#blockFetchClientPeer"><span class="hs-identifier hs-type">blockFetchClientPeer</span></a></span><span>
+</span><span id="line-51"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679110132"><span class="annot"><a href="#local-6989586621679110132"><span class="hs-identifier hs-type">block</span></a></span></span><span> </span><span id="local-6989586621679110131"><span class="annot"><a href="#local-6989586621679110131"><span class="hs-identifier hs-type">point</span></a></span></span><span> </span><span id="local-6989586621679110130"><span class="annot"><a href="#local-6989586621679110130"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679110129"><span class="annot"><a href="#local-6989586621679110129"><span class="hs-identifier hs-type">a</span></a></span></span><span class="hs-operator">.</span><span>
+</span><span id="line-52"></span><span>     </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Monad</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110130"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-53"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchClient"><span class="hs-identifier hs-type">BlockFetchClient</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110132"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110131"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110130"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110129"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-54"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Peer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#BlockFetch"><span class="hs-identifier hs-type">BlockFetch</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110132"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110131"><span class="hs-identifier hs-type">point</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AsClient</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#BFIdle"><span class="hs-identifier hs-type">BFIdle</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110130"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110129"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-55"></span><span id="blockFetchClientPeer"><span class="annot"><span class="annottext">blockFetchClientPeer :: BlockFetchClient block point m a
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFIdle m a
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#blockFetchClientPeer"><span class="hs-identifier hs-var hs-var">blockFetchClientPeer</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchClient"><span class="hs-identifier hs-type">BlockFetchClient</span></a></span><span> </span><span id="local-6989586621679110128"><span class="annot"><span class="annottext">m (BlockFetchRequest block point m a)
+</span><a href="#local-6989586621679110128"><span class="hs-identifier hs-var">mclient</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-56"></span><span>  </span><span class="annot"><span class="annottext">m (Peer (BlockFetch block point) 'AsClient 'BFIdle m a)
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFIdle m a
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) a.
+m (Peer ps pr st m a) -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Effect</span></span><span> </span><span class="annot"><span class="annottext">(m (Peer (BlockFetch block point) 'AsClient 'BFIdle m a)
+ -&gt; Peer (BlockFetch block point) 'AsClient 'BFIdle m a)
+-&gt; m (Peer (BlockFetch block point) 'AsClient 'BFIdle m a)
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFIdle m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">BlockFetchRequest block point m a
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFIdle m a
+</span><a href="#local-6989586621679110126"><span class="hs-identifier hs-var">blockFetchRequestPeer</span></a></span><span> </span><span class="annot"><span class="annottext">(BlockFetchRequest block point m a
+ -&gt; Peer (BlockFetch block point) 'AsClient 'BFIdle m a)
+-&gt; m (BlockFetchRequest block point m a)
+-&gt; m (Peer (BlockFetch block point) 'AsClient 'BFIdle m a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">m (BlockFetchRequest block point m a)
+</span><a href="#local-6989586621679110128"><span class="hs-identifier hs-var">mclient</span></a></span><span>
+</span><span id="line-57"></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-58"></span><span>  </span><span class="annot"><a href="#local-6989586621679110126"><span class="hs-identifier hs-type">blockFetchRequestPeer</span></a></span><span>
+</span><span id="line-59"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchRequest"><span class="hs-identifier hs-type">BlockFetchRequest</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110132"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110131"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110130"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110129"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-60"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Peer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#BlockFetch"><span class="hs-identifier hs-type">BlockFetch</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110132"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110131"><span class="hs-identifier hs-type">point</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AsClient</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#BFIdle"><span class="hs-identifier hs-type">BFIdle</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110130"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110129"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-61"></span><span>
+</span><span id="line-62"></span><span>  </span><span id="local-6989586621679110126"><span class="annot"><span class="annottext">blockFetchRequestPeer :: BlockFetchRequest block point m a
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFIdle m a
+</span><a href="#local-6989586621679110126"><span class="hs-identifier hs-var hs-var">blockFetchRequestPeer</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#SendMsgClientDone"><span class="hs-identifier hs-type">SendMsgClientDone</span></a></span><span> </span><span id="local-6989586621679110124"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679110124"><span class="hs-identifier hs-var">result</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-63"></span><span>    </span><span class="annot"><span class="annottext">WeHaveAgency 'AsClient 'BFIdle
+-&gt; Message (BlockFetch block point) 'BFIdle 'BFDone
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFDone m a
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFIdle m a
+forall (pr :: PeerRole) ps (st :: ps) (st' :: ps) (m :: * -&gt; *) a.
+WeHaveAgency pr st
+-&gt; Message ps st st' -&gt; Peer ps pr st' m a -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Yield</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ClientHasAgency 'BFIdle -&gt; WeHaveAgency 'AsClient 'BFIdle
+forall ps (st :: ps).
+ClientHasAgency st -&gt; PeerHasAgency 'AsClient st
+</span><span class="hs-identifier hs-var">ClientAgency</span></span><span> </span><span class="annot"><span class="annottext">ClientHasAgency 'BFIdle
+forall k k (block :: k) (point :: k). ClientHasAgency 'BFIdle
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#TokIdle"><span class="hs-identifier hs-var">TokIdle</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Message (BlockFetch block point) 'BFIdle 'BFDone
+forall k k (block :: k) (point :: k).
+Message (BlockFetch block point) 'BFIdle 'BFDone
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#MsgClientDone"><span class="hs-identifier hs-var">MsgClientDone</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NobodyHasAgency 'BFDone
+-&gt; a -&gt; Peer (BlockFetch block point) 'AsClient 'BFDone m a
+forall ps (st :: ps) a (pr :: PeerRole) (m :: * -&gt; *).
+NobodyHasAgency st -&gt; a -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Done</span></span><span> </span><span class="annot"><span class="annottext">NobodyHasAgency 'BFDone
+forall k k (block :: k) (point :: k). NobodyHasAgency 'BFDone
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#TokDone"><span class="hs-identifier hs-var">TokDone</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679110124"><span class="hs-identifier hs-var">result</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-64"></span><span>
+</span><span id="line-65"></span><span>  </span><span class="annot"><a href="#local-6989586621679110126"><span class="hs-identifier hs-var">blockFetchRequestPeer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#SendMsgRequestRange"><span class="hs-identifier hs-type">SendMsgRequestRange</span></a></span><span> </span><span id="local-6989586621679110117"><span class="annot"><span class="annottext">ChainRange point
+</span><a href="#local-6989586621679110117"><span class="hs-identifier hs-var">range</span></a></span></span><span> </span><span id="local-6989586621679110116"><span class="annot"><span class="annottext">BlockFetchResponse block m a
+</span><a href="#local-6989586621679110116"><span class="hs-identifier hs-var">resp</span></a></span></span><span> </span><span id="local-6989586621679110115"><span class="annot"><span class="annottext">BlockFetchClient block point m a
+</span><a href="#local-6989586621679110115"><span class="hs-identifier hs-var">next</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-66"></span><span>    </span><span class="annot"><span class="annottext">WeHaveAgency 'AsClient 'BFIdle
+-&gt; Message (BlockFetch block point) 'BFIdle 'BFBusy
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFBusy m a
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFIdle m a
+forall (pr :: PeerRole) ps (st :: ps) (st' :: ps) (m :: * -&gt; *) a.
+WeHaveAgency pr st
+-&gt; Message ps st st' -&gt; Peer ps pr st' m a -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Yield</span></span><span>
+</span><span id="line-67"></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ClientHasAgency 'BFIdle -&gt; WeHaveAgency 'AsClient 'BFIdle
+forall ps (st :: ps).
+ClientHasAgency st -&gt; PeerHasAgency 'AsClient st
+</span><span class="hs-identifier hs-var">ClientAgency</span></span><span> </span><span class="annot"><span class="annottext">ClientHasAgency 'BFIdle
+forall k k (block :: k) (point :: k). ClientHasAgency 'BFIdle
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#TokIdle"><span class="hs-identifier hs-var">TokIdle</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-68"></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ChainRange point
+-&gt; Message (BlockFetch block point) 'BFIdle 'BFBusy
+forall k point (block :: k).
+ChainRange point
+-&gt; Message (BlockFetch block point) 'BFIdle 'BFBusy
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#MsgRequestRange"><span class="hs-identifier hs-var">MsgRequestRange</span></a></span><span> </span><span class="annot"><span class="annottext">ChainRange point
+</span><a href="#local-6989586621679110117"><span class="hs-identifier hs-var">range</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-69"></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="annottext">BlockFetchClient block point m a
+-&gt; BlockFetchResponse block m a
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFBusy m a
+</span><a href="#local-6989586621679110113"><span class="hs-identifier hs-var">blockFetchResponsePeer</span></a></span><span> </span><span class="annot"><span class="annottext">BlockFetchClient block point m a
+</span><a href="#local-6989586621679110115"><span class="hs-identifier hs-var">next</span></a></span><span> </span><span class="annot"><span class="annottext">BlockFetchResponse block m a
+</span><a href="#local-6989586621679110116"><span class="hs-identifier hs-var">resp</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-70"></span><span>
+</span><span id="line-71"></span><span>
+</span><span id="line-72"></span><span>  </span><span class="annot"><a href="#local-6989586621679110113"><span class="hs-identifier hs-type">blockFetchResponsePeer</span></a></span><span>
+</span><span id="line-73"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchClient"><span class="hs-identifier hs-type">BlockFetchClient</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110132"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110131"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110130"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110129"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-74"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchResponse"><span class="hs-identifier hs-type">BlockFetchResponse</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110132"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110130"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110129"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-75"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Peer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#BlockFetch"><span class="hs-identifier hs-type">BlockFetch</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110132"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110131"><span class="hs-identifier hs-type">point</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AsClient</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#BFBusy"><span class="hs-identifier hs-type">BFBusy</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110130"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110129"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-76"></span><span>  </span><span id="local-6989586621679110113"><span class="annot"><span class="annottext">blockFetchResponsePeer :: BlockFetchClient block point m a
+-&gt; BlockFetchResponse block m a
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFBusy m a
+</span><a href="#local-6989586621679110113"><span class="hs-identifier hs-var hs-var">blockFetchResponsePeer</span></a></span></span><span> </span><span id="local-6989586621679110112"><span class="annot"><span class="annottext">BlockFetchClient block point m a
+</span><a href="#local-6989586621679110112"><span class="hs-identifier hs-var">next</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchResponse"><span class="hs-identifier hs-type">BlockFetchResponse</span></a></span><span class="hs-special">{</span><span id="local-6989586621679110111"><span class="annot"><span class="annottext">m ()
+handleNoBlocks :: m ()
+handleNoBlocks :: forall block (m :: * -&gt; *) k (a :: k).
+BlockFetchResponse block m a -&gt; m ()
+</span><a href="#local-6989586621679110111"><span class="hs-identifier hs-var hs-var">handleNoBlocks</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679110110"><span class="annot"><span class="annottext">m (BlockFetchReceiver block m)
+handleStartBatch :: m (BlockFetchReceiver block m)
+handleStartBatch :: forall block (m :: * -&gt; *) k (a :: k).
+BlockFetchResponse block m a -&gt; m (BlockFetchReceiver block m)
+</span><a href="#local-6989586621679110110"><span class="hs-identifier hs-var hs-var">handleStartBatch</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-77"></span><span>    </span><span class="annot"><span class="annottext">TheyHaveAgency 'AsClient 'BFBusy
+-&gt; (forall (st' :: BlockFetch block point).
+    Message (BlockFetch block point) 'BFBusy st'
+    -&gt; Peer (BlockFetch block point) 'AsClient st' m a)
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFBusy m a
+forall (pr :: PeerRole) ps (st :: ps) (m :: * -&gt; *) a.
+TheyHaveAgency pr st
+-&gt; (forall (st' :: ps). Message ps st st' -&gt; Peer ps pr st' m a)
+-&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Await</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ServerHasAgency 'BFBusy -&gt; PeerHasAgency 'AsServer 'BFBusy
+forall ps (st :: ps).
+ServerHasAgency st -&gt; PeerHasAgency 'AsServer st
+</span><span class="hs-identifier hs-var">ServerAgency</span></span><span> </span><span class="annot"><span class="annottext">ServerHasAgency 'BFBusy
+forall k k (block :: k) (point :: k). ServerHasAgency 'BFBusy
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#TokBusy"><span class="hs-identifier hs-var">TokBusy</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">((forall (st' :: BlockFetch block point).
+  Message (BlockFetch block point) 'BFBusy st'
+  -&gt; Peer (BlockFetch block point) 'AsClient st' m a)
+ -&gt; Peer (BlockFetch block point) 'AsClient 'BFBusy m a)
+-&gt; (forall (st' :: BlockFetch block point).
+    Message (BlockFetch block point) 'BFBusy st'
+    -&gt; Peer (BlockFetch block point) 'AsClient st' m a)
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFBusy m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679110106"><span class="annot"><span class="annottext">Message (BlockFetch block point) 'BFBusy st'
+</span><a href="#local-6989586621679110106"><span class="hs-identifier hs-var">msg</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Message (BlockFetch block point) 'BFBusy st'
+</span><a href="#local-6989586621679110106"><span class="hs-identifier hs-var">msg</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-78"></span><span>      </span><span class="annot"><span class="annottext">Message (BlockFetch block point) 'BFBusy st'
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#MsgStartBatch"><span class="hs-identifier hs-var">MsgStartBatch</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">m (Peer (BlockFetch block point) 'AsClient 'BFStreaming m a)
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFStreaming m a
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) a.
+m (Peer ps pr st m a) -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Effect</span></span><span> </span><span class="annot"><span class="annottext">(m (Peer (BlockFetch block point) 'AsClient 'BFStreaming m a)
+ -&gt; Peer (BlockFetch block point) 'AsClient 'BFStreaming m a)
+-&gt; m (Peer (BlockFetch block point) 'AsClient 'BFStreaming m a)
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFStreaming m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">BlockFetchClient block point m a
+-&gt; BlockFetchReceiver block m
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFStreaming m a
+</span><a href="#local-6989586621679110104"><span class="hs-identifier hs-var">blockReceiver</span></a></span><span> </span><span class="annot"><span class="annottext">BlockFetchClient block point m a
+</span><a href="#local-6989586621679110112"><span class="hs-identifier hs-var">next</span></a></span><span> </span><span class="annot"><span class="annottext">(BlockFetchReceiver block m
+ -&gt; Peer (BlockFetch block point) 'AsClient 'BFStreaming m a)
+-&gt; m (BlockFetchReceiver block m)
+-&gt; m (Peer (BlockFetch block point) 'AsClient 'BFStreaming m a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">m (BlockFetchReceiver block m)
+</span><a href="#local-6989586621679110110"><span class="hs-identifier hs-var">handleStartBatch</span></a></span><span>
+</span><span id="line-79"></span><span>      </span><span class="annot"><span class="annottext">Message (BlockFetch block point) 'BFBusy st'
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#MsgNoBlocks"><span class="hs-identifier hs-var">MsgNoBlocks</span></a></span><span>   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">m (Peer (BlockFetch block point) 'AsClient 'BFIdle m a)
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFIdle m a
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) a.
+m (Peer ps pr st m a) -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Effect</span></span><span> </span><span class="annot"><span class="annottext">(m (Peer (BlockFetch block point) 'AsClient 'BFIdle m a)
+ -&gt; Peer (BlockFetch block point) 'AsClient 'BFIdle m a)
+-&gt; m (Peer (BlockFetch block point) 'AsClient 'BFIdle m a)
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFIdle m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">m ()
+</span><a href="#local-6989586621679110111"><span class="hs-identifier hs-var">handleNoBlocks</span></a></span><span> </span><span class="annot"><span class="annottext">m ()
+-&gt; m (Peer (BlockFetch block point) 'AsClient 'BFIdle m a)
+-&gt; m (Peer (BlockFetch block point) 'AsClient 'BFIdle m a)
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; m b -&gt; m b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&gt;&gt;</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">BlockFetchRequest block point m a
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFIdle m a
+</span><a href="#local-6989586621679110126"><span class="hs-identifier hs-var">blockFetchRequestPeer</span></a></span><span> </span><span class="annot"><span class="annottext">(BlockFetchRequest block point m a
+ -&gt; Peer (BlockFetch block point) 'AsClient 'BFIdle m a)
+-&gt; m (BlockFetchRequest block point m a)
+-&gt; m (Peer (BlockFetch block point) 'AsClient 'BFIdle m a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">BlockFetchClient block point m a
+-&gt; m (BlockFetchRequest block point m a)
+forall block point (m :: * -&gt; *) a.
+BlockFetchClient block point m a
+-&gt; m (BlockFetchRequest block point m a)
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#runBlockFetchClient"><span class="hs-identifier hs-var hs-var">runBlockFetchClient</span></a></span><span> </span><span class="annot"><span class="annottext">BlockFetchClient block point m a
+</span><a href="#local-6989586621679110112"><span class="hs-identifier hs-var">next</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-80"></span><span>
+</span><span id="line-81"></span><span>  </span><span class="annot"><a href="#local-6989586621679110104"><span class="hs-identifier hs-type">blockReceiver</span></a></span><span>
+</span><span id="line-82"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchClient"><span class="hs-identifier hs-type">BlockFetchClient</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110132"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110131"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110130"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110129"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-83"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchReceiver"><span class="hs-identifier hs-type">BlockFetchReceiver</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110132"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110130"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-84"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Peer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#BlockFetch"><span class="hs-identifier hs-type">BlockFetch</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110132"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110131"><span class="hs-identifier hs-type">point</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AsClient</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#BFStreaming"><span class="hs-identifier hs-type">BFStreaming</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110130"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110129"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-85"></span><span>  </span><span id="local-6989586621679110104"><span class="annot"><span class="annottext">blockReceiver :: BlockFetchClient block point m a
+-&gt; BlockFetchReceiver block m
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFStreaming m a
+</span><a href="#local-6989586621679110104"><span class="hs-identifier hs-var hs-var">blockReceiver</span></a></span></span><span> </span><span id="local-6989586621679110102"><span class="annot"><span class="annottext">BlockFetchClient block point m a
+</span><a href="#local-6989586621679110102"><span class="hs-identifier hs-var">next</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchReceiver"><span class="hs-identifier hs-type">BlockFetchReceiver</span></a></span><span class="hs-special">{</span><span id="local-6989586621679110101"><span class="annot"><span class="annottext">block -&gt; m (BlockFetchReceiver block m)
+handleBlock :: block -&gt; m (BlockFetchReceiver block m)
+handleBlock :: forall block (m :: * -&gt; *).
+BlockFetchReceiver block m
+-&gt; block -&gt; m (BlockFetchReceiver block m)
+</span><a href="#local-6989586621679110101"><span class="hs-identifier hs-var hs-var">handleBlock</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679110100"><span class="annot"><span class="annottext">m ()
+handleBatchDone :: m ()
+handleBatchDone :: forall block (m :: * -&gt; *). BlockFetchReceiver block m -&gt; m ()
+</span><a href="#local-6989586621679110100"><span class="hs-identifier hs-var hs-var">handleBatchDone</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-86"></span><span>    </span><span class="annot"><span class="annottext">TheyHaveAgency 'AsClient 'BFStreaming
+-&gt; (forall (st' :: BlockFetch block point).
+    Message (BlockFetch block point) 'BFStreaming st'
+    -&gt; Peer (BlockFetch block point) 'AsClient st' m a)
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFStreaming m a
+forall (pr :: PeerRole) ps (st :: ps) (m :: * -&gt; *) a.
+TheyHaveAgency pr st
+-&gt; (forall (st' :: ps). Message ps st st' -&gt; Peer ps pr st' m a)
+-&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Await</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ServerHasAgency 'BFStreaming
+-&gt; PeerHasAgency 'AsServer 'BFStreaming
+forall ps (st :: ps).
+ServerHasAgency st -&gt; PeerHasAgency 'AsServer st
+</span><span class="hs-identifier hs-var">ServerAgency</span></span><span> </span><span class="annot"><span class="annottext">ServerHasAgency 'BFStreaming
+forall k k (block :: k) (point :: k). ServerHasAgency 'BFStreaming
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#TokStreaming"><span class="hs-identifier hs-var">TokStreaming</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">((forall (st' :: BlockFetch block point).
+  Message (BlockFetch block point) 'BFStreaming st'
+  -&gt; Peer (BlockFetch block point) 'AsClient st' m a)
+ -&gt; Peer (BlockFetch block point) 'AsClient 'BFStreaming m a)
+-&gt; (forall (st' :: BlockFetch block point).
+    Message (BlockFetch block point) 'BFStreaming st'
+    -&gt; Peer (BlockFetch block point) 'AsClient st' m a)
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFStreaming m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679110098"><span class="annot"><span class="annottext">Message (BlockFetch block point) 'BFStreaming st'
+</span><a href="#local-6989586621679110098"><span class="hs-identifier hs-var">msg</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Message (BlockFetch block point) 'BFStreaming st'
+</span><a href="#local-6989586621679110098"><span class="hs-identifier hs-var">msg</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-87"></span><span>      </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#MsgBlock"><span class="hs-identifier hs-type">MsgBlock</span></a></span><span> </span><span id="local-6989586621679110096"><span class="annot"><a href="#local-6989586621679110096"><span class="hs-identifier hs-var">block</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">m (Peer (BlockFetch block point) 'AsClient 'BFStreaming m a)
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFStreaming m a
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) a.
+m (Peer ps pr st m a) -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Effect</span></span><span> </span><span class="annot"><span class="annottext">(m (Peer (BlockFetch block point) 'AsClient 'BFStreaming m a)
+ -&gt; Peer (BlockFetch block point) 'AsClient 'BFStreaming m a)
+-&gt; m (Peer (BlockFetch block point) 'AsClient 'BFStreaming m a)
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFStreaming m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">BlockFetchClient block point m a
+-&gt; BlockFetchReceiver block m
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFStreaming m a
+</span><a href="#local-6989586621679110104"><span class="hs-identifier hs-var">blockReceiver</span></a></span><span> </span><span class="annot"><span class="annottext">BlockFetchClient block point m a
+</span><a href="#local-6989586621679110102"><span class="hs-identifier hs-var">next</span></a></span><span> </span><span class="annot"><span class="annottext">(BlockFetchReceiver block m
+ -&gt; Peer (BlockFetch block point) 'AsClient 'BFStreaming m a)
+-&gt; m (BlockFetchReceiver block m)
+-&gt; m (Peer (BlockFetch block point) 'AsClient 'BFStreaming m a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">block -&gt; m (BlockFetchReceiver block m)
+</span><a href="#local-6989586621679110101"><span class="hs-identifier hs-var">handleBlock</span></a></span><span> </span><span class="annot"><span class="annottext">block
+block
+</span><a href="#local-6989586621679110096"><span class="hs-identifier hs-var">block</span></a></span><span>
+</span><span id="line-88"></span><span>      </span><span class="annot"><span class="annottext">Message (BlockFetch block point) 'BFStreaming st'
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#MsgBatchDone"><span class="hs-identifier hs-var">MsgBatchDone</span></a></span><span>   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">m (Peer (BlockFetch block point) 'AsClient 'BFIdle m a)
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFIdle m a
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) a.
+m (Peer ps pr st m a) -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Effect</span></span><span> </span><span class="annot"><span class="annottext">(m (Peer (BlockFetch block point) 'AsClient 'BFIdle m a)
+ -&gt; Peer (BlockFetch block point) 'AsClient 'BFIdle m a)
+-&gt; m (Peer (BlockFetch block point) 'AsClient 'BFIdle m a)
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFIdle m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-89"></span><span>        </span><span class="annot"><span class="annottext">m ()
+</span><a href="#local-6989586621679110100"><span class="hs-identifier hs-var">handleBatchDone</span></a></span><span>
+</span><span id="line-90"></span><span>        </span><span class="annot"><span class="annottext">BlockFetchRequest block point m a
+-&gt; Peer (BlockFetch block point) 'AsClient 'BFIdle m a
+</span><a href="#local-6989586621679110126"><span class="hs-identifier hs-var">blockFetchRequestPeer</span></a></span><span> </span><span class="annot"><span class="annottext">(BlockFetchRequest block point m a
+ -&gt; Peer (BlockFetch block point) 'AsClient 'BFIdle m a)
+-&gt; m (BlockFetchRequest block point m a)
+-&gt; m (Peer (BlockFetch block point) 'AsClient 'BFIdle m a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">BlockFetchClient block point m a
+-&gt; m (BlockFetchRequest block point m a)
+forall block point (m :: * -&gt; *) a.
+BlockFetchClient block point m a
+-&gt; m (BlockFetchRequest block point m a)
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#runBlockFetchClient"><span class="hs-identifier hs-var hs-var">runBlockFetchClient</span></a></span><span> </span><span class="annot"><span class="annottext">BlockFetchClient block point m a
+</span><a href="#local-6989586621679110102"><span class="hs-identifier hs-var">next</span></a></span><span>
+</span><span id="line-91"></span><span>
+</span><span id="line-92"></span><span class="hs-comment">--</span><span>
+</span><span id="line-93"></span><span class="hs-comment">-- Pipelined client</span><span>
+</span><span id="line-94"></span><span class="hs-comment">--</span><span>
+</span><span id="line-95"></span><span>
+</span><span id="line-96"></span><span class="hs-comment">-- | A BlockFetch client designed for running the protcol in a pipelined way.</span><span>
+</span><span id="line-97"></span><span class="hs-comment">--</span><span>
+</span><span id="line-98"></span><span class="hs-keyword">data</span><span> </span><span id="BlockFetchClientPipelined"><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchClientPipelined"><span class="hs-identifier hs-var">BlockFetchClientPipelined</span></a></span></span><span> </span><span id="local-6989586621679110094"><span class="annot"><a href="#local-6989586621679110094"><span class="hs-identifier hs-type">block</span></a></span></span><span> </span><span id="local-6989586621679110093"><span class="annot"><a href="#local-6989586621679110093"><span class="hs-identifier hs-type">point</span></a></span></span><span> </span><span id="local-6989586621679110092"><span class="annot"><a href="#local-6989586621679110092"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679110091"><span class="annot"><a href="#local-6989586621679110091"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-99"></span><span>   </span><span class="hs-comment">-- | A 'BlockFetchSender', but starting with zero outstanding pipelined</span><span>
+</span><span id="line-100"></span><span>   </span><span class="hs-comment">-- responses, and for any internal collect type @c@.</span><span>
+</span><span id="line-101"></span><span>   </span><span id="local-6989586621679110086"><span id="local-6989586621679110087"><span id="local-6989586621679110088"><span id="local-6989586621679110089"><span id="local-6989586621679110090"><span id="BlockFetchClientPipelined"><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchClientPipelined"><span class="hs-identifier hs-var">BlockFetchClientPipelined</span></a></span></span><span>
+</span><span id="line-102"></span><span>     </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchSender"><span class="hs-identifier hs-type">BlockFetchSender</span></a></span><span>      </span><span class="annot"><span class="hs-identifier hs-type">Z</span></span><span> </span><span class="annot"><a href="#local-6989586621679110090"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110089"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110088"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110087"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110086"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-103"></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchClientPipelined"><span class="hs-identifier hs-type">BlockFetchClientPipelined</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110089"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110088"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110087"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110086"><span class="hs-identifier hs-type">a</span></a></span></span></span></span></span></span><span>
+</span><span id="line-104"></span><span>
+</span><span id="line-105"></span><span class="hs-comment">-- | A 'BlockFetchSender' with @n@ outstanding stream of block bodies.</span><span>
+</span><span id="line-106"></span><span class="hs-comment">--</span><span>
+</span><span id="line-107"></span><span class="hs-keyword">data</span><span> </span><span id="BlockFetchSender"><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchSender"><span class="hs-identifier hs-var">BlockFetchSender</span></a></span></span><span> </span><span id="local-6989586621679110084"><span class="annot"><a href="#local-6989586621679110084"><span class="hs-identifier hs-type">n</span></a></span></span><span> </span><span id="local-6989586621679110083"><span class="annot"><a href="#local-6989586621679110083"><span class="hs-identifier hs-type">c</span></a></span></span><span> </span><span id="local-6989586621679110082"><span class="annot"><a href="#local-6989586621679110082"><span class="hs-identifier hs-type">block</span></a></span></span><span> </span><span id="local-6989586621679110081"><span class="annot"><a href="#local-6989586621679110081"><span class="hs-identifier hs-type">point</span></a></span></span><span> </span><span id="local-6989586621679110080"><span class="annot"><a href="#local-6989586621679110080"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679110079"><span class="annot"><a href="#local-6989586621679110079"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-108"></span><span>
+</span><span id="line-109"></span><span>  </span><span class="hs-comment">-- | Send a `MsgRequestRange` but do not wait for response.  Supply a monadic</span><span>
+</span><span id="line-110"></span><span>  </span><span class="hs-comment">-- action which runs on each received block and which updates the internal</span><span>
+</span><span id="line-111"></span><span>  </span><span class="hs-comment">-- received value @c@.  @c@ could be a Monoid, though it's more general this</span><span>
+</span><span id="line-112"></span><span>  </span><span class="hs-comment">-- way.</span><span>
+</span><span id="line-113"></span><span>  </span><span class="hs-comment">--</span><span>
+</span><span id="line-114"></span><span>  </span><span id="local-6989586621679110073"><span id="local-6989586621679110074"><span id="local-6989586621679110075"><span id="local-6989586621679110076"><span id="local-6989586621679110077"><span id="local-6989586621679110078"><span id="SendMsgRequestRangePipelined"><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#SendMsgRequestRangePipelined"><span class="hs-identifier hs-var">SendMsgRequestRangePipelined</span></a></span></span><span>
+</span><span id="line-115"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#ChainRange"><span class="hs-identifier hs-type">ChainRange</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110078"><span class="hs-identifier hs-type">point</span></a></span><span>
+</span><span id="line-116"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679110077"><span class="hs-identifier hs-type">c</span></a></span><span>
+</span><span id="line-117"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110076"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679110077"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679110075"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110077"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-118"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchSender"><span class="hs-identifier hs-type">BlockFetchSender</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">S</span></span><span> </span><span class="annot"><a href="#local-6989586621679110074"><span class="hs-identifier hs-type">n</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="#local-6989586621679110077"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110076"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110078"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110075"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110073"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-119"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchSender"><span class="hs-identifier hs-type">BlockFetchSender</span></a></span><span>    </span><span class="annot"><a href="#local-6989586621679110074"><span class="hs-identifier hs-type">n</span></a></span><span>  </span><span class="annot"><a href="#local-6989586621679110077"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110076"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110078"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110075"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110073"><span class="hs-identifier hs-type">a</span></a></span></span></span></span></span></span></span><span>
+</span><span id="line-120"></span><span>
+</span><span id="line-121"></span><span>  </span><span class="hs-comment">-- | Collect the result of a previous pipelined receive action</span><span>
+</span><span id="line-122"></span><span>  </span><span class="hs-comment">--</span><span>
+</span><span id="line-123"></span><span>  </span><span id="local-6989586621679110066"><span id="local-6989586621679110067"><span id="local-6989586621679110068"><span id="local-6989586621679110069"><span id="local-6989586621679110070"><span id="local-6989586621679110071"><span id="CollectBlocksPipelined"><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#CollectBlocksPipelined"><span class="hs-identifier hs-var">CollectBlocksPipelined</span></a></span></span><span>
+</span><span id="line-124"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchSender"><span class="hs-identifier hs-type">BlockFetchSender</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">S</span></span><span> </span><span class="annot"><a href="#local-6989586621679110071"><span class="hs-identifier hs-type">n</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="#local-6989586621679110070"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110069"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110068"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110067"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110066"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-125"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679110070"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>  </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchSender"><span class="hs-identifier hs-type">BlockFetchSender</span></a></span><span>    </span><span class="annot"><a href="#local-6989586621679110071"><span class="hs-identifier hs-type">n</span></a></span><span>  </span><span class="annot"><a href="#local-6989586621679110070"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110069"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110068"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110067"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110066"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-126"></span><span>    </span><span class="hs-glyph">-&gt;</span><span>        </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchSender"><span class="hs-identifier hs-type">BlockFetchSender</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">S</span></span><span> </span><span class="annot"><a href="#local-6989586621679110071"><span class="hs-identifier hs-type">n</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="#local-6989586621679110070"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110069"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110068"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110067"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110066"><span class="hs-identifier hs-type">a</span></a></span></span></span></span></span></span></span><span>
+</span><span id="line-127"></span><span>
+</span><span id="line-128"></span><span>  </span><span class="hs-comment">-- | Termination of the block-fetch protocol.</span><span>
+</span><span id="line-129"></span><span>  </span><span id="local-6989586621679110060"><span id="local-6989586621679110061"><span id="local-6989586621679110062"><span id="local-6989586621679110063"><span id="local-6989586621679110064"><span id="SendMsgDonePipelined"><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#SendMsgDonePipelined"><span class="hs-identifier hs-var">SendMsgDonePipelined</span></a></span></span><span>
+</span><span id="line-130"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679110064"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchSender"><span class="hs-identifier hs-type">BlockFetchSender</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Z</span></span><span> </span><span class="annot"><a href="#local-6989586621679110063"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110062"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110061"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110060"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110064"><span class="hs-identifier hs-type">a</span></a></span></span></span></span></span></span><span>
+</span><span id="line-131"></span><span>
+</span><span id="line-132"></span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#blockFetchClientPeerPipelined"><span class="hs-identifier hs-type">blockFetchClientPeerPipelined</span></a></span><span>
+</span><span id="line-133"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679110057"><span class="annot"><a href="#local-6989586621679110057"><span class="hs-identifier hs-type">block</span></a></span></span><span> </span><span id="local-6989586621679110056"><span class="annot"><a href="#local-6989586621679110056"><span class="hs-identifier hs-type">point</span></a></span></span><span> </span><span id="local-6989586621679110055"><span class="annot"><a href="#local-6989586621679110055"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679110054"><span class="annot"><a href="#local-6989586621679110054"><span class="hs-identifier hs-type">a</span></a></span></span><span class="hs-operator">.</span><span>
+</span><span id="line-134"></span><span>     </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Monad</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110055"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-135"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchClientPipelined"><span class="hs-identifier hs-type">BlockFetchClientPipelined</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110057"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110056"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110055"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110054"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-136"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">PeerPipelined</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#BlockFetch"><span class="hs-identifier hs-type">BlockFetch</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110057"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110056"><span class="hs-identifier hs-type">point</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AsClient</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#BFIdle"><span class="hs-identifier hs-type">BFIdle</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110055"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110054"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-137"></span><span id="blockFetchClientPeerPipelined"><span class="annot"><span class="annottext">blockFetchClientPeerPipelined :: BlockFetchClientPipelined block point m a
+-&gt; PeerPipelined (BlockFetch block point) 'AsClient 'BFIdle m a
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#blockFetchClientPeerPipelined"><span class="hs-identifier hs-var hs-var">blockFetchClientPeerPipelined</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchClientPipelined"><span class="hs-identifier hs-type">BlockFetchClientPipelined</span></a></span><span> </span><span id="local-6989586621679110053"><span class="annot"><span class="annottext">BlockFetchSender 'Z c block point m a
+</span><a href="#local-6989586621679110053"><span class="hs-identifier hs-var">sender</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-138"></span><span>  </span><span class="annot"><span class="annottext">PeerSender (BlockFetch block point) 'AsClient 'BFIdle 'Z c m a
+-&gt; PeerPipelined (BlockFetch block point) 'AsClient 'BFIdle m a
+forall ps (pr :: PeerRole) (st :: ps) c (m :: * -&gt; *) a.
+PeerSender ps pr st 'Z c m a -&gt; PeerPipelined ps pr st m a
+</span><span class="hs-identifier hs-var">PeerPipelined</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">BlockFetchSender 'Z c block point m a
+-&gt; PeerSender (BlockFetch block point) 'AsClient 'BFIdle 'Z c m a
+forall (n :: N) block point c (m :: * -&gt; *) a.
+Monad m =&gt;
+BlockFetchSender n c block point m a
+-&gt; PeerSender (BlockFetch block point) 'AsClient 'BFIdle n c m a
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#blockFetchClientPeerSender"><span class="hs-identifier hs-var">blockFetchClientPeerSender</span></a></span><span> </span><span class="annot"><span class="annottext">BlockFetchSender 'Z c block point m a
+</span><a href="#local-6989586621679110053"><span class="hs-identifier hs-var">sender</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-139"></span><span>
+</span><span id="line-140"></span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#blockFetchClientPeerSender"><span class="hs-identifier hs-type">blockFetchClientPeerSender</span></a></span><span>
+</span><span id="line-141"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679110198"><span class="annot"><a href="#local-6989586621679110198"><span class="hs-identifier hs-type">n</span></a></span></span><span> </span><span id="local-6989586621679110196"><span class="annot"><a href="#local-6989586621679110196"><span class="hs-identifier hs-type">block</span></a></span></span><span> </span><span id="local-6989586621679110195"><span class="annot"><a href="#local-6989586621679110195"><span class="hs-identifier hs-type">point</span></a></span></span><span> </span><span id="local-6989586621679110197"><span class="annot"><a href="#local-6989586621679110197"><span class="hs-identifier hs-type">c</span></a></span></span><span> </span><span id="local-6989586621679110199"><span class="annot"><a href="#local-6989586621679110199"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679110194"><span class="annot"><a href="#local-6989586621679110194"><span class="hs-identifier hs-type">a</span></a></span></span><span class="hs-operator">.</span><span>
+</span><span id="line-142"></span><span>     </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Monad</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110199"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-143"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#BlockFetchSender"><span class="hs-identifier hs-type">BlockFetchSender</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110198"><span class="hs-identifier hs-type">n</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110197"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110196"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110195"><span class="hs-identifier hs-type">point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110199"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110194"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-144"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">PeerSender</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#BlockFetch"><span class="hs-identifier hs-type">BlockFetch</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110196"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110195"><span class="hs-identifier hs-type">point</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AsClient</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#BFIdle"><span class="hs-identifier hs-type">BFIdle</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110198"><span class="hs-identifier hs-type">n</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110197"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110199"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110194"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-145"></span><span>
+</span><span id="line-146"></span><span id="blockFetchClientPeerSender"><span class="annot"><span class="annottext">blockFetchClientPeerSender :: BlockFetchSender n c block point m a
+-&gt; PeerSender (BlockFetch block point) 'AsClient 'BFIdle n c m a
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#blockFetchClientPeerSender"><span class="hs-identifier hs-var hs-var">blockFetchClientPeerSender</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#SendMsgDonePipelined"><span class="hs-identifier hs-type">SendMsgDonePipelined</span></a></span><span> </span><span id="local-6989586621679110050"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679110050"><span class="hs-identifier hs-var">result</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-147"></span><span>  </span><span class="hs-comment">-- Send `MsgClientDone` and complete the protocol</span><span>
+</span><span id="line-148"></span><span>  </span><span class="annot"><span class="annottext">WeHaveAgency 'AsClient 'BFIdle
+-&gt; Message (BlockFetch block point) 'BFIdle 'BFDone
+-&gt; PeerSender (BlockFetch block point) 'AsClient 'BFDone 'Z c m a
+-&gt; PeerSender (BlockFetch block point) 'AsClient 'BFIdle 'Z c m a
+forall (pr :: PeerRole) ps (st :: ps) (st' :: ps) c (m :: * -&gt; *)
+       a.
+WeHaveAgency pr st
+-&gt; Message ps st st'
+-&gt; PeerSender ps pr st' 'Z c m a
+-&gt; PeerSender ps pr st 'Z c m a
+</span><span class="hs-identifier hs-var">SenderYield</span></span><span>
+</span><span id="line-149"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ClientHasAgency 'BFIdle -&gt; WeHaveAgency 'AsClient 'BFIdle
+forall ps (st :: ps).
+ClientHasAgency st -&gt; PeerHasAgency 'AsClient st
+</span><span class="hs-identifier hs-var">ClientAgency</span></span><span> </span><span class="annot"><span class="annottext">ClientHasAgency 'BFIdle
+forall k k (block :: k) (point :: k). ClientHasAgency 'BFIdle
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#TokIdle"><span class="hs-identifier hs-var">TokIdle</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-150"></span><span>    </span><span class="annot"><span class="annottext">Message (BlockFetch block point) 'BFIdle 'BFDone
+forall k k (block :: k) (point :: k).
+Message (BlockFetch block point) 'BFIdle 'BFDone
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#MsgClientDone"><span class="hs-identifier hs-var">MsgClientDone</span></a></span><span>
+</span><span id="line-151"></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NobodyHasAgency 'BFDone
+-&gt; a
+-&gt; PeerSender (BlockFetch block point) 'AsClient 'BFDone 'Z c m a
+forall ps (st :: ps) a (pr :: PeerRole) c (m :: * -&gt; *).
+NobodyHasAgency st -&gt; a -&gt; PeerSender ps pr st 'Z c m a
+</span><span class="hs-identifier hs-var">SenderDone</span></span><span> </span><span class="annot"><span class="annottext">NobodyHasAgency 'BFDone
+forall k k (block :: k) (point :: k). NobodyHasAgency 'BFDone
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#TokDone"><span class="hs-identifier hs-var">TokDone</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679110050"><span class="hs-identifier hs-var">result</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-152"></span><span>
+</span><span id="line-153"></span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#blockFetchClientPeerSender"><span class="hs-identifier hs-var">blockFetchClientPeerSender</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#SendMsgRequestRangePipelined"><span class="hs-identifier hs-type">SendMsgRequestRangePipelined</span></a></span><span> </span><span id="local-6989586621679110047"><span class="annot"><span class="annottext">ChainRange point
+</span><a href="#local-6989586621679110047"><span class="hs-identifier hs-var">range</span></a></span></span><span> </span><span id="local-6989586621679110046"><span class="annot"><span class="annottext">c
+</span><a href="#local-6989586621679110046"><span class="hs-identifier hs-var">c0</span></a></span></span><span> </span><span id="local-6989586621679110045"><span class="annot"><span class="annottext">Maybe block -&gt; c -&gt; m c
+</span><a href="#local-6989586621679110045"><span class="hs-identifier hs-var">receive</span></a></span></span><span> </span><span id="local-6989586621679110044"><span class="annot"><span class="annottext">BlockFetchSender ('S n) c block point m a
+</span><a href="#local-6989586621679110044"><span class="hs-identifier hs-var">next</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-154"></span><span>  </span><span class="hs-comment">-- Pipelined yield: send `MsgRequestRange`, return receicer which will</span><span>
+</span><span id="line-155"></span><span>  </span><span class="hs-comment">-- consume a stream of blocks.</span><span>
+</span><span id="line-156"></span><span>  </span><span class="annot"><span class="annottext">WeHaveAgency 'AsClient 'BFIdle
+-&gt; Message (BlockFetch block point) 'BFIdle 'BFBusy
+-&gt; PeerReceiver
+     (BlockFetch block point) 'AsClient 'BFBusy 'BFIdle m c
+-&gt; PeerSender
+     (BlockFetch block point) 'AsClient 'BFIdle ('S n) c m a
+-&gt; PeerSender (BlockFetch block point) 'AsClient 'BFIdle n c m a
+forall (pr :: PeerRole) ps (st :: ps) (st' :: ps) (st'' :: ps)
+       (m :: * -&gt; *) c (n :: N) a.
+WeHaveAgency pr st
+-&gt; Message ps st st'
+-&gt; PeerReceiver ps pr st' st'' m c
+-&gt; PeerSender ps pr st'' ('S n) c m a
+-&gt; PeerSender ps pr st n c m a
+</span><span class="hs-identifier hs-var">SenderPipeline</span></span><span>
+</span><span id="line-157"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ClientHasAgency 'BFIdle -&gt; WeHaveAgency 'AsClient 'BFIdle
+forall ps (st :: ps).
+ClientHasAgency st -&gt; PeerHasAgency 'AsClient st
+</span><span class="hs-identifier hs-var">ClientAgency</span></span><span> </span><span class="annot"><span class="annottext">ClientHasAgency 'BFIdle
+forall k k (block :: k) (point :: k). ClientHasAgency 'BFIdle
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#TokIdle"><span class="hs-identifier hs-var">TokIdle</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-158"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ChainRange point
+-&gt; Message (BlockFetch block point) 'BFIdle 'BFBusy
+forall k point (block :: k).
+ChainRange point
+-&gt; Message (BlockFetch block point) 'BFIdle 'BFBusy
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#MsgRequestRange"><span class="hs-identifier hs-var">MsgRequestRange</span></a></span><span> </span><span class="annot"><span class="annottext">ChainRange point
+</span><a href="#local-6989586621679110047"><span class="hs-identifier hs-var">range</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-159"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TheyHaveAgency 'AsClient 'BFBusy
+-&gt; (forall (st' :: BlockFetch block point).
+    Message (BlockFetch block point) 'BFBusy st'
+    -&gt; PeerReceiver (BlockFetch block point) 'AsClient st' 'BFIdle m c)
+-&gt; PeerReceiver
+     (BlockFetch block point) 'AsClient 'BFBusy 'BFIdle m c
+forall (pr :: PeerRole) ps (st :: ps) (stdone :: ps) (m :: * -&gt; *)
+       c.
+TheyHaveAgency pr st
+-&gt; (forall (st' :: ps).
+    Message ps st st' -&gt; PeerReceiver ps pr st' stdone m c)
+-&gt; PeerReceiver ps pr st stdone m c
+</span><span class="hs-identifier hs-var">ReceiverAwait</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ServerHasAgency 'BFBusy -&gt; PeerHasAgency 'AsServer 'BFBusy
+forall ps (st :: ps).
+ServerHasAgency st -&gt; PeerHasAgency 'AsServer st
+</span><span class="hs-identifier hs-var">ServerAgency</span></span><span> </span><span class="annot"><span class="annottext">ServerHasAgency 'BFBusy
+forall k k (block :: k) (point :: k). ServerHasAgency 'BFBusy
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#TokBusy"><span class="hs-identifier hs-var">TokBusy</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">((forall (st' :: BlockFetch block point).
+  Message (BlockFetch block point) 'BFBusy st'
+  -&gt; PeerReceiver (BlockFetch block point) 'AsClient st' 'BFIdle m c)
+ -&gt; PeerReceiver
+      (BlockFetch block point) 'AsClient 'BFBusy 'BFIdle m c)
+-&gt; (forall (st' :: BlockFetch block point).
+    Message (BlockFetch block point) 'BFBusy st'
+    -&gt; PeerReceiver (BlockFetch block point) 'AsClient st' 'BFIdle m c)
+-&gt; PeerReceiver
+     (BlockFetch block point) 'AsClient 'BFBusy 'BFIdle m c
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679110041"><span class="annot"><span class="annottext">Message (BlockFetch block point) 'BFBusy st'
+</span><a href="#local-6989586621679110041"><span class="hs-identifier hs-var">msg</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Message (BlockFetch block point) 'BFBusy st'
+</span><a href="#local-6989586621679110041"><span class="hs-identifier hs-var">msg</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-160"></span><span>      </span><span class="annot"><span class="annottext">Message (BlockFetch block point) 'BFBusy st'
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#MsgStartBatch"><span class="hs-identifier hs-var">MsgStartBatch</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">c
+-&gt; PeerReceiver
+     (BlockFetch block point) 'AsClient 'BFStreaming 'BFIdle m c
+</span><a href="#local-6989586621679110040"><span class="hs-identifier hs-var">receiveBlocks</span></a></span><span> </span><span class="annot"><span class="annottext">c
+</span><a href="#local-6989586621679110046"><span class="hs-identifier hs-var">c0</span></a></span><span>
+</span><span id="line-161"></span><span>      </span><span class="annot"><span class="annottext">Message (BlockFetch block point) 'BFBusy st'
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#MsgNoBlocks"><span class="hs-identifier hs-var">MsgNoBlocks</span></a></span><span>   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">c -&gt; PeerReceiver (BlockFetch block point) 'AsClient st' st' m c
+forall c ps (pr :: PeerRole) (st :: ps) (m :: * -&gt; *).
+c -&gt; PeerReceiver ps pr st st m c
+</span><span class="hs-identifier hs-var">ReceiverDone</span></span><span> </span><span class="annot"><span class="annottext">c
+</span><a href="#local-6989586621679110046"><span class="hs-identifier hs-var">c0</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-162"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">BlockFetchSender ('S n) c block point m a
+-&gt; PeerSender
+     (BlockFetch block point) 'AsClient 'BFIdle ('S n) c m a
+forall (n :: N) block point c (m :: * -&gt; *) a.
+Monad m =&gt;
+BlockFetchSender n c block point m a
+-&gt; PeerSender (BlockFetch block point) 'AsClient 'BFIdle n c m a
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#blockFetchClientPeerSender"><span class="hs-identifier hs-var">blockFetchClientPeerSender</span></a></span><span> </span><span class="annot"><span class="annottext">BlockFetchSender ('S n) c block point m a
+</span><a href="#local-6989586621679110044"><span class="hs-identifier hs-var">next</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-163"></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-164"></span><span>  </span><span class="annot"><a href="#local-6989586621679110040"><span class="hs-identifier hs-type">receiveBlocks</span></a></span><span>
+</span><span id="line-165"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679110197"><span class="hs-identifier hs-type">c</span></a></span><span>
+</span><span id="line-166"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">PeerReceiver</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#BlockFetch"><span class="hs-identifier hs-type">BlockFetch</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110196"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110195"><span class="hs-identifier hs-type">point</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AsClient</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#BFStreaming"><span class="hs-identifier hs-type">BFStreaming</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#BFIdle"><span class="hs-identifier hs-type">BFIdle</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110199"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110197"><span class="hs-identifier hs-type">c</span></a></span><span>
+</span><span id="line-167"></span><span>  </span><span id="local-6989586621679110040"><span class="annot"><span class="annottext">receiveBlocks :: c
+-&gt; PeerReceiver
+     (BlockFetch block point) 'AsClient 'BFStreaming 'BFIdle m c
+</span><a href="#local-6989586621679110040"><span class="hs-identifier hs-var hs-var">receiveBlocks</span></a></span></span><span> </span><span id="local-6989586621679110038"><span class="annot"><span class="annottext">c
+</span><a href="#local-6989586621679110038"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TheyHaveAgency 'AsClient 'BFStreaming
+-&gt; (forall (st' :: BlockFetch block point).
+    Message (BlockFetch block point) 'BFStreaming st'
+    -&gt; PeerReceiver (BlockFetch block point) 'AsClient st' 'BFIdle m c)
+-&gt; PeerReceiver
+     (BlockFetch block point) 'AsClient 'BFStreaming 'BFIdle m c
+forall (pr :: PeerRole) ps (st :: ps) (stdone :: ps) (m :: * -&gt; *)
+       c.
+TheyHaveAgency pr st
+-&gt; (forall (st' :: ps).
+    Message ps st st' -&gt; PeerReceiver ps pr st' stdone m c)
+-&gt; PeerReceiver ps pr st stdone m c
+</span><span class="hs-identifier hs-var">ReceiverAwait</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ServerHasAgency 'BFStreaming
+-&gt; PeerHasAgency 'AsServer 'BFStreaming
+forall ps (st :: ps).
+ServerHasAgency st -&gt; PeerHasAgency 'AsServer st
+</span><span class="hs-identifier hs-var">ServerAgency</span></span><span> </span><span class="annot"><span class="annottext">ServerHasAgency 'BFStreaming
+forall k k (block :: k) (point :: k). ServerHasAgency 'BFStreaming
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#TokStreaming"><span class="hs-identifier hs-var">TokStreaming</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">((forall (st' :: BlockFetch block point).
+  Message (BlockFetch block point) 'BFStreaming st'
+  -&gt; PeerReceiver (BlockFetch block point) 'AsClient st' 'BFIdle m c)
+ -&gt; PeerReceiver
+      (BlockFetch block point) 'AsClient 'BFStreaming 'BFIdle m c)
+-&gt; (forall (st' :: BlockFetch block point).
+    Message (BlockFetch block point) 'BFStreaming st'
+    -&gt; PeerReceiver (BlockFetch block point) 'AsClient st' 'BFIdle m c)
+-&gt; PeerReceiver
+     (BlockFetch block point) 'AsClient 'BFStreaming 'BFIdle m c
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679110037"><span class="annot"><span class="annottext">Message (BlockFetch block point) 'BFStreaming st'
+</span><a href="#local-6989586621679110037"><span class="hs-identifier hs-var">msg</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Message (BlockFetch block point) 'BFStreaming st'
+</span><a href="#local-6989586621679110037"><span class="hs-identifier hs-var">msg</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-168"></span><span>    </span><span class="hs-comment">-- received a block, run an acction and compute the result</span><span>
+</span><span id="line-169"></span><span>    </span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#MsgBlock"><span class="hs-identifier hs-type">MsgBlock</span></a></span><span> </span><span id="local-6989586621679110036"><span class="annot"><a href="#local-6989586621679110036"><span class="hs-identifier hs-var">block</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">m (PeerReceiver
+     (BlockFetch block point) 'AsClient 'BFStreaming 'BFIdle m c)
+-&gt; PeerReceiver
+     (BlockFetch block point) 'AsClient 'BFStreaming 'BFIdle m c
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) (stdone :: ps)
+       c.
+m (PeerReceiver ps pr st stdone m c)
+-&gt; PeerReceiver ps pr st stdone m c
+</span><span class="hs-identifier hs-var">ReceiverEffect</span></span><span> </span><span class="annot"><span class="annottext">(m (PeerReceiver
+      (BlockFetch block point) 'AsClient 'BFStreaming 'BFIdle m c)
+ -&gt; PeerReceiver
+      (BlockFetch block point) 'AsClient 'BFStreaming 'BFIdle m c)
+-&gt; m (PeerReceiver
+        (BlockFetch block point) 'AsClient 'BFStreaming 'BFIdle m c)
+-&gt; PeerReceiver
+     (BlockFetch block point) 'AsClient 'BFStreaming 'BFIdle m c
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-170"></span><span>      </span><span id="local-6989586621679110034"><span class="annot"><span class="annottext">c
+</span><a href="#local-6989586621679110034"><span class="hs-identifier hs-var">c'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Maybe block -&gt; c -&gt; m c
+</span><a href="#local-6989586621679110045"><span class="hs-identifier hs-var">receive</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">block -&gt; Maybe block
+forall a. a -&gt; Maybe a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">block
+</span><a href="#local-6989586621679110036"><span class="hs-identifier hs-var">block</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">c
+</span><a href="#local-6989586621679110038"><span class="hs-identifier hs-var">c</span></a></span><span>
+</span><span id="line-171"></span><span>      </span><span class="annot"><span class="annottext">PeerReceiver
+  (BlockFetch block point) 'AsClient 'BFStreaming 'BFIdle m c
+-&gt; m (PeerReceiver
+        (BlockFetch block point) 'AsClient 'BFStreaming 'BFIdle m c)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">(PeerReceiver
+   (BlockFetch block point) 'AsClient 'BFStreaming 'BFIdle m c
+ -&gt; m (PeerReceiver
+         (BlockFetch block point) 'AsClient 'BFStreaming 'BFIdle m c))
+-&gt; PeerReceiver
+     (BlockFetch block point) 'AsClient 'BFStreaming 'BFIdle m c
+-&gt; m (PeerReceiver
+        (BlockFetch block point) 'AsClient 'BFStreaming 'BFIdle m c)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">c
+-&gt; PeerReceiver
+     (BlockFetch block point) 'AsClient 'BFStreaming 'BFIdle m c
+</span><a href="#local-6989586621679110040"><span class="hs-identifier hs-var">receiveBlocks</span></a></span><span> </span><span class="annot"><span class="annottext">c
+</span><a href="#local-6989586621679110034"><span class="hs-identifier hs-var">c'</span></a></span><span>
+</span><span id="line-172"></span><span>    </span><span class="annot"><span class="annottext">Message (BlockFetch block point) 'BFStreaming st'
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Type.html#MsgBatchDone"><span class="hs-identifier hs-var">MsgBatchDone</span></a></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">c -&gt; PeerReceiver (BlockFetch block point) 'AsClient st' st' m c
+forall c ps (pr :: PeerRole) (st :: ps) (m :: * -&gt; *).
+c -&gt; PeerReceiver ps pr st st m c
+</span><span class="hs-identifier hs-var">ReceiverDone</span></span><span> </span><span class="annot"><span class="annottext">c
+</span><a href="#local-6989586621679110038"><span class="hs-identifier hs-var">c</span></a></span><span>
+</span><span id="line-173"></span><span>
+</span><span id="line-174"></span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#blockFetchClientPeerSender"><span class="hs-identifier hs-var">blockFetchClientPeerSender</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#CollectBlocksPipelined"><span class="hs-identifier hs-type">CollectBlocksPipelined</span></a></span><span> </span><span id="local-6989586621679110033"><span class="annot"><span class="annottext">Maybe (BlockFetchSender ('S n) c block point m a)
+</span><a href="#local-6989586621679110033"><span class="hs-identifier hs-var">mNone</span></a></span></span><span> </span><span id="local-6989586621679110032"><span class="annot"><span class="annottext">c -&gt; BlockFetchSender n c block point m a
+</span><a href="#local-6989586621679110032"><span class="hs-identifier hs-var">collect</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-175"></span><span>  </span><span class="annot"><span class="annottext">Maybe
+  (PeerSender
+     (BlockFetch block point) 'AsClient 'BFIdle ('S n) c m a)
+-&gt; (c
+    -&gt; PeerSender (BlockFetch block point) 'AsClient 'BFIdle n c m a)
+-&gt; PeerSender
+     (BlockFetch block point) 'AsClient 'BFIdle ('S n) c m a
+forall ps (pr :: PeerRole) (st :: ps) (n1 :: N) c (m :: * -&gt; *) a.
+Maybe (PeerSender ps pr st ('S n1) c m a)
+-&gt; (c -&gt; PeerSender ps pr st n1 c m a)
+-&gt; PeerSender ps pr st ('S n1) c m a
+</span><span class="hs-identifier hs-var">SenderCollect</span></span><span>
+</span><span id="line-176"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(BlockFetchSender ('S n) c block point m a
+ -&gt; PeerSender
+      (BlockFetch block point) 'AsClient 'BFIdle ('S n) c m a)
+-&gt; Maybe (BlockFetchSender ('S n) c block point m a)
+-&gt; Maybe
+     (PeerSender
+        (BlockFetch block point) 'AsClient 'BFIdle ('S n) c m a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fmap</span></a></span><span> </span><span class="annot"><span class="annottext">BlockFetchSender ('S n) c block point m a
+-&gt; PeerSender
+     (BlockFetch block point) 'AsClient 'BFIdle ('S n) c m a
+forall (n :: N) block point c (m :: * -&gt; *) a.
+Monad m =&gt;
+BlockFetchSender n c block point m a
+-&gt; PeerSender (BlockFetch block point) 'AsClient 'BFIdle n c m a
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#blockFetchClientPeerSender"><span class="hs-identifier hs-var">blockFetchClientPeerSender</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe (BlockFetchSender ('S n) c block point m a)
+</span><a href="#local-6989586621679110033"><span class="hs-identifier hs-var">mNone</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-177"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">BlockFetchSender n c block point m a
+-&gt; PeerSender (BlockFetch block point) 'AsClient 'BFIdle n c m a
+forall (n :: N) block point c (m :: * -&gt; *) a.
+Monad m =&gt;
+BlockFetchSender n c block point m a
+-&gt; PeerSender (BlockFetch block point) 'AsClient 'BFIdle n c m a
+</span><a href="Ouroboros.Network.Protocol.BlockFetch.Client.html#blockFetchClientPeerSender"><span class="hs-identifier hs-var">blockFetchClientPeerSender</span></a></span><span> </span><span class="annot"><span class="annottext">(BlockFetchSender n c block point m a
+ -&gt; PeerSender (BlockFetch block point) 'AsClient 'BFIdle n c m a)
+-&gt; (c -&gt; BlockFetchSender n c block point m a)
+-&gt; c
+-&gt; PeerSender (BlockFetch block point) 'AsClient 'BFIdle n c m a
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">c -&gt; BlockFetchSender n c block point m a
+</span><a href="#local-6989586621679110032"><span class="hs-identifier hs-var">collect</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-178"></span></pre></body></html>

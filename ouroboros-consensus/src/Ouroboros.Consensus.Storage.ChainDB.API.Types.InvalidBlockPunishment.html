@@ -1,0 +1,270 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DataKinds           #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DerivingVia         #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE FlexibleContexts    #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE LambdaCase          #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables #-}</span><span>
+</span><span id="line-6"></span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- | How to punish the sender of a invalid block</span><span>
+</span><span id="line-8"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-9"></span><span>    </span><span class="annot"><span class="hs-comment">-- * opaque</span></span><span>
+</span><span id="line-10"></span><span>    </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#InvalidBlockPunishment"><span class="hs-identifier">InvalidBlockPunishment</span></a></span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#enact"><span class="hs-identifier">enact</span></a></span><span>
+</span><span id="line-12"></span><span>    </span><span class="annot"><span class="hs-comment">-- * combinators</span></span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#Invalidity"><span class="hs-identifier">Invalidity</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#branch"><span class="hs-identifier">branch</span></a></span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#mkPunishThisThread"><span class="hs-identifier">mkPunishThisThread</span></a></span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#mkUnlessImproved"><span class="hs-identifier">mkUnlessImproved</span></a></span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#noPunishment"><span class="hs-identifier">noPunishment</span></a></span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-19"></span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Control.Exception</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Exn</span></span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Control.Monad</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">join</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">unless</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Functor</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator">(&lt;&amp;&gt;)</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">NoThunks.Class</span></span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Block.Abstract.html"><span class="hs-identifier">Ouroboros.Consensus.Block.Abstract</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Block.Abstract.html#BlockProtocol"><span class="hs-identifier">BlockProtocol</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Abstract.html"><span class="hs-identifier">Ouroboros.Consensus.Protocol.Abstract</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Abstract.html#SelectView"><span class="hs-identifier">SelectView</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Util.IOLike.html"><span class="hs-identifier">Ouroboros.Consensus.Util.IOLike</span></a></span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Util.TentativeState.html"><span class="hs-identifier">Ouroboros.Consensus.Util.TentativeState</span></a></span><span>
+</span><span id="line-30"></span><span>
+</span><span id="line-31"></span><span class="hs-comment">-- | Is the added block itself invalid, or is its prefix invalid?</span><span>
+</span><span id="line-32"></span><span class="hs-keyword">data</span><span> </span><span id="Invalidity"><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#Invalidity"><span class="hs-identifier hs-var">Invalidity</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-33"></span><span>    </span><span id="BlockItself"><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#BlockItself"><span class="hs-identifier hs-var">BlockItself</span></a></span></span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="BlockPrefix"><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#BlockPrefix"><span class="hs-identifier hs-var">BlockPrefix</span></a></span></span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span class="hs-comment">-- | How to handle a discovered 'Invalidity'</span><span>
+</span><span id="line-37"></span><span class="hs-comment">--</span><span>
+</span><span id="line-38"></span><span class="hs-comment">-- This type is opaque because the soundness of the punishment is subtle because</span><span>
+</span><span id="line-39"></span><span class="hs-comment">-- of where it is invoked during the chain selection. As a result, arbitrary</span><span>
+</span><span id="line-40"></span><span class="hs-comment">-- monadic actions would be foot guns. Instead, this module defines a small DSL</span><span>
+</span><span id="line-41"></span><span class="hs-comment">-- for punishment that we judge to be sound.</span><span>
+</span><span id="line-42"></span><span class="hs-keyword">newtype</span><span> </span><span id="InvalidBlockPunishment"><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#InvalidBlockPunishment"><span class="hs-identifier hs-var">InvalidBlockPunishment</span></a></span></span><span> </span><span id="local-6989586621679983596"><span class="annot"><a href="#local-6989586621679983596"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="InvalidBlockPunishment"><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#InvalidBlockPunishment"><span class="hs-identifier hs-var">InvalidBlockPunishment</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-43"></span><span>    </span><span id="enact"><span class="annot"><span class="annottext">InvalidBlockPunishment m -&gt; Invalidity -&gt; m ()
+</span><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#enact"><span class="hs-identifier hs-var hs-var">enact</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#Invalidity"><span class="hs-identifier hs-type">Invalidity</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679983596"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-45"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679983535"><span id="local-6989586621679983537"><span id="local-6989586621679983539"><span class="annot"><span class="annottext">Context -&gt; InvalidBlockPunishment m -&gt; IO (Maybe ThunkInfo)
+Proxy (InvalidBlockPunishment m) -&gt; String
+(Context -&gt; InvalidBlockPunishment m -&gt; IO (Maybe ThunkInfo))
+-&gt; (Context -&gt; InvalidBlockPunishment m -&gt; IO (Maybe ThunkInfo))
+-&gt; (Proxy (InvalidBlockPunishment m) -&gt; String)
+-&gt; NoThunks (InvalidBlockPunishment m)
+forall a.
+(Context -&gt; a -&gt; IO (Maybe ThunkInfo))
+-&gt; (Context -&gt; a -&gt; IO (Maybe ThunkInfo))
+-&gt; (Proxy a -&gt; String)
+-&gt; NoThunks a
+forall (m :: * -&gt; *).
+Context -&gt; InvalidBlockPunishment m -&gt; IO (Maybe ThunkInfo)
+forall (m :: * -&gt; *). Proxy (InvalidBlockPunishment m) -&gt; String
+showTypeOf :: Proxy (InvalidBlockPunishment m) -&gt; String
+$cshowTypeOf :: forall (m :: * -&gt; *). Proxy (InvalidBlockPunishment m) -&gt; String
+wNoThunks :: Context -&gt; InvalidBlockPunishment m -&gt; IO (Maybe ThunkInfo)
+$cwNoThunks :: forall (m :: * -&gt; *).
+Context -&gt; InvalidBlockPunishment m -&gt; IO (Maybe ThunkInfo)
+noThunks :: Context -&gt; InvalidBlockPunishment m -&gt; IO (Maybe ThunkInfo)
+$cnoThunks :: forall (m :: * -&gt; *).
+Context -&gt; InvalidBlockPunishment m -&gt; IO (Maybe ThunkInfo)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">NoThunks</span></span></span></span></span><span> </span><span class="hs-keyword">via</span><span>
+</span><span id="line-46"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">OnlyCheckWhnfNamed</span></span><span> </span><span class="annot"><span class="hs-string">&quot;InvalidBlockPunishment&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#InvalidBlockPunishment"><span class="hs-identifier hs-type">InvalidBlockPunishment</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983596"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span class="hs-comment">-- | A noop punishment</span><span>
+</span><span id="line-49"></span><span id="local-6989586621679983532"><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#noPunishment"><span class="hs-identifier hs-type">noPunishment</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Applicative</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983532"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#InvalidBlockPunishment"><span class="hs-identifier hs-type">InvalidBlockPunishment</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983532"><span class="hs-identifier hs-type">m</span></a></span></span><span>
+</span><span id="line-50"></span><span id="noPunishment"><span class="annot"><span class="annottext">noPunishment :: InvalidBlockPunishment m
+</span><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#noPunishment"><span class="hs-identifier hs-var hs-var">noPunishment</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Invalidity -&gt; m ()) -&gt; InvalidBlockPunishment m
+forall (m :: * -&gt; *).
+(Invalidity -&gt; m ()) -&gt; InvalidBlockPunishment m
+</span><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#InvalidBlockPunishment"><span class="hs-identifier hs-var">InvalidBlockPunishment</span></a></span><span> </span><span class="annot"><span class="annottext">((Invalidity -&gt; m ()) -&gt; InvalidBlockPunishment m)
+-&gt; (Invalidity -&gt; m ()) -&gt; InvalidBlockPunishment m
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679983531"><span class="annot"><span class="annottext">Invalidity
+</span><a href="#local-6989586621679983531"><span class="hs-identifier hs-var">_invalidity</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">() -&gt; m ()
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-51"></span><span>
+</span><span id="line-52"></span><span class="hs-comment">-- | Create a punishment that kills this thread</span><span>
+</span><span id="line-53"></span><span id="local-6989586621679983530"><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#mkPunishThisThread"><span class="hs-identifier hs-type">mkPunishThisThread</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Util.IOLike.html#IOLike"><span class="hs-identifier hs-type">IOLike</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983530"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679983530"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#InvalidBlockPunishment"><span class="hs-identifier hs-type">InvalidBlockPunishment</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983530"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-54"></span><span id="mkPunishThisThread"><span class="annot"><span class="annottext">mkPunishThisThread :: m (InvalidBlockPunishment m)
+</span><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#mkPunishThisThread"><span class="hs-identifier hs-var hs-var">mkPunishThisThread</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-55"></span><span>    </span><span id="local-6989586621679983528"><span class="annot"><span class="annottext">ThreadId m
+</span><a href="#local-6989586621679983528"><span class="hs-identifier hs-var">tid</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">m (ThreadId m)
+forall (m :: * -&gt; *). MonadThread m =&gt; m (ThreadId m)
+</span><span class="hs-identifier hs-var">myThreadId</span></span><span>
+</span><span id="line-56"></span><span>    </span><span class="annot"><span class="annottext">InvalidBlockPunishment m -&gt; m (InvalidBlockPunishment m)
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">(InvalidBlockPunishment m -&gt; m (InvalidBlockPunishment m))
+-&gt; InvalidBlockPunishment m -&gt; m (InvalidBlockPunishment m)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">(Invalidity -&gt; m ()) -&gt; InvalidBlockPunishment m
+forall (m :: * -&gt; *).
+(Invalidity -&gt; m ()) -&gt; InvalidBlockPunishment m
+</span><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#InvalidBlockPunishment"><span class="hs-identifier hs-var">InvalidBlockPunishment</span></a></span><span> </span><span class="annot"><span class="annottext">((Invalidity -&gt; m ()) -&gt; InvalidBlockPunishment m)
+-&gt; (Invalidity -&gt; m ()) -&gt; InvalidBlockPunishment m
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679983526"><span class="annot"><span class="annottext">Invalidity
+</span><a href="#local-6989586621679983526"><span class="hs-identifier hs-var">_invalidity</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-57"></span><span>      </span><span class="annot"><span class="annottext">ThreadId m -&gt; PeerSentAnInvalidBlockException -&gt; m ()
+forall (m :: * -&gt; *) e.
+(MonadFork m, Exception e) =&gt;
+ThreadId m -&gt; e -&gt; m ()
+</span><span class="hs-identifier hs-var">throwTo</span></span><span> </span><span class="annot"><span class="annottext">ThreadId m
+</span><a href="#local-6989586621679983528"><span class="hs-identifier hs-var">tid</span></a></span><span> </span><span class="annot"><span class="annottext">PeerSentAnInvalidBlockException
+</span><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#PeerSentAnInvalidBlockException"><span class="hs-identifier hs-var">PeerSentAnInvalidBlockException</span></a></span><span>
+</span><span id="line-58"></span><span>
+</span><span id="line-59"></span><span class="hs-comment">-- | Thrown asynchronously to the client thread that added the block whose</span><span>
+</span><span id="line-60"></span><span class="hs-comment">-- processing involved an invalid block.</span><span>
+</span><span id="line-61"></span><span class="hs-comment">--</span><span>
+</span><span id="line-62"></span><span class="hs-comment">-- See 'punishThisThread'.</span><span>
+</span><span id="line-63"></span><span class="hs-keyword">data</span><span> </span><span id="PeerSentAnInvalidBlockException"><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#PeerSentAnInvalidBlockException"><span class="hs-identifier hs-var">PeerSentAnInvalidBlockException</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="PeerSentAnInvalidBlockException"><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#PeerSentAnInvalidBlockException"><span class="hs-identifier hs-var">PeerSentAnInvalidBlockException</span></a></span></span><span>
+</span><span id="line-64"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679983518"><span id="local-6989586621679983520"><span id="local-6989586621679983522"><span class="annot"><span class="annottext">Int -&gt; PeerSentAnInvalidBlockException -&gt; ShowS
+[PeerSentAnInvalidBlockException] -&gt; ShowS
+PeerSentAnInvalidBlockException -&gt; String
+(Int -&gt; PeerSentAnInvalidBlockException -&gt; ShowS)
+-&gt; (PeerSentAnInvalidBlockException -&gt; String)
+-&gt; ([PeerSentAnInvalidBlockException] -&gt; ShowS)
+-&gt; Show PeerSentAnInvalidBlockException
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [PeerSentAnInvalidBlockException] -&gt; ShowS
+$cshowList :: [PeerSentAnInvalidBlockException] -&gt; ShowS
+show :: PeerSentAnInvalidBlockException -&gt; String
+$cshow :: PeerSentAnInvalidBlockException -&gt; String
+showsPrec :: Int -&gt; PeerSentAnInvalidBlockException -&gt; ShowS
+$cshowsPrec :: Int -&gt; PeerSentAnInvalidBlockException -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-65"></span><span>
+</span><span id="line-66"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679983509"><span id="local-6989586621679983511"><span id="local-6989586621679983513"><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Exn.Exception</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#PeerSentAnInvalidBlockException"><span class="hs-identifier hs-type">PeerSentAnInvalidBlockException</span></a></span></span></span></span><span>
+</span><span id="line-67"></span><span>
+</span><span id="line-68"></span><span class="hs-comment">-- | Allocate a stateful punishment that performs the given punishment unless</span><span>
+</span><span id="line-69"></span><span class="hs-comment">-- the given header is better than the previous invocation</span><span>
+</span><span id="line-70"></span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#mkUnlessImproved"><span class="hs-identifier hs-type">mkUnlessImproved</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679983507"><span class="annot"><a href="#local-6989586621679983507"><span class="hs-identifier hs-type">proxy</span></a></span></span><span> </span><span id="local-6989586621679983506"><span class="annot"><a href="#local-6989586621679983506"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679983505"><span class="annot"><a href="#local-6989586621679983505"><span class="hs-identifier hs-type">blk</span></a></span></span><span class="hs-operator">.</span><span>
+</span><span id="line-71"></span><span>     </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Util.IOLike.html#IOLike"><span class="hs-identifier hs-type">IOLike</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983506"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-72"></span><span>     </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NoThunks</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Abstract.html#SelectView"><span class="hs-identifier hs-type">SelectView</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Block.Abstract.html#BlockProtocol"><span class="hs-identifier hs-type">BlockProtocol</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983505"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-73"></span><span>     </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Ord</span></a></span><span>      </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Abstract.html#SelectView"><span class="hs-identifier hs-type">SelectView</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Block.Abstract.html#BlockProtocol"><span class="hs-identifier hs-type">BlockProtocol</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983505"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-74"></span><span>     </span><span class="hs-special">)</span><span>
+</span><span id="line-75"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679983507"><span class="hs-identifier hs-type">proxy</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983505"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-76"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">STM</span></span><span> </span><span class="annot"><a href="#local-6989586621679983506"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span>   </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Abstract.html#SelectView"><span class="hs-identifier hs-type">SelectView</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Block.Abstract.html#BlockProtocol"><span class="hs-identifier hs-type">BlockProtocol</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983505"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-77"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#InvalidBlockPunishment"><span class="hs-identifier hs-type">InvalidBlockPunishment</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983506"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-78"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#InvalidBlockPunishment"><span class="hs-identifier hs-type">InvalidBlockPunishment</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983506"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-79"></span><span>           </span><span class="hs-special">)</span><span>
+</span><span id="line-80"></span><span id="mkUnlessImproved"><span class="annot"><span class="annottext">mkUnlessImproved :: proxy blk
+-&gt; STM
+     m
+     (SelectView (BlockProtocol blk)
+      -&gt; InvalidBlockPunishment m -&gt; InvalidBlockPunishment m)
+</span><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#mkUnlessImproved"><span class="hs-identifier hs-var hs-var">mkUnlessImproved</span></a></span></span><span> </span><span id="local-6989586621679983504"><span class="annot"><span class="annottext">proxy blk
+</span><a href="#local-6989586621679983504"><span class="hs-identifier hs-var">_prx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-81"></span><span>    </span><span id="local-6989586621679983503"><span class="annot"><span class="annottext">StrictTVar m (TentativeState blk)
+</span><a href="#local-6989586621679983503"><span class="hs-identifier hs-var">var</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">TentativeState blk -&gt; STM m (StrictTVar m (TentativeState blk))
+forall (m :: * -&gt; *) a.
+(MonadSTM m, HasCallStack, NoThunks a) =&gt;
+a -&gt; STM m (StrictTVar m a)
+</span><a href="Ouroboros.Consensus.Util.MonadSTM.NormalForm.html#newTVar"><span class="hs-identifier hs-var">newTVar</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TentativeState blk
+forall blk. TentativeState blk
+</span><a href="Ouroboros.Consensus.Util.TentativeState.html#NoLastInvalidTentative"><span class="hs-identifier hs-var">NoLastInvalidTentative</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Util.TentativeState.html#TentativeState"><span class="hs-identifier hs-type">TentativeState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983505"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-82"></span><span>    </span><span class="annot"><span class="annottext">(SelectView (BlockProtocol blk)
+ -&gt; InvalidBlockPunishment m -&gt; InvalidBlockPunishment m)
+-&gt; STM
+     m
+     (SelectView (BlockProtocol blk)
+      -&gt; InvalidBlockPunishment m -&gt; InvalidBlockPunishment m)
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">((SelectView (BlockProtocol blk)
+  -&gt; InvalidBlockPunishment m -&gt; InvalidBlockPunishment m)
+ -&gt; STM
+      m
+      (SelectView (BlockProtocol blk)
+       -&gt; InvalidBlockPunishment m -&gt; InvalidBlockPunishment m))
+-&gt; (SelectView (BlockProtocol blk)
+    -&gt; InvalidBlockPunishment m -&gt; InvalidBlockPunishment m)
+-&gt; STM
+     m
+     (SelectView (BlockProtocol blk)
+      -&gt; InvalidBlockPunishment m -&gt; InvalidBlockPunishment m)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679983500"><span class="annot"><span class="annottext">SelectView (BlockProtocol blk)
+</span><a href="#local-6989586621679983500"><span class="hs-identifier hs-var">new</span></a></span></span><span> </span><span id="local-6989586621679983499"><span class="annot"><span class="annottext">InvalidBlockPunishment m
+</span><a href="#local-6989586621679983499"><span class="hs-identifier hs-var">punish</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Invalidity -&gt; m ()) -&gt; InvalidBlockPunishment m
+forall (m :: * -&gt; *).
+(Invalidity -&gt; m ()) -&gt; InvalidBlockPunishment m
+</span><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#InvalidBlockPunishment"><span class="hs-identifier hs-var">InvalidBlockPunishment</span></a></span><span> </span><span class="annot"><span class="annottext">((Invalidity -&gt; m ()) -&gt; InvalidBlockPunishment m)
+-&gt; (Invalidity -&gt; m ()) -&gt; InvalidBlockPunishment m
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679983498"><span class="annot"><span class="annottext">Invalidity
+</span><a href="#local-6989586621679983498"><span class="hs-identifier hs-var">invalidity</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">m (m ()) -&gt; m ()
+forall (m :: * -&gt; *) a. Monad m =&gt; m (m a) -&gt; m a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">join</span></a></span><span> </span><span class="annot"><span class="annottext">(m (m ()) -&gt; m ()) -&gt; m (m ()) -&gt; m ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">STM m (m ()) -&gt; m (m ())
+forall (m :: * -&gt; *) a.
+(MonadSTM m, HasCallStack) =&gt;
+STM m a -&gt; m a
+</span><span class="hs-identifier hs-var">atomically</span></span><span> </span><span class="annot"><span class="annottext">(STM m (m ()) -&gt; m (m ())) -&gt; STM m (m ()) -&gt; m (m ())
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-83"></span><span>      </span><span id="local-6989586621679983496"><span class="annot"><span class="annottext">m ()
+</span><a href="#local-6989586621679983496"><span class="hs-identifier hs-var">io</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">StrictTVar m (TentativeState blk) -&gt; STM m (TentativeState blk)
+forall (m :: * -&gt; *) a. MonadSTM m =&gt; StrictTVar m a -&gt; STM m a
+</span><span class="hs-identifier hs-var">readTVar</span></span><span> </span><span class="annot"><span class="annottext">StrictTVar m (TentativeState blk)
+</span><a href="#local-6989586621679983503"><span class="hs-identifier hs-var">var</span></a></span><span> </span><span class="annot"><span class="annottext">STM m (TentativeState blk)
+-&gt; (TentativeState blk -&gt; m ()) -&gt; STM m (m ())
+forall (f :: * -&gt; *) a b. Functor f =&gt; f a -&gt; (a -&gt; b) -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&amp;&gt;</span></a></span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-84"></span><span>        </span><span class="annot"><span class="annottext">TentativeState blk
+</span><a href="Ouroboros.Consensus.Util.TentativeState.html#NoLastInvalidTentative"><span class="hs-identifier hs-var">NoLastInvalidTentative</span></a></span><span>   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">() -&gt; m ()
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-85"></span><span>        </span><span class="annot"><a href="Ouroboros.Consensus.Util.TentativeState.html#LastInvalidTentative"><span class="hs-identifier hs-type">LastInvalidTentative</span></a></span><span> </span><span id="local-6989586621679983493"><span class="annot"><span class="annottext">SelectView (BlockProtocol blk)
+</span><a href="#local-6989586621679983493"><span class="hs-identifier hs-var">old</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; m () -&gt; m ()
+forall (f :: * -&gt; *). Applicative f =&gt; Bool -&gt; f () -&gt; f ()
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">unless</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SelectView (BlockProtocol blk)
+</span><a href="#local-6989586621679983500"><span class="hs-identifier hs-var">new</span></a></span><span> </span><span class="annot"><span class="annottext">SelectView (BlockProtocol blk)
+-&gt; SelectView (BlockProtocol blk) -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">SelectView (BlockProtocol blk)
+</span><a href="#local-6989586621679983493"><span class="hs-identifier hs-var">old</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(m () -&gt; m ()) -&gt; m () -&gt; m ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-86"></span><span>          </span><span class="annot"><span class="annottext">InvalidBlockPunishment m -&gt; Invalidity -&gt; m ()
+forall (m :: * -&gt; *).
+InvalidBlockPunishment m -&gt; Invalidity -&gt; m ()
+</span><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#enact"><span class="hs-identifier hs-var hs-var">enact</span></a></span><span> </span><span class="annot"><span class="annottext">InvalidBlockPunishment m
+</span><a href="#local-6989586621679983499"><span class="hs-identifier hs-var">punish</span></a></span><span> </span><span class="annot"><span class="annottext">Invalidity
+</span><a href="#local-6989586621679983498"><span class="hs-identifier hs-var">invalidity</span></a></span><span>
+</span><span id="line-87"></span><span>      </span><span class="annot"><span class="annottext">StrictTVar m (TentativeState blk) -&gt; TentativeState blk -&gt; STM m ()
+forall (m :: * -&gt; *) a.
+(MonadSTM m, HasCallStack) =&gt;
+StrictTVar m a -&gt; a -&gt; STM m ()
+</span><span class="hs-identifier hs-var">writeTVar</span></span><span> </span><span class="annot"><span class="annottext">StrictTVar m (TentativeState blk)
+</span><a href="#local-6989586621679983503"><span class="hs-identifier hs-var">var</span></a></span><span> </span><span class="annot"><span class="annottext">(TentativeState blk -&gt; STM m ()) -&gt; TentativeState blk -&gt; STM m ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">SelectView (BlockProtocol blk) -&gt; TentativeState blk
+forall blk. SelectView (BlockProtocol blk) -&gt; TentativeState blk
+</span><a href="Ouroboros.Consensus.Util.TentativeState.html#LastInvalidTentative"><span class="hs-identifier hs-var">LastInvalidTentative</span></a></span><span> </span><span class="annot"><span class="annottext">SelectView (BlockProtocol blk)
+</span><a href="#local-6989586621679983500"><span class="hs-identifier hs-var">new</span></a></span><span>
+</span><span id="line-88"></span><span>      </span><span class="annot"><span class="annottext">m () -&gt; STM m (m ())
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">m ()
+</span><a href="#local-6989586621679983496"><span class="hs-identifier hs-var">io</span></a></span><span>
+</span><span id="line-89"></span><span>
+</span><span id="line-90"></span><span class="hs-comment">-- | Punish according to the 'Invalidity'</span><span>
+</span><span id="line-91"></span><span id="local-6989586621679983490"><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#branch"><span class="hs-identifier hs-type">branch</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#Invalidity"><span class="hs-identifier hs-type">Invalidity</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#InvalidBlockPunishment"><span class="hs-identifier hs-type">InvalidBlockPunishment</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983490"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#InvalidBlockPunishment"><span class="hs-identifier hs-type">InvalidBlockPunishment</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679983490"><span class="hs-identifier hs-type">m</span></a></span></span><span>
+</span><span id="line-92"></span><span id="branch"><span class="annot"><span class="annottext">branch :: (Invalidity -&gt; InvalidBlockPunishment m)
+-&gt; InvalidBlockPunishment m
+</span><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#branch"><span class="hs-identifier hs-var hs-var">branch</span></a></span></span><span> </span><span id="local-6989586621679983489"><span class="annot"><span class="annottext">Invalidity -&gt; InvalidBlockPunishment m
+</span><a href="#local-6989586621679983489"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Invalidity -&gt; m ()) -&gt; InvalidBlockPunishment m
+forall (m :: * -&gt; *).
+(Invalidity -&gt; m ()) -&gt; InvalidBlockPunishment m
+</span><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#InvalidBlockPunishment"><span class="hs-identifier hs-var">InvalidBlockPunishment</span></a></span><span> </span><span class="annot"><span class="annottext">((Invalidity -&gt; m ()) -&gt; InvalidBlockPunishment m)
+-&gt; (Invalidity -&gt; m ()) -&gt; InvalidBlockPunishment m
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679983488"><span class="annot"><span class="annottext">Invalidity
+</span><a href="#local-6989586621679983488"><span class="hs-identifier hs-var">invalidity</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-93"></span><span>    </span><span class="annot"><span class="annottext">InvalidBlockPunishment m -&gt; Invalidity -&gt; m ()
+forall (m :: * -&gt; *).
+InvalidBlockPunishment m -&gt; Invalidity -&gt; m ()
+</span><a href="Ouroboros.Consensus.Storage.ChainDB.API.Types.InvalidBlockPunishment.html#enact"><span class="hs-identifier hs-var hs-var">enact</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Invalidity -&gt; InvalidBlockPunishment m
+</span><a href="#local-6989586621679983489"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Invalidity
+</span><a href="#local-6989586621679983488"><span class="hs-identifier hs-var">invalidity</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Invalidity
+</span><a href="#local-6989586621679983488"><span class="hs-identifier hs-var">invalidity</span></a></span><span>
+</span><span id="line-94"></span></pre></body></html>

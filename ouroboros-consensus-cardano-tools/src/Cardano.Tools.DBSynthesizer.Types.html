@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span>
+</span><span id="line-2"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Cardano.Tools.DBSynthesizer.Types</span><span> </span><span class="hs-special">(</span><span class="hs-keyword">module</span><span> </span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html"><span class="hs-identifier">Cardano.Tools.DBSynthesizer.Types</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-3"></span><span>
+</span><span id="line-4"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Aeson</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Aeson</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Value</span></span><span class="hs-special">)</span><span>
+</span><span id="line-5"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Word</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Word64</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-6"></span><span>
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Block.Abstract</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">SlotNo</span></span><span class="hs-special">)</span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-shelley-0.3.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier">Ouroboros.Consensus.Shelley.Eras</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-shelley-0.3.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier">StandardShelley</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-shelley-0.3.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier">Ouroboros.Consensus.Shelley.Node</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">ShelleyGenesis</span></span><span class="hs-special">)</span><span>
+</span><span id="line-10"></span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Cardano.Node.Types.html"><span class="hs-identifier">Cardano.Node.Types</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Node.Types.html#ProtocolFilepaths"><span class="hs-identifier">ProtocolFilepaths</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">data</span><span> </span><span id="NodeConfigStub"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#NodeConfigStub"><span class="hs-identifier hs-var">NodeConfigStub</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="NodeConfigStub"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#NodeConfigStub"><span class="hs-identifier hs-var">NodeConfigStub</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-15"></span><span>    </span><span id="ncsNodeConfig"><span class="annot"><span class="annottext">NodeConfigStub -&gt; Value
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#ncsNodeConfig"><span class="hs-identifier hs-var hs-var">ncsNodeConfig</span></a></span></span><span>         </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><span class="hs-identifier hs-type">Aeson.Value</span></span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="ncsAlonzoGenesisFile"><span class="annot"><span class="annottext">NodeConfigStub -&gt; FilePath
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#ncsAlonzoGenesisFile"><span class="hs-identifier hs-var hs-var">ncsAlonzoGenesisFile</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="ncsShelleyGenesisFile"><span class="annot"><span class="annottext">NodeConfigStub -&gt; FilePath
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#ncsShelleyGenesisFile"><span class="hs-identifier hs-var hs-var">ncsShelleyGenesisFile</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="ncsByronGenesisFile"><span class="annot"><span class="annottext">NodeConfigStub -&gt; FilePath
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#ncsByronGenesisFile"><span class="hs-identifier hs-var hs-var">ncsByronGenesisFile</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="ncsConwayGenesisFile"><span class="annot"><span class="annottext">NodeConfigStub -&gt; FilePath
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#ncsConwayGenesisFile"><span class="hs-identifier hs-var hs-var">ncsConwayGenesisFile</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679372884"><span id="local-6989586621679372886"><span id="local-6989586621679372888"><span class="annot"><span class="annottext">Int -&gt; NodeConfigStub -&gt; ShowS
+[NodeConfigStub] -&gt; ShowS
+NodeConfigStub -&gt; FilePath
+(Int -&gt; NodeConfigStub -&gt; ShowS)
+-&gt; (NodeConfigStub -&gt; FilePath)
+-&gt; ([NodeConfigStub] -&gt; ShowS)
+-&gt; Show NodeConfigStub
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; FilePath) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [NodeConfigStub] -&gt; ShowS
+$cshowList :: [NodeConfigStub] -&gt; ShowS
+show :: NodeConfigStub -&gt; FilePath
+$cshow :: NodeConfigStub -&gt; FilePath
+showsPrec :: Int -&gt; NodeConfigStub -&gt; ShowS
+$cshowsPrec :: Int -&gt; NodeConfigStub -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span>
+</span><span id="line-22"></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">data</span><span> </span><span id="NodeFilePaths"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#NodeFilePaths"><span class="hs-identifier hs-var">NodeFilePaths</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="NodeFilePaths"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#NodeFilePaths"><span class="hs-identifier hs-var">NodeFilePaths</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-24"></span><span>    </span><span id="nfpConfig"><span class="annot"><span class="annottext">NodeFilePaths -&gt; FilePath
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#nfpConfig"><span class="hs-identifier hs-var hs-var">nfpConfig</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="nfpChainDB"><span class="annot"><span class="annottext">NodeFilePaths -&gt; FilePath
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#nfpChainDB"><span class="hs-identifier hs-var hs-var">nfpChainDB</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679372874"><span id="local-6989586621679372876"><span id="local-6989586621679372878"><span class="annot"><span class="annottext">Int -&gt; NodeFilePaths -&gt; ShowS
+[NodeFilePaths] -&gt; ShowS
+NodeFilePaths -&gt; FilePath
+(Int -&gt; NodeFilePaths -&gt; ShowS)
+-&gt; (NodeFilePaths -&gt; FilePath)
+-&gt; ([NodeFilePaths] -&gt; ShowS)
+-&gt; Show NodeFilePaths
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; FilePath) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [NodeFilePaths] -&gt; ShowS
+$cshowList :: [NodeFilePaths] -&gt; ShowS
+show :: NodeFilePaths -&gt; FilePath
+$cshow :: NodeFilePaths -&gt; FilePath
+showsPrec :: Int -&gt; NodeFilePaths -&gt; ShowS
+$cshowsPrec :: Int -&gt; NodeFilePaths -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span>
+</span><span id="line-28"></span><span>
+</span><span id="line-29"></span><span class="hs-keyword">data</span><span> </span><span id="NodeCredentials"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#NodeCredentials"><span class="hs-identifier hs-var">NodeCredentials</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="NodeCredentials"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#NodeCredentials"><span class="hs-identifier hs-var">NodeCredentials</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-30"></span><span>    </span><span id="credCertFile"><span class="annot"><span class="annottext">NodeCredentials -&gt; Maybe FilePath
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#credCertFile"><span class="hs-identifier hs-var hs-var">credCertFile</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="credVRFFile"><span class="annot"><span class="annottext">NodeCredentials -&gt; Maybe FilePath
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#credVRFFile"><span class="hs-identifier hs-var hs-var">credVRFFile</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="credKESFile"><span class="annot"><span class="annottext">NodeCredentials -&gt; Maybe FilePath
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#credKESFile"><span class="hs-identifier hs-var hs-var">credKESFile</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-33"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="credBulkFile"><span class="annot"><span class="annottext">NodeCredentials -&gt; Maybe FilePath
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#credBulkFile"><span class="hs-identifier hs-var hs-var">credBulkFile</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-35"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679372863"><span id="local-6989586621679372865"><span id="local-6989586621679372867"><span class="annot"><span class="annottext">Int -&gt; NodeCredentials -&gt; ShowS
+[NodeCredentials] -&gt; ShowS
+NodeCredentials -&gt; FilePath
+(Int -&gt; NodeCredentials -&gt; ShowS)
+-&gt; (NodeCredentials -&gt; FilePath)
+-&gt; ([NodeCredentials] -&gt; ShowS)
+-&gt; Show NodeCredentials
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; FilePath) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [NodeCredentials] -&gt; ShowS
+$cshowList :: [NodeCredentials] -&gt; ShowS
+show :: NodeCredentials -&gt; FilePath
+$cshow :: NodeCredentials -&gt; FilePath
+showsPrec :: Int -&gt; NodeCredentials -&gt; ShowS
+$cshowsPrec :: Int -&gt; NodeCredentials -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span>
+</span><span id="line-36"></span><span>
+</span><span id="line-37"></span><span class="hs-keyword">data</span><span> </span><span id="ForgeLimit"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#ForgeLimit"><span class="hs-identifier hs-var">ForgeLimit</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-38"></span><span>    </span><span id="ForgeLimitBlock"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#ForgeLimitBlock"><span class="hs-identifier hs-var">ForgeLimitBlock</span></a></span></span><span>   </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Word64</span></a></span><span>
+</span><span id="line-39"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="ForgeLimitSlot"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#ForgeLimitSlot"><span class="hs-identifier hs-var">ForgeLimitSlot</span></a></span></span><span>    </span><span class="hs-glyph">!</span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span>
+</span><span id="line-40"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="ForgeLimitEpoch"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#ForgeLimitEpoch"><span class="hs-identifier hs-var">ForgeLimitEpoch</span></a></span></span><span>   </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Word64</span></a></span><span>
+</span><span id="line-41"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679372856"><span id="local-6989586621679372858"><span class="annot"><span class="annottext">ForgeLimit -&gt; ForgeLimit -&gt; Bool
+(ForgeLimit -&gt; ForgeLimit -&gt; Bool)
+-&gt; (ForgeLimit -&gt; ForgeLimit -&gt; Bool) -&gt; Eq ForgeLimit
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: ForgeLimit -&gt; ForgeLimit -&gt; Bool
+$c/= :: ForgeLimit -&gt; ForgeLimit -&gt; Bool
+== :: ForgeLimit -&gt; ForgeLimit -&gt; Bool
+$c== :: ForgeLimit -&gt; ForgeLimit -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679372849"><span id="local-6989586621679372851"><span id="local-6989586621679372853"><span class="annot"><span class="annottext">Int -&gt; ForgeLimit -&gt; ShowS
+[ForgeLimit] -&gt; ShowS
+ForgeLimit -&gt; FilePath
+(Int -&gt; ForgeLimit -&gt; ShowS)
+-&gt; (ForgeLimit -&gt; FilePath)
+-&gt; ([ForgeLimit] -&gt; ShowS)
+-&gt; Show ForgeLimit
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; FilePath) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [ForgeLimit] -&gt; ShowS
+$cshowList :: [ForgeLimit] -&gt; ShowS
+show :: ForgeLimit -&gt; FilePath
+$cshow :: ForgeLimit -&gt; FilePath
+showsPrec :: Int -&gt; ForgeLimit -&gt; ShowS
+$cshowsPrec :: Int -&gt; ForgeLimit -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-42"></span><span>
+</span><span id="line-43"></span><span class="hs-keyword">newtype</span><span> </span><span id="ForgeResult"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#ForgeResult"><span class="hs-identifier hs-var">ForgeResult</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ForgeResult"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#ForgeResult"><span class="hs-identifier hs-var">ForgeResult</span></a></span></span><span> </span><span class="hs-special">{</span><span id="resultForged"><span class="annot"><span class="annottext">ForgeResult -&gt; Int
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#resultForged"><span class="hs-identifier hs-var hs-var">resultForged</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-44"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679372843"><span id="local-6989586621679372845"><span class="annot"><span class="annottext">ForgeResult -&gt; ForgeResult -&gt; Bool
+(ForgeResult -&gt; ForgeResult -&gt; Bool)
+-&gt; (ForgeResult -&gt; ForgeResult -&gt; Bool) -&gt; Eq ForgeResult
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: ForgeResult -&gt; ForgeResult -&gt; Bool
+$c/= :: ForgeResult -&gt; ForgeResult -&gt; Bool
+== :: ForgeResult -&gt; ForgeResult -&gt; Bool
+$c== :: ForgeResult -&gt; ForgeResult -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679372837"><span id="local-6989586621679372839"><span id="local-6989586621679372841"><span class="annot"><span class="annottext">Int -&gt; ForgeResult -&gt; ShowS
+[ForgeResult] -&gt; ShowS
+ForgeResult -&gt; FilePath
+(Int -&gt; ForgeResult -&gt; ShowS)
+-&gt; (ForgeResult -&gt; FilePath)
+-&gt; ([ForgeResult] -&gt; ShowS)
+-&gt; Show ForgeResult
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; FilePath) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [ForgeResult] -&gt; ShowS
+$cshowList :: [ForgeResult] -&gt; ShowS
+show :: ForgeResult -&gt; FilePath
+$cshow :: ForgeResult -&gt; FilePath
+showsPrec :: Int -&gt; ForgeResult -&gt; ShowS
+$cshowsPrec :: Int -&gt; ForgeResult -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-45"></span><span>
+</span><span id="line-46"></span><span class="hs-keyword">data</span><span> </span><span id="DBSynthesizerOpenMode"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#DBSynthesizerOpenMode"><span class="hs-identifier hs-var">DBSynthesizerOpenMode</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-47"></span><span>      </span><span id="OpenCreate"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#OpenCreate"><span class="hs-identifier hs-var">OpenCreate</span></a></span></span><span>
+</span><span id="line-48"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="OpenCreateForce"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#OpenCreateForce"><span class="hs-identifier hs-var">OpenCreateForce</span></a></span></span><span>
+</span><span id="line-49"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="OpenAppend"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#OpenAppend"><span class="hs-identifier hs-var">OpenAppend</span></a></span></span><span>
+</span><span id="line-50"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679372830"><span id="local-6989586621679372832"><span class="annot"><span class="annottext">DBSynthesizerOpenMode -&gt; DBSynthesizerOpenMode -&gt; Bool
+(DBSynthesizerOpenMode -&gt; DBSynthesizerOpenMode -&gt; Bool)
+-&gt; (DBSynthesizerOpenMode -&gt; DBSynthesizerOpenMode -&gt; Bool)
+-&gt; Eq DBSynthesizerOpenMode
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: DBSynthesizerOpenMode -&gt; DBSynthesizerOpenMode -&gt; Bool
+$c/= :: DBSynthesizerOpenMode -&gt; DBSynthesizerOpenMode -&gt; Bool
+== :: DBSynthesizerOpenMode -&gt; DBSynthesizerOpenMode -&gt; Bool
+$c== :: DBSynthesizerOpenMode -&gt; DBSynthesizerOpenMode -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679372824"><span id="local-6989586621679372826"><span id="local-6989586621679372828"><span class="annot"><span class="annottext">Int -&gt; DBSynthesizerOpenMode -&gt; ShowS
+[DBSynthesizerOpenMode] -&gt; ShowS
+DBSynthesizerOpenMode -&gt; FilePath
+(Int -&gt; DBSynthesizerOpenMode -&gt; ShowS)
+-&gt; (DBSynthesizerOpenMode -&gt; FilePath)
+-&gt; ([DBSynthesizerOpenMode] -&gt; ShowS)
+-&gt; Show DBSynthesizerOpenMode
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; FilePath) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [DBSynthesizerOpenMode] -&gt; ShowS
+$cshowList :: [DBSynthesizerOpenMode] -&gt; ShowS
+show :: DBSynthesizerOpenMode -&gt; FilePath
+$cshow :: DBSynthesizerOpenMode -&gt; FilePath
+showsPrec :: Int -&gt; DBSynthesizerOpenMode -&gt; ShowS
+$cshowsPrec :: Int -&gt; DBSynthesizerOpenMode -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-51"></span><span>
+</span><span id="line-52"></span><span class="hs-keyword">data</span><span> </span><span id="DBSynthesizerOptions"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#DBSynthesizerOptions"><span class="hs-identifier hs-var">DBSynthesizerOptions</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="DBSynthesizerOptions"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#DBSynthesizerOptions"><span class="hs-identifier hs-var">DBSynthesizerOptions</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-53"></span><span>    </span><span id="synthLimit"><span class="annot"><span class="annottext">DBSynthesizerOptions -&gt; ForgeLimit
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#synthLimit"><span class="hs-identifier hs-var hs-var">synthLimit</span></a></span></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#ForgeLimit"><span class="hs-identifier hs-type">ForgeLimit</span></a></span><span>
+</span><span id="line-54"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="synthOpenMode"><span class="annot"><span class="annottext">DBSynthesizerOptions -&gt; DBSynthesizerOpenMode
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#synthOpenMode"><span class="hs-identifier hs-var hs-var">synthOpenMode</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#DBSynthesizerOpenMode"><span class="hs-identifier hs-type">DBSynthesizerOpenMode</span></a></span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-56"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679372815"><span id="local-6989586621679372817"><span id="local-6989586621679372819"><span class="annot"><span class="annottext">Int -&gt; DBSynthesizerOptions -&gt; ShowS
+[DBSynthesizerOptions] -&gt; ShowS
+DBSynthesizerOptions -&gt; FilePath
+(Int -&gt; DBSynthesizerOptions -&gt; ShowS)
+-&gt; (DBSynthesizerOptions -&gt; FilePath)
+-&gt; ([DBSynthesizerOptions] -&gt; ShowS)
+-&gt; Show DBSynthesizerOptions
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; FilePath) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [DBSynthesizerOptions] -&gt; ShowS
+$cshowList :: [DBSynthesizerOptions] -&gt; ShowS
+show :: DBSynthesizerOptions -&gt; FilePath
+$cshow :: DBSynthesizerOptions -&gt; FilePath
+showsPrec :: Int -&gt; DBSynthesizerOptions -&gt; ShowS
+$cshowsPrec :: Int -&gt; DBSynthesizerOptions -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span>
+</span><span id="line-57"></span><span>
+</span><span id="line-58"></span><span class="hs-keyword">data</span><span> </span><span id="DBSynthesizerConfig"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#DBSynthesizerConfig"><span class="hs-identifier hs-var">DBSynthesizerConfig</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="DBSynthesizerConfig"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#DBSynthesizerConfig"><span class="hs-identifier hs-var">DBSynthesizerConfig</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-59"></span><span>    </span><span id="confConfigStub"><span class="annot"><span class="annottext">DBSynthesizerConfig -&gt; NodeConfigStub
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#confConfigStub"><span class="hs-identifier hs-var hs-var">confConfigStub</span></a></span></span><span>          </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#NodeConfigStub"><span class="hs-identifier hs-type">NodeConfigStub</span></a></span><span>
+</span><span id="line-60"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="confOptions"><span class="annot"><span class="annottext">DBSynthesizerConfig -&gt; DBSynthesizerOptions
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#confOptions"><span class="hs-identifier hs-var hs-var">confOptions</span></a></span></span><span>             </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#DBSynthesizerOptions"><span class="hs-identifier hs-type">DBSynthesizerOptions</span></a></span><span>
+</span><span id="line-61"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="confProtocolCredentials"><span class="annot"><span class="annottext">DBSynthesizerConfig -&gt; ProtocolFilepaths
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#confProtocolCredentials"><span class="hs-identifier hs-var hs-var">confProtocolCredentials</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Cardano.Node.Types.html#ProtocolFilepaths"><span class="hs-identifier hs-type">ProtocolFilepaths</span></a></span><span>
+</span><span id="line-62"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="confShelleyGenesis"><span class="annot"><span class="annottext">DBSynthesizerConfig -&gt; ShelleyGenesis StandardShelley
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#confShelleyGenesis"><span class="hs-identifier hs-var hs-var">confShelleyGenesis</span></a></span></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ShelleyGenesis</span></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-shelley-0.3.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-type">StandardShelley</span></a></span><span>
+</span><span id="line-63"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="confDbDir"><span class="annot"><span class="annottext">DBSynthesizerConfig -&gt; FilePath
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#confDbDir"><span class="hs-identifier hs-var hs-var">confDbDir</span></a></span></span><span>               </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span>
+</span><span id="line-64"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-65"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679372803"><span id="local-6989586621679372805"><span id="local-6989586621679372807"><span class="annot"><span class="annottext">Int -&gt; DBSynthesizerConfig -&gt; ShowS
+[DBSynthesizerConfig] -&gt; ShowS
+DBSynthesizerConfig -&gt; FilePath
+(Int -&gt; DBSynthesizerConfig -&gt; ShowS)
+-&gt; (DBSynthesizerConfig -&gt; FilePath)
+-&gt; ([DBSynthesizerConfig] -&gt; ShowS)
+-&gt; Show DBSynthesizerConfig
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; FilePath) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [DBSynthesizerConfig] -&gt; ShowS
+$cshowList :: [DBSynthesizerConfig] -&gt; ShowS
+show :: DBSynthesizerConfig -&gt; FilePath
+$cshow :: DBSynthesizerConfig -&gt; FilePath
+showsPrec :: Int -&gt; DBSynthesizerConfig -&gt; ShowS
+$cshowsPrec :: Int -&gt; DBSynthesizerConfig -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span>
+</span><span id="line-66"></span></pre></body></html>

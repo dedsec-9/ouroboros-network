@@ -1,0 +1,426 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DataKinds                  #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DeriveGeneric              #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE DerivingStrategies         #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE GADTs                      #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE GeneralizedNewtypeDeriving #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE KindSignatures             #-}</span><span>
+</span><span id="line-7"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings          #-}</span><span>
+</span><span id="line-8"></span><span class="hs-pragma">{-# LANGUAGE RankNTypes                 #-}</span><span>
+</span><span id="line-9"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables        #-}</span><span>
+</span><span id="line-10"></span><span class="hs-pragma">{-# LANGUAGE TypeApplications           #-}</span><span>
+</span><span id="line-11"></span><span class="hs-pragma">{-# OPTIONS_GHC -Wno-unticked-promoted-constructors #-}</span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span class="hs-comment">-- | This module implements VRF range extension as described in</span><span>
+</span><span id="line-14"></span><span class="hs-comment">-- https://iohk.io/en/research/library/papers/on-uc-secure-range-extension-and-batch-verification-for-ecvrf/</span><span>
+</span><span id="line-15"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Consensus.Protocol.Praos.VRF</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-16"></span><span>    </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#InputVRF"><span class="hs-identifier">InputVRF</span></a></span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#VRFUsage"><span class="hs-identifier">VRFUsage</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#mkInputVRF"><span class="hs-identifier">mkInputVRF</span></a></span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#vrfLeaderValue"><span class="hs-identifier">vrfLeaderValue</span></a></span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#vrfNonceValue"><span class="hs-identifier">vrfNonceValue</span></a></span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-22"></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Binary</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">ToCBOR</span></span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Crypto.Hash</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Blake2b_256</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Hash</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">castHash</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">hashToBytes</span></span><span class="hs-special">,</span><span>
+</span><span id="line-25"></span><span>                     </span><span class="annot"><span class="hs-identifier">hashWith</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">sizeHash</span></span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Crypto.Hash</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Hash</span></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Crypto.Util</span></span><span>
+</span><span id="line-28"></span><span>                     </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">SignableRepresentation</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">getSignableRepresentation</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-29"></span><span>                     </span><span class="annot"><span class="hs-identifier">bytesToNatural</span></span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Crypto.VRF</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">CertifiedVRF</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">certifiedOutput</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-31"></span><span>                     </span><span class="annot"><span class="hs-identifier">OutputVRF</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">getOutputVRFBytes</span></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.BaseTypes</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Nonce</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NeutralNonce</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Nonce</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Crypto</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Crypto</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">HASH</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">VRF</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Serialization</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">runByteBuilder</span></span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Slot</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">SlotNo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">SlotNo</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Protocol.TPraos.BHeader</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">BoundedNatural</span></span><span class="hs-special">,</span><span>
+</span><span id="line-37"></span><span>                     </span><span class="annot"><span class="hs-identifier">assertBoundedNatural</span></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier">Data.ByteString.Builder</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">BS</span></span><span>
+</span><span id="line-39"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier">Data.ByteString.Builder.Extra</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">BS</span></span><span>
+</span><span id="line-40"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Proxy</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Proxy</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Proxy</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-41"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">GHC.Generics</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Generic</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-42"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">NoThunks.Class</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NoThunks</span></span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Numeric.Natural</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Natural</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span class="hs-comment">-- | Input to the verifiable random function. Consists of the hash of the slot</span><span>
+</span><span id="line-46"></span><span class="hs-comment">-- and the epoch nonce.</span><span>
+</span><span id="line-47"></span><span id="local-6989586621679276219"><span id="local-6989586621679276220"></span></span><span class="hs-keyword">newtype</span><span> </span><span id="InputVRF"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#InputVRF"><span class="hs-identifier hs-var">InputVRF</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="InputVRF"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#InputVRF"><span class="hs-identifier hs-var">InputVRF</span></a></span></span><span> </span><span class="hs-special">{</span><span id="unInputVRF"><span class="annot"><span class="annottext">InputVRF -&gt; Hash Blake2b_256 InputVRF
+</span><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#unInputVRF"><span class="hs-identifier hs-var hs-var">unInputVRF</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Hash</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Blake2b_256</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#InputVRF"><span class="hs-identifier hs-type">InputVRF</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-48"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679276213"><span id="local-6989586621679276215"><span class="annot"><span class="annottext">InputVRF -&gt; InputVRF -&gt; Bool
+(InputVRF -&gt; InputVRF -&gt; Bool)
+-&gt; (InputVRF -&gt; InputVRF -&gt; Bool) -&gt; Eq InputVRF
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: InputVRF -&gt; InputVRF -&gt; Bool
+$c/= :: InputVRF -&gt; InputVRF -&gt; Bool
+== :: InputVRF -&gt; InputVRF -&gt; Bool
+$c== :: InputVRF -&gt; InputVRF -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276197"><span id="local-6989586621679276199"><span id="local-6989586621679276201"><span id="local-6989586621679276203"><span id="local-6989586621679276205"><span id="local-6989586621679276207"><span id="local-6989586621679276209"><span class="annot"><span class="annottext">Eq InputVRF
+Eq InputVRF
+-&gt; (InputVRF -&gt; InputVRF -&gt; Ordering)
+-&gt; (InputVRF -&gt; InputVRF -&gt; Bool)
+-&gt; (InputVRF -&gt; InputVRF -&gt; Bool)
+-&gt; (InputVRF -&gt; InputVRF -&gt; Bool)
+-&gt; (InputVRF -&gt; InputVRF -&gt; Bool)
+-&gt; (InputVRF -&gt; InputVRF -&gt; InputVRF)
+-&gt; (InputVRF -&gt; InputVRF -&gt; InputVRF)
+-&gt; Ord InputVRF
+InputVRF -&gt; InputVRF -&gt; Bool
+InputVRF -&gt; InputVRF -&gt; Ordering
+InputVRF -&gt; InputVRF -&gt; InputVRF
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: InputVRF -&gt; InputVRF -&gt; InputVRF
+$cmin :: InputVRF -&gt; InputVRF -&gt; InputVRF
+max :: InputVRF -&gt; InputVRF -&gt; InputVRF
+$cmax :: InputVRF -&gt; InputVRF -&gt; InputVRF
+&gt;= :: InputVRF -&gt; InputVRF -&gt; Bool
+$c&gt;= :: InputVRF -&gt; InputVRF -&gt; Bool
+&gt; :: InputVRF -&gt; InputVRF -&gt; Bool
+$c&gt; :: InputVRF -&gt; InputVRF -&gt; Bool
+&lt;= :: InputVRF -&gt; InputVRF -&gt; Bool
+$c&lt;= :: InputVRF -&gt; InputVRF -&gt; Bool
+&lt; :: InputVRF -&gt; InputVRF -&gt; Bool
+$c&lt; :: InputVRF -&gt; InputVRF -&gt; Bool
+compare :: InputVRF -&gt; InputVRF -&gt; Ordering
+$ccompare :: InputVRF -&gt; InputVRF -&gt; Ordering
+$cp1Ord :: Eq InputVRF
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></a></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276190"><span id="local-6989586621679276192"><span id="local-6989586621679276194"><span class="annot"><span class="annottext">Int -&gt; InputVRF -&gt; ShowS
+[InputVRF] -&gt; ShowS
+InputVRF -&gt; String
+(Int -&gt; InputVRF -&gt; ShowS)
+-&gt; (InputVRF -&gt; String) -&gt; ([InputVRF] -&gt; ShowS) -&gt; Show InputVRF
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [InputVRF] -&gt; ShowS
+$cshowList :: [InputVRF] -&gt; ShowS
+show :: InputVRF -&gt; String
+$cshow :: InputVRF -&gt; String
+showsPrec :: Int -&gt; InputVRF -&gt; ShowS
+$cshowsPrec :: Int -&gt; InputVRF -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. InputVRF -&gt; Rep InputVRF x)
+-&gt; (forall x. Rep InputVRF x -&gt; InputVRF) -&gt; Generic InputVRF
+forall x. Rep InputVRF x -&gt; InputVRF
+forall x. InputVRF -&gt; Rep InputVRF x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cto :: forall x. Rep InputVRF x -&gt; InputVRF
+$cfrom :: forall x. InputVRF -&gt; Rep InputVRF x
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-49"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679276180"><span id="local-6989586621679276182"><span id="local-6989586621679276184"><span class="annot"><span class="annottext">Context -&gt; InputVRF -&gt; IO (Maybe ThunkInfo)
+Proxy InputVRF -&gt; String
+(Context -&gt; InputVRF -&gt; IO (Maybe ThunkInfo))
+-&gt; (Context -&gt; InputVRF -&gt; IO (Maybe ThunkInfo))
+-&gt; (Proxy InputVRF -&gt; String)
+-&gt; NoThunks InputVRF
+forall a.
+(Context -&gt; a -&gt; IO (Maybe ThunkInfo))
+-&gt; (Context -&gt; a -&gt; IO (Maybe ThunkInfo))
+-&gt; (Proxy a -&gt; String)
+-&gt; NoThunks a
+showTypeOf :: Proxy InputVRF -&gt; String
+$cshowTypeOf :: Proxy InputVRF -&gt; String
+wNoThunks :: Context -&gt; InputVRF -&gt; IO (Maybe ThunkInfo)
+$cwNoThunks :: Context -&gt; InputVRF -&gt; IO (Maybe ThunkInfo)
+noThunks :: Context -&gt; InputVRF -&gt; IO (Maybe ThunkInfo)
+$cnoThunks :: Context -&gt; InputVRF -&gt; IO (Maybe ThunkInfo)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">NoThunks</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276172"><span id="local-6989586621679276174"><span id="local-6989586621679276176"><span class="annot"><span class="annottext">Typeable InputVRF
+Typeable InputVRF
+-&gt; (InputVRF -&gt; Encoding)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+    -&gt; Proxy InputVRF -&gt; Size)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size)
+    -&gt; Proxy [InputVRF] -&gt; Size)
+-&gt; ToCBOR InputVRF
+InputVRF -&gt; Encoding
+(forall t. ToCBOR t =&gt; Proxy t -&gt; Size) -&gt; Proxy [InputVRF] -&gt; Size
+(forall t. ToCBOR t =&gt; Proxy t -&gt; Size) -&gt; Proxy InputVRF -&gt; Size
+forall a.
+Typeable a
+-&gt; (a -&gt; Encoding)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size) -&gt; Proxy a -&gt; Size)
+-&gt; ((forall t. ToCBOR t =&gt; Proxy t -&gt; Size) -&gt; Proxy [a] -&gt; Size)
+-&gt; ToCBOR a
+encodedListSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size) -&gt; Proxy [InputVRF] -&gt; Size
+$cencodedListSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size) -&gt; Proxy [InputVRF] -&gt; Size
+encodedSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size) -&gt; Proxy InputVRF -&gt; Size
+$cencodedSizeExpr :: (forall t. ToCBOR t =&gt; Proxy t -&gt; Size) -&gt; Proxy InputVRF -&gt; Size
+toCBOR :: InputVRF -&gt; Encoding
+$ctoCBOR :: InputVRF -&gt; Encoding
+$cp1ToCBOR :: Typeable InputVRF
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">ToCBOR</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-50"></span><span>
+</span><span id="line-51"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SignableRepresentation</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#InputVRF"><span class="hs-identifier hs-type">InputVRF</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-52"></span><span>  </span><span id="local-6989586621679276168"><span class="annot"><span class="annottext">getSignableRepresentation :: InputVRF -&gt; ByteString
+</span><a href="#local-6989586621679276168"><span class="hs-identifier hs-var hs-var hs-var hs-var">getSignableRepresentation</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#InputVRF"><span class="hs-identifier hs-type">InputVRF</span></a></span><span> </span><span id="local-6989586621679276167"><span class="annot"><span class="annottext">Hash Blake2b_256 InputVRF
+</span><a href="#local-6989586621679276167"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Hash Blake2b_256 InputVRF -&gt; ByteString
+forall h a. Hash h a -&gt; ByteString
+</span><span class="hs-identifier hs-var">hashToBytes</span></span><span> </span><span class="annot"><span class="annottext">Hash Blake2b_256 InputVRF
+</span><a href="#local-6989586621679276167"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-53"></span><span>
+</span><span id="line-54"></span><span class="hs-comment">-- | Construct a unified VRF value</span><span>
+</span><span id="line-55"></span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#mkInputVRF"><span class="hs-identifier hs-type">mkInputVRF</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-56"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-57"></span><span>  </span><span class="hs-comment">-- | Epoch nonce</span><span>
+</span><span id="line-58"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Nonce</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-59"></span><span>  </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#InputVRF"><span class="hs-identifier hs-type">InputVRF</span></a></span><span>
+</span><span id="line-60"></span><span id="mkInputVRF"><span class="annot"><span class="annottext">mkInputVRF :: SlotNo -&gt; Nonce -&gt; InputVRF
+</span><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#mkInputVRF"><span class="hs-identifier hs-var hs-var">mkInputVRF</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span id="local-6989586621679276166"><span class="annot"><span class="annottext">Word64
+</span><a href="#local-6989586621679276166"><span class="hs-identifier hs-var">slot</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679276165"><span class="annot"><span class="annottext">Nonce
+</span><a href="#local-6989586621679276165"><span class="hs-identifier hs-var">eNonce</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-61"></span><span>  </span><span class="annot"><span class="annottext">Hash Blake2b_256 InputVRF -&gt; InputVRF
+</span><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#InputVRF"><span class="hs-identifier hs-var">InputVRF</span></a></span><span>
+</span><span id="line-62"></span><span>    </span><span class="annot"><span class="annottext">(Hash Blake2b_256 InputVRF -&gt; InputVRF)
+-&gt; (Builder -&gt; Hash Blake2b_256 InputVRF) -&gt; Builder -&gt; InputVRF
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Hash Blake2b_256 ByteString -&gt; Hash Blake2b_256 InputVRF
+forall h a b. Hash h a -&gt; Hash h b
+</span><span class="hs-identifier hs-var">Hash.castHash</span></span><span>
+</span><span id="line-63"></span><span>    </span><span class="annot"><span class="annottext">(Hash Blake2b_256 ByteString -&gt; Hash Blake2b_256 InputVRF)
+-&gt; (Builder -&gt; Hash Blake2b_256 ByteString)
+-&gt; Builder
+-&gt; Hash Blake2b_256 InputVRF
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; ByteString)
+-&gt; ByteString -&gt; Hash Blake2b_256 ByteString
+forall h a. HashAlgorithm h =&gt; (a -&gt; ByteString) -&gt; a -&gt; Hash h a
+</span><span class="hs-identifier hs-var">Hash.hashWith</span></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; ByteString
+forall a. a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">id</span></a></span><span>
+</span><span id="line-64"></span><span>    </span><span class="annot"><span class="annottext">(ByteString -&gt; Hash Blake2b_256 ByteString)
+-&gt; (Builder -&gt; ByteString)
+-&gt; Builder
+-&gt; Hash Blake2b_256 ByteString
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Builder -&gt; ByteString
+</span><span class="hs-identifier hs-var">runByteBuilder</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">8</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">32</span></span><span class="hs-special">)</span><span>
+</span><span id="line-65"></span><span>    </span><span class="annot"><span class="annottext">(Builder -&gt; InputVRF) -&gt; Builder -&gt; InputVRF
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; Builder
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-var">BS.word64BE</span></a></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><a href="#local-6989586621679276166"><span class="hs-identifier hs-var">slot</span></a></span><span>
+</span><span id="line-66"></span><span>      </span><span class="annot"><span class="annottext">Builder -&gt; Builder -&gt; Builder
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="hs-special">(</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Nonce
+</span><a href="#local-6989586621679276165"><span class="hs-identifier hs-var">eNonce</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-67"></span><span>             </span><span class="annot"><span class="annottext">Nonce
+</span><span class="hs-identifier hs-var">NeutralNonce</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Builder
+forall a. Monoid a =&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">mempty</span></a></span><span>
+</span><span id="line-68"></span><span>             </span><span class="annot"><span class="hs-identifier hs-type">Nonce</span></span><span> </span><span id="local-6989586621679276160"><span class="annot"><span class="annottext">Hash Blake2b_256 Nonce
+</span><a href="#local-6989586621679276160"><span class="hs-identifier hs-var">h</span></a></span></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; Builder
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-var">BS.byteStringCopy</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Hash Blake2b_256 Nonce -&gt; ByteString
+forall h a. Hash h a -&gt; ByteString
+</span><span class="hs-identifier hs-var">Hash.hashToBytes</span></span><span> </span><span class="annot"><span class="annottext">Hash Blake2b_256 Nonce
+</span><a href="#local-6989586621679276160"><span class="hs-identifier hs-var">h</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-69"></span><span>         </span><span class="hs-special">)</span><span>
+</span><span id="line-70"></span><span>
+</span><span id="line-71"></span><span class="hs-comment">-- | Indicate the usage of the VRF result.</span><span>
+</span><span id="line-72"></span><span class="hs-keyword">data</span><span> </span><span id="VRFUsage"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#VRFUsage"><span class="hs-identifier hs-var">VRFUsage</span></a></span></span><span>
+</span><span id="line-73"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-comment">-- | The VRF value will be used to establish whether the issuing node is</span><span>
+</span><span id="line-74"></span><span>    </span><span class="hs-comment">-- indeed a leader for this slot.</span><span>
+</span><span id="line-75"></span><span>    </span><span id="VRFLeader"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#VRFLeader"><span class="hs-identifier hs-var">VRFLeader</span></a></span></span><span>
+</span><span id="line-76"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="hs-comment">-- | The VRF value will be used to contribute to the evolving nonce.</span><span>
+</span><span id="line-77"></span><span>    </span><span id="VRFNonce"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#VRFNonce"><span class="hs-identifier hs-var">VRFNonce</span></a></span></span><span>
+</span><span id="line-78"></span><span>
+</span><span id="line-79"></span><span class="hs-comment">-- | Singleton VRF usage</span><span>
+</span><span id="line-80"></span><span class="hs-keyword">data</span><span> </span><span id="SVRFUsage"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#SVRFUsage"><span class="hs-identifier hs-var">SVRFUsage</span></a></span></span><span> </span><span id="local-6989586621679276158"><span class="annot"><a href="#local-6989586621679276158"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-81"></span><span>  </span><span id="SVRFLeader"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#SVRFLeader"><span class="hs-identifier hs-var">SVRFLeader</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#SVRFUsage"><span class="hs-identifier hs-type">SVRFUsage</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#VRFLeader"><span class="hs-identifier hs-type">VRFLeader</span></a></span><span>
+</span><span id="line-82"></span><span>  </span><span id="SVRFNonce"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#SVRFNonce"><span class="hs-identifier hs-var">SVRFNonce</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#SVRFUsage"><span class="hs-identifier hs-type">SVRFUsage</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#VRFNonce"><span class="hs-identifier hs-type">VRFNonce</span></a></span><span>
+</span><span id="line-83"></span><span>
+</span><span id="line-84"></span><span class="hs-comment">-- | Indicate the result of the VRF evaluation.</span><span>
+</span><span id="line-85"></span><span class="hs-keyword">data</span><span> </span><span id="VRFResult"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#VRFResult"><span class="hs-identifier hs-var">VRFResult</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679276155"><span class="annot"><a href="#local-6989586621679276155"><span class="hs-identifier hs-type">v</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#VRFUsage"><span class="hs-identifier hs-type">VRFUsage</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-86"></span><span>
+</span><span id="line-87"></span><span class="hs-comment">-- | Compute a hash of the unified VRF output appropriate to its usage.</span><span>
+</span><span id="line-88"></span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#hashVRF"><span class="hs-identifier hs-type">hashVRF</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-89"></span><span>  </span><span class="hs-keyword">forall</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679276241"><span class="annot"><a href="#local-6989586621679276241"><span class="hs-identifier hs-type">v</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#VRFUsage"><span class="hs-identifier hs-type">VRFUsage</span></a></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679276244"><span class="annot"><a href="#local-6989586621679276244"><span class="hs-identifier hs-type">c</span></a></span></span><span> </span><span id="local-6989586621679276242"><span class="annot"><a href="#local-6989586621679276242"><span class="hs-identifier hs-type">proxy</span></a></span></span><span class="hs-operator">.</span><span>
+</span><span id="line-90"></span><span>  </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Crypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679276244"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-91"></span><span>  </span><span class="annot"><a href="#local-6989586621679276242"><span class="hs-identifier hs-type">proxy</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276244"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-92"></span><span>  </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#SVRFUsage"><span class="hs-identifier hs-type">SVRFUsage</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276241"><span class="hs-identifier hs-type">v</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-93"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">CertifiedVRF</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">VRF</span></span><span> </span><span class="annot"><a href="#local-6989586621679276244"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#InputVRF"><span class="hs-identifier hs-type">InputVRF</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-94"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Hash</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">HASH</span></span><span> </span><span class="annot"><a href="#local-6989586621679276244"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#VRFResult"><span class="hs-identifier hs-type">VRFResult</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276241"><span class="hs-identifier hs-type">v</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-95"></span><span id="hashVRF"><span class="annot"><span class="annottext">hashVRF :: proxy c
+-&gt; SVRFUsage v
+-&gt; CertifiedVRF (VRF c) InputVRF
+-&gt; Hash (HASH c) (VRFResult v)
+</span><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#hashVRF"><span class="hs-identifier hs-var hs-var">hashVRF</span></a></span></span><span> </span><span class="annot"><span class="annottext">proxy c
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679276153"><span class="annot"><span class="annottext">SVRFUsage v
+</span><a href="#local-6989586621679276153"><span class="hs-identifier hs-var">use</span></a></span></span><span> </span><span id="local-6989586621679276152"><span class="annot"><span class="annottext">CertifiedVRF (VRF c) InputVRF
+</span><a href="#local-6989586621679276152"><span class="hs-identifier hs-var">certVRF</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-96"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679276151"><span class="annot"><span class="annottext">vrfOutputAsBytes :: ByteString
+</span><a href="#local-6989586621679276151"><span class="hs-identifier hs-var hs-var">vrfOutputAsBytes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">OutputVRF (VRF c) -&gt; ByteString
+forall v. OutputVRF v -&gt; ByteString
+</span><span class="hs-identifier hs-var hs-var">getOutputVRFBytes</span></span><span> </span><span class="annot"><span class="annottext">(OutputVRF (VRF c) -&gt; ByteString)
+-&gt; OutputVRF (VRF c) -&gt; ByteString
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">CertifiedVRF (VRF c) InputVRF -&gt; OutputVRF (VRF c)
+forall v a. CertifiedVRF v a -&gt; OutputVRF v
+</span><span class="hs-identifier hs-var hs-var">certifiedOutput</span></span><span> </span><span class="annot"><span class="annottext">CertifiedVRF (VRF c) InputVRF
+</span><a href="#local-6989586621679276152"><span class="hs-identifier hs-var">certVRF</span></a></span><span>
+</span><span id="line-97"></span><span>   </span><span class="hs-keyword">in</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">SVRFUsage v
+</span><a href="#local-6989586621679276153"><span class="hs-identifier hs-var">use</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-98"></span><span>        </span><span class="annot"><span class="annottext">SVRFUsage v
+</span><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#SVRFLeader"><span class="hs-identifier hs-var">SVRFLeader</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Hash (HASH c) ByteString -&gt; Hash (HASH c) (VRFResult v)
+forall h a b. Hash h a -&gt; Hash h b
+</span><span class="hs-identifier hs-var">castHash</span></span><span> </span><span class="annot"><span class="annottext">(Hash (HASH c) ByteString -&gt; Hash (HASH c) (VRFResult v))
+-&gt; Hash (HASH c) ByteString -&gt; Hash (HASH c) (VRFResult v)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; ByteString)
+-&gt; ByteString -&gt; Hash (HASH c) ByteString
+forall h a. HashAlgorithm h =&gt; (a -&gt; ByteString) -&gt; a -&gt; Hash h a
+</span><span class="hs-identifier hs-var">hashWith</span></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; ByteString
+forall a. a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">id</span></a></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; Hash (HASH c) ByteString)
+-&gt; ByteString -&gt; Hash (HASH c) ByteString
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><span class="hs-string">&quot;L&quot;</span></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; ByteString -&gt; ByteString
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679276151"><span class="hs-identifier hs-var">vrfOutputAsBytes</span></a></span><span>
+</span><span id="line-99"></span><span>        </span><span class="annot"><span class="annottext">SVRFUsage v
+</span><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#SVRFNonce"><span class="hs-identifier hs-var">SVRFNonce</span></a></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Hash (HASH c) ByteString -&gt; Hash (HASH c) (VRFResult v)
+forall h a b. Hash h a -&gt; Hash h b
+</span><span class="hs-identifier hs-var">castHash</span></span><span> </span><span class="annot"><span class="annottext">(Hash (HASH c) ByteString -&gt; Hash (HASH c) (VRFResult v))
+-&gt; Hash (HASH c) ByteString -&gt; Hash (HASH c) (VRFResult v)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; ByteString)
+-&gt; ByteString -&gt; Hash (HASH c) ByteString
+forall h a. HashAlgorithm h =&gt; (a -&gt; ByteString) -&gt; a -&gt; Hash h a
+</span><span class="hs-identifier hs-var">hashWith</span></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; ByteString
+forall a. a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">id</span></a></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; Hash (HASH c) ByteString)
+-&gt; ByteString -&gt; Hash (HASH c) ByteString
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><span class="hs-string">&quot;N&quot;</span></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; ByteString -&gt; ByteString
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679276151"><span class="hs-identifier hs-var">vrfOutputAsBytes</span></a></span><span>
+</span><span id="line-100"></span><span>
+</span><span id="line-101"></span><span class="hs-comment">-- | Range-extend a VRF output to be used for leader checks from the relevant</span><span>
+</span><span id="line-102"></span><span class="hs-comment">-- hash. See section 4.1 of the linked paper for details.</span><span>
+</span><span id="line-103"></span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#vrfLeaderValue"><span class="hs-identifier hs-type">vrfLeaderValue</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-104"></span><span>  </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679276150"><span class="annot"><a href="#local-6989586621679276150"><span class="hs-identifier hs-type">c</span></a></span></span><span> </span><span id="local-6989586621679276149"><span class="annot"><a href="#local-6989586621679276149"><span class="hs-identifier hs-type">proxy</span></a></span></span><span class="hs-operator">.</span><span>
+</span><span id="line-105"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Crypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679276150"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-106"></span><span>  </span><span class="annot"><a href="#local-6989586621679276149"><span class="hs-identifier hs-type">proxy</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276150"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-107"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">CertifiedVRF</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">VRF</span></span><span> </span><span class="annot"><a href="#local-6989586621679276150"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#InputVRF"><span class="hs-identifier hs-type">InputVRF</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-108"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">BoundedNatural</span></span><span>
+</span><span id="line-109"></span><span id="vrfLeaderValue"><span class="annot"><span class="annottext">vrfLeaderValue :: proxy c -&gt; CertifiedVRF (VRF c) InputVRF -&gt; BoundedNatural
+</span><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#vrfLeaderValue"><span class="hs-identifier hs-var hs-var">vrfLeaderValue</span></a></span></span><span> </span><span id="local-6989586621679276148"><span class="annot"><span class="annottext">proxy c
+</span><a href="#local-6989586621679276148"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span id="local-6989586621679276147"><span class="annot"><span class="annottext">CertifiedVRF (VRF c) InputVRF
+</span><a href="#local-6989586621679276147"><span class="hs-identifier hs-var">cvrf</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-110"></span><span>  </span><span class="annot"><span class="annottext">Natural -&gt; Natural -&gt; BoundedNatural
+</span><span class="hs-identifier hs-var">assertBoundedNatural</span></span><span>
+</span><span id="line-111"></span><span>    </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Natural
+</span><span class="hs-number">2</span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Natural</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Natural -&gt; Word -&gt; Natural
+forall a b. (Num a, Integral b) =&gt; a -&gt; b -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">^</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word
+</span><span class="hs-number">8</span></span><span> </span><span class="annot"><span class="annottext">Word -&gt; Word -&gt; Word
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">*</span></a></span><span> </span><span class="annot"><span class="annottext">Proxy (HASH c) -&gt; Word
+forall h (proxy :: * -&gt; *). HashAlgorithm h =&gt; proxy h -&gt; Word
+</span><span class="hs-identifier hs-var">sizeHash</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Proxy (HASH c)
+forall k (t :: k). Proxy t
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Proxy</span></a></span><span> </span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">HASH</span></span><span> </span><span class="annot"><a href="#local-6989586621679276150"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-112"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ByteString -&gt; Natural
+</span><span class="hs-identifier hs-var">bytesToNatural</span></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; Natural)
+-&gt; (Hash (HASH c) (VRFResult 'VRFLeader) -&gt; ByteString)
+-&gt; Hash (HASH c) (VRFResult 'VRFLeader)
+-&gt; Natural
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Hash (HASH c) (VRFResult 'VRFLeader) -&gt; ByteString
+forall h a. Hash h a -&gt; ByteString
+</span><span class="hs-identifier hs-var">hashToBytes</span></span><span> </span><span class="annot"><span class="annottext">(Hash (HASH c) (VRFResult 'VRFLeader) -&gt; Natural)
+-&gt; Hash (HASH c) (VRFResult 'VRFLeader) -&gt; Natural
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">proxy c
+-&gt; SVRFUsage 'VRFLeader
+-&gt; CertifiedVRF (VRF c) InputVRF
+-&gt; Hash (HASH c) (VRFResult 'VRFLeader)
+forall (v :: VRFUsage) c (proxy :: * -&gt; *).
+Crypto c =&gt;
+proxy c
+-&gt; SVRFUsage v
+-&gt; CertifiedVRF (VRF c) InputVRF
+-&gt; Hash (HASH c) (VRFResult v)
+</span><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#hashVRF"><span class="hs-identifier hs-var">hashVRF</span></a></span><span> </span><span class="annot"><span class="annottext">proxy c
+</span><a href="#local-6989586621679276148"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">SVRFUsage 'VRFLeader
+</span><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#SVRFLeader"><span class="hs-identifier hs-var">SVRFLeader</span></a></span><span> </span><span class="annot"><span class="annottext">CertifiedVRF (VRF c) InputVRF
+</span><a href="#local-6989586621679276147"><span class="hs-identifier hs-var">cvrf</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-113"></span><span>
+</span><span id="line-114"></span><span class="hs-comment">-- | Range-extend a VRF output to be used for the evolving nonce. See section</span><span>
+</span><span id="line-115"></span><span class="hs-comment">-- 4.1 of the linked paper for details.</span><span>
+</span><span id="line-116"></span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#vrfNonceValue"><span class="hs-identifier hs-type">vrfNonceValue</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-117"></span><span>  </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679276144"><span class="annot"><a href="#local-6989586621679276144"><span class="hs-identifier hs-type">c</span></a></span></span><span> </span><span id="local-6989586621679276143"><span class="annot"><a href="#local-6989586621679276143"><span class="hs-identifier hs-type">proxy</span></a></span></span><span class="hs-operator">.</span><span>
+</span><span id="line-118"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Crypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679276144"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-119"></span><span>  </span><span class="annot"><a href="#local-6989586621679276143"><span class="hs-identifier hs-type">proxy</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276144"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-120"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">CertifiedVRF</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">VRF</span></span><span> </span><span class="annot"><a href="#local-6989586621679276144"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#InputVRF"><span class="hs-identifier hs-type">InputVRF</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-121"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Nonce</span></span><span>
+</span><span id="line-122"></span><span id="vrfNonceValue"><span class="annot"><span class="annottext">vrfNonceValue :: proxy c -&gt; CertifiedVRF (VRF c) InputVRF -&gt; Nonce
+</span><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#vrfNonceValue"><span class="hs-identifier hs-var hs-var">vrfNonceValue</span></a></span></span><span> </span><span id="local-6989586621679276142"><span class="annot"><span class="annottext">proxy c
+</span><a href="#local-6989586621679276142"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-123"></span><span>  </span><span class="hs-comment">-- The double hashing below is perhaps a little confusing. The first hash is</span><span>
+</span><span id="line-124"></span><span>  </span><span class="hs-comment">-- how we do range extension as per the VRF paper. The second hash is how we</span><span>
+</span><span id="line-125"></span><span>  </span><span class="hs-comment">-- generate a nonce value from a VRF output. However, that &quot;VRF output&quot; is now</span><span>
+</span><span id="line-126"></span><span>  </span><span class="hs-comment">-- itself a hash.</span><span>
+</span><span id="line-127"></span><span>  </span><span class="hs-comment">--</span><span>
+</span><span id="line-128"></span><span>  </span><span class="hs-comment">-- However, while the VRF hash is crypto-dependent, for the nonce we use a</span><span>
+</span><span id="line-129"></span><span>  </span><span class="hs-comment">-- fixed `Blake2b_256` hashing function. So this double hashing is still</span><span>
+</span><span id="line-130"></span><span>  </span><span class="hs-comment">-- needed.</span><span>
+</span><span id="line-131"></span><span>  </span><span class="annot"><span class="annottext">Hash Blake2b_256 Nonce -&gt; Nonce
+</span><span class="hs-identifier hs-var">Nonce</span></span><span> </span><span class="annot"><span class="annottext">(Hash Blake2b_256 Nonce -&gt; Nonce)
+-&gt; (CertifiedVRF (VRF c) InputVRF -&gt; Hash Blake2b_256 Nonce)
+-&gt; CertifiedVRF (VRF c) InputVRF
+-&gt; Nonce
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Hash Blake2b_256 ByteString -&gt; Hash Blake2b_256 Nonce
+forall h a b. Hash h a -&gt; Hash h b
+</span><span class="hs-identifier hs-var">castHash</span></span><span> </span><span class="annot"><span class="annottext">(Hash Blake2b_256 ByteString -&gt; Hash Blake2b_256 Nonce)
+-&gt; (CertifiedVRF (VRF c) InputVRF -&gt; Hash Blake2b_256 ByteString)
+-&gt; CertifiedVRF (VRF c) InputVRF
+-&gt; Hash Blake2b_256 Nonce
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; ByteString)
+-&gt; ByteString -&gt; Hash Blake2b_256 ByteString
+forall h a. HashAlgorithm h =&gt; (a -&gt; ByteString) -&gt; a -&gt; Hash h a
+</span><span class="hs-identifier hs-var">hashWith</span></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; ByteString
+forall a. a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">id</span></a></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; Hash Blake2b_256 ByteString)
+-&gt; (CertifiedVRF (VRF c) InputVRF -&gt; ByteString)
+-&gt; CertifiedVRF (VRF c) InputVRF
+-&gt; Hash Blake2b_256 ByteString
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Hash (HASH c) (VRFResult 'VRFNonce) -&gt; ByteString
+forall h a. Hash h a -&gt; ByteString
+</span><span class="hs-identifier hs-var">hashToBytes</span></span><span> </span><span class="annot"><span class="annottext">(Hash (HASH c) (VRFResult 'VRFNonce) -&gt; ByteString)
+-&gt; (CertifiedVRF (VRF c) InputVRF
+    -&gt; Hash (HASH c) (VRFResult 'VRFNonce))
+-&gt; CertifiedVRF (VRF c) InputVRF
+-&gt; ByteString
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">proxy c
+-&gt; SVRFUsage 'VRFNonce
+-&gt; CertifiedVRF (VRF c) InputVRF
+-&gt; Hash (HASH c) (VRFResult 'VRFNonce)
+forall (v :: VRFUsage) c (proxy :: * -&gt; *).
+Crypto c =&gt;
+proxy c
+-&gt; SVRFUsage v
+-&gt; CertifiedVRF (VRF c) InputVRF
+-&gt; Hash (HASH c) (VRFResult v)
+</span><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#hashVRF"><span class="hs-identifier hs-var">hashVRF</span></a></span><span> </span><span class="annot"><span class="annottext">proxy c
+</span><a href="#local-6989586621679276142"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">SVRFUsage 'VRFNonce
+</span><a href="Ouroboros.Consensus.Protocol.Praos.VRF.html#SVRFNonce"><span class="hs-identifier hs-var">SVRFNonce</span></a></span><span>
+</span><span id="line-132"></span></pre></body></html>

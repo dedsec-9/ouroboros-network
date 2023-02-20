@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DataKinds      #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE GADTs          #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE NamedFieldPuns #-}</span><span>
+</span><span id="line-4"></span><span>
+</span><span id="line-5"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.Protocol.KeepAlive.Server</span><span>
+</span><span id="line-6"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.KeepAlive.Server.html#KeepAliveServer"><span class="hs-identifier">KeepAliveServer</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-7"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.KeepAlive.Server.html#keepAliveServerPeer"><span class="hs-identifier">keepAliveServerPeer</span></a></span><span>
+</span><span id="line-8"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Network.TypedProtocol.Core</span></span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.Protocol.KeepAlive.Type.html"><span class="hs-identifier">Ouroboros.Network.Protocol.KeepAlive.Type</span></a></span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">data</span><span> </span><span id="KeepAliveServer"><span class="annot"><a href="Ouroboros.Network.Protocol.KeepAlive.Server.html#KeepAliveServer"><span class="hs-identifier hs-var">KeepAliveServer</span></a></span></span><span> </span><span id="local-6989586621679112024"><span class="annot"><a href="#local-6989586621679112024"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679112023"><span class="annot"><a href="#local-6989586621679112023"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="KeepAliveServer"><span class="annot"><a href="Ouroboros.Network.Protocol.KeepAlive.Server.html#KeepAliveServer"><span class="hs-identifier hs-var">KeepAliveServer</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-15"></span><span>    </span><span id="recvMsgKeepAlive"><span class="annot"><span class="annottext">KeepAliveServer m a -&gt; m (KeepAliveServer m a)
+</span><a href="Ouroboros.Network.Protocol.KeepAlive.Server.html#recvMsgKeepAlive"><span class="hs-identifier hs-var hs-var">recvMsgKeepAlive</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679112024"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.KeepAlive.Server.html#KeepAliveServer"><span class="hs-identifier hs-type">KeepAliveServer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679112024"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679112023"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span>    </span><span id="recvMsgDone"><span class="annot"><span class="annottext">KeepAliveServer m a -&gt; m a
+</span><a href="Ouroboros.Network.Protocol.KeepAlive.Server.html#recvMsgDone"><span class="hs-identifier hs-var hs-var">recvMsgDone</span></a></span></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679112024"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679112023"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-19"></span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span id="local-6989586621679111990"><span id="local-6989586621679111991"><span class="annot"><a href="Ouroboros.Network.Protocol.KeepAlive.Server.html#keepAliveServerPeer"><span class="hs-identifier hs-type">keepAliveServerPeer</span></a></span><span>
+</span><span id="line-22"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Functor</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679111991"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-23"></span><span>    </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.KeepAlive.Server.html#KeepAliveServer"><span class="hs-identifier hs-type">KeepAliveServer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679111991"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679111990"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-24"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Peer</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.KeepAlive.Type.html#KeepAlive"><span class="hs-identifier hs-type">KeepAlive</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">AsServer</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.KeepAlive.Type.html#StClient"><span class="hs-identifier hs-type">StClient</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679111991"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679111990"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-25"></span><span id="keepAliveServerPeer"><span class="annot"><span class="annottext">keepAliveServerPeer :: KeepAliveServer m a -&gt; Peer KeepAlive 'AsServer 'StClient m a
+</span><a href="Ouroboros.Network.Protocol.KeepAlive.Server.html#keepAliveServerPeer"><span class="hs-identifier hs-var hs-var">keepAliveServerPeer</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.KeepAlive.Server.html#KeepAliveServer"><span class="hs-identifier hs-type">KeepAliveServer</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679111985"><span class="annot"><span class="annottext">m (KeepAliveServer m a)
+recvMsgKeepAlive :: m (KeepAliveServer m a)
+recvMsgKeepAlive :: forall (m :: * -&gt; *) a.
+KeepAliveServer m a -&gt; m (KeepAliveServer m a)
+</span><a href="#local-6989586621679111985"><span class="hs-identifier hs-var hs-var">recvMsgKeepAlive</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679111984"><span class="annot"><span class="annottext">m a
+recvMsgDone :: m a
+recvMsgDone :: forall (m :: * -&gt; *) a. KeepAliveServer m a -&gt; m a
+</span><a href="#local-6989586621679111984"><span class="hs-identifier hs-var hs-var">recvMsgDone</span></a></span></span><span> </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-26"></span><span>    </span><span class="annot"><span class="annottext">TheyHaveAgency 'AsServer 'StClient
+-&gt; (forall (st' :: KeepAlive).
+    Message KeepAlive 'StClient st'
+    -&gt; Peer KeepAlive 'AsServer st' m a)
+-&gt; Peer KeepAlive 'AsServer 'StClient m a
+forall (pr :: PeerRole) ps (st :: ps) (m :: * -&gt; *) a.
+TheyHaveAgency pr st
+-&gt; (forall (st' :: ps). Message ps st st' -&gt; Peer ps pr st' m a)
+-&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Await</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ClientHasAgency 'StClient -&gt; PeerHasAgency 'AsClient 'StClient
+forall ps (st :: ps).
+ClientHasAgency st -&gt; PeerHasAgency 'AsClient st
+</span><span class="hs-identifier hs-var">ClientAgency</span></span><span> </span><span class="annot"><span class="annottext">ClientHasAgency 'StClient
+</span><a href="Ouroboros.Network.Protocol.KeepAlive.Type.html#TokClient"><span class="hs-identifier hs-var">TokClient</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">((forall (st' :: KeepAlive).
+  Message KeepAlive 'StClient st'
+  -&gt; Peer KeepAlive 'AsServer st' m a)
+ -&gt; Peer KeepAlive 'AsServer 'StClient m a)
+-&gt; (forall (st' :: KeepAlive).
+    Message KeepAlive 'StClient st'
+    -&gt; Peer KeepAlive 'AsServer st' m a)
+-&gt; Peer KeepAlive 'AsServer 'StClient m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679111980"><span class="annot"><span class="annottext">Message KeepAlive 'StClient st'
+</span><a href="#local-6989586621679111980"><span class="hs-identifier hs-var">msg</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-27"></span><span>      </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Message KeepAlive 'StClient st'
+</span><a href="#local-6989586621679111980"><span class="hs-identifier hs-var">msg</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-28"></span><span>        </span><span class="annot"><span class="annottext">Message KeepAlive 'StClient st'
+</span><a href="Ouroboros.Network.Protocol.KeepAlive.Type.html#MsgDone"><span class="hs-identifier hs-var">MsgDone</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">m (Peer KeepAlive 'AsServer 'StDone m a)
+-&gt; Peer KeepAlive 'AsServer 'StDone m a
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) a.
+m (Peer ps pr st m a) -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Effect</span></span><span> </span><span class="annot"><span class="annottext">(m (Peer KeepAlive 'AsServer 'StDone m a)
+ -&gt; Peer KeepAlive 'AsServer 'StDone m a)
+-&gt; m (Peer KeepAlive 'AsServer 'StDone m a)
+-&gt; Peer KeepAlive 'AsServer 'StDone m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">NobodyHasAgency 'StDone
+-&gt; a -&gt; Peer KeepAlive 'AsServer 'StDone m a
+forall ps (st :: ps) a (pr :: PeerRole) (m :: * -&gt; *).
+NobodyHasAgency st -&gt; a -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Done</span></span><span> </span><span class="annot"><span class="annottext">NobodyHasAgency 'StDone
+</span><a href="Ouroboros.Network.Protocol.KeepAlive.Type.html#TokDone"><span class="hs-identifier hs-var">TokDone</span></a></span><span> </span><span class="annot"><span class="annottext">(a -&gt; Peer KeepAlive 'AsServer 'StDone m a)
+-&gt; m a -&gt; m (Peer KeepAlive 'AsServer 'StDone m a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">m a
+</span><a href="#local-6989586621679111984"><span class="hs-identifier hs-var">recvMsgDone</span></a></span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span>        </span><span class="annot"><a href="Ouroboros.Network.Protocol.KeepAlive.Type.html#MsgKeepAlive"><span class="hs-identifier hs-type">MsgKeepAlive</span></a></span><span> </span><span id="local-6989586621679111973"><span class="annot"><a href="#local-6989586621679111973"><span class="hs-identifier hs-var">cookie</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-31"></span><span>          </span><span class="annot"><span class="annottext">m (Peer KeepAlive 'AsServer 'StServer m a)
+-&gt; Peer KeepAlive 'AsServer 'StServer m a
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) a.
+m (Peer ps pr st m a) -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Effect</span></span><span> </span><span class="annot"><span class="annottext">(m (Peer KeepAlive 'AsServer 'StServer m a)
+ -&gt; Peer KeepAlive 'AsServer 'StServer m a)
+-&gt; m (Peer KeepAlive 'AsServer 'StServer m a)
+-&gt; Peer KeepAlive 'AsServer 'StServer m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-32"></span><span>            </span><span class="annot"><span class="annottext">(KeepAliveServer m a -&gt; Peer KeepAlive 'AsServer 'StServer m a)
+-&gt; m (KeepAliveServer m a)
+-&gt; m (Peer KeepAlive 'AsServer 'StServer m a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fmap</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679111972"><span class="annot"><span class="annottext">KeepAliveServer m a
+</span><a href="#local-6989586621679111972"><span class="hs-identifier hs-var">server</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-33"></span><span>                    </span><span class="annot"><span class="annottext">WeHaveAgency 'AsServer 'StServer
+-&gt; Message KeepAlive 'StServer 'StClient
+-&gt; Peer KeepAlive 'AsServer 'StClient m a
+-&gt; Peer KeepAlive 'AsServer 'StServer m a
+forall (pr :: PeerRole) ps (st :: ps) (st' :: ps) (m :: * -&gt; *) a.
+WeHaveAgency pr st
+-&gt; Message ps st st' -&gt; Peer ps pr st' m a -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Yield</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ServerHasAgency 'StServer -&gt; WeHaveAgency 'AsServer 'StServer
+forall ps (st :: ps).
+ServerHasAgency st -&gt; PeerHasAgency 'AsServer st
+</span><span class="hs-identifier hs-var">ServerAgency</span></span><span> </span><span class="annot"><span class="annottext">ServerHasAgency 'StServer
+</span><a href="Ouroboros.Network.Protocol.KeepAlive.Type.html#TokServer"><span class="hs-identifier hs-var">TokServer</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span>                          </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Cookie -&gt; Message KeepAlive 'StServer 'StClient
+</span><a href="Ouroboros.Network.Protocol.KeepAlive.Type.html#MsgKeepAliveResponse"><span class="hs-identifier hs-var">MsgKeepAliveResponse</span></a></span><span> </span><span class="annot"><span class="annottext">Cookie
+</span><a href="#local-6989586621679111973"><span class="hs-identifier hs-var">cookie</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span>                          </span><span class="hs-special">(</span><span class="annot"><span class="annottext">KeepAliveServer m a -&gt; Peer KeepAlive 'AsServer 'StClient m a
+forall (m :: * -&gt; *) a.
+Functor m =&gt;
+KeepAliveServer m a -&gt; Peer KeepAlive 'AsServer 'StClient m a
+</span><a href="Ouroboros.Network.Protocol.KeepAlive.Server.html#keepAliveServerPeer"><span class="hs-identifier hs-var">keepAliveServerPeer</span></a></span><span> </span><span class="annot"><span class="annottext">KeepAliveServer m a
+</span><a href="#local-6989586621679111972"><span class="hs-identifier hs-var">server</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-36"></span><span>                 </span><span class="annot"><span class="annottext">m (KeepAliveServer m a)
+</span><a href="#local-6989586621679111985"><span class="hs-identifier hs-var">recvMsgKeepAlive</span></a></span><span>
+</span><span id="line-37"></span></pre></body></html>

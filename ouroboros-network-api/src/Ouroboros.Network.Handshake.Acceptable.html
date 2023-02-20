@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.Handshake.Acceptable</span><span>
+</span><span id="line-2"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Ouroboros.Network.Handshake.Acceptable.html#Accept"><span class="hs-identifier">Accept</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-3"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Handshake.Acceptable.html#Acceptable"><span class="hs-identifier">Acceptable</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-4"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-5"></span><span>
+</span><span id="line-6"></span><span>
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/text-1.2.4.1/src"><span class="hs-identifier">Data.Text</span></a></span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- | A @'Maybe'@ like type which better explains its purpose.</span><span>
+</span><span id="line-10"></span><span class="hs-comment">--</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">data</span><span> </span><span id="Accept"><span class="annot"><a href="Ouroboros.Network.Handshake.Acceptable.html#Accept"><span class="hs-identifier hs-var">Accept</span></a></span></span><span> </span><span id="local-6989586621679127755"><span class="annot"><a href="#local-6989586621679127755"><span class="hs-identifier hs-type">vData</span></a></span></span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="Accept"><span class="annot"><a href="Ouroboros.Network.Handshake.Acceptable.html#Accept"><span class="hs-identifier hs-var">Accept</span></a></span></span><span> </span><span class="annot"><a href="#local-6989586621679127755"><span class="hs-identifier hs-type">vData</span></a></span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Refuse"><span class="annot"><a href="Ouroboros.Network.Handshake.Acceptable.html#Refuse"><span class="hs-identifier hs-var">Refuse</span></a></span></span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-type">Text</span></a></span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679127748"><span id="local-6989586621679127750"><span class="annot"><span class="annottext">Accept vData -&gt; Accept vData -&gt; Bool
+(Accept vData -&gt; Accept vData -&gt; Bool)
+-&gt; (Accept vData -&gt; Accept vData -&gt; Bool) -&gt; Eq (Accept vData)
+forall vData. Eq vData =&gt; Accept vData -&gt; Accept vData -&gt; Bool
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Accept vData -&gt; Accept vData -&gt; Bool
+$c/= :: forall vData. Eq vData =&gt; Accept vData -&gt; Accept vData -&gt; Bool
+== :: Accept vData -&gt; Accept vData -&gt; Bool
+$c== :: forall vData. Eq vData =&gt; Accept vData -&gt; Accept vData -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679127741"><span id="local-6989586621679127743"><span id="local-6989586621679127745"><span class="annot"><span class="annottext">Int -&gt; Accept vData -&gt; ShowS
+[Accept vData] -&gt; ShowS
+Accept vData -&gt; String
+(Int -&gt; Accept vData -&gt; ShowS)
+-&gt; (Accept vData -&gt; String)
+-&gt; ([Accept vData] -&gt; ShowS)
+-&gt; Show (Accept vData)
+forall vData. Show vData =&gt; Int -&gt; Accept vData -&gt; ShowS
+forall vData. Show vData =&gt; [Accept vData] -&gt; ShowS
+forall vData. Show vData =&gt; Accept vData -&gt; String
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Accept vData] -&gt; ShowS
+$cshowList :: forall vData. Show vData =&gt; [Accept vData] -&gt; ShowS
+show :: Accept vData -&gt; String
+$cshow :: forall vData. Show vData =&gt; Accept vData -&gt; String
+showsPrec :: Int -&gt; Accept vData -&gt; ShowS
+$cshowsPrec :: forall vData. Show vData =&gt; Int -&gt; Accept vData -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">class</span><span> </span><span id="Acceptable"><span class="annot"><a href="Ouroboros.Network.Handshake.Acceptable.html#Acceptable"><span class="hs-identifier hs-var">Acceptable</span></a></span></span><span> </span><span id="local-6989586621679127739"><span class="annot"><a href="#local-6989586621679127739"><span class="hs-identifier hs-type">v</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-comment">-- | The 'acceptableVersion' function ought to be symmetric, this guarantees</span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-comment">-- that local and remote sides will agree on the same data.</span><span>
+</span><span id="line-20"></span><span>  </span><span id="acceptableVersion"><span class="annot"><a href="Ouroboros.Network.Handshake.Acceptable.html#acceptableVersion"><span class="hs-identifier hs-type">acceptableVersion</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679127739"><span class="hs-identifier hs-type">v</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679127739"><span class="hs-identifier hs-type">v</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Handshake.Acceptable.html#Accept"><span class="hs-identifier hs-type">Accept</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679127739"><span class="hs-identifier hs-type">v</span></a></span><span>
+</span><span id="line-21"></span></pre></body></html>

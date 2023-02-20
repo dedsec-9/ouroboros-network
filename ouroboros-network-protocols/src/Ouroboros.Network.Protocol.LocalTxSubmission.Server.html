@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DataKinds           #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE GADTs               #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE KindSignatures      #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE NamedFieldPuns      #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables #-}</span><span>
+</span><span id="line-6"></span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- | A view of the local transaction submission protocol from the point of view</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- of the server.</span><span>
+</span><span id="line-9"></span><span class="hs-comment">--</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- This provides a view that uses less complex types and should be easier to</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- use than the underlying typed protocol itself.</span><span>
+</span><span id="line-12"></span><span class="hs-comment">--</span><span>
+</span><span id="line-13"></span><span class="hs-comment">-- For execution, a conversion into the typed protocol is provided.</span><span>
+</span><span id="line-14"></span><span class="hs-comment">--</span><span>
+</span><span id="line-15"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.Protocol.LocalTxSubmission.Server</span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-comment">-- * Protocol type for the server</span></span><span>
+</span><span id="line-17"></span><span>    </span><span class="annot"><span class="hs-comment">-- | The protocol states from the point of view of the server.</span></span><span>
+</span><span id="line-18"></span><span>    </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Server.html#LocalTxSubmissionServer"><span class="hs-identifier">LocalTxSubmissionServer</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Execution as a typed protocol</span></span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Server.html#localTxSubmissionServerPeer"><span class="hs-identifier">localTxSubmissionServerPeer</span></a></span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-22"></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Network.TypedProtocol.Core</span></span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Type.html"><span class="hs-identifier">Ouroboros.Network.Protocol.LocalTxSubmission.Type</span></a></span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span>
+</span><span id="line-28"></span><span class="hs-comment">-- | The server side of the local transaction submission protocol.</span><span>
+</span><span id="line-29"></span><span class="hs-comment">--</span><span>
+</span><span id="line-30"></span><span class="hs-comment">-- The peer in the client role submits transactions to the peer in the server</span><span>
+</span><span id="line-31"></span><span class="hs-comment">-- role.</span><span>
+</span><span id="line-32"></span><span class="hs-comment">--</span><span>
+</span><span id="line-33"></span><span class="hs-keyword">data</span><span> </span><span id="LocalTxSubmissionServer"><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Server.html#LocalTxSubmissionServer"><span class="hs-identifier hs-var">LocalTxSubmissionServer</span></a></span></span><span> </span><span id="local-6989586621679114594"><span class="annot"><a href="#local-6989586621679114594"><span class="hs-identifier hs-type">tx</span></a></span></span><span> </span><span id="local-6989586621679114593"><span class="annot"><a href="#local-6989586621679114593"><span class="hs-identifier hs-type">reject</span></a></span></span><span> </span><span id="local-6989586621679114592"><span class="annot"><a href="#local-6989586621679114592"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679114591"><span class="annot"><a href="#local-6989586621679114591"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-34"></span><span>     </span><span id="LocalTxSubmissionServer"><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Server.html#LocalTxSubmissionServer"><span class="hs-identifier hs-var">LocalTxSubmissionServer</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span>       </span><span class="hs-comment">-- | The client has submited a single transaction and it expects a reply.</span><span>
+</span><span id="line-37"></span><span>       </span><span class="hs-comment">--</span><span>
+</span><span id="line-38"></span><span>       </span><span class="hs-comment">-- The server must reply to inform the client that it has either accepted</span><span>
+</span><span id="line-39"></span><span>       </span><span class="hs-comment">-- the transaction or rejected it. In the rejection case a reason for the</span><span>
+</span><span id="line-40"></span><span>       </span><span class="hs-comment">-- rejection is included.</span><span>
+</span><span id="line-41"></span><span>       </span><span class="hs-comment">--</span><span>
+</span><span id="line-42"></span><span>       </span><span id="recvMsgSubmitTx"><span class="annot"><span class="annottext">LocalTxSubmissionServer tx reject m a
+-&gt; tx
+-&gt; m (SubmitResult reject, LocalTxSubmissionServer tx reject m a)
+</span><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Server.html#recvMsgSubmitTx"><span class="hs-identifier hs-var hs-var">recvMsgSubmitTx</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679114594"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679114592"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Type.html#SubmitResult"><span class="hs-identifier hs-type">SubmitResult</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679114593"><span class="hs-identifier hs-type">reject</span></a></span><span>
+</span><span id="line-43"></span><span>                                  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Server.html#LocalTxSubmissionServer"><span class="hs-identifier hs-type">LocalTxSubmissionServer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679114594"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679114593"><span class="hs-identifier hs-type">reject</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679114592"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679114591"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span>       </span><span class="hs-comment">-- | The client can terminate the protocol.</span><span>
+</span><span id="line-46"></span><span>       </span><span class="hs-comment">--</span><span>
+</span><span id="line-47"></span><span>       </span><span id="recvMsgDone"><span class="annot"><span class="annottext">LocalTxSubmissionServer tx reject m a -&gt; a
+</span><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Server.html#recvMsgDone"><span class="hs-identifier hs-var hs-var">recvMsgDone</span></a></span></span><span>     </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679114591"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-48"></span><span>     </span><span class="hs-special">}</span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span>
+</span><span id="line-51"></span><span class="hs-comment">-- | A non-pipelined 'Peer' representing the 'LocalTxSubmissionServer'.</span><span>
+</span><span id="line-52"></span><span class="hs-comment">--</span><span>
+</span><span id="line-53"></span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Server.html#localTxSubmissionServerPeer"><span class="hs-identifier hs-type">localTxSubmissionServerPeer</span></a></span><span>
+</span><span id="line-54"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679114549"><span class="annot"><a href="#local-6989586621679114549"><span class="hs-identifier hs-type">tx</span></a></span></span><span> </span><span id="local-6989586621679114548"><span class="annot"><a href="#local-6989586621679114548"><span class="hs-identifier hs-type">reject</span></a></span></span><span> </span><span id="local-6989586621679114547"><span class="annot"><a href="#local-6989586621679114547"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679114546"><span class="annot"><a href="#local-6989586621679114546"><span class="hs-identifier hs-type">a</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Monad</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679114547"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679114547"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Server.html#LocalTxSubmissionServer"><span class="hs-identifier hs-type">LocalTxSubmissionServer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679114549"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679114548"><span class="hs-identifier hs-type">reject</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679114547"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679114546"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-56"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Peer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Type.html#LocalTxSubmission"><span class="hs-identifier hs-type">LocalTxSubmission</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679114549"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679114548"><span class="hs-identifier hs-type">reject</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AsServer</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Type.html#StIdle"><span class="hs-identifier hs-type">StIdle</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679114547"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679114546"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-57"></span><span id="localTxSubmissionServerPeer"><span class="annot"><span class="annottext">localTxSubmissionServerPeer :: m (LocalTxSubmissionServer tx reject m a)
+-&gt; Peer (LocalTxSubmission tx reject) 'AsServer 'StIdle m a
+</span><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Server.html#localTxSubmissionServerPeer"><span class="hs-identifier hs-var hs-var">localTxSubmissionServerPeer</span></a></span></span><span> </span><span id="local-6989586621679114545"><span class="annot"><span class="annottext">m (LocalTxSubmissionServer tx reject m a)
+</span><a href="#local-6989586621679114545"><span class="hs-identifier hs-var">server</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-58"></span><span>    </span><span class="annot"><span class="annottext">m (Peer (LocalTxSubmission tx reject) 'AsServer 'StIdle m a)
+-&gt; Peer (LocalTxSubmission tx reject) 'AsServer 'StIdle m a
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) a.
+m (Peer ps pr st m a) -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Effect</span></span><span> </span><span class="annot"><span class="annottext">(m (Peer (LocalTxSubmission tx reject) 'AsServer 'StIdle m a)
+ -&gt; Peer (LocalTxSubmission tx reject) 'AsServer 'StIdle m a)
+-&gt; m (Peer (LocalTxSubmission tx reject) 'AsServer 'StIdle m a)
+-&gt; Peer (LocalTxSubmission tx reject) 'AsServer 'StIdle m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">LocalTxSubmissionServer tx reject m a
+-&gt; Peer (LocalTxSubmission tx reject) 'AsServer 'StIdle m a
+</span><a href="#local-6989586621679114543"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">(LocalTxSubmissionServer tx reject m a
+ -&gt; Peer (LocalTxSubmission tx reject) 'AsServer 'StIdle m a)
+-&gt; m (LocalTxSubmissionServer tx reject m a)
+-&gt; m (Peer (LocalTxSubmission tx reject) 'AsServer 'StIdle m a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">m (LocalTxSubmissionServer tx reject m a)
+</span><a href="#local-6989586621679114545"><span class="hs-identifier hs-var">server</span></a></span><span>
+</span><span id="line-59"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-60"></span><span>    </span><span class="annot"><a href="#local-6989586621679114543"><span class="hs-identifier hs-type">go</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Server.html#LocalTxSubmissionServer"><span class="hs-identifier hs-type">LocalTxSubmissionServer</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679114549"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679114548"><span class="hs-identifier hs-type">reject</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679114547"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679114546"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-61"></span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Peer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Type.html#LocalTxSubmission"><span class="hs-identifier hs-type">LocalTxSubmission</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679114549"><span class="hs-identifier hs-type">tx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679114548"><span class="hs-identifier hs-type">reject</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AsServer</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Type.html#StIdle"><span class="hs-identifier hs-type">StIdle</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679114547"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679114546"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-62"></span><span>    </span><span id="local-6989586621679114543"><span class="annot"><span class="annottext">go :: LocalTxSubmissionServer tx reject m a
+-&gt; Peer (LocalTxSubmission tx reject) 'AsServer 'StIdle m a
+</span><a href="#local-6989586621679114543"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Server.html#LocalTxSubmissionServer"><span class="hs-identifier hs-type">LocalTxSubmissionServer</span></a></span><span class="hs-special">{</span><span id="local-6989586621679114541"><span class="annot"><span class="annottext">tx
+-&gt; m (SubmitResult reject, LocalTxSubmissionServer tx reject m a)
+recvMsgSubmitTx :: tx
+-&gt; m (SubmitResult reject, LocalTxSubmissionServer tx reject m a)
+recvMsgSubmitTx :: forall tx reject (m :: * -&gt; *) a.
+LocalTxSubmissionServer tx reject m a
+-&gt; tx
+-&gt; m (SubmitResult reject, LocalTxSubmissionServer tx reject m a)
+</span><a href="#local-6989586621679114541"><span class="hs-identifier hs-var hs-var">recvMsgSubmitTx</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679114540"><span class="annot"><span class="annottext">a
+recvMsgDone :: a
+recvMsgDone :: forall tx reject (m :: * -&gt; *) a.
+LocalTxSubmissionServer tx reject m a -&gt; a
+</span><a href="#local-6989586621679114540"><span class="hs-identifier hs-var hs-var">recvMsgDone</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-63"></span><span>      </span><span class="annot"><span class="annottext">TheyHaveAgency 'AsServer 'StIdle
+-&gt; (forall (st' :: LocalTxSubmission tx reject).
+    Message (LocalTxSubmission tx reject) 'StIdle st'
+    -&gt; Peer (LocalTxSubmission tx reject) 'AsServer st' m a)
+-&gt; Peer (LocalTxSubmission tx reject) 'AsServer 'StIdle m a
+forall (pr :: PeerRole) ps (st :: ps) (m :: * -&gt; *) a.
+TheyHaveAgency pr st
+-&gt; (forall (st' :: ps). Message ps st st' -&gt; Peer ps pr st' m a)
+-&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Await</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ClientHasAgency 'StIdle -&gt; PeerHasAgency 'AsClient 'StIdle
+forall ps (st :: ps).
+ClientHasAgency st -&gt; PeerHasAgency 'AsClient st
+</span><span class="hs-identifier hs-var">ClientAgency</span></span><span> </span><span class="annot"><span class="annottext">ClientHasAgency 'StIdle
+forall k k (tx :: k) (reject :: k). ClientHasAgency 'StIdle
+</span><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Type.html#TokIdle"><span class="hs-identifier hs-var">TokIdle</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">((forall (st' :: LocalTxSubmission tx reject).
+  Message (LocalTxSubmission tx reject) 'StIdle st'
+  -&gt; Peer (LocalTxSubmission tx reject) 'AsServer st' m a)
+ -&gt; Peer (LocalTxSubmission tx reject) 'AsServer 'StIdle m a)
+-&gt; (forall (st' :: LocalTxSubmission tx reject).
+    Message (LocalTxSubmission tx reject) 'StIdle st'
+    -&gt; Peer (LocalTxSubmission tx reject) 'AsServer st' m a)
+-&gt; Peer (LocalTxSubmission tx reject) 'AsServer 'StIdle m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679114536"><span class="annot"><span class="annottext">Message (LocalTxSubmission tx reject) 'StIdle st'
+</span><a href="#local-6989586621679114536"><span class="hs-identifier hs-var">msg</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Message (LocalTxSubmission tx reject) 'StIdle st'
+</span><a href="#local-6989586621679114536"><span class="hs-identifier hs-var">msg</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-64"></span><span>        </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Type.html#MsgSubmitTx"><span class="hs-identifier hs-type">MsgSubmitTx</span></a></span><span> </span><span id="local-6989586621679114534"><span class="annot"><a href="#local-6989586621679114534"><span class="hs-identifier hs-var">tx</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">m (Peer (LocalTxSubmission tx reject) 'AsServer 'StBusy m a)
+-&gt; Peer (LocalTxSubmission tx reject) 'AsServer 'StBusy m a
+forall (m :: * -&gt; *) ps (pr :: PeerRole) (st :: ps) a.
+m (Peer ps pr st m a) -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Effect</span></span><span> </span><span class="annot"><span class="annottext">(m (Peer (LocalTxSubmission tx reject) 'AsServer 'StBusy m a)
+ -&gt; Peer (LocalTxSubmission tx reject) 'AsServer 'StBusy m a)
+-&gt; m (Peer (LocalTxSubmission tx reject) 'AsServer 'StBusy m a)
+-&gt; Peer (LocalTxSubmission tx reject) 'AsServer 'StBusy m a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-65"></span><span>          </span><span class="hs-special">(</span><span id="local-6989586621679114533"><span class="annot"><span class="annottext">SubmitResult reject
+</span><a href="#local-6989586621679114533"><span class="hs-identifier hs-var">result</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679114532"><span class="annot"><span class="annottext">LocalTxSubmissionServer tx reject m a
+</span><a href="#local-6989586621679114532"><span class="hs-identifier hs-var">k</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">tx
+-&gt; m (SubmitResult reject, LocalTxSubmissionServer tx reject m a)
+</span><a href="#local-6989586621679114541"><span class="hs-identifier hs-var">recvMsgSubmitTx</span></a></span><span> </span><span class="annot"><span class="annottext">tx
+tx
+</span><a href="#local-6989586621679114534"><span class="hs-identifier hs-var">tx</span></a></span><span>
+</span><span id="line-66"></span><span>          </span><span class="annot"><span class="annottext">Peer (LocalTxSubmission tx reject) 'AsServer 'StBusy m a
+-&gt; m (Peer (LocalTxSubmission tx reject) 'AsServer 'StBusy m a)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">(Peer (LocalTxSubmission tx reject) 'AsServer 'StBusy m a
+ -&gt; m (Peer (LocalTxSubmission tx reject) 'AsServer 'StBusy m a))
+-&gt; Peer (LocalTxSubmission tx reject) 'AsServer 'StBusy m a
+-&gt; m (Peer (LocalTxSubmission tx reject) 'AsServer 'StBusy m a)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-67"></span><span>            </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">SubmitResult reject
+</span><a href="#local-6989586621679114533"><span class="hs-identifier hs-var">result</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-68"></span><span>              </span><span class="annot"><span class="annottext">SubmitResult reject
+</span><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Type.html#SubmitSuccess"><span class="hs-identifier hs-var">SubmitSuccess</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-69"></span><span>                </span><span class="annot"><span class="annottext">WeHaveAgency 'AsServer 'StBusy
+-&gt; Message (LocalTxSubmission tx reject) 'StBusy 'StIdle
+-&gt; Peer (LocalTxSubmission tx reject) 'AsServer 'StIdle m a
+-&gt; Peer (LocalTxSubmission tx reject) 'AsServer 'StBusy m a
+forall (pr :: PeerRole) ps (st :: ps) (st' :: ps) (m :: * -&gt; *) a.
+WeHaveAgency pr st
+-&gt; Message ps st st' -&gt; Peer ps pr st' m a -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Yield</span></span><span>
+</span><span id="line-70"></span><span>                  </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ServerHasAgency 'StBusy -&gt; WeHaveAgency 'AsServer 'StBusy
+forall ps (st :: ps).
+ServerHasAgency st -&gt; PeerHasAgency 'AsServer st
+</span><span class="hs-identifier hs-var">ServerAgency</span></span><span> </span><span class="annot"><span class="annottext">ServerHasAgency 'StBusy
+forall k k (tx :: k) (reject :: k). ServerHasAgency 'StBusy
+</span><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Type.html#TokBusy"><span class="hs-identifier hs-var">TokBusy</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-71"></span><span>                  </span><span class="annot"><span class="annottext">Message (LocalTxSubmission tx reject) 'StBusy 'StIdle
+forall k k (tx :: k) (reject :: k).
+Message (LocalTxSubmission tx reject) 'StBusy 'StIdle
+</span><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Type.html#MsgAcceptTx"><span class="hs-identifier hs-var">MsgAcceptTx</span></a></span><span>
+</span><span id="line-72"></span><span>                  </span><span class="hs-special">(</span><span class="annot"><span class="annottext">LocalTxSubmissionServer tx reject m a
+-&gt; Peer (LocalTxSubmission tx reject) 'AsServer 'StIdle m a
+</span><a href="#local-6989586621679114543"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">LocalTxSubmissionServer tx reject m a
+</span><a href="#local-6989586621679114532"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-73"></span><span>              </span><span class="annot"><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Type.html#SubmitFail"><span class="hs-identifier hs-type">SubmitFail</span></a></span><span> </span><span id="local-6989586621679114525"><span class="annot"><span class="annottext">reject
+</span><a href="#local-6989586621679114525"><span class="hs-identifier hs-var">reject</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-74"></span><span>                </span><span class="annot"><span class="annottext">WeHaveAgency 'AsServer 'StBusy
+-&gt; Message (LocalTxSubmission tx reject) 'StBusy 'StIdle
+-&gt; Peer (LocalTxSubmission tx reject) 'AsServer 'StIdle m a
+-&gt; Peer (LocalTxSubmission tx reject) 'AsServer 'StBusy m a
+forall (pr :: PeerRole) ps (st :: ps) (st' :: ps) (m :: * -&gt; *) a.
+WeHaveAgency pr st
+-&gt; Message ps st st' -&gt; Peer ps pr st' m a -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Yield</span></span><span>
+</span><span id="line-75"></span><span>                  </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ServerHasAgency 'StBusy -&gt; WeHaveAgency 'AsServer 'StBusy
+forall ps (st :: ps).
+ServerHasAgency st -&gt; PeerHasAgency 'AsServer st
+</span><span class="hs-identifier hs-var">ServerAgency</span></span><span> </span><span class="annot"><span class="annottext">ServerHasAgency 'StBusy
+forall k k (tx :: k) (reject :: k). ServerHasAgency 'StBusy
+</span><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Type.html#TokBusy"><span class="hs-identifier hs-var">TokBusy</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-76"></span><span>                  </span><span class="hs-special">(</span><span class="annot"><span class="annottext">reject -&gt; Message (LocalTxSubmission tx reject) 'StBusy 'StIdle
+forall k reject (tx :: k).
+reject -&gt; Message (LocalTxSubmission tx reject) 'StBusy 'StIdle
+</span><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Type.html#MsgRejectTx"><span class="hs-identifier hs-var">MsgRejectTx</span></a></span><span> </span><span class="annot"><span class="annottext">reject
+</span><a href="#local-6989586621679114525"><span class="hs-identifier hs-var">reject</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-77"></span><span>                  </span><span class="hs-special">(</span><span class="annot"><span class="annottext">LocalTxSubmissionServer tx reject m a
+-&gt; Peer (LocalTxSubmission tx reject) 'AsServer 'StIdle m a
+</span><a href="#local-6989586621679114543"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">LocalTxSubmissionServer tx reject m a
+</span><a href="#local-6989586621679114532"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-78"></span><span>
+</span><span id="line-79"></span><span>        </span><span class="annot"><span class="annottext">Message (LocalTxSubmission tx reject) 'StIdle st'
+</span><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Type.html#MsgDone"><span class="hs-identifier hs-var">MsgDone</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">NobodyHasAgency 'StDone
+-&gt; a -&gt; Peer (LocalTxSubmission tx reject) 'AsServer 'StDone m a
+forall ps (st :: ps) a (pr :: PeerRole) (m :: * -&gt; *).
+NobodyHasAgency st -&gt; a -&gt; Peer ps pr st m a
+</span><span class="hs-identifier hs-var">Done</span></span><span> </span><span class="annot"><span class="annottext">NobodyHasAgency 'StDone
+forall k k (tx :: k) (reject :: k). NobodyHasAgency 'StDone
+</span><a href="Ouroboros.Network.Protocol.LocalTxSubmission.Type.html#TokDone"><span class="hs-identifier hs-var">TokDone</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679114540"><span class="hs-identifier hs-var">recvMsgDone</span></a></span><span>
+</span><span id="line-80"></span><span>
+</span><span id="line-81"></span></pre></body></html>

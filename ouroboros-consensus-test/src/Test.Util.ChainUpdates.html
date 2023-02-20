@@ -1,0 +1,740 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="%24maxtag_ARuSGomh9EMJJSeA0EGrKD"><span id="%24tag2con_ARuSGomh9EMJJSeA0EGrKD"><span id="%24con2tag_ARuSGomh9EMJJSeA0EGrKD"></span></span></span><span class="hs-pragma">{-# LANGUAGE DerivingStrategies #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE FlexibleContexts   #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE LambdaCase         #-}</span><span>
+</span><span id="line-4"></span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- | Generate sequences of updates to model an evolving chain</span><span>
+</span><span id="line-6"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Test.Util.ChainUpdates</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-7"></span><span>    </span><span class="annot"><a href="Test.Util.ChainUpdates.html#ChainUpdate"><span class="hs-identifier">ChainUpdate</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-8"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Test.Util.ChainUpdates.html#UpdateBehavior"><span class="hs-identifier">UpdateBehavior</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-9"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Test.Util.ChainUpdates.html#genChainUpdates"><span class="hs-identifier">genChainUpdates</span></a></span><span>
+</span><span id="line-10"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Test.Util.ChainUpdates.html#toChainUpdates"><span class="hs-identifier">toChainUpdates</span></a></span><span>
+</span><span id="line-11"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Tests</span></span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Test.Util.ChainUpdates.html#prop_genChainUpdates"><span class="hs-identifier">prop_genChainUpdates</span></a></span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/mtl-2.2.2/src"><span class="hs-identifier">Control.Monad.State.Strict</span></a></span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Test.QuickCheck</span></span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-mock-0.1.0.0/noopt/doc/html/ouroboros-network-mock/src"><span class="hs-identifier">Ouroboros.Network.Mock.Chain</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-mock-0.1.0.0/noopt/doc/html/ouroboros-network-mock/src"><span class="hs-identifier">Chain</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-mock-0.1.0.0/noopt/doc/html/ouroboros-network-mock/src"><span class="hs-identifier">Genesis</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-mock-0.1.0.0/noopt/doc/html/ouroboros-network-mock/src"><span class="hs-identifier">Ouroboros.Network.Mock.Chain</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Chain</span></span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Block</span></a></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Config</span></a></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Util.Condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Condense</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-25"></span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Test.Util.TestBlock.html"><span class="hs-identifier">Test.Util.TestBlock</span></a></span><span>
+</span><span id="line-27"></span><span>
+</span><span id="line-28"></span><span class="hs-keyword">data</span><span> </span><span id="ChainUpdate"><span class="annot"><a href="Test.Util.ChainUpdates.html#ChainUpdate"><span class="hs-identifier hs-var">ChainUpdate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-29"></span><span>    </span><span id="AddBlock"><span class="annot"><a href="Test.Util.ChainUpdates.html#AddBlock"><span class="hs-identifier hs-var">AddBlock</span></a></span></span><span> </span><span class="annot"><a href="Test.Util.TestBlock.html#TestBlock"><span class="hs-identifier hs-type">TestBlock</span></a></span><span>
+</span><span id="line-30"></span><span>    </span><span class="hs-comment">-- | Roll back to the given 'Point', and then /immediately/ roll</span><span>
+</span><span id="line-31"></span><span>    </span><span class="hs-comment">-- forward by the given 'TestBlock's.</span><span>
+</span><span id="line-32"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="SwitchFork"><span class="annot"><a href="Test.Util.ChainUpdates.html#SwitchFork"><span class="hs-identifier hs-var">SwitchFork</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="annot"><a href="Test.Util.TestBlock.html#TestBlock"><span class="hs-identifier hs-type">TestBlock</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Test.Util.TestBlock.html#TestBlock"><span class="hs-identifier hs-type">TestBlock</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-33"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679280025"><span id="local-6989586621679280027"><span class="annot"><span class="annottext">ChainUpdate -&gt; ChainUpdate -&gt; Bool
+(ChainUpdate -&gt; ChainUpdate -&gt; Bool)
+-&gt; (ChainUpdate -&gt; ChainUpdate -&gt; Bool) -&gt; Eq ChainUpdate
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: ChainUpdate -&gt; ChainUpdate -&gt; Bool
+$c/= :: ChainUpdate -&gt; ChainUpdate -&gt; Bool
+== :: ChainUpdate -&gt; ChainUpdate -&gt; Bool
+$c== :: ChainUpdate -&gt; ChainUpdate -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679280018"><span id="local-6989586621679280020"><span id="local-6989586621679280022"><span class="annot"><span class="annottext">Int -&gt; ChainUpdate -&gt; ShowS
+[ChainUpdate] -&gt; ShowS
+ChainUpdate -&gt; String
+(Int -&gt; ChainUpdate -&gt; ShowS)
+-&gt; (ChainUpdate -&gt; String)
+-&gt; ([ChainUpdate] -&gt; ShowS)
+-&gt; Show ChainUpdate
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [ChainUpdate] -&gt; ShowS
+$cshowList :: [ChainUpdate] -&gt; ShowS
+show :: ChainUpdate -&gt; String
+$cshow :: ChainUpdate -&gt; String
+showsPrec :: Int -&gt; ChainUpdate -&gt; ShowS
+$cshowsPrec :: Int -&gt; ChainUpdate -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span>
+</span><span id="line-35"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="annot"><a href="Test.Util.ChainUpdates.html#ChainUpdate"><span class="hs-identifier hs-type">ChainUpdate</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-36"></span><span>  </span><span id="local-6989586621679280014"><span class="annot"><span class="annottext">condense :: ChainUpdate -&gt; String
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-37"></span><span>    </span><span class="annot"><a href="Test.Util.ChainUpdates.html#AddBlock"><span class="hs-identifier hs-type">AddBlock</span></a></span><span> </span><span id="local-6989586621679280012"><span class="annot"><span class="annottext">TestBlock
+</span><a href="#local-6989586621679280012"><span class="hs-identifier hs-var">b</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;AddBlock &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">TestBlock -&gt; String
+forall a. Condense a =&gt; a -&gt; String
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">condense</span></a></span><span> </span><span class="annot"><span class="annottext">TestBlock
+</span><a href="#local-6989586621679280012"><span class="hs-identifier hs-var">b</span></a></span><span>
+</span><span id="line-38"></span><span>    </span><span class="annot"><a href="Test.Util.ChainUpdates.html#SwitchFork"><span class="hs-identifier hs-type">SwitchFork</span></a></span><span> </span><span id="local-6989586621679280011"><span class="annot"><span class="annottext">Point TestBlock
+</span><a href="#local-6989586621679280011"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span id="local-6989586621679280010"><span class="annot"><span class="annottext">[TestBlock]
+</span><a href="#local-6989586621679280010"><span class="hs-identifier hs-var">bs</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;SwitchFork &lt;- &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Point TestBlock -&gt; String
+forall a. Condense a =&gt; a -&gt; String
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">condense</span></a></span><span> </span><span class="annot"><span class="annottext">Point TestBlock
+</span><a href="#local-6989586621679280011"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot; -&gt; &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span>
+</span><span id="line-39"></span><span>      </span><span class="annot"><span class="annottext">[String] -&gt; String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">unwords</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(TestBlock -&gt; String) -&gt; [TestBlock] -&gt; [String]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">map</span></a></span><span> </span><span class="annot"><span class="annottext">TestBlock -&gt; String
+forall a. Condense a =&gt; a -&gt; String
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">condense</span></a></span><span> </span><span class="annot"><span class="annottext">[TestBlock]
+</span><a href="#local-6989586621679280010"><span class="hs-identifier hs-var">bs</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-40"></span><span>
+</span><span id="line-41"></span><span class="annot"><a href="Test.Util.ChainUpdates.html#toChainUpdates"><span class="hs-identifier hs-type">toChainUpdates</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Test.Util.ChainUpdates.html#ChainUpdate"><span class="hs-identifier hs-type">ChainUpdate</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Chain.ChainUpdate</span></a></span><span> </span><span class="annot"><a href="Test.Util.TestBlock.html#TestBlock"><span class="hs-identifier hs-type">TestBlock</span></a></span><span> </span><span class="annot"><a href="Test.Util.TestBlock.html#TestBlock"><span class="hs-identifier hs-type">TestBlock</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-42"></span><span id="toChainUpdates"><span class="annot"><span class="annottext">toChainUpdates :: [ChainUpdate] -&gt; [ChainUpdate TestBlock TestBlock]
+</span><a href="Test.Util.ChainUpdates.html#toChainUpdates"><span class="hs-identifier hs-var hs-var">toChainUpdates</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(ChainUpdate -&gt; [ChainUpdate TestBlock TestBlock])
+-&gt; [ChainUpdate] -&gt; [ChainUpdate TestBlock TestBlock]
+forall (t :: * -&gt; *) a b. Foldable t =&gt; (a -&gt; [b]) -&gt; t a -&gt; [b]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">concatMap</span></a></span><span> </span><span class="annot"><span class="annottext">((ChainUpdate -&gt; [ChainUpdate TestBlock TestBlock])
+ -&gt; [ChainUpdate] -&gt; [ChainUpdate TestBlock TestBlock])
+-&gt; (ChainUpdate -&gt; [ChainUpdate TestBlock TestBlock])
+-&gt; [ChainUpdate]
+-&gt; [ChainUpdate TestBlock TestBlock]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-43"></span><span>    </span><span class="annot"><a href="Test.Util.ChainUpdates.html#SwitchFork"><span class="hs-identifier hs-type">SwitchFork</span></a></span><span> </span><span id="local-6989586621679280007"><span class="annot"><span class="annottext">Point TestBlock
+</span><a href="#local-6989586621679280007"><span class="hs-identifier hs-var">pt</span></a></span></span><span> </span><span id="local-6989586621679280006"><span class="annot"><span class="annottext">[TestBlock]
+</span><a href="#local-6989586621679280006"><span class="hs-identifier hs-var">bs</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Point TestBlock -&gt; ChainUpdate TestBlock TestBlock
+forall block a. Point block -&gt; ChainUpdate block a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">Chain.RollBack</span></a></span><span> </span><span class="annot"><span class="annottext">Point TestBlock
+</span><a href="#local-6989586621679280007"><span class="hs-identifier hs-var">pt</span></a></span><span> </span><span class="annot"><span class="annottext">ChainUpdate TestBlock TestBlock
+-&gt; [ChainUpdate TestBlock TestBlock]
+-&gt; [ChainUpdate TestBlock TestBlock]
+forall a. a -&gt; [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-var">:</span></a></span><span> </span><span class="annot"><span class="annottext">(TestBlock -&gt; ChainUpdate TestBlock TestBlock)
+-&gt; [TestBlock] -&gt; [ChainUpdate TestBlock TestBlock]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">map</span></a></span><span> </span><span class="annot"><span class="annottext">TestBlock -&gt; ChainUpdate TestBlock TestBlock
+forall block a. a -&gt; ChainUpdate block a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">Chain.AddBlock</span></a></span><span> </span><span class="annot"><span class="annottext">[TestBlock]
+</span><a href="#local-6989586621679280006"><span class="hs-identifier hs-var">bs</span></a></span><span>
+</span><span id="line-44"></span><span>    </span><span class="annot"><a href="Test.Util.ChainUpdates.html#AddBlock"><span class="hs-identifier hs-type">AddBlock</span></a></span><span> </span><span id="local-6989586621679280003"><span class="annot"><span class="annottext">TestBlock
+</span><a href="#local-6989586621679280003"><span class="hs-identifier hs-var">b</span></a></span></span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">TestBlock -&gt; ChainUpdate TestBlock TestBlock
+forall block a. a -&gt; ChainUpdate block a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">Chain.AddBlock</span></a></span><span> </span><span class="annot"><span class="annottext">TestBlock
+</span><a href="#local-6989586621679280003"><span class="hs-identifier hs-var">b</span></a></span><span>  </span><span class="annot"><span class="annottext">ChainUpdate TestBlock TestBlock
+-&gt; [ChainUpdate TestBlock TestBlock]
+-&gt; [ChainUpdate TestBlock TestBlock]
+forall a. a -&gt; [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-var">:</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-45"></span><span>
+</span><span id="line-46"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+  Generating ChainUpdates
+-------------------------------------------------------------------------------}</span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span class="hs-comment">-- | We need some state to generate @ChainUpdate@s</span><span>
+</span><span id="line-51"></span><span class="hs-keyword">data</span><span> </span><span id="ChainUpdateState"><span class="annot"><a href="Test.Util.ChainUpdates.html#ChainUpdateState"><span class="hs-identifier hs-var">ChainUpdateState</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ChainUpdateState"><span class="annot"><a href="Test.Util.ChainUpdates.html#ChainUpdateState"><span class="hs-identifier hs-var">ChainUpdateState</span></a></span></span><span>
+</span><span id="line-52"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="cusCurrentChain"><span class="annot"><span class="annottext">ChainUpdateState -&gt; Chain TestBlock
+</span><a href="Test.Util.ChainUpdates.html#cusCurrentChain"><span class="hs-identifier hs-var hs-var">cusCurrentChain</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-mock-0.1.0.0/noopt/doc/html/ouroboros-network-mock/src"><span class="hs-identifier hs-type">Chain</span></a></span><span> </span><span class="annot"><a href="Test.Util.TestBlock.html#TestBlock"><span class="hs-identifier hs-type">TestBlock</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-53"></span><span>    </span><span class="hs-comment">-- ^ The current chain, obtained by applying all the 'cusUpdates' in reverse</span><span>
+</span><span id="line-54"></span><span>    </span><span class="hs-comment">-- order.</span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="cusUpdates"><span class="annot"><span class="annottext">ChainUpdateState -&gt; [ChainUpdate]
+</span><a href="Test.Util.ChainUpdates.html#cusUpdates"><span class="hs-identifier hs-var hs-var">cusUpdates</span></a></span></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">[</span><span class="annot"><a href="Test.Util.ChainUpdates.html#ChainUpdate"><span class="hs-identifier hs-type">ChainUpdate</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-56"></span><span>    </span><span class="hs-comment">-- ^ The updates that have been generated so far, in reverse order: the</span><span>
+</span><span id="line-57"></span><span>    </span><span class="hs-comment">-- first update in the list is the last update to apply.</span><span>
+</span><span id="line-58"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679279994"><span id="local-6989586621679279996"><span id="local-6989586621679279998"><span class="annot"><span class="annottext">Int -&gt; ChainUpdateState -&gt; ShowS
+[ChainUpdateState] -&gt; ShowS
+ChainUpdateState -&gt; String
+(Int -&gt; ChainUpdateState -&gt; ShowS)
+-&gt; (ChainUpdateState -&gt; String)
+-&gt; ([ChainUpdateState] -&gt; ShowS)
+-&gt; Show ChainUpdateState
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [ChainUpdateState] -&gt; ShowS
+$cshowList :: [ChainUpdateState] -&gt; ShowS
+show :: ChainUpdateState -&gt; String
+$cshow :: ChainUpdateState -&gt; String
+showsPrec :: Int -&gt; ChainUpdateState -&gt; ShowS
+$cshowsPrec :: Int -&gt; ChainUpdateState -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-59"></span><span>
+</span><span id="line-60"></span><span class="annot"><a href="Test.Util.ChainUpdates.html#emptyUpdateState"><span class="hs-identifier hs-type">emptyUpdateState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Test.Util.ChainUpdates.html#ChainUpdateState"><span class="hs-identifier hs-type">ChainUpdateState</span></a></span><span>
+</span><span id="line-61"></span><span id="emptyUpdateState"><span class="annot"><span class="annottext">emptyUpdateState :: ChainUpdateState
+</span><a href="Test.Util.ChainUpdates.html#emptyUpdateState"><span class="hs-identifier hs-var hs-var">emptyUpdateState</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ChainUpdateState :: Chain TestBlock -&gt; [ChainUpdate] -&gt; ChainUpdateState
+</span><a href="Test.Util.ChainUpdates.html#ChainUpdateState"><span class="hs-identifier hs-type">ChainUpdateState</span></a></span><span>
+</span><span id="line-62"></span><span>  </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">cusCurrentChain :: Chain TestBlock
+</span><a href="Test.Util.ChainUpdates.html#cusCurrentChain"><span class="hs-identifier hs-var">cusCurrentChain</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Chain TestBlock
+forall block. Chain block
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-mock-0.1.0.0/noopt/doc/html/ouroboros-network-mock/src"><span class="hs-identifier hs-var">Genesis</span></a></span><span>
+</span><span id="line-63"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">cusUpdates :: [ChainUpdate]
+</span><a href="Test.Util.ChainUpdates.html#cusUpdates"><span class="hs-identifier hs-var">cusUpdates</span></a></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-64"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-65"></span><span>
+</span><span id="line-66"></span><span class="annot"><a href="Test.Util.ChainUpdates.html#getChainUpdates"><span class="hs-identifier hs-type">getChainUpdates</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Test.Util.ChainUpdates.html#ChainUpdateState"><span class="hs-identifier hs-type">ChainUpdateState</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Test.Util.ChainUpdates.html#ChainUpdate"><span class="hs-identifier hs-type">ChainUpdate</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-67"></span><span id="getChainUpdates"><span class="annot"><span class="annottext">getChainUpdates :: ChainUpdateState -&gt; [ChainUpdate]
+</span><a href="Test.Util.ChainUpdates.html#getChainUpdates"><span class="hs-identifier hs-var hs-var">getChainUpdates</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[ChainUpdate] -&gt; [ChainUpdate]
+forall a. [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">reverse</span></a></span><span> </span><span class="annot"><span class="annottext">([ChainUpdate] -&gt; [ChainUpdate])
+-&gt; (ChainUpdateState -&gt; [ChainUpdate])
+-&gt; ChainUpdateState
+-&gt; [ChainUpdate]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">ChainUpdateState -&gt; [ChainUpdate]
+</span><a href="Test.Util.ChainUpdates.html#cusUpdates"><span class="hs-identifier hs-var hs-var">cusUpdates</span></a></span><span>
+</span><span id="line-68"></span><span>
+</span><span id="line-69"></span><span class="hs-comment">-- | Different strategies how to generate a sequence of 'ChainUpdate's.</span><span>
+</span><span id="line-70"></span><span class="hs-keyword">data</span><span> </span><span id="UpdateBehavior"><span class="annot"><a href="Test.Util.ChainUpdates.html#UpdateBehavior"><span class="hs-identifier hs-var">UpdateBehavior</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-71"></span><span>    </span><span class="hs-comment">-- | Chain updates tracking the selected chain of an honest node. In</span><span>
+</span><span id="line-72"></span><span>    </span><span class="hs-comment">-- particular, this includes:</span><span>
+</span><span id="line-73"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-74"></span><span>    </span><span class="hs-comment">--  * All blocks involved are valid.</span><span>
+</span><span id="line-75"></span><span>    </span><span class="hs-comment">--  * Every 'ChainUpdate' improves the chain.</span><span>
+</span><span id="line-76"></span><span>    </span><span id="SelectedChainBehavior"><span class="annot"><a href="Test.Util.ChainUpdates.html#SelectedChainBehavior"><span class="hs-identifier hs-var">SelectedChainBehavior</span></a></span></span><span>
+</span><span id="line-77"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="hs-comment">-- | Chain updates tracking the tentative chain of an honest node (in the</span><span>
+</span><span id="line-78"></span><span>    </span><span class="hs-comment">-- context of diffusion pipelining). This is similiar to</span><span>
+</span><span id="line-79"></span><span>    </span><span class="hs-comment">-- 'SelectedChainBehavior', but allows for the following sequence of</span><span>
+</span><span id="line-80"></span><span>    </span><span class="hs-comment">-- 'ChainUpdates':</span><span>
+</span><span id="line-81"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-82"></span><span>    </span><span class="hs-comment">--  1. @'AddBlock' blk@ for @blk@ invalid</span><span>
+</span><span id="line-83"></span><span>    </span><span class="hs-comment">--  2. @'SwitchFork' (prevPoint blk) [blk']@ where @blk'@ is preferable to</span><span>
+</span><span id="line-84"></span><span>    </span><span class="hs-comment">--     @blk@.</span><span>
+</span><span id="line-85"></span><span>    </span><span id="TentativeChainBehavior"><span class="annot"><a href="Test.Util.ChainUpdates.html#TentativeChainBehavior"><span class="hs-identifier hs-var">TentativeChainBehavior</span></a></span></span><span>
+</span><span id="line-86"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679279982"><span id="local-6989586621679279984"><span id="local-6989586621679279986"><span class="annot"><span class="annottext">Int -&gt; UpdateBehavior -&gt; ShowS
+[UpdateBehavior] -&gt; ShowS
+UpdateBehavior -&gt; String
+(Int -&gt; UpdateBehavior -&gt; ShowS)
+-&gt; (UpdateBehavior -&gt; String)
+-&gt; ([UpdateBehavior] -&gt; ShowS)
+-&gt; Show UpdateBehavior
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [UpdateBehavior] -&gt; ShowS
+$cshowList :: [UpdateBehavior] -&gt; ShowS
+show :: UpdateBehavior -&gt; String
+$cshow :: UpdateBehavior -&gt; String
+showsPrec :: Int -&gt; UpdateBehavior -&gt; ShowS
+$cshowsPrec :: Int -&gt; UpdateBehavior -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679279978"><span id="local-6989586621679279980"><span class="annot"><span class="annottext">UpdateBehavior -&gt; UpdateBehavior -&gt; Bool
+(UpdateBehavior -&gt; UpdateBehavior -&gt; Bool)
+-&gt; (UpdateBehavior -&gt; UpdateBehavior -&gt; Bool) -&gt; Eq UpdateBehavior
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: UpdateBehavior -&gt; UpdateBehavior -&gt; Bool
+$c/= :: UpdateBehavior -&gt; UpdateBehavior -&gt; Bool
+== :: UpdateBehavior -&gt; UpdateBehavior -&gt; Bool
+$c== :: UpdateBehavior -&gt; UpdateBehavior -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679279962"><span id="local-6989586621679279964"><span id="local-6989586621679279966"><span id="local-6989586621679279968"><span id="local-6989586621679279970"><span id="local-6989586621679279972"><span id="local-6989586621679279974"><span id="local-6989586621679279976"><span class="annot"><span class="annottext">Int -&gt; UpdateBehavior
+UpdateBehavior -&gt; Int
+UpdateBehavior -&gt; [UpdateBehavior]
+UpdateBehavior -&gt; UpdateBehavior
+UpdateBehavior -&gt; UpdateBehavior -&gt; [UpdateBehavior]
+UpdateBehavior
+-&gt; UpdateBehavior -&gt; UpdateBehavior -&gt; [UpdateBehavior]
+(UpdateBehavior -&gt; UpdateBehavior)
+-&gt; (UpdateBehavior -&gt; UpdateBehavior)
+-&gt; (Int -&gt; UpdateBehavior)
+-&gt; (UpdateBehavior -&gt; Int)
+-&gt; (UpdateBehavior -&gt; [UpdateBehavior])
+-&gt; (UpdateBehavior -&gt; UpdateBehavior -&gt; [UpdateBehavior])
+-&gt; (UpdateBehavior -&gt; UpdateBehavior -&gt; [UpdateBehavior])
+-&gt; (UpdateBehavior
+    -&gt; UpdateBehavior -&gt; UpdateBehavior -&gt; [UpdateBehavior])
+-&gt; Enum UpdateBehavior
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+enumFromThenTo :: UpdateBehavior
+-&gt; UpdateBehavior -&gt; UpdateBehavior -&gt; [UpdateBehavior]
+$cenumFromThenTo :: UpdateBehavior
+-&gt; UpdateBehavior -&gt; UpdateBehavior -&gt; [UpdateBehavior]
+enumFromTo :: UpdateBehavior -&gt; UpdateBehavior -&gt; [UpdateBehavior]
+$cenumFromTo :: UpdateBehavior -&gt; UpdateBehavior -&gt; [UpdateBehavior]
+enumFromThen :: UpdateBehavior -&gt; UpdateBehavior -&gt; [UpdateBehavior]
+$cenumFromThen :: UpdateBehavior -&gt; UpdateBehavior -&gt; [UpdateBehavior]
+enumFrom :: UpdateBehavior -&gt; [UpdateBehavior]
+$cenumFrom :: UpdateBehavior -&gt; [UpdateBehavior]
+fromEnum :: UpdateBehavior -&gt; Int
+$cfromEnum :: UpdateBehavior -&gt; Int
+toEnum :: Int -&gt; UpdateBehavior
+$ctoEnum :: Int -&gt; UpdateBehavior
+pred :: UpdateBehavior -&gt; UpdateBehavior
+$cpred :: UpdateBehavior -&gt; UpdateBehavior
+succ :: UpdateBehavior -&gt; UpdateBehavior
+$csucc :: UpdateBehavior -&gt; UpdateBehavior
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></a></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679279957"><span id="local-6989586621679279959"><span class="annot"><span class="annottext">UpdateBehavior
+UpdateBehavior -&gt; UpdateBehavior -&gt; Bounded UpdateBehavior
+forall a. a -&gt; a -&gt; Bounded a
+maxBound :: UpdateBehavior
+$cmaxBound :: UpdateBehavior
+minBound :: UpdateBehavior
+$cminBound :: UpdateBehavior
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></a></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-87"></span><span>
+</span><span id="line-88"></span><span class="annot"><a href="Test.Util.ChainUpdates.html#genChainUpdates"><span class="hs-identifier hs-type">genChainUpdates</span></a></span><span>
+</span><span id="line-89"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Test.Util.ChainUpdates.html#UpdateBehavior"><span class="hs-identifier hs-type">UpdateBehavior</span></a></span><span>
+</span><span id="line-90"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">SecurityParam</span></a></span><span>
+</span><span id="line-91"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span>  </span><span class="hs-comment">-- ^ The number of updates to generate</span><span>
+</span><span id="line-92"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Test.Util.ChainUpdates.html#ChainUpdate"><span class="hs-identifier hs-type">ChainUpdate</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-93"></span><span id="genChainUpdates"><span class="annot"><span class="annottext">genChainUpdates :: UpdateBehavior -&gt; SecurityParam -&gt; Int -&gt; Gen [ChainUpdate]
+</span><a href="Test.Util.ChainUpdates.html#genChainUpdates"><span class="hs-identifier hs-var hs-var">genChainUpdates</span></a></span></span><span> </span><span id="local-6989586621679279955"><span class="annot"><span class="annottext">UpdateBehavior
+</span><a href="#local-6989586621679279955"><span class="hs-identifier hs-var">updateBehavior</span></a></span></span><span> </span><span id="local-6989586621679279954"><span class="annot"><span class="annottext">SecurityParam
+</span><a href="#local-6989586621679279954"><span class="hs-identifier hs-var">securityParam</span></a></span></span><span> </span><span id="local-6989586621679279953"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679279953"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-94"></span><span>        </span><span class="annot"><span class="annottext">ChainUpdateState -&gt; [ChainUpdate]
+</span><a href="Test.Util.ChainUpdates.html#getChainUpdates"><span class="hs-identifier hs-var">getChainUpdates</span></a></span><span>
+</span><span id="line-95"></span><span>    </span><span class="annot"><span class="annottext">(ChainUpdateState -&gt; [ChainUpdate])
+-&gt; Gen ChainUpdateState -&gt; Gen [ChainUpdate]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">UpdateBehavior
+-&gt; SecurityParam -&gt; Int -&gt; ChainUpdateState -&gt; Gen ChainUpdateState
+</span><a href="Test.Util.ChainUpdates.html#genChainUpdateState"><span class="hs-identifier hs-var">genChainUpdateState</span></a></span><span> </span><span class="annot"><span class="annottext">UpdateBehavior
+</span><a href="#local-6989586621679279955"><span class="hs-identifier hs-var">updateBehavior</span></a></span><span> </span><span class="annot"><span class="annottext">SecurityParam
+</span><a href="#local-6989586621679279954"><span class="hs-identifier hs-var">securityParam</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679279953"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">ChainUpdateState
+</span><a href="Test.Util.ChainUpdates.html#emptyUpdateState"><span class="hs-identifier hs-var">emptyUpdateState</span></a></span><span>
+</span><span id="line-96"></span><span>
+</span><span id="line-97"></span><span class="annot"><a href="Test.Util.ChainUpdates.html#genChainUpdateState"><span class="hs-identifier hs-type">genChainUpdateState</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-98"></span><span>     </span><span class="annot"><a href="Test.Util.ChainUpdates.html#UpdateBehavior"><span class="hs-identifier hs-type">UpdateBehavior</span></a></span><span>
+</span><span id="line-99"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">SecurityParam</span></a></span><span>
+</span><span id="line-100"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span>
+</span><span id="line-101"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Test.Util.ChainUpdates.html#ChainUpdateState"><span class="hs-identifier hs-type">ChainUpdateState</span></a></span><span>
+</span><span id="line-102"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="annot"><a href="Test.Util.ChainUpdates.html#ChainUpdateState"><span class="hs-identifier hs-type">ChainUpdateState</span></a></span><span>
+</span><span id="line-103"></span><span id="genChainUpdateState"><span class="annot"><span class="annottext">genChainUpdateState :: UpdateBehavior
+-&gt; SecurityParam -&gt; Int -&gt; ChainUpdateState -&gt; Gen ChainUpdateState
+</span><a href="Test.Util.ChainUpdates.html#genChainUpdateState"><span class="hs-identifier hs-var hs-var">genChainUpdateState</span></a></span></span><span> </span><span id="local-6989586621679279950"><span class="annot"><span class="annottext">UpdateBehavior
+</span><a href="#local-6989586621679279950"><span class="hs-identifier hs-var">updateBehavior</span></a></span></span><span> </span><span id="local-6989586621679279949"><span class="annot"><span class="annottext">SecurityParam
+</span><a href="#local-6989586621679279949"><span class="hs-identifier hs-var">securityParam</span></a></span></span><span> </span><span id="local-6989586621679279948"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679279948"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-104"></span><span>    </span><span class="annot"><span class="annottext">StateT ChainUpdateState Gen ()
+-&gt; ChainUpdateState -&gt; Gen ChainUpdateState
+forall (m :: * -&gt; *) s a. Monad m =&gt; StateT s m a -&gt; s -&gt; m s
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-var">execStateT</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+-&gt; StateT ChainUpdateState Gen () -&gt; StateT ChainUpdateState Gen ()
+forall (m :: * -&gt; *) a. Applicative m =&gt; Int -&gt; m a -&gt; m ()
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">replicateM_</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679279948"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">StateT ChainUpdateState Gen ()
+</span><a href="#local-6989586621679279945"><span class="hs-identifier hs-var">genChainUpdate</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-105"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-106"></span><span>    </span><span class="hs-comment">-- Modify the state</span><span>
+</span><span id="line-107"></span><span>    </span><span id="local-6989586621679279944"><span class="annot"><span class="annottext">addUpdate :: ChainUpdate -&gt; ChainUpdateState -&gt; ChainUpdateState
+</span><a href="#local-6989586621679279944"><span class="hs-identifier hs-var hs-var">addUpdate</span></a></span></span><span> </span><span id="local-6989586621679279943"><span class="annot"><span class="annottext">ChainUpdate
+</span><a href="#local-6989586621679279943"><span class="hs-identifier hs-var">u</span></a></span></span><span> </span><span id="local-6989586621679279942"><span class="annot"><span class="annottext">ChainUpdateState
+</span><a href="#local-6989586621679279942"><span class="hs-identifier hs-var">cus</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ChainUpdateState
+</span><a href="#local-6989586621679279942"><span class="hs-identifier hs-var">cus</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">cusUpdates :: [ChainUpdate]
+</span><a href="Test.Util.ChainUpdates.html#cusUpdates"><span class="hs-identifier hs-var">cusUpdates</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ChainUpdate
+</span><a href="#local-6989586621679279943"><span class="hs-identifier hs-var">u</span></a></span><span> </span><span class="annot"><span class="annottext">ChainUpdate -&gt; [ChainUpdate] -&gt; [ChainUpdate]
+forall a. a -&gt; [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-var">:</span></a></span><span> </span><span class="annot"><span class="annottext">ChainUpdateState -&gt; [ChainUpdate]
+</span><a href="Test.Util.ChainUpdates.html#cusUpdates"><span class="hs-identifier hs-var hs-var">cusUpdates</span></a></span><span> </span><span class="annot"><span class="annottext">ChainUpdateState
+</span><a href="#local-6989586621679279942"><span class="hs-identifier hs-var">cus</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-108"></span><span>    </span><span id="local-6989586621679279941"><span class="annot"><span class="annottext">setChain :: Chain TestBlock -&gt; ChainUpdateState -&gt; ChainUpdateState
+</span><a href="#local-6989586621679279941"><span class="hs-identifier hs-var hs-var">setChain</span></a></span></span><span>  </span><span id="local-6989586621679279940"><span class="annot"><span class="annottext">Chain TestBlock
+</span><a href="#local-6989586621679279940"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span id="local-6989586621679279939"><span class="annot"><span class="annottext">ChainUpdateState
+</span><a href="#local-6989586621679279939"><span class="hs-identifier hs-var">cus</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ChainUpdateState
+</span><a href="#local-6989586621679279939"><span class="hs-identifier hs-var">cus</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">cusCurrentChain :: Chain TestBlock
+</span><a href="Test.Util.ChainUpdates.html#cusCurrentChain"><span class="hs-identifier hs-var">cusCurrentChain</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Chain TestBlock
+</span><a href="#local-6989586621679279940"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-109"></span><span>
+</span><span id="line-110"></span><span>    </span><span id="local-6989586621679279938"><span class="annot"><span class="annottext">k :: Int
+</span><a href="#local-6989586621679279938"><span class="hs-identifier hs-var hs-var">k</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; Int
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="annot"><span class="annottext">(Word64 -&gt; Int) -&gt; Word64 -&gt; Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">SecurityParam -&gt; Word64
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var">maxRollbacks</span></a></span><span> </span><span class="annot"><span class="annottext">SecurityParam
+</span><a href="#local-6989586621679279949"><span class="hs-identifier hs-var">securityParam</span></a></span><span>
+</span><span id="line-111"></span><span>
+</span><span id="line-112"></span><span>    </span><span id="local-6989586621679279945"><span class="annot"><span class="annottext">genChainUpdate :: StateT ChainUpdateState Gen ()
+</span><a href="#local-6989586621679279945"><span class="hs-identifier hs-var hs-var">genChainUpdate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-113"></span><span>      </span><span class="annot"><a href="Test.Util.ChainUpdates.html#ChainUpdateState"><span class="hs-identifier hs-type">ChainUpdateState</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">cusCurrentChain :: ChainUpdateState -&gt; Chain TestBlock
+</span><a href="Test.Util.ChainUpdates.html#cusCurrentChain"><span class="hs-identifier hs-var">cusCurrentChain</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679279936"><span class="annot"><span class="annottext">Chain TestBlock
+</span><a href="#local-6989586621679279936"><span class="hs-identifier hs-var">chain</span></a></span></span><span> </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">StateT ChainUpdateState Gen ChainUpdateState
+forall s (m :: * -&gt; *). MonadState s m =&gt; m s
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/mtl-2.2.2/src"><span class="hs-identifier hs-var">get</span></a></span><span>
+</span><span id="line-114"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679279934"><span class="annot"><span class="annottext">genValid :: StateT ChainUpdateState Gen ()
+</span><a href="#local-6989586621679279934"><span class="hs-identifier hs-var hs-var">genValid</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-115"></span><span>            </span><span class="annot"><span class="annottext">[(Int, StateT ChainUpdateState Gen ())]
+-&gt; StateT ChainUpdateState Gen ()
+forall (t :: (* -&gt; *) -&gt; * -&gt; *) a.
+(MonadTrans t, Monad (t Gen)) =&gt;
+[(Int, t Gen a)] -&gt; t Gen a
+</span><a href="Test.Util.ChainUpdates.html#frequency%27"><span class="hs-identifier hs-var">frequency'</span></a></span><span>
+</span><span id="line-116"></span><span>              </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">3</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Validity -&gt; StateT ChainUpdateState Gen ()
+forall (t :: (* -&gt; *) -&gt; * -&gt; *).
+(MonadState ChainUpdateState (t Gen), MonadTrans t) =&gt;
+Validity -&gt; t Gen ()
+</span><a href="#local-6989586621679279932"><span class="hs-identifier hs-var">genAddBlock</span></a></span><span> </span><span class="annot"><span class="annottext">Validity
+</span><a href="Test.Util.TestBlock.html#Valid"><span class="hs-identifier hs-var">Valid</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-117"></span><span>              </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Chain TestBlock -&gt; Bool
+forall block. Chain block -&gt; Bool
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-mock-0.1.0.0/noopt/doc/html/ouroboros-network-mock/src"><span class="hs-identifier hs-var">Chain.null</span></a></span><span> </span><span class="annot"><span class="annottext">Chain TestBlock
+</span><a href="#local-6989586621679279936"><span class="hs-identifier hs-var">chain</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-118"></span><span>                </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Gen Int -&gt; StateT ChainUpdateState Gen ()
+forall (t :: (* -&gt; *) -&gt; * -&gt; *).
+(MonadState ChainUpdateState (t Gen), MonadTrans t) =&gt;
+Gen Int -&gt; t Gen ()
+</span><a href="#local-6989586621679279929"><span class="hs-identifier hs-var">genSwitchFork</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Int, Int) -&gt; Gen Int
+forall a. Random a =&gt; (a, a) -&gt; Gen a
+</span><span class="hs-identifier hs-var">choose</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679279938"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-119"></span><span>                </span><span class="hs-special">)</span><span>
+</span><span id="line-120"></span><span>              </span><span class="hs-special">]</span><span>
+</span><span id="line-121"></span><span>      </span><span class="annot"><span class="annottext">[(Int, StateT ChainUpdateState Gen ())]
+-&gt; StateT ChainUpdateState Gen ()
+forall (t :: (* -&gt; *) -&gt; * -&gt; *) a.
+(MonadTrans t, Monad (t Gen)) =&gt;
+[(Int, t Gen a)] -&gt; t Gen a
+</span><a href="Test.Util.ChainUpdates.html#frequency%27"><span class="hs-identifier hs-var">frequency'</span></a></span><span> </span><span class="annot"><span class="annottext">([(Int, StateT ChainUpdateState Gen ())]
+ -&gt; StateT ChainUpdateState Gen ())
+-&gt; [(Int, StateT ChainUpdateState Gen ())]
+-&gt; StateT ChainUpdateState Gen ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-122"></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">5</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+-&gt; StateT ChainUpdateState Gen () -&gt; StateT ChainUpdateState Gen ()
+forall (m :: * -&gt; *) a. Applicative m =&gt; Int -&gt; m a -&gt; m ()
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">replicateM_</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span> </span><span class="annot"><span class="annottext">StateT ChainUpdateState Gen ()
+</span><a href="#local-6989586621679279934"><span class="hs-identifier hs-var">genValid</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Int, StateT ChainUpdateState Gen ())
+-&gt; [(Int, StateT ChainUpdateState Gen ())]
+-&gt; [(Int, StateT ChainUpdateState Gen ())]
+forall a. a -&gt; [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-var">:</span></a></span><span>
+</span><span id="line-123"></span><span>        </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">StateT ChainUpdateState Gen ()
+</span><a href="#local-6989586621679279927"><span class="hs-identifier hs-var">genInvalidBlock</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">UpdateBehavior
+</span><a href="#local-6989586621679279950"><span class="hs-identifier hs-var">updateBehavior</span></a></span><span> </span><span class="annot"><span class="annottext">UpdateBehavior -&gt; UpdateBehavior -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">==</span></a></span><span> </span><span class="annot"><span class="annottext">UpdateBehavior
+</span><a href="Test.Util.ChainUpdates.html#TentativeChainBehavior"><span class="hs-identifier hs-var">TentativeChainBehavior</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-124"></span><span>
+</span><span id="line-125"></span><span>    </span><span id="local-6989586621679279926"><span class="annot"><span class="annottext">genBlockToAdd :: Validity -&gt; t Gen TestBlock
+</span><a href="#local-6989586621679279926"><span class="hs-identifier hs-var hs-var">genBlockToAdd</span></a></span></span><span> </span><span id="local-6989586621679279925"><span class="annot"><span class="annottext">Validity
+</span><a href="#local-6989586621679279925"><span class="hs-identifier hs-var">validity</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-126"></span><span>        </span><span class="annot"><a href="Test.Util.ChainUpdates.html#ChainUpdateState"><span class="hs-identifier hs-type">ChainUpdateState</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">cusCurrentChain :: ChainUpdateState -&gt; Chain TestBlock
+</span><a href="Test.Util.ChainUpdates.html#cusCurrentChain"><span class="hs-identifier hs-var">cusCurrentChain</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679279924"><span class="annot"><span class="annottext">Chain TestBlock
+</span><a href="#local-6989586621679279924"><span class="hs-identifier hs-var">chain</span></a></span></span><span> </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">t Gen ChainUpdateState
+forall s (m :: * -&gt; *). MonadState s m =&gt; m s
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/mtl-2.2.2/src"><span class="hs-identifier hs-var">get</span></a></span><span>
+</span><span id="line-127"></span><span>        </span><span id="local-6989586621679279923"><span class="annot"><span class="annottext">TestBlock
+</span><a href="#local-6989586621679279923"><span class="hs-identifier hs-var">block</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Gen TestBlock -&gt; t Gen TestBlock
+forall (t :: (* -&gt; *) -&gt; * -&gt; *) (m :: * -&gt; *) a.
+(MonadTrans t, Monad m) =&gt;
+m a -&gt; t m a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-var">lift</span></a></span><span> </span><span class="annot"><span class="annottext">(Gen TestBlock -&gt; t Gen TestBlock)
+-&gt; Gen TestBlock -&gt; t Gen TestBlock
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Chain TestBlock -&gt; Maybe TestBlock
+forall b. Chain b -&gt; Maybe b
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-mock-0.1.0.0/noopt/doc/html/ouroboros-network-mock/src"><span class="hs-identifier hs-var">Chain.head</span></a></span><span> </span><span class="annot"><span class="annottext">Chain TestBlock
+</span><a href="#local-6989586621679279924"><span class="hs-identifier hs-var">chain</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-128"></span><span>          </span><span class="annot"><span class="annottext">Maybe TestBlock
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">TestBlock -&gt; TestBlock
+forall ptype. TestBlockWith ptype -&gt; TestBlockWith ptype
+</span><a href="#local-6989586621679279920"><span class="hs-identifier hs-var">setValidity</span></a></span><span> </span><span class="annot"><span class="annottext">(TestBlock -&gt; TestBlock)
+-&gt; (Word64 -&gt; TestBlock) -&gt; Word64 -&gt; TestBlock
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; TestBlock
+</span><a href="Test.Util.TestBlock.html#firstBlock"><span class="hs-identifier hs-var">firstBlock</span></a></span><span> </span><span class="annot"><span class="annottext">(Word64 -&gt; TestBlock) -&gt; Gen Word64 -&gt; Gen TestBlock
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Gen Word64
+</span><a href="#local-6989586621679279918"><span class="hs-identifier hs-var">genForkNo</span></a></span><span>
+</span><span id="line-129"></span><span>          </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Just</span></a></span><span> </span><span id="local-6989586621679279917"><span class="annot"><span class="annottext">TestBlock
+</span><a href="#local-6989586621679279917"><span class="hs-identifier hs-var">curHead</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-130"></span><span>            </span><span id="local-6989586621679279916"><span class="annot"><span class="annottext">Word64
+</span><a href="#local-6989586621679279916"><span class="hs-identifier hs-var">forkNo</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Validity
+</span><a href="#local-6989586621679279925"><span class="hs-identifier hs-var">validity</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-131"></span><span>              </span><span class="annot"><span class="annottext">Validity
+</span><a href="Test.Util.TestBlock.html#Valid"><span class="hs-identifier hs-var">Valid</span></a></span><span>   </span><span class="hs-glyph">-&gt;</span><span>  </span><span class="annot"><span class="annottext">Gen Word64
+</span><a href="#local-6989586621679279918"><span class="hs-identifier hs-var">genForkNo</span></a></span><span>
+</span><span id="line-132"></span><span>              </span><span class="annot"><span class="annottext">Validity
+</span><a href="Test.Util.TestBlock.html#Invalid"><span class="hs-identifier hs-var">Invalid</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; Gen Word64
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><span class="hs-number">3</span></span><span>
+</span><span id="line-133"></span><span>            </span><span class="annot"><span class="annottext">TestBlock -&gt; Gen TestBlock
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">return</span></a></span><span>
+</span><span id="line-134"></span><span>              </span><span class="annot"><span class="annottext">(TestBlock -&gt; Gen TestBlock)
+-&gt; (TestBlock -&gt; TestBlock) -&gt; TestBlock -&gt; Gen TestBlock
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">(Word64 -&gt; Word64) -&gt; TestBlock -&gt; TestBlock
+</span><a href="Test.Util.TestBlock.html#modifyFork"><span class="hs-identifier hs-var">modifyFork</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word64 -&gt; Word64 -&gt; Word64
+forall a b. a -&gt; b -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">const</span></a></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><a href="#local-6989586621679279916"><span class="hs-identifier hs-var">forkNo</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-135"></span><span>              </span><span class="annot"><span class="annottext">(TestBlock -&gt; TestBlock)
+-&gt; (TestBlock -&gt; TestBlock) -&gt; TestBlock -&gt; TestBlock
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">TestBlock -&gt; TestBlock
+forall ptype. TestBlockWith ptype -&gt; TestBlockWith ptype
+</span><a href="#local-6989586621679279920"><span class="hs-identifier hs-var">setValidity</span></a></span><span>
+</span><span id="line-136"></span><span>              </span><span class="annot"><span class="annottext">(TestBlock -&gt; Gen TestBlock) -&gt; TestBlock -&gt; Gen TestBlock
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">TestBlock -&gt; TestBlock
+</span><a href="Test.Util.TestBlock.html#successorBlock"><span class="hs-identifier hs-var">successorBlock</span></a></span><span> </span><span class="annot"><span class="annottext">TestBlock
+</span><a href="#local-6989586621679279917"><span class="hs-identifier hs-var">curHead</span></a></span><span>
+</span><span id="line-137"></span><span>        </span><span class="annot"><span class="annottext">(ChainUpdateState -&gt; ChainUpdateState) -&gt; t Gen ()
+forall s (m :: * -&gt; *). MonadState s m =&gt; (s -&gt; s) -&gt; m ()
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/mtl-2.2.2/src"><span class="hs-identifier hs-var">modify</span></a></span><span> </span><span class="annot"><span class="annottext">((ChainUpdateState -&gt; ChainUpdateState) -&gt; t Gen ())
+-&gt; (ChainUpdateState -&gt; ChainUpdateState) -&gt; t Gen ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Chain TestBlock -&gt; ChainUpdateState -&gt; ChainUpdateState
+</span><a href="#local-6989586621679279941"><span class="hs-identifier hs-var">setChain</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TestBlock -&gt; Chain TestBlock -&gt; Chain TestBlock
+forall block.
+HasHeader block =&gt;
+block -&gt; Chain block -&gt; Chain block
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-mock-0.1.0.0/noopt/doc/html/ouroboros-network-mock/src"><span class="hs-identifier hs-var">Chain.addBlock</span></a></span><span> </span><span class="annot"><span class="annottext">TestBlock
+</span><a href="#local-6989586621679279923"><span class="hs-identifier hs-var">block</span></a></span><span> </span><span class="annot"><span class="annottext">Chain TestBlock
+</span><a href="#local-6989586621679279924"><span class="hs-identifier hs-var">chain</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-138"></span><span>        </span><span class="annot"><span class="annottext">TestBlock -&gt; t Gen TestBlock
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">TestBlock
+</span><a href="#local-6989586621679279923"><span class="hs-identifier hs-var">block</span></a></span><span>
+</span><span id="line-139"></span><span>      </span><span class="hs-keyword">where</span><span>
+</span><span id="line-140"></span><span>        </span><span id="local-6989586621679279920"><span class="annot"><span class="annottext">setValidity :: TestBlockWith ptype -&gt; TestBlockWith ptype
+</span><a href="#local-6989586621679279920"><span class="hs-identifier hs-var hs-var">setValidity</span></a></span></span><span> </span><span id="local-6989586621679279909"><span class="annot"><span class="annottext">TestBlockWith ptype
+</span><a href="#local-6989586621679279909"><span class="hs-identifier hs-var">b</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TestBlockWith ptype
+</span><a href="#local-6989586621679279909"><span class="hs-identifier hs-var">b</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">tbValid :: Validity
+</span><a href="#local-6989586621679279908"><span class="hs-identifier hs-var">tbValid</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Validity
+</span><a href="#local-6989586621679279925"><span class="hs-identifier hs-var">validity</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-141"></span><span>        </span><span id="local-6989586621679279918"><span class="annot"><span class="annottext">genForkNo :: Gen Word64
+</span><a href="#local-6989586621679279918"><span class="hs-identifier hs-var hs-var">genForkNo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Validity
+</span><a href="#local-6989586621679279925"><span class="hs-identifier hs-var">validity</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-142"></span><span>          </span><span class="annot"><span class="annottext">Validity
+</span><a href="Test.Util.TestBlock.html#Valid"><span class="hs-identifier hs-var">Valid</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[(Int, Gen Word64)] -&gt; Gen Word64
+forall a. [(Int, Gen a)] -&gt; Gen a
+</span><span class="hs-identifier hs-var">frequency</span></span><span>
+</span><span id="line-143"></span><span>            </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; Gen Word64
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><span class="hs-number">0</span></span><span class="hs-special">)</span><span>
+</span><span id="line-144"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(Word64, Word64) -&gt; Gen Word64
+forall a. Random a =&gt; (a, a) -&gt; Gen a
+</span><span class="hs-identifier hs-var">choose</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word64
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Word64
+</span><span class="hs-number">2</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-145"></span><span>            </span><span class="hs-special">]</span><span>
+</span><span id="line-146"></span><span>          </span><span class="hs-comment">-- Blocks with equal hashes have to have equal validity, so we reserve</span><span>
+</span><span id="line-147"></span><span>          </span><span class="hs-comment">-- a specific ForkNo for invalid blocks to ensure this.</span><span>
+</span><span id="line-148"></span><span>          </span><span class="annot"><span class="annottext">Validity
+</span><a href="Test.Util.TestBlock.html#Invalid"><span class="hs-identifier hs-var">Invalid</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; Gen Word64
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><span class="hs-number">3</span></span><span>
+</span><span id="line-149"></span><span>
+</span><span id="line-150"></span><span>    </span><span id="local-6989586621679279932"><span class="annot"><span class="annottext">genAddBlock :: Validity -&gt; t Gen ()
+</span><a href="#local-6989586621679279932"><span class="hs-identifier hs-var hs-var">genAddBlock</span></a></span></span><span> </span><span id="local-6989586621679279906"><span class="annot"><span class="annottext">Validity
+</span><a href="#local-6989586621679279906"><span class="hs-identifier hs-var">validity</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-151"></span><span>      </span><span id="local-6989586621679279905"><span class="annot"><span class="annottext">TestBlock
+</span><a href="#local-6989586621679279905"><span class="hs-identifier hs-var">block</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Validity -&gt; t Gen TestBlock
+forall (t :: (* -&gt; *) -&gt; * -&gt; *).
+(MonadState ChainUpdateState (t Gen), MonadTrans t) =&gt;
+Validity -&gt; t Gen TestBlock
+</span><a href="#local-6989586621679279926"><span class="hs-identifier hs-var">genBlockToAdd</span></a></span><span> </span><span class="annot"><span class="annottext">Validity
+</span><a href="#local-6989586621679279906"><span class="hs-identifier hs-var">validity</span></a></span><span>
+</span><span id="line-152"></span><span>      </span><span class="annot"><span class="annottext">(ChainUpdateState -&gt; ChainUpdateState) -&gt; t Gen ()
+forall s (m :: * -&gt; *). MonadState s m =&gt; (s -&gt; s) -&gt; m ()
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/mtl-2.2.2/src"><span class="hs-identifier hs-var">modify</span></a></span><span> </span><span class="annot"><span class="annottext">((ChainUpdateState -&gt; ChainUpdateState) -&gt; t Gen ())
+-&gt; (ChainUpdateState -&gt; ChainUpdateState) -&gt; t Gen ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ChainUpdate -&gt; ChainUpdateState -&gt; ChainUpdateState
+</span><a href="#local-6989586621679279944"><span class="hs-identifier hs-var">addUpdate</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TestBlock -&gt; ChainUpdate
+</span><a href="Test.Util.ChainUpdates.html#AddBlock"><span class="hs-identifier hs-var">AddBlock</span></a></span><span> </span><span class="annot"><span class="annottext">TestBlock
+</span><a href="#local-6989586621679279905"><span class="hs-identifier hs-var">block</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-153"></span><span>
+</span><span id="line-154"></span><span>    </span><span id="local-6989586621679279929"><span class="annot"><span class="annottext">genSwitchFork :: Gen Int -&gt; t Gen ()
+</span><a href="#local-6989586621679279929"><span class="hs-identifier hs-var hs-var">genSwitchFork</span></a></span></span><span> </span><span id="local-6989586621679279904"><span class="annot"><span class="annottext">Gen Int
+</span><a href="#local-6989586621679279904"><span class="hs-identifier hs-var">genRollBackBlocks</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-155"></span><span>      </span><span class="annot"><a href="Test.Util.ChainUpdates.html#ChainUpdateState"><span class="hs-identifier hs-type">ChainUpdateState</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">cusCurrentChain :: ChainUpdateState -&gt; Chain TestBlock
+</span><a href="Test.Util.ChainUpdates.html#cusCurrentChain"><span class="hs-identifier hs-var">cusCurrentChain</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679279903"><span class="annot"><span class="annottext">Chain TestBlock
+</span><a href="#local-6989586621679279903"><span class="hs-identifier hs-var">chain</span></a></span></span><span> </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">t Gen ChainUpdateState
+forall s (m :: * -&gt; *). MonadState s m =&gt; m s
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/mtl-2.2.2/src"><span class="hs-identifier hs-var">get</span></a></span><span>
+</span><span id="line-156"></span><span>      </span><span id="local-6989586621679279902"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679279902"><span class="hs-identifier hs-var">rollBackBlocks</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Gen Int -&gt; t Gen Int
+forall (t :: (* -&gt; *) -&gt; * -&gt; *) (m :: * -&gt; *) a.
+(MonadTrans t, Monad m) =&gt;
+m a -&gt; t m a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-var">lift</span></a></span><span> </span><span class="annot"><span class="annottext">Gen Int
+</span><a href="#local-6989586621679279904"><span class="hs-identifier hs-var">genRollBackBlocks</span></a></span><span>
+</span><span id="line-157"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679279901"><span class="annot"><span class="annottext">chain' :: Chain TestBlock
+</span><a href="#local-6989586621679279901"><span class="hs-identifier hs-var hs-var">chain'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Chain TestBlock -&gt; Chain TestBlock
+forall block. Int -&gt; Chain block -&gt; Chain block
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-mock-0.1.0.0/noopt/doc/html/ouroboros-network-mock/src"><span class="hs-identifier hs-var">Chain.drop</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679279902"><span class="hs-identifier hs-var">rollBackBlocks</span></a></span><span> </span><span class="annot"><span class="annottext">Chain TestBlock
+</span><a href="#local-6989586621679279903"><span class="hs-identifier hs-var">chain</span></a></span><span>
+</span><span id="line-158"></span><span>      </span><span class="annot"><span class="annottext">(ChainUpdateState -&gt; ChainUpdateState) -&gt; t Gen ()
+forall s (m :: * -&gt; *). MonadState s m =&gt; (s -&gt; s) -&gt; m ()
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/mtl-2.2.2/src"><span class="hs-identifier hs-var">modify</span></a></span><span> </span><span class="annot"><span class="annottext">((ChainUpdateState -&gt; ChainUpdateState) -&gt; t Gen ())
+-&gt; (ChainUpdateState -&gt; ChainUpdateState) -&gt; t Gen ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Chain TestBlock -&gt; ChainUpdateState -&gt; ChainUpdateState
+</span><a href="#local-6989586621679279941"><span class="hs-identifier hs-var">setChain</span></a></span><span> </span><span class="annot"><span class="annottext">Chain TestBlock
+</span><a href="#local-6989586621679279901"><span class="hs-identifier hs-var">chain'</span></a></span><span>
+</span><span id="line-159"></span><span>      </span><span id="local-6989586621679279899"><span class="annot"><span class="annottext">[TestBlock]
+</span><a href="#local-6989586621679279899"><span class="hs-identifier hs-var">blocks</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Int -&gt; t Gen TestBlock -&gt; t Gen [TestBlock]
+forall (m :: * -&gt; *) a. Applicative m =&gt; Int -&gt; m a -&gt; m [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">replicateM</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679279902"><span class="hs-identifier hs-var">rollBackBlocks</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Validity -&gt; t Gen TestBlock
+forall (t :: (* -&gt; *) -&gt; * -&gt; *).
+(MonadState ChainUpdateState (t Gen), MonadTrans t) =&gt;
+Validity -&gt; t Gen TestBlock
+</span><a href="#local-6989586621679279926"><span class="hs-identifier hs-var">genBlockToAdd</span></a></span><span> </span><span class="annot"><span class="annottext">Validity
+</span><a href="Test.Util.TestBlock.html#Valid"><span class="hs-identifier hs-var">Valid</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-160"></span><span>      </span><span class="annot"><span class="annottext">(ChainUpdateState -&gt; ChainUpdateState) -&gt; t Gen ()
+forall s (m :: * -&gt; *). MonadState s m =&gt; (s -&gt; s) -&gt; m ()
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/mtl-2.2.2/src"><span class="hs-identifier hs-var">modify</span></a></span><span> </span><span class="annot"><span class="annottext">((ChainUpdateState -&gt; ChainUpdateState) -&gt; t Gen ())
+-&gt; (ChainUpdateState -&gt; ChainUpdateState) -&gt; t Gen ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ChainUpdate -&gt; ChainUpdateState -&gt; ChainUpdateState
+</span><a href="#local-6989586621679279944"><span class="hs-identifier hs-var">addUpdate</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Point TestBlock -&gt; [TestBlock] -&gt; ChainUpdate
+</span><a href="Test.Util.ChainUpdates.html#SwitchFork"><span class="hs-identifier hs-var">SwitchFork</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Chain TestBlock -&gt; Point TestBlock
+forall block. HasHeader block =&gt; Chain block -&gt; Point block
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-mock-0.1.0.0/noopt/doc/html/ouroboros-network-mock/src"><span class="hs-identifier hs-var">Chain.headPoint</span></a></span><span> </span><span class="annot"><span class="annottext">Chain TestBlock
+</span><a href="#local-6989586621679279901"><span class="hs-identifier hs-var">chain'</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[TestBlock]
+</span><a href="#local-6989586621679279899"><span class="hs-identifier hs-var">blocks</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-161"></span><span>
+</span><span id="line-162"></span><span>    </span><span id="local-6989586621679279927"><span class="annot"><span class="annottext">genInvalidBlock :: StateT ChainUpdateState Gen ()
+</span><a href="#local-6989586621679279927"><span class="hs-identifier hs-var hs-var">genInvalidBlock</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-163"></span><span>      </span><span class="annot"><span class="annottext">Validity -&gt; StateT ChainUpdateState Gen ()
+forall (t :: (* -&gt; *) -&gt; * -&gt; *).
+(MonadState ChainUpdateState (t Gen), MonadTrans t) =&gt;
+Validity -&gt; t Gen ()
+</span><a href="#local-6989586621679279932"><span class="hs-identifier hs-var">genAddBlock</span></a></span><span> </span><span class="annot"><span class="annottext">Validity
+</span><a href="Test.Util.TestBlock.html#Invalid"><span class="hs-identifier hs-var">Invalid</span></a></span><span>
+</span><span id="line-164"></span><span>      </span><span class="annot"><span class="annottext">Gen Int -&gt; StateT ChainUpdateState Gen ()
+forall (t :: (* -&gt; *) -&gt; * -&gt; *).
+(MonadState ChainUpdateState (t Gen), MonadTrans t) =&gt;
+Gen Int -&gt; t Gen ()
+</span><a href="#local-6989586621679279929"><span class="hs-identifier hs-var">genSwitchFork</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Gen Int
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span>
+</span><span id="line-165"></span><span>
+</span><span id="line-166"></span><span class="hs-comment">-- | Variant of 'frequency' that allows for transformers of 'Gen'</span><span>
+</span><span id="line-167"></span><span id="local-6989586621679280088"><span id="local-6989586621679280090"><span class="annot"><a href="Test.Util.ChainUpdates.html#frequency%27"><span class="hs-identifier hs-type">frequency'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-type">MonadTrans</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679280090"><span class="hs-identifier hs-type">t</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Monad</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679280090"><span class="hs-identifier hs-type">t</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679280090"><span class="hs-identifier hs-type">t</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="annot"><a href="#local-6989586621679280088"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679280090"><span class="hs-identifier hs-type">t</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="annot"><a href="#local-6989586621679280088"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-168"></span><span id="frequency%27"><span class="annot"><span class="annottext">frequency' :: [(Int, t Gen a)] -&gt; t Gen a
+</span><a href="Test.Util.ChainUpdates.html#frequency%27"><span class="hs-identifier hs-var hs-var">frequency'</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; t Gen a
+forall a. HasCallStack =&gt; String -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">error</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;frequency' used with empty list&quot;</span></span><span>
+</span><span id="line-169"></span><span class="annot"><a href="Test.Util.ChainUpdates.html#frequency%27"><span class="hs-identifier hs-var">frequency'</span></a></span><span> </span><span id="local-6989586621679279895"><span class="annot"><span class="annottext">[(Int, t Gen a)]
+</span><a href="#local-6989586621679279895"><span class="hs-identifier hs-var">xs0</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen Int -&gt; t Gen Int
+forall (t :: (* -&gt; *) -&gt; * -&gt; *) (m :: * -&gt; *) a.
+(MonadTrans t, Monad m) =&gt;
+m a -&gt; t m a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-var">lift</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Int, Int) -&gt; Gen Int
+forall a. Random a =&gt; (a, a) -&gt; Gen a
+</span><span class="hs-identifier hs-var">choose</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679279894"><span class="hs-identifier hs-var">tot</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">t Gen Int -&gt; (Int -&gt; t Gen a) -&gt; t Gen a
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&gt;&gt;=</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; [(Int, t Gen a)] -&gt; t Gen a
+forall t p. (Ord t, Num t) =&gt; t -&gt; [(t, p)] -&gt; p
+</span><a href="#local-6989586621679279893"><span class="hs-operator hs-var">`pick`</span></a></span><span> </span><span class="annot"><span class="annottext">[(Int, t Gen a)]
+</span><a href="#local-6989586621679279895"><span class="hs-identifier hs-var">xs0</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-170"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-171"></span><span>    </span><span id="local-6989586621679279894"><span class="annot"><span class="annottext">tot :: Int
+</span><a href="#local-6989586621679279894"><span class="hs-identifier hs-var hs-var">tot</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Int
+forall (t :: * -&gt; *) a. (Foldable t, Num a) =&gt; t a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">sum</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">((Int, t Gen a) -&gt; Int) -&gt; [(Int, t Gen a)] -&gt; [Int]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">map</span></a></span><span> </span><span class="annot"><span class="annottext">(Int, t Gen a) -&gt; Int
+forall a b. (a, b) -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fst</span></a></span><span> </span><span class="annot"><span class="annottext">[(Int, t Gen a)]
+</span><a href="#local-6989586621679279895"><span class="hs-identifier hs-var">xs0</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-172"></span><span>
+</span><span id="line-173"></span><span>    </span><span id="local-6989586621679279893"><span class="annot"><span class="annottext">pick :: t -&gt; [(t, p)] -&gt; p
+</span><a href="#local-6989586621679279893"><span class="hs-identifier hs-var hs-var">pick</span></a></span></span><span> </span><span id="local-6989586621679279891"><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679279891"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span id="local-6989586621679279890"><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679279890"><span class="hs-identifier hs-var">k</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679279889"><span class="annot"><span class="annottext">p
+</span><a href="#local-6989586621679279889"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">)</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">:</span></a></span><span id="local-6989586621679279888"><span class="annot"><span class="annottext">[(t, p)]
+</span><a href="#local-6989586621679279888"><span class="hs-identifier hs-var">xs</span></a></span></span><span class="hs-special">)</span><span>
+</span><span id="line-174"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679279891"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">t -&gt; t -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&lt;=</span></a></span><span> </span><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679279890"><span class="hs-identifier hs-var">k</span></a></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">p
+</span><a href="#local-6989586621679279889"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-175"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">t -&gt; [(t, p)] -&gt; p
+</span><a href="#local-6989586621679279893"><span class="hs-identifier hs-var">pick</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679279891"><span class="hs-identifier hs-var">n</span></a></span><span class="annot"><span class="annottext">t -&gt; t -&gt; t
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-glyph hs-var">-</span></a></span><span class="annot"><span class="annottext">t
+</span><a href="#local-6989586621679279890"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[(t, p)]
+</span><a href="#local-6989586621679279888"><span class="hs-identifier hs-var">xs</span></a></span><span>
+</span><span id="line-176"></span><span>    </span><span class="annot"><a href="#local-6989586621679279893"><span class="hs-identifier hs-var">pick</span></a></span><span> </span><span class="annot"><span class="annottext">t
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">[(t, p)]
+</span><span class="hs-identifier">_</span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; p
+forall a. HasCallStack =&gt; String -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">error</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;pick used with empty list&quot;</span></span><span>
+</span><span id="line-177"></span><span>
+</span><span id="line-178"></span><span class="hs-comment">-- | Test that applying the generated updates gives us the same chain</span><span>
+</span><span id="line-179"></span><span class="hs-comment">-- as @cusCurrentChain@.</span><span>
+</span><span id="line-180"></span><span class="annot"><a href="Test.Util.ChainUpdates.html#prop_genChainUpdates"><span class="hs-identifier hs-type">prop_genChainUpdates</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">SecurityParam</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Property</span></span><span>
+</span><span id="line-181"></span><span id="prop_genChainUpdates"><span class="annot"><span class="annottext">prop_genChainUpdates :: SecurityParam -&gt; Int -&gt; Property
+</span><a href="Test.Util.ChainUpdates.html#prop_genChainUpdates"><span class="hs-identifier hs-var hs-var">prop_genChainUpdates</span></a></span></span><span> </span><span id="local-6989586621679279886"><span class="annot"><span class="annottext">SecurityParam
+</span><a href="#local-6989586621679279886"><span class="hs-identifier hs-var">securityParam</span></a></span></span><span> </span><span id="local-6989586621679279885"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679279885"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-182"></span><span>    </span><span class="annot"><span class="annottext">Gen ChainUpdateState -&gt; (ChainUpdateState -&gt; Property) -&gt; Property
+forall a prop.
+(Show a, Testable prop) =&gt;
+Gen a -&gt; (a -&gt; prop) -&gt; Property
+</span><span class="hs-identifier hs-var">forAll</span></span><span> </span><span class="annot"><span class="annottext">Gen ChainUpdateState
+</span><a href="#local-6989586621679279883"><span class="hs-identifier hs-var">genCUS</span></a></span><span> </span><span class="annot"><span class="annottext">((ChainUpdateState -&gt; Property) -&gt; Property)
+-&gt; (ChainUpdateState -&gt; Property) -&gt; Property
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679279882"><span class="annot"><span class="annottext">ChainUpdateState
+</span><a href="#local-6989586621679279882"><span class="hs-identifier hs-var">cus</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-183"></span><span>      </span><span class="annot"><span class="annottext">[ChainUpdate TestBlock TestBlock]
+-&gt; Chain TestBlock -&gt; Maybe (Chain TestBlock)
+forall block.
+HasHeader block =&gt;
+[ChainUpdate block block] -&gt; Chain block -&gt; Maybe (Chain block)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-mock-0.1.0.0/noopt/doc/html/ouroboros-network-mock/src"><span class="hs-identifier hs-var">Chain.applyChainUpdates</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[ChainUpdate] -&gt; [ChainUpdate TestBlock TestBlock]
+</span><a href="Test.Util.ChainUpdates.html#toChainUpdates"><span class="hs-identifier hs-var">toChainUpdates</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ChainUpdateState -&gt; [ChainUpdate]
+</span><a href="Test.Util.ChainUpdates.html#getChainUpdates"><span class="hs-identifier hs-var">getChainUpdates</span></a></span><span> </span><span class="annot"><span class="annottext">ChainUpdateState
+</span><a href="#local-6989586621679279882"><span class="hs-identifier hs-var">cus</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Chain TestBlock
+forall block. Chain block
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-mock-0.1.0.0/noopt/doc/html/ouroboros-network-mock/src"><span class="hs-identifier hs-var">Genesis</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe (Chain TestBlock) -&gt; Maybe (Chain TestBlock) -&gt; Property
+forall a. (Eq a, Show a) =&gt; a -&gt; a -&gt; Property
+</span><span class="hs-operator hs-var">===</span></span><span>
+</span><span id="line-184"></span><span>      </span><span class="annot"><span class="annottext">Chain TestBlock -&gt; Maybe (Chain TestBlock)
+forall a. a -&gt; Maybe a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ChainUpdateState -&gt; Chain TestBlock
+</span><a href="Test.Util.ChainUpdates.html#cusCurrentChain"><span class="hs-identifier hs-var hs-var">cusCurrentChain</span></a></span><span> </span><span class="annot"><span class="annottext">ChainUpdateState
+</span><a href="#local-6989586621679279882"><span class="hs-identifier hs-var">cus</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-185"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-186"></span><span>    </span><span id="local-6989586621679279883"><span class="annot"><span class="annottext">genCUS :: Gen ChainUpdateState
+</span><a href="#local-6989586621679279883"><span class="hs-identifier hs-var hs-var">genCUS</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-187"></span><span>      </span><span id="local-6989586621679279879"><span class="annot"><span class="annottext">UpdateBehavior
+</span><a href="#local-6989586621679279879"><span class="hs-identifier hs-var">behavior</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(UpdateBehavior, UpdateBehavior) -&gt; Gen UpdateBehavior
+forall a. Enum a =&gt; (a, a) -&gt; Gen a
+</span><span class="hs-identifier hs-var">chooseEnum</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">UpdateBehavior
+forall a. Bounded a =&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">minBound</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">UpdateBehavior
+forall a. Bounded a =&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">maxBound</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-188"></span><span>      </span><span class="annot"><span class="annottext">UpdateBehavior
+-&gt; SecurityParam -&gt; Int -&gt; ChainUpdateState -&gt; Gen ChainUpdateState
+</span><a href="Test.Util.ChainUpdates.html#genChainUpdateState"><span class="hs-identifier hs-var">genChainUpdateState</span></a></span><span> </span><span class="annot"><span class="annottext">UpdateBehavior
+</span><a href="#local-6989586621679279879"><span class="hs-identifier hs-var">behavior</span></a></span><span> </span><span class="annot"><span class="annottext">SecurityParam
+</span><a href="#local-6989586621679279886"><span class="hs-identifier hs-var">securityParam</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679279885"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">ChainUpdateState
+</span><a href="Test.Util.ChainUpdates.html#emptyUpdateState"><span class="hs-identifier hs-var">emptyUpdateState</span></a></span><span>
+</span><span id="line-189"></span></pre></body></html>

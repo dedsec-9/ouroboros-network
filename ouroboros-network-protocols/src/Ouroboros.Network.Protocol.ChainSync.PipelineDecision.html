@@ -1,0 +1,553 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DataKinds           #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE GADTs               #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE RankNTypes          #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables #-}</span><span>
+</span><span id="line-5"></span><span>
+</span><span id="line-6"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.Protocol.ChainSync.PipelineDecision</span><span>
+</span><span id="line-7"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#PipelineDecision"><span class="hs-identifier">PipelineDecision</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-8"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#MkPipelineDecision"><span class="hs-identifier">MkPipelineDecision</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-9"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#runPipelineDecision"><span class="hs-identifier">runPipelineDecision</span></a></span><span>
+</span><span id="line-10"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#constantPipelineDecision"><span class="hs-identifier">constantPipelineDecision</span></a></span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#pipelineDecisionMax"><span class="hs-identifier">pipelineDecisionMax</span></a></span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#pipelineDecisionMin"><span class="hs-identifier">pipelineDecisionMin</span></a></span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#pipelineDecisionLowHighMark"><span class="hs-identifier">pipelineDecisionLowHighMark</span></a></span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Control.Exception</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">assert</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Word</span></a></span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Network.TypedProtocol.Pipelined</span></span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier">Ouroboros.Network.Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">BlockNo</span></span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier">Ouroboros.Network.Point</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">WithOrigin</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span class="hs-comment">-- | Pipeline decision: we can do either one of these:</span><span>
+</span><span id="line-25"></span><span class="hs-comment">--</span><span>
+</span><span id="line-26"></span><span class="hs-comment">-- * non-pipelined request</span><span>
+</span><span id="line-27"></span><span class="hs-comment">-- * pipeline a request</span><span>
+</span><span id="line-28"></span><span class="hs-comment">-- * collect or pipeline, but only when there are pipelined requests</span><span>
+</span><span id="line-29"></span><span class="hs-comment">-- * collect, as above, only when there are pipelined requests</span><span>
+</span><span id="line-30"></span><span class="hs-comment">--</span><span>
+</span><span id="line-31"></span><span class="hs-comment">-- There might be other useful pipelining scenarios: collect a given number of</span><span>
+</span><span id="line-32"></span><span class="hs-comment">-- requests (which also can be used to collect all outstanding requests).</span><span>
+</span><span id="line-33"></span><span class="hs-comment">--</span><span>
+</span><span id="line-34"></span><span class="hs-keyword">data</span><span> </span><span id="PipelineDecision"><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#PipelineDecision"><span class="hs-identifier hs-var">PipelineDecision</span></a></span></span><span> </span><span id="local-6989586621679110372"><span class="annot"><a href="#local-6989586621679110372"><span class="hs-identifier hs-type">n</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-35"></span><span>    </span><span id="Request"><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#Request"><span class="hs-identifier hs-var">Request</span></a></span></span><span>           </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#PipelineDecision"><span class="hs-identifier hs-type">PipelineDecision</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Z</span></span><span>
+</span><span id="line-36"></span><span>    </span><span id="local-6989586621679110390"><span id="Pipeline"><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#Pipeline"><span class="hs-identifier hs-var">Pipeline</span></a></span></span><span>          </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#PipelineDecision"><span class="hs-identifier hs-type">PipelineDecision</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110390"><span class="hs-identifier hs-type">n</span></a></span></span><span>
+</span><span id="line-37"></span><span>    </span><span id="local-6989586621679110369"><span id="CollectOrPipeline"><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#CollectOrPipeline"><span class="hs-identifier hs-var">CollectOrPipeline</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#PipelineDecision"><span class="hs-identifier hs-type">PipelineDecision</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">S</span></span><span> </span><span class="annot"><a href="#local-6989586621679110369"><span class="hs-identifier hs-type">n</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-38"></span><span>    </span><span id="local-6989586621679110367"><span id="Collect"><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#Collect"><span class="hs-identifier hs-var">Collect</span></a></span></span><span>           </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#PipelineDecision"><span class="hs-identifier hs-type">PipelineDecision</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">S</span></span><span> </span><span class="annot"><a href="#local-6989586621679110367"><span class="hs-identifier hs-type">n</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-39"></span><span>
+</span><span id="line-40"></span><span>
+</span><span id="line-41"></span><span class="hs-comment">-- | The callback gets the following arguments:</span><span>
+</span><span id="line-42"></span><span class="hs-comment">--</span><span>
+</span><span id="line-43"></span><span class="hs-comment">-- * how many requests are not yet collected (in flight or</span><span>
+</span><span id="line-44"></span><span class="hs-comment">--   already queued)</span><span>
+</span><span id="line-45"></span><span class="hs-comment">-- * block number of client's tip</span><span>
+</span><span id="line-46"></span><span class="hs-comment">-- * block number of server's tip</span><span>
+</span><span id="line-47"></span><span class="hs-comment">--</span><span>
+</span><span id="line-48"></span><span class="hs-comment">-- Client's tip block number and server's tip block number can only be equal</span><span>
+</span><span id="line-49"></span><span class="hs-comment">-- (from the client's perspective) when both the client's and the server's tip</span><span>
+</span><span id="line-50"></span><span class="hs-comment">-- headers agree. If they would not agree (server forked), then the server</span><span>
+</span><span id="line-51"></span><span class="hs-comment">-- sends 'MsgRollBackward', which rolls back one block and causes the client's</span><span>
+</span><span id="line-52"></span><span class="hs-comment">-- tip and the server's tip to differ.</span><span>
+</span><span id="line-53"></span><span class="hs-comment">--</span><span>
+</span><span id="line-54"></span><span class="hs-comment">-- In this module we implement three pipelining strategies:</span><span>
+</span><span id="line-55"></span><span class="hs-comment">--</span><span>
+</span><span id="line-56"></span><span class="hs-comment">-- * 'pipelineDecisionMax'</span><span>
+</span><span id="line-57"></span><span class="hs-comment">-- * 'pipelineDecisionMin'</span><span>
+</span><span id="line-58"></span><span class="hs-comment">-- * 'pipelineDecisionLowHighMark'</span><span>
+</span><span id="line-59"></span><span class="hs-comment">--</span><span>
+</span><span id="line-60"></span><span class="hs-keyword">data</span><span> </span><span id="MkPipelineDecision"><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#MkPipelineDecision"><span class="hs-identifier hs-var">MkPipelineDecision</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-61"></span><span>     </span><span id="MkPipelineDecision"><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#MkPipelineDecision"><span class="hs-identifier hs-var">MkPipelineDecision</span></a></span></span><span>
+</span><span id="line-62"></span><span>       </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679110399"><span class="annot"><a href="#local-6989586621679110399"><span class="hs-identifier hs-type">n</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Nat</span></span><span> </span><span class="annot"><a href="#local-6989586621679110399"><span class="hs-identifier hs-type">n</span></a></span><span>
+</span><span id="line-63"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">WithOrigin</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span>
+</span><span id="line-64"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">WithOrigin</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span>
+</span><span id="line-65"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#PipelineDecision"><span class="hs-identifier hs-type">PipelineDecision</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110399"><span class="hs-identifier hs-type">n</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#MkPipelineDecision"><span class="hs-identifier hs-type">MkPipelineDecision</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-66"></span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#MkPipelineDecision"><span class="hs-identifier hs-type">MkPipelineDecision</span></a></span><span>
+</span><span id="line-67"></span><span>
+</span><span id="line-68"></span><span id="local-6989586621679110364"><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#runPipelineDecision"><span class="hs-identifier hs-type">runPipelineDecision</span></a></span><span>
+</span><span id="line-69"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#MkPipelineDecision"><span class="hs-identifier hs-type">MkPipelineDecision</span></a></span><span>
+</span><span id="line-70"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Nat</span></span><span> </span><span class="annot"><a href="#local-6989586621679110364"><span class="hs-identifier hs-type">n</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">WithOrigin</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">WithOrigin</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span>
+</span><span id="line-71"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#PipelineDecision"><span class="hs-identifier hs-type">PipelineDecision</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110364"><span class="hs-identifier hs-type">n</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#MkPipelineDecision"><span class="hs-identifier hs-type">MkPipelineDecision</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-72"></span><span id="runPipelineDecision"><span class="annot"><span class="annottext">runPipelineDecision :: MkPipelineDecision
+-&gt; Nat n
+-&gt; WithOrigin BlockNo
+-&gt; WithOrigin BlockNo
+-&gt; (PipelineDecision n, MkPipelineDecision)
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#runPipelineDecision"><span class="hs-identifier hs-var hs-var">runPipelineDecision</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#MkPipelineDecision"><span class="hs-identifier hs-type">MkPipelineDecision</span></a></span><span> </span><span id="local-6989586621679110363"><span class="annot"><span class="annottext">forall (n :: N).
+Nat n
+-&gt; WithOrigin BlockNo
+-&gt; WithOrigin BlockNo
+-&gt; (PipelineDecision n, MkPipelineDecision)
+</span><a href="#local-6989586621679110363"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679110362"><span class="annot"><span class="annottext">Nat n
+</span><a href="#local-6989586621679110362"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span id="local-6989586621679110361"><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110361"><span class="hs-identifier hs-var">clientTipBlockNo</span></a></span></span><span> </span><span id="local-6989586621679110360"><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110360"><span class="hs-identifier hs-var">serverTipBlockNo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-73"></span><span>    </span><span class="annot"><span class="annottext">Nat n
+-&gt; WithOrigin BlockNo
+-&gt; WithOrigin BlockNo
+-&gt; (PipelineDecision n, MkPipelineDecision)
+forall (n :: N).
+Nat n
+-&gt; WithOrigin BlockNo
+-&gt; WithOrigin BlockNo
+-&gt; (PipelineDecision n, MkPipelineDecision)
+</span><a href="#local-6989586621679110363"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Nat n
+</span><a href="#local-6989586621679110362"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110361"><span class="hs-identifier hs-var">clientTipBlockNo</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110360"><span class="hs-identifier hs-var">serverTipBlockNo</span></a></span><span>
+</span><span id="line-74"></span><span>
+</span><span id="line-75"></span><span>
+</span><span id="line-76"></span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#constantPipelineDecision"><span class="hs-identifier hs-type">constantPipelineDecision</span></a></span><span>
+</span><span id="line-77"></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679110398"><span class="annot"><a href="#local-6989586621679110398"><span class="hs-identifier hs-type">n</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Nat</span></span><span> </span><span class="annot"><a href="#local-6989586621679110398"><span class="hs-identifier hs-type">n</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">WithOrigin</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">WithOrigin</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#PipelineDecision"><span class="hs-identifier hs-type">PipelineDecision</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110398"><span class="hs-identifier hs-type">n</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-78"></span><span>   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#MkPipelineDecision"><span class="hs-identifier hs-type">MkPipelineDecision</span></a></span><span>
+</span><span id="line-79"></span><span id="constantPipelineDecision"><span class="annot"><span class="annottext">constantPipelineDecision :: (forall (n :: N).
+ Nat n
+ -&gt; WithOrigin BlockNo -&gt; WithOrigin BlockNo -&gt; PipelineDecision n)
+-&gt; MkPipelineDecision
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#constantPipelineDecision"><span class="hs-identifier hs-var hs-var">constantPipelineDecision</span></a></span></span><span> </span><span id="local-6989586621679110359"><span class="annot"><span class="annottext">forall (n :: N).
+Nat n
+-&gt; WithOrigin BlockNo -&gt; WithOrigin BlockNo -&gt; PipelineDecision n
+</span><a href="#local-6989586621679110359"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(forall (n :: N).
+ Nat n
+ -&gt; WithOrigin BlockNo
+ -&gt; WithOrigin BlockNo
+ -&gt; (PipelineDecision n, MkPipelineDecision))
+-&gt; MkPipelineDecision
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#MkPipelineDecision"><span class="hs-identifier hs-var">MkPipelineDecision</span></a></span><span>
+</span><span id="line-80"></span><span>  </span><span class="annot"><span class="annottext">((forall (n :: N).
+  Nat n
+  -&gt; WithOrigin BlockNo
+  -&gt; WithOrigin BlockNo
+  -&gt; (PipelineDecision n, MkPipelineDecision))
+ -&gt; MkPipelineDecision)
+-&gt; (forall (n :: N).
+    Nat n
+    -&gt; WithOrigin BlockNo
+    -&gt; WithOrigin BlockNo
+    -&gt; (PipelineDecision n, MkPipelineDecision))
+-&gt; MkPipelineDecision
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679110358"><span class="annot"><span class="annottext">Nat n
+</span><a href="#local-6989586621679110358"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span id="local-6989586621679110357"><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110357"><span class="hs-identifier hs-var">clientTipBlockNo</span></a></span></span><span> </span><span id="local-6989586621679110356"><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110356"><span class="hs-identifier hs-var">serverTipBlockNo</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-81"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Nat n
+-&gt; WithOrigin BlockNo -&gt; WithOrigin BlockNo -&gt; PipelineDecision n
+forall (n :: N).
+Nat n
+-&gt; WithOrigin BlockNo -&gt; WithOrigin BlockNo -&gt; PipelineDecision n
+</span><a href="#local-6989586621679110359"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Nat n
+</span><a href="#local-6989586621679110358"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110357"><span class="hs-identifier hs-var">clientTipBlockNo</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110356"><span class="hs-identifier hs-var">serverTipBlockNo</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall (n :: N).
+ Nat n
+ -&gt; WithOrigin BlockNo -&gt; WithOrigin BlockNo -&gt; PipelineDecision n)
+-&gt; MkPipelineDecision
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#constantPipelineDecision"><span class="hs-identifier hs-var">constantPipelineDecision</span></a></span><span> </span><span class="annot"><span class="annottext">forall (n :: N).
+Nat n
+-&gt; WithOrigin BlockNo -&gt; WithOrigin BlockNo -&gt; PipelineDecision n
+</span><a href="#local-6989586621679110359"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-82"></span><span>
+</span><span id="line-83"></span><span>
+</span><span id="line-84"></span><span class="hs-comment">-- | Present maximal pipelining of at most @omax@ requests.  Collect responses</span><span>
+</span><span id="line-85"></span><span class="hs-comment">-- either when we are at the same block number as the server or when we sent</span><span>
+</span><span id="line-86"></span><span class="hs-comment">-- more than @omax@ requests.</span><span>
+</span><span id="line-87"></span><span class="hs-comment">--</span><span>
+</span><span id="line-88"></span><span class="hs-comment">-- If @omax = 3@ this pipelining strategy will generate a sequence:</span><span>
+</span><span id="line-89"></span><span class="hs-comment">-- @</span><span>
+</span><span id="line-90"></span><span class="hs-comment">--    Pipeline</span><span>
+</span><span id="line-91"></span><span class="hs-comment">--    Pipeline</span><span>
+</span><span id="line-92"></span><span class="hs-comment">--    Pipeline</span><span>
+</span><span id="line-93"></span><span class="hs-comment">--    Collect</span><span>
+</span><span id="line-94"></span><span class="hs-comment">--    Pipeline</span><span>
+</span><span id="line-95"></span><span class="hs-comment">--    Collect</span><span>
+</span><span id="line-96"></span><span class="hs-comment">--    ....</span><span>
+</span><span id="line-97"></span><span class="hs-comment">--    Pipeline</span><span>
+</span><span id="line-98"></span><span class="hs-comment">--    Collect</span><span>
+</span><span id="line-99"></span><span class="hs-comment">--    Collect</span><span>
+</span><span id="line-100"></span><span class="hs-comment">--    Collect</span><span>
+</span><span id="line-101"></span><span class="hs-comment">-- @</span><span>
+</span><span id="line-102"></span><span class="hs-comment">--</span><span>
+</span><span id="line-103"></span><span id="local-6989586621679110355"><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#pipelineDecisionMax"><span class="hs-identifier hs-type">pipelineDecisionMax</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Nat</span></span><span> </span><span class="annot"><a href="#local-6989586621679110355"><span class="hs-identifier hs-type">n</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">WithOrigin</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">WithOrigin</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span>
+</span><span id="line-104"></span><span>                    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#PipelineDecision"><span class="hs-identifier hs-type">PipelineDecision</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110355"><span class="hs-identifier hs-type">n</span></a></span></span><span>
+</span><span id="line-105"></span><span id="pipelineDecisionMax"><span class="annot"><span class="annottext">pipelineDecisionMax :: Word32
+-&gt; Nat n
+-&gt; WithOrigin BlockNo
+-&gt; WithOrigin BlockNo
+-&gt; PipelineDecision n
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#pipelineDecisionMax"><span class="hs-identifier hs-var hs-var">pipelineDecisionMax</span></a></span></span><span> </span><span id="local-6989586621679110354"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679110354"><span class="hs-identifier hs-var">omax</span></a></span></span><span> </span><span id="local-6989586621679110353"><span class="annot"><span class="annottext">Nat n
+</span><a href="#local-6989586621679110353"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span id="local-6989586621679110352"><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110352"><span class="hs-identifier hs-var">cliTipBlockNo</span></a></span></span><span> </span><span id="local-6989586621679110351"><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110351"><span class="hs-identifier hs-var">srvTipBlockNo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-106"></span><span>    </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Nat n
+</span><a href="#local-6989586621679110353"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-107"></span><span>      </span><span class="annot"><span class="annottext">Nat n
+</span><span class="hs-identifier hs-var">Zero</span></span><span>   </span><span class="hs-comment">-- We are insync with the server's tip. We use</span><span>
+</span><span id="line-108"></span><span>             </span><span class="hs-comment">-- equality so that this does not get triggered when we are ahead</span><span>
+</span><span id="line-109"></span><span>             </span><span class="hs-comment">-- of the producer, and it will send us 'MsgRollBackward'.</span><span>
+</span><span id="line-110"></span><span>             </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110352"><span class="hs-identifier hs-var">cliTipBlockNo</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo -&gt; WithOrigin BlockNo -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">==</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110351"><span class="hs-identifier hs-var">srvTipBlockNo</span></a></span><span>
+</span><span id="line-111"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">PipelineDecision n
+PipelineDecision 'Z
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#Request"><span class="hs-identifier hs-var">Request</span></a></span><span>
+</span><span id="line-112"></span><span>
+</span><span id="line-113"></span><span>             </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>
+</span><span id="line-114"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">PipelineDecision n
+forall (n :: N). PipelineDecision n
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#Pipeline"><span class="hs-identifier hs-var">Pipeline</span></a></span><span>
+</span><span id="line-115"></span><span>
+</span><span id="line-116"></span><span>      </span><span class="annot"><span class="hs-identifier hs-type">Succ</span></span><span class="hs-special">{</span><span class="hs-special">}</span><span> </span><span class="hs-comment">-- We pipelined some requests and we are now synchronised or we</span><span>
+</span><span id="line-117"></span><span>             </span><span class="hs-comment">-- exceeded the pipelining limit, and thus we should await for a</span><span>
+</span><span id="line-118"></span><span>             </span><span class="hs-comment">-- response.</span><span>
+</span><span id="line-119"></span><span>             </span><span class="hs-comment">--</span><span>
+</span><span id="line-120"></span><span>             </span><span class="hs-comment">-- Note: we add @omax'@ to avoid a deadlock in tests. This</span><span>
+</span><span id="line-121"></span><span>             </span><span class="hs-comment">-- pipelining strategy collects at this stage a single result,</span><span>
+</span><span id="line-122"></span><span>             </span><span class="hs-comment">-- this causes @n'@ to drop and we will pipeline the next</span><span>
+</span><span id="line-123"></span><span>             </span><span class="hs-comment">-- message. This assures that when we approach the end of the</span><span>
+</span><span id="line-124"></span><span>             </span><span class="hs-comment">-- chain we will collect all outstanding requests without</span><span>
+</span><span id="line-125"></span><span>             </span><span class="hs-comment">-- pipelining a request.</span><span>
+</span><span id="line-126"></span><span>             </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110352"><span class="hs-identifier hs-var">cliTipBlockNo</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo -&gt; BlockNo -&gt; WithOrigin BlockNo
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#bnoPlus"><span class="hs-operator hs-var">`bnoPlus`</span></a></span><span> </span><span class="annot"><span class="annottext">BlockNo
+</span><a href="#local-6989586621679110347"><span class="hs-identifier hs-var">n'</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo -&gt; WithOrigin BlockNo -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;=</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110351"><span class="hs-identifier hs-var">srvTipBlockNo</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">||</span></a></span><span> </span><span class="annot"><span class="annottext">BlockNo
+</span><a href="#local-6989586621679110347"><span class="hs-identifier hs-var">n'</span></a></span><span> </span><span class="annot"><span class="annottext">BlockNo -&gt; BlockNo -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;=</span></a></span><span> </span><span class="annot"><span class="annottext">BlockNo
+</span><a href="#local-6989586621679110345"><span class="hs-identifier hs-var">omax'</span></a></span><span>
+</span><span id="line-127"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">PipelineDecision n
+forall (n :: N). PipelineDecision ('S n)
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#Collect"><span class="hs-identifier hs-var">Collect</span></a></span><span>
+</span><span id="line-128"></span><span>
+</span><span id="line-129"></span><span>             </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>
+</span><span id="line-130"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">PipelineDecision n
+forall (n :: N). PipelineDecision n
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#Pipeline"><span class="hs-identifier hs-var">Pipeline</span></a></span><span>
+</span><span id="line-131"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-132"></span><span>    </span><span class="annot"><a href="#local-6989586621679110347"><span class="hs-identifier hs-type">n'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span>
+</span><span id="line-133"></span><span>    </span><span id="local-6989586621679110347"><span class="annot"><span class="annottext">n' :: BlockNo
+</span><a href="#local-6989586621679110347"><span class="hs-identifier hs-var hs-var">n'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; BlockNo
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Nat n -&gt; Int
+forall (n :: N). Nat n -&gt; Int
+</span><span class="hs-identifier hs-var">natToInt</span></span><span> </span><span class="annot"><span class="annottext">Nat n
+</span><a href="#local-6989586621679110353"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-134"></span><span>
+</span><span id="line-135"></span><span>    </span><span class="annot"><a href="#local-6989586621679110345"><span class="hs-identifier hs-type">omax'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span>
+</span><span id="line-136"></span><span>    </span><span id="local-6989586621679110345"><span class="annot"><span class="annottext">omax' :: BlockNo
+</span><a href="#local-6989586621679110345"><span class="hs-identifier hs-var hs-var">omax'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; BlockNo
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679110354"><span class="hs-identifier hs-var">omax</span></a></span><span>
+</span><span id="line-137"></span><span>
+</span><span id="line-138"></span><span>
+</span><span id="line-139"></span><span class="hs-comment">-- | Present minimum pipelining of at most @omax@ requests, collect responses</span><span>
+</span><span id="line-140"></span><span class="hs-comment">-- eagerly.</span><span>
+</span><span id="line-141"></span><span class="hs-comment">--</span><span>
+</span><span id="line-142"></span><span id="local-6989586621679110343"><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#pipelineDecisionMin"><span class="hs-identifier hs-type">pipelineDecisionMin</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Nat</span></span><span> </span><span class="annot"><a href="#local-6989586621679110343"><span class="hs-identifier hs-type">n</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">WithOrigin</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">WithOrigin</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span>
+</span><span id="line-143"></span><span>                    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#PipelineDecision"><span class="hs-identifier hs-type">PipelineDecision</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679110343"><span class="hs-identifier hs-type">n</span></a></span></span><span>
+</span><span id="line-144"></span><span id="pipelineDecisionMin"><span class="annot"><span class="annottext">pipelineDecisionMin :: Word32
+-&gt; Nat n
+-&gt; WithOrigin BlockNo
+-&gt; WithOrigin BlockNo
+-&gt; PipelineDecision n
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#pipelineDecisionMin"><span class="hs-identifier hs-var hs-var">pipelineDecisionMin</span></a></span></span><span> </span><span id="local-6989586621679110342"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679110342"><span class="hs-identifier hs-var">omax</span></a></span></span><span> </span><span id="local-6989586621679110341"><span class="annot"><span class="annottext">Nat n
+</span><a href="#local-6989586621679110341"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span id="local-6989586621679110340"><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110340"><span class="hs-identifier hs-var">cliTipBlockNo</span></a></span></span><span> </span><span id="local-6989586621679110339"><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110339"><span class="hs-identifier hs-var">srvTipBlockNo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-145"></span><span>    </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Nat n
+</span><a href="#local-6989586621679110341"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-146"></span><span>      </span><span class="annot"><span class="annottext">Nat n
+</span><span class="hs-identifier hs-var">Zero</span></span><span>   </span><span class="hs-comment">-- We are insync with the server's tip. We use</span><span>
+</span><span id="line-147"></span><span>             </span><span class="hs-comment">-- equality so that this does not get triggered when we are ahead</span><span>
+</span><span id="line-148"></span><span>             </span><span class="hs-comment">-- of the producer, and it will send us 'MsgRollBackward'.</span><span>
+</span><span id="line-149"></span><span>             </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110340"><span class="hs-identifier hs-var">cliTipBlockNo</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo -&gt; WithOrigin BlockNo -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">==</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110339"><span class="hs-identifier hs-var">srvTipBlockNo</span></a></span><span>
+</span><span id="line-150"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">PipelineDecision n
+PipelineDecision 'Z
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#Request"><span class="hs-identifier hs-var">Request</span></a></span><span>
+</span><span id="line-151"></span><span>
+</span><span id="line-152"></span><span>             </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>
+</span><span id="line-153"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">PipelineDecision n
+forall (n :: N). PipelineDecision n
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#Pipeline"><span class="hs-identifier hs-var">Pipeline</span></a></span><span>
+</span><span id="line-154"></span><span>
+</span><span id="line-155"></span><span>      </span><span class="annot"><span class="hs-identifier hs-type">Succ</span></span><span class="hs-special">{</span><span class="hs-special">}</span><span> </span><span class="hs-comment">-- We pipelined some requests and we are now synchronised or we</span><span>
+</span><span id="line-156"></span><span>             </span><span class="hs-comment">-- exceeded the pipelining limit, and thus we should wait for a</span><span>
+</span><span id="line-157"></span><span>             </span><span class="hs-comment">-- response.</span><span>
+</span><span id="line-158"></span><span>             </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110340"><span class="hs-identifier hs-var">cliTipBlockNo</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo -&gt; BlockNo -&gt; WithOrigin BlockNo
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#bnoPlus"><span class="hs-operator hs-var">`bnoPlus`</span></a></span><span> </span><span class="annot"><span class="annottext">BlockNo
+</span><a href="#local-6989586621679110338"><span class="hs-identifier hs-var">n'</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo -&gt; WithOrigin BlockNo -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;=</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110339"><span class="hs-identifier hs-var">srvTipBlockNo</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">||</span></a></span><span> </span><span class="annot"><span class="annottext">BlockNo
+</span><a href="#local-6989586621679110338"><span class="hs-identifier hs-var">n'</span></a></span><span> </span><span class="annot"><span class="annottext">BlockNo -&gt; BlockNo -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;=</span></a></span><span> </span><span class="annot"><span class="annottext">BlockNo
+</span><a href="#local-6989586621679110337"><span class="hs-identifier hs-var">omax'</span></a></span><span>
+</span><span id="line-159"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">PipelineDecision n
+forall (n :: N). PipelineDecision ('S n)
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#Collect"><span class="hs-identifier hs-var">Collect</span></a></span><span>
+</span><span id="line-160"></span><span>
+</span><span id="line-161"></span><span>             </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>
+</span><span id="line-162"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">PipelineDecision n
+forall (n :: N). PipelineDecision ('S n)
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#CollectOrPipeline"><span class="hs-identifier hs-var">CollectOrPipeline</span></a></span><span>
+</span><span id="line-163"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-164"></span><span>    </span><span class="annot"><a href="#local-6989586621679110338"><span class="hs-identifier hs-type">n'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span>
+</span><span id="line-165"></span><span>    </span><span id="local-6989586621679110338"><span class="annot"><span class="annottext">n' :: BlockNo
+</span><a href="#local-6989586621679110338"><span class="hs-identifier hs-var hs-var">n'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; BlockNo
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Nat n -&gt; Int
+forall (n :: N). Nat n -&gt; Int
+</span><span class="hs-identifier hs-var">natToInt</span></span><span> </span><span class="annot"><span class="annottext">Nat n
+</span><a href="#local-6989586621679110341"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-166"></span><span>
+</span><span id="line-167"></span><span>    </span><span class="annot"><a href="#local-6989586621679110337"><span class="hs-identifier hs-type">omax'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span>
+</span><span id="line-168"></span><span>    </span><span id="local-6989586621679110337"><span class="annot"><span class="annottext">omax' :: BlockNo
+</span><a href="#local-6989586621679110337"><span class="hs-identifier hs-var hs-var">omax'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; BlockNo
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679110342"><span class="hs-identifier hs-var">omax</span></a></span><span>
+</span><span id="line-169"></span><span>
+</span><span id="line-170"></span><span>
+</span><span id="line-171"></span><span class="hs-comment">-- | Pipelining strategy which pipelines up to @highMark@ requests; if the</span><span>
+</span><span id="line-172"></span><span class="hs-comment">-- number of pipelined messages exceeds the high mark, it collects messages</span><span>
+</span><span id="line-173"></span><span class="hs-comment">-- until there are at most @lowMark@ outstanding requests.</span><span>
+</span><span id="line-174"></span><span class="hs-comment">--</span><span>
+</span><span id="line-175"></span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#pipelineDecisionLowHighMark"><span class="hs-identifier hs-type">pipelineDecisionLowHighMark</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#MkPipelineDecision"><span class="hs-identifier hs-type">MkPipelineDecision</span></a></span><span>
+</span><span id="line-176"></span><span id="pipelineDecisionLowHighMark"><span class="annot"><span class="annottext">pipelineDecisionLowHighMark :: Word32 -&gt; Word32 -&gt; MkPipelineDecision
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#pipelineDecisionLowHighMark"><span class="hs-identifier hs-var hs-var">pipelineDecisionLowHighMark</span></a></span></span><span> </span><span id="local-6989586621679110336"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679110336"><span class="hs-identifier hs-var">lowMark</span></a></span></span><span> </span><span id="local-6989586621679110335"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679110335"><span class="hs-identifier hs-var">highMark</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-177"></span><span>    </span><span class="annot"><span class="annottext">Bool -&gt; MkPipelineDecision -&gt; MkPipelineDecision
+forall a. (?callStack::CallStack) =&gt; Bool -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var">assert</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679110336"><span class="hs-identifier hs-var">lowMark</span></a></span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; Word32 -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&lt;=</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679110335"><span class="hs-identifier hs-var">highMark</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">MkPipelineDecision
+</span><a href="#local-6989586621679110333"><span class="hs-identifier hs-var">goLow</span></a></span><span>
+</span><span id="line-178"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-179"></span><span>    </span><span class="annot"><a href="#local-6989586621679110332"><span class="hs-identifier hs-type">goZero</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Nat</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Z</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">WithOrigin</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">WithOrigin</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span>
+</span><span id="line-180"></span><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#PipelineDecision"><span class="hs-identifier hs-type">PipelineDecision</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Z</span></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#MkPipelineDecision"><span class="hs-identifier hs-type">MkPipelineDecision</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-181"></span><span>    </span><span id="local-6989586621679110332"><span class="annot"><span class="annottext">goZero :: Nat 'Z
+-&gt; WithOrigin BlockNo
+-&gt; WithOrigin BlockNo
+-&gt; (PipelineDecision 'Z, MkPipelineDecision)
+</span><a href="#local-6989586621679110332"><span class="hs-identifier hs-var hs-var">goZero</span></a></span></span><span> </span><span class="annot"><span class="annottext">Nat 'Z
+</span><span class="hs-identifier hs-var">Zero</span></span><span> </span><span id="local-6989586621679110331"><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110331"><span class="hs-identifier hs-var">clientTipBlockNo</span></a></span></span><span> </span><span id="local-6989586621679110330"><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110330"><span class="hs-identifier hs-var">serverTipBlockNo</span></a></span></span><span>
+</span><span id="line-182"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110331"><span class="hs-identifier hs-var">clientTipBlockNo</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo -&gt; WithOrigin BlockNo -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">==</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110330"><span class="hs-identifier hs-var">serverTipBlockNo</span></a></span><span>
+</span><span id="line-183"></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PipelineDecision 'Z
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#Request"><span class="hs-identifier hs-var">Request</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">MkPipelineDecision
+</span><a href="#local-6989586621679110333"><span class="hs-identifier hs-var">goLow</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-184"></span><span>
+</span><span id="line-185"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>
+</span><span id="line-186"></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PipelineDecision 'Z
+forall (n :: N). PipelineDecision n
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#Pipeline"><span class="hs-identifier hs-var">Pipeline</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">MkPipelineDecision
+</span><a href="#local-6989586621679110333"><span class="hs-identifier hs-var">goLow</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-187"></span><span>
+</span><span id="line-188"></span><span>    </span><span class="hs-comment">-- Mutually recursive pipeline decision strategies; we start with 'goLow',</span><span>
+</span><span id="line-189"></span><span>    </span><span class="hs-comment">-- when we go above the high mark, switch to 'goHigh', switch back to</span><span>
+</span><span id="line-190"></span><span>    </span><span class="hs-comment">-- 'goLow' when we go below the low mark.</span><span>
+</span><span id="line-191"></span><span>    </span><span class="annot"><a href="#local-6989586621679110333"><span class="hs-identifier hs-type">goLow</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679110329"><span class="hs-identifier hs-type">goHigh</span></a></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#MkPipelineDecision"><span class="hs-identifier hs-type">MkPipelineDecision</span></a></span><span>
+</span><span id="line-192"></span><span>
+</span><span id="line-193"></span><span>    </span><span id="local-6989586621679110333"><span class="annot"><span class="annottext">goLow :: MkPipelineDecision
+</span><a href="#local-6989586621679110333"><span class="hs-identifier hs-var hs-var">goLow</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(forall (n :: N).
+ Nat n
+ -&gt; WithOrigin BlockNo
+ -&gt; WithOrigin BlockNo
+ -&gt; (PipelineDecision n, MkPipelineDecision))
+-&gt; MkPipelineDecision
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#MkPipelineDecision"><span class="hs-identifier hs-var">MkPipelineDecision</span></a></span><span> </span><span class="annot"><span class="annottext">((forall (n :: N).
+  Nat n
+  -&gt; WithOrigin BlockNo
+  -&gt; WithOrigin BlockNo
+  -&gt; (PipelineDecision n, MkPipelineDecision))
+ -&gt; MkPipelineDecision)
+-&gt; (forall (n :: N).
+    Nat n
+    -&gt; WithOrigin BlockNo
+    -&gt; WithOrigin BlockNo
+    -&gt; (PipelineDecision n, MkPipelineDecision))
+-&gt; MkPipelineDecision
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-194"></span><span>      </span><span class="hs-glyph">\</span><span id="local-6989586621679110328"><span class="annot"><span class="annottext">Nat n
+</span><a href="#local-6989586621679110328"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span id="local-6989586621679110327"><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110327"><span class="hs-identifier hs-var">clientTipBlockNo</span></a></span></span><span> </span><span id="local-6989586621679110326"><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110326"><span class="hs-identifier hs-var">serverTipBlockNo</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-195"></span><span>        </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Nat n
+</span><a href="#local-6989586621679110328"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-196"></span><span>          </span><span class="annot"><span class="annottext">Nat n
+</span><span class="hs-identifier hs-var">Zero</span></span><span>   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Nat 'Z
+-&gt; WithOrigin BlockNo
+-&gt; WithOrigin BlockNo
+-&gt; (PipelineDecision 'Z, MkPipelineDecision)
+</span><a href="#local-6989586621679110332"><span class="hs-identifier hs-var">goZero</span></a></span><span> </span><span class="annot"><span class="annottext">Nat n
+Nat 'Z
+</span><a href="#local-6989586621679110328"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110327"><span class="hs-identifier hs-var">clientTipBlockNo</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110326"><span class="hs-identifier hs-var">serverTipBlockNo</span></a></span><span>
+</span><span id="line-197"></span><span>
+</span><span id="line-198"></span><span>          </span><span class="annot"><span class="hs-identifier hs-type">Succ</span></span><span class="hs-special">{</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110327"><span class="hs-identifier hs-var">clientTipBlockNo</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo -&gt; BlockNo -&gt; WithOrigin BlockNo
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#bnoPlus"><span class="hs-operator hs-var">`bnoPlus`</span></a></span><span> </span><span class="annot"><span class="annottext">BlockNo
+</span><a href="#local-6989586621679110325"><span class="hs-identifier hs-var">n'</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo -&gt; WithOrigin BlockNo -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;=</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110326"><span class="hs-identifier hs-var">serverTipBlockNo</span></a></span><span>
+</span><span id="line-199"></span><span>                 </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PipelineDecision n
+forall (n :: N). PipelineDecision ('S n)
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#Collect"><span class="hs-identifier hs-var">Collect</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">MkPipelineDecision
+</span><a href="#local-6989586621679110333"><span class="hs-identifier hs-var">goLow</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-200"></span><span>
+</span><span id="line-201"></span><span>                 </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">BlockNo
+</span><a href="#local-6989586621679110325"><span class="hs-identifier hs-var">n'</span></a></span><span> </span><span class="annot"><span class="annottext">BlockNo -&gt; BlockNo -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;=</span></a></span><span> </span><span class="annot"><span class="annottext">BlockNo
+</span><a href="#local-6989586621679110324"><span class="hs-identifier hs-var">highMark'</span></a></span><span>
+</span><span id="line-202"></span><span>                 </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PipelineDecision n
+forall (n :: N). PipelineDecision ('S n)
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#Collect"><span class="hs-identifier hs-var">Collect</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">MkPipelineDecision
+</span><a href="#local-6989586621679110329"><span class="hs-identifier hs-var">goHigh</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-203"></span><span>
+</span><span id="line-204"></span><span>                 </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>
+</span><span id="line-205"></span><span>                 </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PipelineDecision n
+forall (n :: N). PipelineDecision ('S n)
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#CollectOrPipeline"><span class="hs-identifier hs-var">CollectOrPipeline</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">MkPipelineDecision
+</span><a href="#local-6989586621679110333"><span class="hs-identifier hs-var">goLow</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-206"></span><span>            </span><span class="hs-keyword">where</span><span>
+</span><span id="line-207"></span><span>              </span><span class="annot"><a href="#local-6989586621679110325"><span class="hs-identifier hs-type">n'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span>
+</span><span id="line-208"></span><span>              </span><span id="local-6989586621679110325"><span class="annot"><span class="annottext">n' :: BlockNo
+</span><a href="#local-6989586621679110325"><span class="hs-identifier hs-var hs-var">n'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; BlockNo
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Nat n -&gt; Int
+forall (n :: N). Nat n -&gt; Int
+</span><span class="hs-identifier hs-var">natToInt</span></span><span> </span><span class="annot"><span class="annottext">Nat n
+</span><a href="#local-6989586621679110328"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-209"></span><span>
+</span><span id="line-210"></span><span>    </span><span id="local-6989586621679110329"><span class="annot"><span class="annottext">goHigh :: MkPipelineDecision
+</span><a href="#local-6989586621679110329"><span class="hs-identifier hs-var hs-var">goHigh</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(forall (n :: N).
+ Nat n
+ -&gt; WithOrigin BlockNo
+ -&gt; WithOrigin BlockNo
+ -&gt; (PipelineDecision n, MkPipelineDecision))
+-&gt; MkPipelineDecision
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#MkPipelineDecision"><span class="hs-identifier hs-var">MkPipelineDecision</span></a></span><span> </span><span class="annot"><span class="annottext">((forall (n :: N).
+  Nat n
+  -&gt; WithOrigin BlockNo
+  -&gt; WithOrigin BlockNo
+  -&gt; (PipelineDecision n, MkPipelineDecision))
+ -&gt; MkPipelineDecision)
+-&gt; (forall (n :: N).
+    Nat n
+    -&gt; WithOrigin BlockNo
+    -&gt; WithOrigin BlockNo
+    -&gt; (PipelineDecision n, MkPipelineDecision))
+-&gt; MkPipelineDecision
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-211"></span><span>      </span><span class="hs-glyph">\</span><span id="local-6989586621679110323"><span class="annot"><span class="annottext">Nat n
+</span><a href="#local-6989586621679110323"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span id="local-6989586621679110322"><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110322"><span class="hs-identifier hs-var">clientTipBlockNo</span></a></span></span><span> </span><span id="local-6989586621679110321"><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110321"><span class="hs-identifier hs-var">serverTipBlockNo</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-212"></span><span>      </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Nat n
+</span><a href="#local-6989586621679110323"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-213"></span><span>        </span><span class="annot"><span class="annottext">Nat n
+</span><span class="hs-identifier hs-var">Zero</span></span><span>   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Nat 'Z
+-&gt; WithOrigin BlockNo
+-&gt; WithOrigin BlockNo
+-&gt; (PipelineDecision 'Z, MkPipelineDecision)
+</span><a href="#local-6989586621679110332"><span class="hs-identifier hs-var">goZero</span></a></span><span> </span><span class="annot"><span class="annottext">Nat n
+Nat 'Z
+</span><a href="#local-6989586621679110323"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110322"><span class="hs-identifier hs-var">clientTipBlockNo</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><a href="#local-6989586621679110321"><span class="hs-identifier hs-var">serverTipBlockNo</span></a></span><span>
+</span><span id="line-214"></span><span>
+</span><span id="line-215"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Succ</span></span><span class="hs-special">{</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-216"></span><span>            </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">BlockNo
+</span><a href="#local-6989586621679110320"><span class="hs-identifier hs-var">n'</span></a></span><span> </span><span class="annot"><span class="annottext">BlockNo -&gt; BlockNo -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">BlockNo
+</span><a href="#local-6989586621679110318"><span class="hs-identifier hs-var">lowMark'</span></a></span><span>
+</span><span id="line-217"></span><span>              </span><span class="hs-keyword">then</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PipelineDecision n
+forall (n :: N). PipelineDecision ('S n)
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#Collect"><span class="hs-identifier hs-var">Collect</span></a></span><span class="hs-special">,</span><span>           </span><span class="annot"><span class="annottext">MkPipelineDecision
+</span><a href="#local-6989586621679110329"><span class="hs-identifier hs-var">goHigh</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-218"></span><span>              </span><span class="hs-keyword">else</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">PipelineDecision n
+forall (n :: N). PipelineDecision ('S n)
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#CollectOrPipeline"><span class="hs-identifier hs-var">CollectOrPipeline</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">MkPipelineDecision
+</span><a href="#local-6989586621679110333"><span class="hs-identifier hs-var">goLow</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-219"></span><span>          </span><span class="hs-keyword">where</span><span>
+</span><span id="line-220"></span><span>            </span><span class="annot"><a href="#local-6989586621679110320"><span class="hs-identifier hs-type">n'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span>
+</span><span id="line-221"></span><span>            </span><span id="local-6989586621679110320"><span class="annot"><span class="annottext">n' :: BlockNo
+</span><a href="#local-6989586621679110320"><span class="hs-identifier hs-var hs-var">n'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; BlockNo
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Nat n -&gt; Int
+forall (n :: N). Nat n -&gt; Int
+</span><span class="hs-identifier hs-var">natToInt</span></span><span> </span><span class="annot"><span class="annottext">Nat n
+</span><a href="#local-6989586621679110323"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-222"></span><span>
+</span><span id="line-223"></span><span>    </span><span class="annot"><a href="#local-6989586621679110318"><span class="hs-identifier hs-type">lowMark'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span>
+</span><span id="line-224"></span><span>    </span><span id="local-6989586621679110318"><span class="annot"><span class="annottext">lowMark' :: BlockNo
+</span><a href="#local-6989586621679110318"><span class="hs-identifier hs-var hs-var">lowMark'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; BlockNo
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679110336"><span class="hs-identifier hs-var">lowMark</span></a></span><span>
+</span><span id="line-225"></span><span>
+</span><span id="line-226"></span><span>    </span><span class="annot"><a href="#local-6989586621679110324"><span class="hs-identifier hs-type">highMark'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span>
+</span><span id="line-227"></span><span>    </span><span id="local-6989586621679110324"><span class="annot"><span class="annottext">highMark' :: BlockNo
+</span><a href="#local-6989586621679110324"><span class="hs-identifier hs-var hs-var">highMark'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; BlockNo
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679110335"><span class="hs-identifier hs-var">highMark</span></a></span><span>
+</span><span id="line-228"></span><span>
+</span><span id="line-229"></span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#bnoPlus"><span class="hs-identifier hs-type">bnoPlus</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">WithOrigin</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">WithOrigin</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span>
+</span><span id="line-230"></span><span id="bnoPlus"><span class="annot"><span class="annottext">bnoPlus :: WithOrigin BlockNo -&gt; BlockNo -&gt; WithOrigin BlockNo
+</span><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#bnoPlus"><span class="hs-identifier hs-var hs-var">bnoPlus</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">At</span></span><span> </span><span id="local-6989586621679110316"><span class="annot"><span class="annottext">BlockNo
+</span><a href="#local-6989586621679110316"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679110315"><span class="annot"><span class="annottext">BlockNo
+</span><a href="#local-6989586621679110315"><span class="hs-identifier hs-var">y</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BlockNo -&gt; WithOrigin BlockNo
+forall t. t -&gt; WithOrigin t
+</span><span class="hs-identifier hs-var">At</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">BlockNo
+</span><a href="#local-6989586621679110316"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">BlockNo -&gt; BlockNo -&gt; BlockNo
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="annot"><span class="annottext">BlockNo
+</span><a href="#local-6989586621679110315"><span class="hs-identifier hs-var">y</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-231"></span><span class="annot"><a href="Ouroboros.Network.Protocol.ChainSync.PipelineDecision.html#bnoPlus"><span class="hs-identifier hs-var">bnoPlus</span></a></span><span> </span><span class="annot"><span class="annottext">WithOrigin BlockNo
+</span><span class="hs-identifier hs-var">Origin</span></span><span> </span><span id="local-6989586621679110312"><span class="annot"><span class="annottext">BlockNo
+</span><a href="#local-6989586621679110312"><span class="hs-identifier hs-var">y</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BlockNo -&gt; WithOrigin BlockNo
+forall t. t -&gt; WithOrigin t
+</span><span class="hs-identifier hs-var">At</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">BlockNo
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">BlockNo -&gt; BlockNo -&gt; BlockNo
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="annot"><span class="annottext">BlockNo
+</span><a href="#local-6989586621679110312"><span class="hs-identifier hs-var">y</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-232"></span></pre></body></html>

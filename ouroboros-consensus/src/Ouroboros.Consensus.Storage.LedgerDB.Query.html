@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE ConstraintKinds          #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DeriveAnyClass           #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE DeriveGeneric            #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE FlexibleContexts         #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE FlexibleInstances        #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE FunctionalDependencies   #-}</span><span>
+</span><span id="line-7"></span><span class="hs-pragma">{-# LANGUAGE GADTs                    #-}</span><span>
+</span><span id="line-8"></span><span class="hs-pragma">{-# LANGUAGE MultiParamTypeClasses    #-}</span><span>
+</span><span id="line-9"></span><span class="hs-pragma">{-# LANGUAGE NamedFieldPuns           #-}</span><span>
+</span><span id="line-10"></span><span class="hs-pragma">{-# LANGUAGE QuantifiedConstraints    #-}</span><span>
+</span><span id="line-11"></span><span class="hs-pragma">{-# LANGUAGE RankNTypes               #-}</span><span>
+</span><span id="line-12"></span><span class="hs-pragma">{-# LANGUAGE RecordWildCards          #-}</span><span>
+</span><span id="line-13"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables      #-}</span><span>
+</span><span id="line-14"></span><span class="hs-pragma">{-# LANGUAGE StandaloneDeriving       #-}</span><span>
+</span><span id="line-15"></span><span class="hs-pragma">{-# LANGUAGE StandaloneKindSignatures #-}</span><span>
+</span><span id="line-16"></span><span class="hs-pragma">{-# LANGUAGE TypeApplications         #-}</span><span>
+</span><span id="line-17"></span><span class="hs-pragma">{-# LANGUAGE TypeFamilies             #-}</span><span>
+</span><span id="line-18"></span><span class="hs-pragma">{-# LANGUAGE UndecidableInstances     #-}</span><span>
+</span><span id="line-19"></span><span>
+</span><span id="line-20"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Consensus.Storage.LedgerDB.Query</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-21"></span><span>    </span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbAnchor"><span class="hs-identifier">ledgerDbAnchor</span></a></span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbCurrent"><span class="hs-identifier">ledgerDbCurrent</span></a></span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbIsSaturated"><span class="hs-identifier">ledgerDbIsSaturated</span></a></span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbMaxRollback"><span class="hs-identifier">ledgerDbMaxRollback</span></a></span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbPast"><span class="hs-identifier">ledgerDbPast</span></a></span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbSnapshots"><span class="hs-identifier">ledgerDbSnapshots</span></a></span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbTip"><span class="hs-identifier">ledgerDbTip</span></a></span><span>
+</span><span id="line-28"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Foldable</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">find</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Word</span></a></span><span>
+</span><span id="line-32"></span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier">Ouroboros.Network.AnchoredSeq</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">AS</span></span><span>
+</span><span id="line-34"></span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Block.html"><span class="hs-identifier">Ouroboros.Consensus.Block</span></a></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Config.html"><span class="hs-identifier">Ouroboros.Consensus.Config</span></a></span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Abstract.html"><span class="hs-identifier">Ouroboros.Consensus.Ledger.Abstract</span></a></span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.LedgerDB.html"><span class="hs-identifier">Ouroboros.Consensus.Storage.LedgerDB.LedgerDB</span></a></span><span>
+</span><span id="line-40"></span><span>
+</span><span id="line-41"></span><span class="hs-comment">-- | The ledger state at the tip of the chain</span><span>
+</span><span id="line-42"></span><span id="local-6989586621679966985"><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbCurrent"><span class="hs-identifier hs-type">ledgerDbCurrent</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#GetTip"><span class="hs-identifier hs-type">GetTip</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679966985"><span class="hs-identifier hs-type">l</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.LedgerDB.html#LedgerDB"><span class="hs-identifier hs-type">LedgerDB</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679966985"><span class="hs-identifier hs-type">l</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679966985"><span class="hs-identifier hs-type">l</span></a></span></span><span>
+</span><span id="line-43"></span><span id="ledgerDbCurrent"><span class="annot"><span class="annottext">ledgerDbCurrent :: LedgerDB l -&gt; l
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbCurrent"><span class="hs-identifier hs-var hs-var">ledgerDbCurrent</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Checkpoint l -&gt; l)
+-&gt; (Checkpoint l -&gt; l) -&gt; Either (Checkpoint l) (Checkpoint l) -&gt; l
+forall a c b. (a -&gt; c) -&gt; (b -&gt; c) -&gt; Either a b -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">either</span></a></span><span> </span><span class="annot"><span class="annottext">Checkpoint l -&gt; l
+forall l. Checkpoint l -&gt; l
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.LedgerDB.html#unCheckpoint"><span class="hs-identifier hs-var hs-var">unCheckpoint</span></a></span><span> </span><span class="annot"><span class="annottext">Checkpoint l -&gt; l
+forall l. Checkpoint l -&gt; l
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.LedgerDB.html#unCheckpoint"><span class="hs-identifier hs-var hs-var">unCheckpoint</span></a></span><span> </span><span class="annot"><span class="annottext">(Either (Checkpoint l) (Checkpoint l) -&gt; l)
+-&gt; (LedgerDB l -&gt; Either (Checkpoint l) (Checkpoint l))
+-&gt; LedgerDB l
+-&gt; l
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+-&gt; Either (Checkpoint l) (Checkpoint l)
+forall v a b. Anchorable v a b =&gt; AnchoredSeq v a b -&gt; Either a b
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">AS.head</span></a></span><span> </span><span class="annot"><span class="annottext">(AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+ -&gt; Either (Checkpoint l) (Checkpoint l))
+-&gt; (LedgerDB l
+    -&gt; AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l))
+-&gt; LedgerDB l
+-&gt; Either (Checkpoint l) (Checkpoint l)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerDB l
+-&gt; AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+forall l.
+LedgerDB l
+-&gt; AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.LedgerDB.html#ledgerDbCheckpoints"><span class="hs-identifier hs-var hs-var">ledgerDbCheckpoints</span></a></span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span class="hs-comment">-- | Information about the state of the ledger at the anchor</span><span>
+</span><span id="line-46"></span><span id="local-6989586621679966977"><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbAnchor"><span class="hs-identifier hs-type">ledgerDbAnchor</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.LedgerDB.html#LedgerDB"><span class="hs-identifier hs-type">LedgerDB</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679966977"><span class="hs-identifier hs-type">l</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679966977"><span class="hs-identifier hs-type">l</span></a></span></span><span>
+</span><span id="line-47"></span><span id="ledgerDbAnchor"><span class="annot"><span class="annottext">ledgerDbAnchor :: LedgerDB l -&gt; l
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbAnchor"><span class="hs-identifier hs-var hs-var">ledgerDbAnchor</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Checkpoint l -&gt; l
+forall l. Checkpoint l -&gt; l
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.LedgerDB.html#unCheckpoint"><span class="hs-identifier hs-var hs-var">unCheckpoint</span></a></span><span> </span><span class="annot"><span class="annottext">(Checkpoint l -&gt; l)
+-&gt; (LedgerDB l -&gt; Checkpoint l) -&gt; LedgerDB l -&gt; l
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+-&gt; Checkpoint l
+forall v a b. AnchoredSeq v a b -&gt; a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var hs-var">AS.anchor</span></a></span><span> </span><span class="annot"><span class="annottext">(AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+ -&gt; Checkpoint l)
+-&gt; (LedgerDB l
+    -&gt; AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l))
+-&gt; LedgerDB l
+-&gt; Checkpoint l
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerDB l
+-&gt; AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+forall l.
+LedgerDB l
+-&gt; AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.LedgerDB.html#ledgerDbCheckpoints"><span class="hs-identifier hs-var hs-var">ledgerDbCheckpoints</span></a></span><span>
+</span><span id="line-48"></span><span>
+</span><span id="line-49"></span><span class="hs-comment">-- | All snapshots currently stored by the ledger DB (new to old)</span><span>
+</span><span id="line-50"></span><span class="hs-comment">--</span><span>
+</span><span id="line-51"></span><span class="hs-comment">-- This also includes the snapshot at the anchor. For each snapshot we also</span><span>
+</span><span id="line-52"></span><span class="hs-comment">-- return the distance from the tip.</span><span>
+</span><span id="line-53"></span><span id="local-6989586621679966949"><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbSnapshots"><span class="hs-identifier hs-type">ledgerDbSnapshots</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.LedgerDB.html#LedgerDB"><span class="hs-identifier hs-type">LedgerDB</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679966949"><span class="hs-identifier hs-type">l</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Word64</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679966949"><span class="hs-identifier hs-type">l</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span></span><span>
+</span><span id="line-54"></span><span id="ledgerDbSnapshots"><span class="annot"><span class="annottext">ledgerDbSnapshots :: LedgerDB l -&gt; [(Word64, l)]
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbSnapshots"><span class="hs-identifier hs-var hs-var">ledgerDbSnapshots</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.LedgerDB.html#LedgerDB"><span class="hs-identifier hs-type">LedgerDB</span></a></span><span class="hs-special">{</span><span id="local-6989586621679966947"><span class="annot"><span class="annottext">AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+ledgerDbCheckpoints :: AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+ledgerDbCheckpoints :: forall l.
+LedgerDB l
+-&gt; AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+</span><a href="#local-6989586621679966947"><span class="hs-glyph hs-var hs-var">..</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-55"></span><span>    </span><span class="annot"><span class="annottext">[Word64] -&gt; [l] -&gt; [(Word64, l)]
+forall a b. [a] -&gt; [b] -&gt; [(a, b)]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">zip</span></a></span><span>
+</span><span id="line-56"></span><span>      </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Word64
+</span><span class="hs-number">0</span></span><span class="hs-glyph">..</span><span class="hs-special">]</span><span>
+</span><span id="line-57"></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Checkpoint l -&gt; l) -&gt; [Checkpoint l] -&gt; [l]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">map</span></a></span><span> </span><span class="annot"><span class="annottext">Checkpoint l -&gt; l
+forall l. Checkpoint l -&gt; l
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.LedgerDB.html#unCheckpoint"><span class="hs-identifier hs-var hs-var">unCheckpoint</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+-&gt; [Checkpoint l]
+forall v a b. AnchoredSeq v a b -&gt; [b]
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">AS.toNewestFirst</span></a></span><span> </span><span class="annot"><span class="annottext">AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+</span><a href="#local-6989586621679966947"><span class="hs-identifier hs-var">ledgerDbCheckpoints</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-58"></span><span>        </span><span class="annot"><span class="annottext">[l] -&gt; [l] -&gt; [l]
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Checkpoint l -&gt; l
+forall l. Checkpoint l -&gt; l
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.LedgerDB.html#unCheckpoint"><span class="hs-identifier hs-var hs-var">unCheckpoint</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+-&gt; Checkpoint l
+forall v a b. AnchoredSeq v a b -&gt; a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var hs-var">AS.anchor</span></a></span><span> </span><span class="annot"><span class="annottext">AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+</span><a href="#local-6989586621679966947"><span class="hs-identifier hs-var">ledgerDbCheckpoints</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span class="hs-special">)</span><span>
+</span><span id="line-59"></span><span>
+</span><span id="line-60"></span><span class="hs-comment">-- | How many blocks can we currently roll back?</span><span>
+</span><span id="line-61"></span><span id="local-6989586621679966982"><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbMaxRollback"><span class="hs-identifier hs-type">ledgerDbMaxRollback</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#GetTip"><span class="hs-identifier hs-type">GetTip</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679966982"><span class="hs-identifier hs-type">l</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.LedgerDB.html#LedgerDB"><span class="hs-identifier hs-type">LedgerDB</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679966982"><span class="hs-identifier hs-type">l</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Word64</span></a></span></span><span>
+</span><span id="line-62"></span><span id="ledgerDbMaxRollback"><span class="annot"><span class="annottext">ledgerDbMaxRollback :: LedgerDB l -&gt; Word64
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbMaxRollback"><span class="hs-identifier hs-var hs-var">ledgerDbMaxRollback</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.LedgerDB.html#LedgerDB"><span class="hs-identifier hs-type">LedgerDB</span></a></span><span class="hs-special">{</span><span id="local-6989586621679966945"><span class="annot"><span class="annottext">AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+ledgerDbCheckpoints :: AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+ledgerDbCheckpoints :: forall l.
+LedgerDB l
+-&gt; AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+</span><a href="#local-6989586621679966945"><span class="hs-glyph hs-var hs-var">..</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Word64
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+-&gt; Int
+forall v a b. Anchorable v a b =&gt; AnchoredSeq v a b -&gt; Int
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">AS.length</span></a></span><span> </span><span class="annot"><span class="annottext">AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+</span><a href="#local-6989586621679966945"><span class="hs-identifier hs-var">ledgerDbCheckpoints</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-63"></span><span>
+</span><span id="line-64"></span><span class="hs-comment">-- | Reference to the block at the tip of the chain</span><span>
+</span><span id="line-65"></span><span id="local-6989586621679966943"><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbTip"><span class="hs-identifier hs-type">ledgerDbTip</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#GetTip"><span class="hs-identifier hs-type">GetTip</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679966943"><span class="hs-identifier hs-type">l</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.LedgerDB.html#LedgerDB"><span class="hs-identifier hs-type">LedgerDB</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679966943"><span class="hs-identifier hs-type">l</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679966943"><span class="hs-identifier hs-type">l</span></a></span></span><span>
+</span><span id="line-66"></span><span id="ledgerDbTip"><span class="annot"><span class="annottext">ledgerDbTip :: LedgerDB l -&gt; Point l
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbTip"><span class="hs-identifier hs-var hs-var">ledgerDbTip</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Point l -&gt; Point l
+forall b b'.
+Coercible (HeaderHash b) (HeaderHash b') =&gt;
+Point b -&gt; Point b'
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">castPoint</span></a></span><span> </span><span class="annot"><span class="annottext">(Point l -&gt; Point l)
+-&gt; (LedgerDB l -&gt; Point l) -&gt; LedgerDB l -&gt; Point l
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">l -&gt; Point l
+forall l. GetTip l =&gt; l -&gt; Point l
+</span><a href="Ouroboros.Consensus.Ledger.Basics.html#getTip"><span class="hs-identifier hs-var">getTip</span></a></span><span> </span><span class="annot"><span class="annottext">(l -&gt; Point l) -&gt; (LedgerDB l -&gt; l) -&gt; LedgerDB l -&gt; Point l
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerDB l -&gt; l
+forall l. GetTip l =&gt; LedgerDB l -&gt; l
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbCurrent"><span class="hs-identifier hs-var">ledgerDbCurrent</span></a></span><span>
+</span><span id="line-67"></span><span>
+</span><span id="line-68"></span><span class="hs-comment">-- | Have we seen at least @k@ blocks?</span><span>
+</span><span id="line-69"></span><span id="local-6989586621679966940"><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbIsSaturated"><span class="hs-identifier hs-type">ledgerDbIsSaturated</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#GetTip"><span class="hs-identifier hs-type">GetTip</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679966940"><span class="hs-identifier hs-type">l</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Config.SecurityParam.html#SecurityParam"><span class="hs-identifier hs-type">SecurityParam</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.LedgerDB.html#LedgerDB"><span class="hs-identifier hs-type">LedgerDB</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679966940"><span class="hs-identifier hs-type">l</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Bool</span></a></span></span><span>
+</span><span id="line-70"></span><span id="ledgerDbIsSaturated"><span class="annot"><span class="annottext">ledgerDbIsSaturated :: SecurityParam -&gt; LedgerDB l -&gt; Bool
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbIsSaturated"><span class="hs-identifier hs-var hs-var">ledgerDbIsSaturated</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Config.SecurityParam.html#SecurityParam"><span class="hs-identifier hs-type">SecurityParam</span></a></span><span> </span><span id="local-6989586621679966938"><span class="annot"><span class="annottext">Word64
+</span><a href="#local-6989586621679966938"><span class="hs-identifier hs-var">k</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679966937"><span class="annot"><span class="annottext">LedgerDB l
+</span><a href="#local-6989586621679966937"><span class="hs-identifier hs-var">db</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-71"></span><span>    </span><span class="annot"><span class="annottext">LedgerDB l -&gt; Word64
+forall l. GetTip l =&gt; LedgerDB l -&gt; Word64
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbMaxRollback"><span class="hs-identifier hs-var">ledgerDbMaxRollback</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerDB l
+</span><a href="#local-6989586621679966937"><span class="hs-identifier hs-var">db</span></a></span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; Word64 -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;=</span></a></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><a href="#local-6989586621679966938"><span class="hs-identifier hs-var">k</span></a></span><span>
+</span><span id="line-72"></span><span>
+</span><span id="line-73"></span><span class="hs-comment">-- | Get a past ledger state</span><span>
+</span><span id="line-74"></span><span class="hs-comment">--</span><span>
+</span><span id="line-75"></span><span class="hs-comment">--  \( O(\log(\min(i,n-i)) \)</span><span>
+</span><span id="line-76"></span><span class="hs-comment">--</span><span>
+</span><span id="line-77"></span><span class="hs-comment">-- When no ledger state (or anchor) has the given 'Point', 'Nothing' is</span><span>
+</span><span id="line-78"></span><span class="hs-comment">-- returned.</span><span>
+</span><span id="line-79"></span><span id="local-6989586621679966935"><span id="local-6989586621679966936"><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbPast"><span class="hs-identifier hs-type">ledgerDbPast</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-80"></span><span>     </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">HasHeader</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679966936"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#IsLedger"><span class="hs-identifier hs-type">IsLedger</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679966935"><span class="hs-identifier hs-type">l</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">HeaderHash</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679966935"><span class="hs-identifier hs-type">l</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">~</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">HeaderHash</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679966936"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-81"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679966936"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-82"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Storage.LedgerDB.LedgerDB.html#LedgerDB"><span class="hs-identifier hs-type">LedgerDB</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679966935"><span class="hs-identifier hs-type">l</span></a></span><span>
+</span><span id="line-83"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679966935"><span class="hs-identifier hs-type">l</span></a></span></span></span><span>
+</span><span id="line-84"></span><span id="ledgerDbPast"><span class="annot"><span class="annottext">ledgerDbPast :: Point blk -&gt; LedgerDB l -&gt; Maybe l
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbPast"><span class="hs-identifier hs-var hs-var">ledgerDbPast</span></a></span></span><span> </span><span id="local-6989586621679966932"><span class="annot"><span class="annottext">Point blk
+</span><a href="#local-6989586621679966932"><span class="hs-identifier hs-var">pt</span></a></span></span><span> </span><span id="local-6989586621679966931"><span class="annot"><span class="annottext">LedgerDB l
+</span><a href="#local-6989586621679966931"><span class="hs-identifier hs-var">db</span></a></span></span><span>
+</span><span id="line-85"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Point blk
+</span><a href="#local-6989586621679966932"><span class="hs-identifier hs-var">pt</span></a></span><span> </span><span class="annot"><span class="annottext">Point blk -&gt; Point blk -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">==</span></a></span><span> </span><span class="annot"><span class="annottext">Point l -&gt; Point blk
+forall b b'.
+Coercible (HeaderHash b) (HeaderHash b') =&gt;
+Point b -&gt; Point b'
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">castPoint</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">l -&gt; Point l
+forall l. GetTip l =&gt; l -&gt; Point l
+</span><a href="Ouroboros.Consensus.Ledger.Basics.html#getTip"><span class="hs-identifier hs-var">getTip</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">LedgerDB l -&gt; l
+forall l. LedgerDB l -&gt; l
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbAnchor"><span class="hs-identifier hs-var">ledgerDbAnchor</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerDB l
+</span><a href="#local-6989586621679966931"><span class="hs-identifier hs-var">db</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-86"></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">l -&gt; Maybe l
+forall a. a -&gt; Maybe a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">(l -&gt; Maybe l) -&gt; l -&gt; Maybe l
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerDB l -&gt; l
+forall l. LedgerDB l -&gt; l
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.Query.html#ledgerDbAnchor"><span class="hs-identifier hs-var">ledgerDbAnchor</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerDB l
+</span><a href="#local-6989586621679966931"><span class="hs-identifier hs-var">db</span></a></span><span>
+</span><span id="line-87"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>
+</span><span id="line-88"></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Checkpoint l -&gt; l) -&gt; Maybe (Checkpoint l) -&gt; Maybe l
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fmap</span></a></span><span> </span><span class="annot"><span class="annottext">Checkpoint l -&gt; l
+forall l. Checkpoint l -&gt; l
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.LedgerDB.html#unCheckpoint"><span class="hs-identifier hs-var hs-var">unCheckpoint</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe (Checkpoint l) -&gt; Maybe l)
+-&gt; Maybe (Checkpoint l) -&gt; Maybe l
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-89"></span><span>        </span><span class="annot"><span class="annottext">(Checkpoint l -&gt; Bool) -&gt; [Checkpoint l] -&gt; Maybe (Checkpoint l)
+forall (t :: * -&gt; *) a. Foldable t =&gt; (a -&gt; Bool) -&gt; t a -&gt; Maybe a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">find</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Point blk -&gt; Point blk -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">==</span></a></span><span> </span><span class="annot"><span class="annottext">Point blk
+</span><a href="#local-6989586621679966932"><span class="hs-identifier hs-var">pt</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Point blk -&gt; Bool)
+-&gt; (Checkpoint l -&gt; Point blk) -&gt; Checkpoint l -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Point l -&gt; Point blk
+forall b b'.
+Coercible (HeaderHash b) (HeaderHash b') =&gt;
+Point b -&gt; Point b'
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">castPoint</span></a></span><span> </span><span class="annot"><span class="annottext">(Point l -&gt; Point blk)
+-&gt; (Checkpoint l -&gt; Point l) -&gt; Checkpoint l -&gt; Point blk
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">l -&gt; Point l
+forall l. GetTip l =&gt; l -&gt; Point l
+</span><a href="Ouroboros.Consensus.Ledger.Basics.html#getTip"><span class="hs-identifier hs-var">getTip</span></a></span><span> </span><span class="annot"><span class="annottext">(l -&gt; Point l) -&gt; (Checkpoint l -&gt; l) -&gt; Checkpoint l -&gt; Point l
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Checkpoint l -&gt; l
+forall l. Checkpoint l -&gt; l
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.LedgerDB.html#unCheckpoint"><span class="hs-identifier hs-var hs-var">unCheckpoint</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([Checkpoint l] -&gt; Maybe (Checkpoint l))
+-&gt; [Checkpoint l] -&gt; Maybe (Checkpoint l)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-90"></span><span>          </span><span class="annot"><span class="annottext">WithOrigin SlotNo
+-&gt; AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+-&gt; [Checkpoint l]
+forall v a b. Anchorable v a b =&gt; v -&gt; AnchoredSeq v a b -&gt; [b]
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">AS.lookupByMeasure</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Point blk -&gt; WithOrigin SlotNo
+forall block. Point block -&gt; WithOrigin SlotNo
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">pointSlot</span></a></span><span> </span><span class="annot"><span class="annottext">Point blk
+</span><a href="#local-6989586621679966932"><span class="hs-identifier hs-var">pt</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">LedgerDB l
+-&gt; AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+forall l.
+LedgerDB l
+-&gt; AnchoredSeq (WithOrigin SlotNo) (Checkpoint l) (Checkpoint l)
+</span><a href="Ouroboros.Consensus.Storage.LedgerDB.LedgerDB.html#ledgerDbCheckpoints"><span class="hs-identifier hs-var hs-var">ledgerDbCheckpoints</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerDB l
+</span><a href="#local-6989586621679966931"><span class="hs-identifier hs-var">db</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-91"></span></pre></body></html>

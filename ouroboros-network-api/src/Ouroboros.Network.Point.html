@@ -1,0 +1,191 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DeriveAnyClass    #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DeriveFoldable    #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE DeriveFunctor     #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE DeriveGeneric     #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE DeriveTraversable #-}</span><span>
+</span><span id="line-6"></span><span>
+</span><span id="line-7"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.Point</span><span>
+</span><span id="line-8"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier">WithOrigin</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-9"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Point.html#Block"><span class="hs-identifier">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-10"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">origin</span></span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">at</span></span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Point.html#block"><span class="hs-identifier">block</span></a></span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">fromWithOrigin</span></span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">withOrigin</span></span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">withOriginToMaybe</span></span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">withOriginFromMaybe</span></span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">GHC.Generics</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Generic</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">NoThunks.Class</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NoThunks</span></span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Slotting.Slot</span></span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span id="local-6989586621679128278"><span id="local-6989586621679128279"></span></span><span class="hs-keyword">data</span><span> </span><span id="Block"><span class="annot"><a href="Ouroboros.Network.Point.html#Block"><span class="hs-identifier hs-var">Block</span></a></span></span><span> </span><span id="local-6989586621679128288"><span class="annot"><a href="#local-6989586621679128288"><span class="hs-identifier hs-type">slot</span></a></span></span><span> </span><span id="local-6989586621679128287"><span class="annot"><a href="#local-6989586621679128287"><span class="hs-identifier hs-type">hash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Block"><span class="annot"><a href="Ouroboros.Network.Point.html#Block"><span class="hs-identifier hs-var">Block</span></a></span></span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="blockPointSlot"><span class="annot"><span class="annottext">Block slot hash -&gt; slot
+</span><a href="Ouroboros.Network.Point.html#blockPointSlot"><span class="hs-identifier hs-var hs-var">blockPointSlot</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="#local-6989586621679128288"><span class="hs-identifier hs-type">slot</span></a></span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="blockPointHash"><span class="annot"><span class="annottext">Block slot hash -&gt; hash
+</span><a href="Ouroboros.Network.Point.html#blockPointHash"><span class="hs-identifier hs-var hs-var">blockPointHash</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="#local-6989586621679128287"><span class="hs-identifier hs-type">hash</span></a></span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-28"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679128271"><span id="local-6989586621679128273"><span class="annot"><span class="annottext">Block slot hash -&gt; Block slot hash -&gt; Bool
+(Block slot hash -&gt; Block slot hash -&gt; Bool)
+-&gt; (Block slot hash -&gt; Block slot hash -&gt; Bool)
+-&gt; Eq (Block slot hash)
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+forall slot hash.
+(Eq slot, Eq hash) =&gt;
+Block slot hash -&gt; Block slot hash -&gt; Bool
+/= :: Block slot hash -&gt; Block slot hash -&gt; Bool
+$c/= :: forall slot hash.
+(Eq slot, Eq hash) =&gt;
+Block slot hash -&gt; Block slot hash -&gt; Bool
+== :: Block slot hash -&gt; Block slot hash -&gt; Bool
+$c== :: forall slot hash.
+(Eq slot, Eq hash) =&gt;
+Block slot hash -&gt; Block slot hash -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679128255"><span id="local-6989586621679128257"><span id="local-6989586621679128259"><span id="local-6989586621679128261"><span id="local-6989586621679128263"><span id="local-6989586621679128265"><span id="local-6989586621679128267"><span class="annot"><span class="annottext">Eq (Block slot hash)
+Eq (Block slot hash)
+-&gt; (Block slot hash -&gt; Block slot hash -&gt; Ordering)
+-&gt; (Block slot hash -&gt; Block slot hash -&gt; Bool)
+-&gt; (Block slot hash -&gt; Block slot hash -&gt; Bool)
+-&gt; (Block slot hash -&gt; Block slot hash -&gt; Bool)
+-&gt; (Block slot hash -&gt; Block slot hash -&gt; Bool)
+-&gt; (Block slot hash -&gt; Block slot hash -&gt; Block slot hash)
+-&gt; (Block slot hash -&gt; Block slot hash -&gt; Block slot hash)
+-&gt; Ord (Block slot hash)
+Block slot hash -&gt; Block slot hash -&gt; Bool
+Block slot hash -&gt; Block slot hash -&gt; Ordering
+Block slot hash -&gt; Block slot hash -&gt; Block slot hash
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+forall slot hash. (Ord slot, Ord hash) =&gt; Eq (Block slot hash)
+forall slot hash.
+(Ord slot, Ord hash) =&gt;
+Block slot hash -&gt; Block slot hash -&gt; Bool
+forall slot hash.
+(Ord slot, Ord hash) =&gt;
+Block slot hash -&gt; Block slot hash -&gt; Ordering
+forall slot hash.
+(Ord slot, Ord hash) =&gt;
+Block slot hash -&gt; Block slot hash -&gt; Block slot hash
+min :: Block slot hash -&gt; Block slot hash -&gt; Block slot hash
+$cmin :: forall slot hash.
+(Ord slot, Ord hash) =&gt;
+Block slot hash -&gt; Block slot hash -&gt; Block slot hash
+max :: Block slot hash -&gt; Block slot hash -&gt; Block slot hash
+$cmax :: forall slot hash.
+(Ord slot, Ord hash) =&gt;
+Block slot hash -&gt; Block slot hash -&gt; Block slot hash
+&gt;= :: Block slot hash -&gt; Block slot hash -&gt; Bool
+$c&gt;= :: forall slot hash.
+(Ord slot, Ord hash) =&gt;
+Block slot hash -&gt; Block slot hash -&gt; Bool
+&gt; :: Block slot hash -&gt; Block slot hash -&gt; Bool
+$c&gt; :: forall slot hash.
+(Ord slot, Ord hash) =&gt;
+Block slot hash -&gt; Block slot hash -&gt; Bool
+&lt;= :: Block slot hash -&gt; Block slot hash -&gt; Bool
+$c&lt;= :: forall slot hash.
+(Ord slot, Ord hash) =&gt;
+Block slot hash -&gt; Block slot hash -&gt; Bool
+&lt; :: Block slot hash -&gt; Block slot hash -&gt; Bool
+$c&lt; :: forall slot hash.
+(Ord slot, Ord hash) =&gt;
+Block slot hash -&gt; Block slot hash -&gt; Bool
+compare :: Block slot hash -&gt; Block slot hash -&gt; Ordering
+$ccompare :: forall slot hash.
+(Ord slot, Ord hash) =&gt;
+Block slot hash -&gt; Block slot hash -&gt; Ordering
+$cp1Ord :: forall slot hash. (Ord slot, Ord hash) =&gt; Eq (Block slot hash)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></a></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679128248"><span id="local-6989586621679128250"><span id="local-6989586621679128252"><span class="annot"><span class="annottext">Int -&gt; Block slot hash -&gt; ShowS
+[Block slot hash] -&gt; ShowS
+Block slot hash -&gt; String
+(Int -&gt; Block slot hash -&gt; ShowS)
+-&gt; (Block slot hash -&gt; String)
+-&gt; ([Block slot hash] -&gt; ShowS)
+-&gt; Show (Block slot hash)
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+forall slot hash.
+(Show slot, Show hash) =&gt;
+Int -&gt; Block slot hash -&gt; ShowS
+forall slot hash.
+(Show slot, Show hash) =&gt;
+[Block slot hash] -&gt; ShowS
+forall slot hash.
+(Show slot, Show hash) =&gt;
+Block slot hash -&gt; String
+showList :: [Block slot hash] -&gt; ShowS
+$cshowList :: forall slot hash.
+(Show slot, Show hash) =&gt;
+[Block slot hash] -&gt; ShowS
+show :: Block slot hash -&gt; String
+$cshow :: forall slot hash.
+(Show slot, Show hash) =&gt;
+Block slot hash -&gt; String
+showsPrec :: Int -&gt; Block slot hash -&gt; ShowS
+$cshowsPrec :: forall slot hash.
+(Show slot, Show hash) =&gt;
+Int -&gt; Block slot hash -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. Block slot hash -&gt; Rep (Block slot hash) x)
+-&gt; (forall x. Rep (Block slot hash) x -&gt; Block slot hash)
+-&gt; Generic (Block slot hash)
+forall x. Rep (Block slot hash) x -&gt; Block slot hash
+forall x. Block slot hash -&gt; Rep (Block slot hash) x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+forall slot hash x. Rep (Block slot hash) x -&gt; Block slot hash
+forall slot hash x. Block slot hash -&gt; Rep (Block slot hash) x
+$cto :: forall slot hash x. Rep (Block slot hash) x -&gt; Block slot hash
+$cfrom :: forall slot hash x. Block slot hash -&gt; Rep (Block slot hash) x
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679128238"><span id="local-6989586621679128240"><span id="local-6989586621679128242"><span class="annot"><span class="annottext">Context -&gt; Block slot hash -&gt; IO (Maybe ThunkInfo)
+Proxy (Block slot hash) -&gt; String
+(Context -&gt; Block slot hash -&gt; IO (Maybe ThunkInfo))
+-&gt; (Context -&gt; Block slot hash -&gt; IO (Maybe ThunkInfo))
+-&gt; (Proxy (Block slot hash) -&gt; String)
+-&gt; NoThunks (Block slot hash)
+forall a.
+(Context -&gt; a -&gt; IO (Maybe ThunkInfo))
+-&gt; (Context -&gt; a -&gt; IO (Maybe ThunkInfo))
+-&gt; (Proxy a -&gt; String)
+-&gt; NoThunks a
+forall slot hash.
+(NoThunks slot, NoThunks hash) =&gt;
+Context -&gt; Block slot hash -&gt; IO (Maybe ThunkInfo)
+forall slot hash.
+(NoThunks slot, NoThunks hash) =&gt;
+Proxy (Block slot hash) -&gt; String
+showTypeOf :: Proxy (Block slot hash) -&gt; String
+$cshowTypeOf :: forall slot hash.
+(NoThunks slot, NoThunks hash) =&gt;
+Proxy (Block slot hash) -&gt; String
+wNoThunks :: Context -&gt; Block slot hash -&gt; IO (Maybe ThunkInfo)
+$cwNoThunks :: forall slot hash.
+(NoThunks slot, NoThunks hash) =&gt;
+Context -&gt; Block slot hash -&gt; IO (Maybe ThunkInfo)
+noThunks :: Context -&gt; Block slot hash -&gt; IO (Maybe ThunkInfo)
+$cnoThunks :: forall slot hash.
+(NoThunks slot, NoThunks hash) =&gt;
+Context -&gt; Block slot hash -&gt; IO (Maybe ThunkInfo)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">NoThunks</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span id="local-6989586621679128235"><span id="local-6989586621679128236"><span class="annot"><a href="Ouroboros.Network.Point.html#block"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679128236"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679128235"><span class="hs-identifier hs-type">hash</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">WithOrigin</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Point.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679128236"><span class="hs-identifier hs-type">slot</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679128235"><span class="hs-identifier hs-type">hash</span></a></span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-31"></span><span id="block"><span class="annot"><span class="annottext">block :: slot -&gt; hash -&gt; WithOrigin (Block slot hash)
+</span><a href="Ouroboros.Network.Point.html#block"><span class="hs-identifier hs-var hs-var">block</span></a></span></span><span> </span><span id="local-6989586621679128234"><span class="annot"><span class="annottext">slot
+</span><a href="#local-6989586621679128234"><span class="hs-identifier hs-var">slot</span></a></span></span><span> </span><span id="local-6989586621679128233"><span class="annot"><span class="annottext">hash
+</span><a href="#local-6989586621679128233"><span class="hs-identifier hs-var">hash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Block slot hash -&gt; WithOrigin (Block slot hash)
+forall t. t -&gt; WithOrigin t
+</span><span class="hs-identifier hs-var">at</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">slot -&gt; hash -&gt; Block slot hash
+forall slot hash. slot -&gt; hash -&gt; Block slot hash
+</span><a href="Ouroboros.Network.Point.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="annot"><span class="annottext">slot
+</span><a href="#local-6989586621679128234"><span class="hs-identifier hs-var">slot</span></a></span><span> </span><span class="annot"><span class="annottext">hash
+</span><a href="#local-6989586621679128233"><span class="hs-identifier hs-var">hash</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span></pre></body></html>

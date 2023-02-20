@@ -1,0 +1,452 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DerivingStrategies         #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE FlexibleContexts           #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE GeneralizedNewtypeDeriving #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables        #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE TypeApplications           #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE TypeFamilies               #-}</span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- | Mempool capacity, size and transaction size datatypes.</span><span>
+</span><span id="line-9"></span><span class="hs-comment">--</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- This module also defines how to manually override the mempool capacity.</span><span>
+</span><span id="line-11"></span><span class="hs-comment">--</span><span>
+</span><span id="line-12"></span><span class="hs-comment">-- &gt; import           Ouroboros.Consensus.Mempool.Capacity (Capacity)</span><span>
+</span><span id="line-13"></span><span class="hs-comment">-- &gt; import qualified Ouroboros.Consensus.Mempool.Capacity as Capacity</span><span>
+</span><span id="line-14"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Consensus.Mempool.Capacity</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-15"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Mempool capacity</span></span><span>
+</span><span id="line-16"></span><span>    </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolCapacityBytes"><span class="hs-identifier">MempoolCapacityBytes</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolCapacityBytesOverride"><span class="hs-identifier">MempoolCapacityBytesOverride</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#computeMempoolCapacity"><span class="hs-identifier">computeMempoolCapacity</span></a></span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Mempool Size</span></span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolSize"><span class="hs-identifier">MempoolSize</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Transaction size</span></span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#ByteSize"><span class="hs-identifier">ByteSize</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxLimits"><span class="hs-identifier">TxLimits</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#%3C%3D"><span class="hs-operator">(&lt;=)</span></a></span><span>
+</span><span id="line-25"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Restricting more strongly than the ledger's limits</span></span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxOverrides"><span class="hs-identifier">TxOverrides</span></a></span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#applyOverrides"><span class="hs-identifier">applyOverrides</span></a></span><span>
+</span><span id="line-28"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#getOverrides"><span class="hs-identifier">getOverrides</span></a></span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#mkOverrides"><span class="hs-identifier">mkOverrides</span></a></span><span>
+</span><span id="line-30"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#noOverridesMeasure"><span class="hs-identifier">noOverridesMeasure</span></a></span><span>
+</span><span id="line-31"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-32"></span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Prelude</span></a></span><span> </span><span class="hs-keyword">hiding</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator">(&lt;=)</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Coerce</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier">coerce</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Word</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Word32</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">NoThunks.Class</span></span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Measure</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">BoundedMeasure</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Measure</span></span><span class="hs-special">)</span><span>
+</span><span id="line-40"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Measure</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Measure</span></span><span>
+</span><span id="line-41"></span><span>
+</span><span id="line-42"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html"><span class="hs-identifier">Ouroboros.Consensus.Ledger.Basics</span></a></span><span>
+</span><span id="line-43"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html"><span class="hs-identifier">Ouroboros.Consensus.Ledger.SupportsMempool</span></a></span><span>
+</span><span id="line-44"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Ticked.html"><span class="hs-identifier">Ouroboros.Consensus.Ticked</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ticked.html#Ticked"><span class="hs-identifier">Ticked</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-45"></span><span>
+</span><span id="line-46"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+  Mempool capacity in bytes
+-------------------------------------------------------------------------------}</span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span class="hs-comment">-- | Represents the maximum number of bytes worth of transactions that a</span><span>
+</span><span id="line-51"></span><span class="hs-comment">-- 'Mempool' can contain.</span><span>
+</span><span id="line-52"></span><span class="hs-keyword">newtype</span><span> </span><span id="MempoolCapacityBytes"><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolCapacityBytes"><span class="hs-identifier hs-var">MempoolCapacityBytes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="MempoolCapacityBytes"><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolCapacityBytes"><span class="hs-identifier hs-var">MempoolCapacityBytes</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-53"></span><span>      </span><span id="getMempoolCapacityBytes"><span class="annot"><span class="annottext">MempoolCapacityBytes -&gt; Word32
+</span><a href="Ouroboros.Consensus.Mempool.Capacity.html#getMempoolCapacityBytes"><span class="hs-identifier hs-var hs-var">getMempoolCapacityBytes</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span>
+</span><span id="line-54"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679961459"><span id="local-6989586621679961461"><span class="annot"><span class="annottext">MempoolCapacityBytes -&gt; MempoolCapacityBytes -&gt; Bool
+(MempoolCapacityBytes -&gt; MempoolCapacityBytes -&gt; Bool)
+-&gt; (MempoolCapacityBytes -&gt; MempoolCapacityBytes -&gt; Bool)
+-&gt; Eq MempoolCapacityBytes
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: MempoolCapacityBytes -&gt; MempoolCapacityBytes -&gt; Bool
+$c/= :: MempoolCapacityBytes -&gt; MempoolCapacityBytes -&gt; Bool
+== :: MempoolCapacityBytes -&gt; MempoolCapacityBytes -&gt; Bool
+$c== :: MempoolCapacityBytes -&gt; MempoolCapacityBytes -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679961452"><span id="local-6989586621679961454"><span id="local-6989586621679961456"><span class="annot"><span class="annottext">Int -&gt; MempoolCapacityBytes -&gt; ShowS
+[MempoolCapacityBytes] -&gt; ShowS
+MempoolCapacityBytes -&gt; String
+(Int -&gt; MempoolCapacityBytes -&gt; ShowS)
+-&gt; (MempoolCapacityBytes -&gt; String)
+-&gt; ([MempoolCapacityBytes] -&gt; ShowS)
+-&gt; Show MempoolCapacityBytes
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [MempoolCapacityBytes] -&gt; ShowS
+$cshowList :: [MempoolCapacityBytes] -&gt; ShowS
+show :: MempoolCapacityBytes -&gt; String
+$cshow :: MempoolCapacityBytes -&gt; String
+showsPrec :: Int -&gt; MempoolCapacityBytes -&gt; ShowS
+$cshowsPrec :: Int -&gt; MempoolCapacityBytes -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679961445"><span id="local-6989586621679961447"><span id="local-6989586621679961449"><span class="annot"><span class="annottext">Context -&gt; MempoolCapacityBytes -&gt; IO (Maybe ThunkInfo)
+Proxy MempoolCapacityBytes -&gt; String
+(Context -&gt; MempoolCapacityBytes -&gt; IO (Maybe ThunkInfo))
+-&gt; (Context -&gt; MempoolCapacityBytes -&gt; IO (Maybe ThunkInfo))
+-&gt; (Proxy MempoolCapacityBytes -&gt; String)
+-&gt; NoThunks MempoolCapacityBytes
+forall a.
+(Context -&gt; a -&gt; IO (Maybe ThunkInfo))
+-&gt; (Context -&gt; a -&gt; IO (Maybe ThunkInfo))
+-&gt; (Proxy a -&gt; String)
+-&gt; NoThunks a
+showTypeOf :: Proxy MempoolCapacityBytes -&gt; String
+$cshowTypeOf :: Proxy MempoolCapacityBytes -&gt; String
+wNoThunks :: Context -&gt; MempoolCapacityBytes -&gt; IO (Maybe ThunkInfo)
+$cwNoThunks :: Context -&gt; MempoolCapacityBytes -&gt; IO (Maybe ThunkInfo)
+noThunks :: Context -&gt; MempoolCapacityBytes -&gt; IO (Maybe ThunkInfo)
+$cnoThunks :: Context -&gt; MempoolCapacityBytes -&gt; IO (Maybe ThunkInfo)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">NoThunks</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-56"></span><span>
+</span><span id="line-57"></span><span class="hs-comment">-- | An override for the default 'MempoolCapacityBytes' which is 2x the</span><span>
+</span><span id="line-58"></span><span class="hs-comment">-- maximum transaction capacity</span><span>
+</span><span id="line-59"></span><span class="hs-keyword">data</span><span> </span><span id="MempoolCapacityBytesOverride"><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolCapacityBytesOverride"><span class="hs-identifier hs-var">MempoolCapacityBytesOverride</span></a></span></span><span>
+</span><span id="line-60"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="NoMempoolCapacityBytesOverride"><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#NoMempoolCapacityBytesOverride"><span class="hs-identifier hs-var">NoMempoolCapacityBytesOverride</span></a></span></span><span>
+</span><span id="line-61"></span><span>    </span><span class="hs-comment">-- ^ Use 2x the maximum transaction capacity of a block. This will change</span><span>
+</span><span id="line-62"></span><span>    </span><span class="hs-comment">-- dynamically with the protocol parameters adopted in the current ledger.</span><span>
+</span><span id="line-63"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="MempoolCapacityBytesOverride"><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolCapacityBytesOverride"><span class="hs-identifier hs-var">MempoolCapacityBytesOverride</span></a></span></span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolCapacityBytes"><span class="hs-identifier hs-type">MempoolCapacityBytes</span></a></span><span>
+</span><span id="line-64"></span><span>    </span><span class="hs-comment">-- ^ Use the following 'MempoolCapacityBytes'.</span><span>
+</span><span id="line-65"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679961438"><span id="local-6989586621679961440"><span class="annot"><span class="annottext">MempoolCapacityBytesOverride
+-&gt; MempoolCapacityBytesOverride -&gt; Bool
+(MempoolCapacityBytesOverride
+ -&gt; MempoolCapacityBytesOverride -&gt; Bool)
+-&gt; (MempoolCapacityBytesOverride
+    -&gt; MempoolCapacityBytesOverride -&gt; Bool)
+-&gt; Eq MempoolCapacityBytesOverride
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: MempoolCapacityBytesOverride
+-&gt; MempoolCapacityBytesOverride -&gt; Bool
+$c/= :: MempoolCapacityBytesOverride
+-&gt; MempoolCapacityBytesOverride -&gt; Bool
+== :: MempoolCapacityBytesOverride
+-&gt; MempoolCapacityBytesOverride -&gt; Bool
+$c== :: MempoolCapacityBytesOverride
+-&gt; MempoolCapacityBytesOverride -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679961432"><span id="local-6989586621679961434"><span id="local-6989586621679961436"><span class="annot"><span class="annottext">Int -&gt; MempoolCapacityBytesOverride -&gt; ShowS
+[MempoolCapacityBytesOverride] -&gt; ShowS
+MempoolCapacityBytesOverride -&gt; String
+(Int -&gt; MempoolCapacityBytesOverride -&gt; ShowS)
+-&gt; (MempoolCapacityBytesOverride -&gt; String)
+-&gt; ([MempoolCapacityBytesOverride] -&gt; ShowS)
+-&gt; Show MempoolCapacityBytesOverride
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [MempoolCapacityBytesOverride] -&gt; ShowS
+$cshowList :: [MempoolCapacityBytesOverride] -&gt; ShowS
+show :: MempoolCapacityBytesOverride -&gt; String
+$cshow :: MempoolCapacityBytesOverride -&gt; String
+showsPrec :: Int -&gt; MempoolCapacityBytesOverride -&gt; ShowS
+$cshowsPrec :: Int -&gt; MempoolCapacityBytesOverride -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-66"></span><span>
+</span><span id="line-67"></span><span>
+</span><span id="line-68"></span><span class="hs-comment">-- | If no override is provided, calculate the default mempool capacity as 2x</span><span>
+</span><span id="line-69"></span><span class="hs-comment">-- the current ledger's maximum transaction capacity of a block.</span><span>
+</span><span id="line-70"></span><span id="local-6989586621679961431"><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#computeMempoolCapacity"><span class="hs-identifier hs-type">computeMempoolCapacity</span></a></span><span>
+</span><span id="line-71"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#LedgerSupportsMempool"><span class="hs-identifier hs-type">LedgerSupportsMempool</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679961431"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-72"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#TickedLedgerState"><span class="hs-identifier hs-type">TickedLedgerState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679961431"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-73"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolCapacityBytesOverride"><span class="hs-identifier hs-type">MempoolCapacityBytesOverride</span></a></span><span>
+</span><span id="line-74"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolCapacityBytes"><span class="hs-identifier hs-type">MempoolCapacityBytes</span></a></span></span><span>
+</span><span id="line-75"></span><span id="computeMempoolCapacity"><span class="annot"><span class="annottext">computeMempoolCapacity :: TickedLedgerState blk
+-&gt; MempoolCapacityBytesOverride -&gt; MempoolCapacityBytes
+</span><a href="Ouroboros.Consensus.Mempool.Capacity.html#computeMempoolCapacity"><span class="hs-identifier hs-var hs-var">computeMempoolCapacity</span></a></span></span><span> </span><span id="local-6989586621679961430"><span class="annot"><span class="annottext">TickedLedgerState blk
+</span><a href="#local-6989586621679961430"><span class="hs-identifier hs-var">st</span></a></span></span><span> </span><span id="local-6989586621679961429"><span class="annot"><span class="annottext">MempoolCapacityBytesOverride
+</span><a href="#local-6989586621679961429"><span class="hs-identifier hs-var">mc</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">MempoolCapacityBytesOverride
+</span><a href="#local-6989586621679961429"><span class="hs-identifier hs-var">mc</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-76"></span><span>    </span><span class="annot"><span class="annottext">MempoolCapacityBytesOverride
+</span><a href="Ouroboros.Consensus.Mempool.Capacity.html#NoMempoolCapacityBytesOverride"><span class="hs-identifier hs-var">NoMempoolCapacityBytesOverride</span></a></span><span>        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">MempoolCapacityBytes
+</span><a href="#local-6989586621679961428"><span class="hs-identifier hs-var">noOverride</span></a></span><span>
+</span><span id="line-77"></span><span>    </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolCapacityBytesOverride"><span class="hs-identifier hs-type">MempoolCapacityBytesOverride</span></a></span><span> </span><span id="local-6989586621679961427"><span class="annot"><span class="annottext">MempoolCapacityBytes
+</span><a href="#local-6989586621679961427"><span class="hs-identifier hs-var">override</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">MempoolCapacityBytes
+</span><a href="#local-6989586621679961427"><span class="hs-identifier hs-var">override</span></a></span><span>
+</span><span id="line-78"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-79"></span><span>    </span><span id="local-6989586621679961428"><span class="annot"><span class="annottext">noOverride :: MempoolCapacityBytes
+</span><a href="#local-6989586621679961428"><span class="hs-identifier hs-var hs-var">noOverride</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; MempoolCapacityBytes
+</span><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolCapacityBytes"><span class="hs-identifier hs-var">MempoolCapacityBytes</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TickedLedgerState blk -&gt; Word32
+forall blk.
+LedgerSupportsMempool blk =&gt;
+TickedLedgerState blk -&gt; Word32
+</span><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#txsMaxBytes"><span class="hs-identifier hs-var">txsMaxBytes</span></a></span><span> </span><span class="annot"><span class="annottext">TickedLedgerState blk
+</span><a href="#local-6989586621679961430"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; Word32 -&gt; Word32
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">*</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><span class="hs-number">2</span></span><span class="hs-special">)</span><span>
+</span><span id="line-80"></span><span>
+</span><span id="line-81"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+  Mempool size
+-------------------------------------------------------------------------------}</span><span>
+</span><span id="line-84"></span><span>
+</span><span id="line-85"></span><span class="hs-comment">-- | The size of a mempool.</span><span>
+</span><span id="line-86"></span><span class="hs-keyword">data</span><span> </span><span id="MempoolSize"><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolSize"><span class="hs-identifier hs-var">MempoolSize</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="MempoolSize"><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolSize"><span class="hs-identifier hs-var">MempoolSize</span></a></span></span><span>
+</span><span id="line-87"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="msNumTxs"><span class="annot"><span class="annottext">MempoolSize -&gt; Word32
+</span><a href="Ouroboros.Consensus.Mempool.Capacity.html#msNumTxs"><span class="hs-identifier hs-var hs-var">msNumTxs</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span>
+</span><span id="line-88"></span><span>    </span><span class="hs-comment">-- ^ The number of transactions in the mempool.</span><span>
+</span><span id="line-89"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="msNumBytes"><span class="annot"><span class="annottext">MempoolSize -&gt; Word32
+</span><a href="Ouroboros.Consensus.Mempool.Capacity.html#msNumBytes"><span class="hs-identifier hs-var hs-var">msNumBytes</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span>
+</span><span id="line-90"></span><span>    </span><span class="hs-comment">-- ^ The summed byte size of all the transactions in the mempool.</span><span>
+</span><span id="line-91"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679961418"><span id="local-6989586621679961420"><span class="annot"><span class="annottext">MempoolSize -&gt; MempoolSize -&gt; Bool
+(MempoolSize -&gt; MempoolSize -&gt; Bool)
+-&gt; (MempoolSize -&gt; MempoolSize -&gt; Bool) -&gt; Eq MempoolSize
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: MempoolSize -&gt; MempoolSize -&gt; Bool
+$c/= :: MempoolSize -&gt; MempoolSize -&gt; Bool
+== :: MempoolSize -&gt; MempoolSize -&gt; Bool
+$c== :: MempoolSize -&gt; MempoolSize -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679961412"><span id="local-6989586621679961414"><span id="local-6989586621679961416"><span class="annot"><span class="annottext">Int -&gt; MempoolSize -&gt; ShowS
+[MempoolSize] -&gt; ShowS
+MempoolSize -&gt; String
+(Int -&gt; MempoolSize -&gt; ShowS)
+-&gt; (MempoolSize -&gt; String)
+-&gt; ([MempoolSize] -&gt; ShowS)
+-&gt; Show MempoolSize
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [MempoolSize] -&gt; ShowS
+$cshowList :: [MempoolSize] -&gt; ShowS
+show :: MempoolSize -&gt; String
+$cshow :: MempoolSize -&gt; String
+showsPrec :: Int -&gt; MempoolSize -&gt; ShowS
+$cshowsPrec :: Int -&gt; MempoolSize -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-92"></span><span>
+</span><span id="line-93"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679961407"><span id="local-6989586621679961409"><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Semigroup</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolSize"><span class="hs-identifier hs-type">MempoolSize</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-94"></span><span>  </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolSize"><span class="hs-identifier hs-type">MempoolSize</span></a></span><span> </span><span id="local-6989586621679961405"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679961405"><span class="hs-identifier hs-var">xt</span></a></span></span><span> </span><span id="local-6989586621679961404"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679961404"><span class="hs-identifier hs-var">xb</span></a></span></span><span> </span><span id="local-6989586621679961403"><span class="annot"><span class="annottext">&lt;&gt; :: MempoolSize -&gt; MempoolSize -&gt; MempoolSize
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var hs-var hs-var hs-var">&lt;&gt;</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolSize"><span class="hs-identifier hs-type">MempoolSize</span></a></span><span> </span><span id="local-6989586621679961402"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679961402"><span class="hs-identifier hs-var">yt</span></a></span></span><span> </span><span id="local-6989586621679961401"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679961401"><span class="hs-identifier hs-var">yb</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; Word32 -&gt; MempoolSize
+</span><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolSize"><span class="hs-identifier hs-var">MempoolSize</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679961405"><span class="hs-identifier hs-var">xt</span></a></span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; Word32 -&gt; Word32
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679961402"><span class="hs-identifier hs-var">yt</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679961404"><span class="hs-identifier hs-var">xb</span></a></span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; Word32 -&gt; Word32
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679961401"><span class="hs-identifier hs-var">yb</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-95"></span><span>
+</span><span id="line-96"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679961395"><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Monoid</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolSize"><span class="hs-identifier hs-type">MempoolSize</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-97"></span><span>  </span><span id="local-6989586621679961393"><span class="annot"><span class="annottext">mempty :: MempoolSize
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">mempty</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MempoolSize :: Word32 -&gt; Word32 -&gt; MempoolSize
+</span><a href="Ouroboros.Consensus.Mempool.Capacity.html#MempoolSize"><span class="hs-identifier hs-type">MempoolSize</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">msNumTxs :: Word32
+</span><a href="Ouroboros.Consensus.Mempool.Capacity.html#msNumTxs"><span class="hs-identifier hs-var">msNumTxs</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word32
+</span><span class="hs-number">0</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">msNumBytes :: Word32
+</span><a href="Ouroboros.Consensus.Mempool.Capacity.html#msNumBytes"><span class="hs-identifier hs-var">msNumBytes</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word32
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-98"></span><span>  </span><span id="local-6989586621679961392"><span class="annot"><span class="annottext">mappend :: MempoolSize -&gt; MempoolSize -&gt; MempoolSize
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">mappend</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">MempoolSize -&gt; MempoolSize -&gt; MempoolSize
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">(&lt;&gt;)</span></a></span><span>
+</span><span id="line-99"></span><span>
+</span><span id="line-100"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+  Tx sizes
+-------------------------------------------------------------------------------}</span><span>
+</span><span id="line-103"></span><span>
+</span><span id="line-104"></span><span class="hs-comment">-- | Each block has its limits of how many transactions it can hold.</span><span>
+</span><span id="line-105"></span><span class="hs-comment">-- That limit is compared against the sum of measurements</span><span>
+</span><span id="line-106"></span><span class="hs-comment">-- taken of each of the transactions in that block.</span><span>
+</span><span id="line-107"></span><span class="hs-comment">--</span><span>
+</span><span id="line-108"></span><span class="hs-comment">-- How we measure the transaction depends of the era that this</span><span>
+</span><span id="line-109"></span><span class="hs-comment">-- transaction belongs to (more specifically it depends on the block</span><span>
+</span><span id="line-110"></span><span class="hs-comment">-- type to which this transaction will be added). For initial eras</span><span>
+</span><span id="line-111"></span><span class="hs-comment">-- (like Byron and initial generations of Shelley based eras) this</span><span>
+</span><span id="line-112"></span><span class="hs-comment">-- measure was simply a ByteSize (block could not be bigger then</span><span>
+</span><span id="line-113"></span><span class="hs-comment">-- given size - in bytes - specified by the ledger state). In future</span><span>
+</span><span id="line-114"></span><span class="hs-comment">-- eras (starting with Alonzo) this measure was a bit more complex</span><span>
+</span><span id="line-115"></span><span class="hs-comment">-- as it had to take other factors into account (like execution units).</span><span>
+</span><span id="line-116"></span><span class="hs-comment">-- For details please see the individual instances for the TxLimits.</span><span>
+</span><span id="line-117"></span><span class="hs-keyword">class</span><span> </span><span class="annot"><span class="hs-identifier hs-type">BoundedMeasure</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxMeasure"><span class="hs-identifier hs-type">TxMeasure</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679961391"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span id="TxLimits"><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxLimits"><span class="hs-identifier hs-var">TxLimits</span></a></span></span><span> </span><span id="local-6989586621679961391"><span class="annot"><a href="#local-6989586621679961391"><span class="hs-identifier hs-type">blk</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-118"></span><span>  </span><span class="hs-keyword">type</span><span> </span><span id="TxMeasure"><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxMeasure"><span class="hs-identifier hs-var">TxMeasure</span></a></span></span><span> </span><span id="local-6989586621679961391"><span class="annot"><a href="#local-6989586621679961391"><span class="hs-identifier hs-type">blk</span></a></span></span><span>
+</span><span id="line-119"></span><span>
+</span><span id="line-120"></span><span>  </span><span class="hs-comment">-- | What is the measure an individual tx?</span><span>
+</span><span id="line-121"></span><span>  </span><span id="txMeasure"><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#txMeasure"><span class="hs-identifier hs-type">txMeasure</span></a></span></span><span>        </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Abstract.html#Validated"><span class="hs-identifier hs-type">Validated</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ledger.SupportsMempool.html#GenTx"><span class="hs-identifier hs-type">GenTx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679961391"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxMeasure"><span class="hs-identifier hs-type">TxMeasure</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679961391"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-122"></span><span>
+</span><span id="line-123"></span><span>  </span><span class="hs-comment">-- | What is the allowed capacity for txs in an individual block?</span><span>
+</span><span id="line-124"></span><span>  </span><span id="txsBlockCapacity"><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#txsBlockCapacity"><span class="hs-identifier hs-type">txsBlockCapacity</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ticked.html#Ticked"><span class="hs-identifier hs-type">Ticked</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679961391"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxMeasure"><span class="hs-identifier hs-type">TxMeasure</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679961391"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-125"></span><span>
+</span><span id="line-126"></span><span class="hs-comment">-- | Is every component of the first value less-than-or-equal-to the</span><span>
+</span><span id="line-127"></span><span class="hs-comment">-- corresponding component of the second value?</span><span>
+</span><span id="line-128"></span><span id="local-6989586621679961385"><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#%3C%3D"><span class="hs-operator hs-type">(&lt;=)</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Measure</span></span><span> </span><span class="annot"><a href="#local-6989586621679961385"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679961385"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679961385"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Bool</span></a></span></span><span>
+</span><span id="line-129"></span><span id="%3C%3D"><span class="annot"><span class="annottext">&lt;= :: a -&gt; a -&gt; Bool
+</span><a href="Ouroboros.Consensus.Mempool.Capacity.html#%3C%3D"><span class="hs-operator hs-var hs-var">(&lt;=)</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; Bool
+forall a. Measure a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">(Measure.&lt;=)</span></span><span>
+</span><span id="line-130"></span><span>
+</span><span id="line-131"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+  ByteSize
+-------------------------------------------------------------------------------}</span><span>
+</span><span id="line-134"></span><span>
+</span><span id="line-135"></span><span class="hs-keyword">newtype</span><span> </span><span id="ByteSize"><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#ByteSize"><span class="hs-identifier hs-var">ByteSize</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ByteSize"><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#ByteSize"><span class="hs-identifier hs-var">ByteSize</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="unByteSize"><span class="annot"><span class="annottext">ByteSize -&gt; Word32
+</span><a href="Ouroboros.Consensus.Mempool.Capacity.html#unByteSize"><span class="hs-identifier hs-var hs-var">unByteSize</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Word32</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-136"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679961376"><span id="local-6989586621679961378"><span id="local-6989586621679961380"><span class="annot"><span class="annottext">Int -&gt; ByteSize -&gt; ShowS
+[ByteSize] -&gt; ShowS
+ByteSize -&gt; String
+(Int -&gt; ByteSize -&gt; ShowS)
+-&gt; (ByteSize -&gt; String) -&gt; ([ByteSize] -&gt; ShowS) -&gt; Show ByteSize
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [ByteSize] -&gt; ShowS
+$cshowList :: [ByteSize] -&gt; ShowS
+show :: ByteSize -&gt; String
+$cshow :: ByteSize -&gt; String
+showsPrec :: Int -&gt; ByteSize -&gt; ShowS
+$cshowsPrec :: Int -&gt; ByteSize -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-137"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679961372"><span id="local-6989586621679961374"><span class="annot"><span class="annottext">ByteSize -&gt; ByteSize -&gt; Bool
+(ByteSize -&gt; ByteSize -&gt; Bool)
+-&gt; (ByteSize -&gt; ByteSize -&gt; Bool) -&gt; Eq ByteSize
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: ByteSize -&gt; ByteSize -&gt; Bool
+$c/= :: ByteSize -&gt; ByteSize -&gt; Bool
+== :: ByteSize -&gt; ByteSize -&gt; Bool
+$c== :: ByteSize -&gt; ByteSize -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679961357"><span id="local-6989586621679961359"><span id="local-6989586621679961361"><span id="local-6989586621679961363"><span id="local-6989586621679961365"><span id="local-6989586621679961367"><span id="local-6989586621679961369"><span class="annot"><span class="annottext">Eq ByteSize
+Eq ByteSize
+-&gt; (ByteSize -&gt; ByteSize -&gt; Ordering)
+-&gt; (ByteSize -&gt; ByteSize -&gt; Bool)
+-&gt; (ByteSize -&gt; ByteSize -&gt; Bool)
+-&gt; (ByteSize -&gt; ByteSize -&gt; Bool)
+-&gt; (ByteSize -&gt; ByteSize -&gt; Bool)
+-&gt; (ByteSize -&gt; ByteSize -&gt; ByteSize)
+-&gt; (ByteSize -&gt; ByteSize -&gt; ByteSize)
+-&gt; Ord ByteSize
+ByteSize -&gt; ByteSize -&gt; Bool
+ByteSize -&gt; ByteSize -&gt; Ordering
+ByteSize -&gt; ByteSize -&gt; ByteSize
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: ByteSize -&gt; ByteSize -&gt; ByteSize
+$cmin :: ByteSize -&gt; ByteSize -&gt; ByteSize
+max :: ByteSize -&gt; ByteSize -&gt; ByteSize
+$cmax :: ByteSize -&gt; ByteSize -&gt; ByteSize
+&gt;= :: ByteSize -&gt; ByteSize -&gt; Bool
+$c&gt;= :: ByteSize -&gt; ByteSize -&gt; Bool
+&gt; :: ByteSize -&gt; ByteSize -&gt; Bool
+$c&gt; :: ByteSize -&gt; ByteSize -&gt; Bool
+&lt;= :: ByteSize -&gt; ByteSize -&gt; Bool
+$c&lt;= :: ByteSize -&gt; ByteSize -&gt; Bool
+&lt; :: ByteSize -&gt; ByteSize -&gt; Bool
+$c&lt; :: ByteSize -&gt; ByteSize -&gt; Bool
+compare :: ByteSize -&gt; ByteSize -&gt; Ordering
+$ccompare :: ByteSize -&gt; ByteSize -&gt; Ordering
+$cp1Ord :: Eq ByteSize
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></a></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-138"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679961353"><span class="annot"><span class="annottext">Measure ByteSize
+ByteSize
+Measure ByteSize -&gt; ByteSize -&gt; BoundedMeasure ByteSize
+forall a. Measure a -&gt; a -&gt; BoundedMeasure a
+maxBound :: ByteSize
+$cmaxBound :: ByteSize
+$cp1BoundedMeasure :: Measure ByteSize
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var">BoundedMeasure</span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679961343"><span id="local-6989586621679961345"><span id="local-6989586621679961347"><span id="local-6989586621679961349"><span class="annot"><span class="annottext">Eq ByteSize
+ByteSize
+Eq ByteSize
+-&gt; ByteSize
+-&gt; (ByteSize -&gt; ByteSize -&gt; ByteSize)
+-&gt; (ByteSize -&gt; ByteSize -&gt; ByteSize)
+-&gt; (ByteSize -&gt; ByteSize -&gt; ByteSize)
+-&gt; Measure ByteSize
+ByteSize -&gt; ByteSize -&gt; ByteSize
+forall a.
+Eq a
+-&gt; a
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Measure a
+max :: ByteSize -&gt; ByteSize -&gt; ByteSize
+$cmax :: ByteSize -&gt; ByteSize -&gt; ByteSize
+min :: ByteSize -&gt; ByteSize -&gt; ByteSize
+$cmin :: ByteSize -&gt; ByteSize -&gt; ByteSize
+plus :: ByteSize -&gt; ByteSize -&gt; ByteSize
+$cplus :: ByteSize -&gt; ByteSize -&gt; ByteSize
+zero :: ByteSize
+$czero :: ByteSize
+$cp1Measure :: Eq ByteSize
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Measure</span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-139"></span><span>
+</span><span id="line-140"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+  Overrides
+-------------------------------------------------------------------------------}</span><span>
+</span><span id="line-143"></span><span>
+</span><span id="line-144"></span><span class="hs-comment">-- | An override that lowers a capacity limit</span><span>
+</span><span id="line-145"></span><span class="hs-comment">--</span><span>
+</span><span id="line-146"></span><span class="hs-comment">-- Specifically, we use this override to let the node operator limit the total</span><span>
+</span><span id="line-147"></span><span class="hs-comment">-- 'TxMeasure' of transactions in blocks even more severely than would the</span><span>
+</span><span id="line-148"></span><span class="hs-comment">-- ledger state's 'txsBlockCapacity'. The forge logic will use the 'Measure.min'</span><span>
+</span><span id="line-149"></span><span class="hs-comment">-- (ie the lattice's @meet@ operator) to combine this override with the capacity</span><span>
+</span><span id="line-150"></span><span class="hs-comment">-- given by the ledger state. More concretely, that will typically be a</span><span>
+</span><span id="line-151"></span><span class="hs-comment">-- componentwise minimum operation, along each of the components\/dimensions of</span><span>
+</span><span id="line-152"></span><span class="hs-comment">-- @'TxMeasure' blk@.</span><span>
+</span><span id="line-153"></span><span class="hs-comment">--</span><span>
+</span><span id="line-154"></span><span class="hs-comment">-- This newtype wrapper distinguishes the intention of this particular</span><span>
+</span><span id="line-155"></span><span class="hs-comment">-- 'TxMeasure' as such an override. We use 'TxMeasure' in different ways in this</span><span>
+</span><span id="line-156"></span><span class="hs-comment">-- code base. The newtype also allows us to distinguish the one most appropriate</span><span>
+</span><span id="line-157"></span><span class="hs-comment">-- monoid among many offered by the 'TxLimits' superclass constraints: it is the</span><span>
+</span><span id="line-158"></span><span class="hs-comment">-- monoid induced by the bounded meet-semilattice (see 'BoundedMeasure') that is</span><span>
+</span><span id="line-159"></span><span class="hs-comment">-- relevant to the notion of /overriding/ the ledger's block capacity.</span><span>
+</span><span id="line-160"></span><span class="hs-keyword">newtype</span><span> </span><span id="TxOverrides"><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxOverrides"><span class="hs-identifier hs-var">TxOverrides</span></a></span></span><span> </span><span id="local-6989586621679961485"><span class="annot"><a href="#local-6989586621679961485"><span class="hs-identifier hs-type">blk</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-161"></span><span>  </span><span class="hs-comment">-- This constructor is not exported.</span><span>
+</span><span id="line-162"></span><span>  </span><span id="TxOverrides"><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxOverrides"><span class="hs-identifier hs-var">TxOverrides</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="getOverrides"><span class="annot"><span class="annottext">TxOverrides blk -&gt; TxMeasure blk
+</span><a href="Ouroboros.Consensus.Mempool.Capacity.html#getOverrides"><span class="hs-identifier hs-var hs-var">getOverrides</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxMeasure"><span class="hs-identifier hs-type">TxMeasure</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679961485"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-163"></span><span>
+</span><span id="line-164"></span><span id="local-6989586621679961340"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679961334"><span id="local-6989586621679961336"><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxLimits"><span class="hs-identifier hs-type">TxLimits</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679961340"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Monoid</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxOverrides"><span class="hs-identifier hs-type">TxOverrides</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679961340"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-165"></span><span>  </span><span id="local-6989586621679961333"><span class="annot"><span class="annottext">mempty :: TxOverrides blk
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">mempty</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxMeasure blk -&gt; TxOverrides blk
+forall blk. TxMeasure blk -&gt; TxOverrides blk
+</span><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxOverrides"><span class="hs-identifier hs-var">TxOverrides</span></a></span><span> </span><span class="annot"><span class="annottext">TxMeasure blk
+forall a. BoundedMeasure a =&gt; a
+</span><a href="Ouroboros.Consensus.Mempool.Capacity.html#noOverridesMeasure"><span class="hs-identifier hs-var">noOverridesMeasure</span></a></span></span><span>
+</span><span id="line-166"></span><span>
+</span><span id="line-167"></span><span id="local-6989586621679961332"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679961327"><span id="local-6989586621679961329"><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxLimits"><span class="hs-identifier hs-type">TxLimits</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679961332"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Semigroup</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxOverrides"><span class="hs-identifier hs-type">TxOverrides</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679961332"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-168"></span><span>  </span><span id="local-6989586621679961326"><span class="annot"><span class="annottext">&lt;&gt; :: TxOverrides blk -&gt; TxOverrides blk -&gt; TxOverrides blk
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var hs-var hs-var hs-var">(&lt;&gt;)</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(TxMeasure blk -&gt; TxMeasure blk -&gt; TxMeasure blk)
+-&gt; TxOverrides blk -&gt; TxOverrides blk -&gt; TxOverrides blk
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">coerce</span></a></span><span> </span><span class="annot"><span class="annottext">((TxMeasure blk -&gt; TxMeasure blk -&gt; TxMeasure blk)
+ -&gt; TxOverrides blk -&gt; TxOverrides blk -&gt; TxOverrides blk)
+-&gt; (TxMeasure blk -&gt; TxMeasure blk -&gt; TxMeasure blk)
+-&gt; TxOverrides blk
+-&gt; TxOverrides blk
+-&gt; TxOverrides blk
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Measure (TxMeasure blk) =&gt;
+TxMeasure blk -&gt; TxMeasure blk -&gt; TxMeasure blk
+forall a. Measure a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">Measure.min</span></span><span> </span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxMeasure"><span class="hs-identifier hs-type">TxMeasure</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679961332"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-169"></span><span>
+</span><span id="line-170"></span><span class="hs-comment">-- | @'applyOverrides' 'noOverrides' m = m@</span><span>
+</span><span id="line-171"></span><span id="local-6989586621679961484"><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#noOverridesMeasure"><span class="hs-identifier hs-type">noOverridesMeasure</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">BoundedMeasure</span></span><span> </span><span class="annot"><a href="#local-6989586621679961484"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679961484"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-172"></span><span id="noOverridesMeasure"><span class="annot"><span class="annottext">noOverridesMeasure :: a
+</span><a href="Ouroboros.Consensus.Mempool.Capacity.html#noOverridesMeasure"><span class="hs-identifier hs-var hs-var">noOverridesMeasure</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a
+forall a. BoundedMeasure a =&gt; a
+</span><span class="hs-identifier hs-var">Measure.maxBound</span></span><span>
+</span><span id="line-173"></span><span>
+</span><span id="line-174"></span><span class="hs-comment">-- | Smart constructor for 'Overrides'.</span><span>
+</span><span id="line-175"></span><span id="local-6989586621679961323"><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#mkOverrides"><span class="hs-identifier hs-type">mkOverrides</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxMeasure"><span class="hs-identifier hs-type">TxMeasure</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679961323"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxOverrides"><span class="hs-identifier hs-type">TxOverrides</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679961323"><span class="hs-identifier hs-type">blk</span></a></span></span><span>
+</span><span id="line-176"></span><span id="mkOverrides"><span class="annot"><span class="annottext">mkOverrides :: TxMeasure blk -&gt; TxOverrides blk
+</span><a href="Ouroboros.Consensus.Mempool.Capacity.html#mkOverrides"><span class="hs-identifier hs-var hs-var">mkOverrides</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxMeasure blk -&gt; TxOverrides blk
+forall blk. TxMeasure blk -&gt; TxOverrides blk
+</span><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxOverrides"><span class="hs-identifier hs-var">TxOverrides</span></a></span><span>
+</span><span id="line-177"></span><span>
+</span><span id="line-178"></span><span class="hs-comment">-- | Apply the override</span><span>
+</span><span id="line-179"></span><span id="local-6989586621679961322"><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#applyOverrides"><span class="hs-identifier hs-type">applyOverrides</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-180"></span><span>     </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxLimits"><span class="hs-identifier hs-type">TxLimits</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679961322"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-181"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxOverrides"><span class="hs-identifier hs-type">TxOverrides</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679961322"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-182"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxMeasure"><span class="hs-identifier hs-type">TxMeasure</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679961322"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-183"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxMeasure"><span class="hs-identifier hs-type">TxMeasure</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679961322"><span class="hs-identifier hs-type">blk</span></a></span></span><span>
+</span><span id="line-184"></span><span id="applyOverrides"><span class="annot"><span class="annottext">applyOverrides :: TxOverrides blk -&gt; TxMeasure blk -&gt; TxMeasure blk
+</span><a href="Ouroboros.Consensus.Mempool.Capacity.html#applyOverrides"><span class="hs-identifier hs-var hs-var">applyOverrides</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Mempool.Capacity.html#TxOverrides"><span class="hs-identifier hs-type">TxOverrides</span></a></span><span> </span><span id="local-6989586621679961321"><span class="annot"><span class="annottext">TxMeasure blk
+</span><a href="#local-6989586621679961321"><span class="hs-identifier hs-var">m'</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679961320"><span class="annot"><span class="annottext">TxMeasure blk
+</span><a href="#local-6989586621679961320"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxMeasure blk -&gt; TxMeasure blk -&gt; TxMeasure blk
+forall a. Measure a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">Measure.min</span></span><span> </span><span class="annot"><span class="annottext">TxMeasure blk
+</span><a href="#local-6989586621679961321"><span class="hs-identifier hs-var">m'</span></a></span><span> </span><span class="annot"><span class="annottext">TxMeasure blk
+</span><a href="#local-6989586621679961320"><span class="hs-identifier hs-var">m</span></a></span><span>
+</span><span id="line-185"></span></pre></body></html>

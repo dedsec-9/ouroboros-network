@@ -8,11 +8,11 @@
 </span><span id="line-8"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Subscription.Client.html#clientSubscriptionWorker"><span class="hs-identifier">clientSubscriptionWorker</span></a></span><span>
 </span><span id="line-9"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-10"></span><span>
-</span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/io-classes-0.2.0.0/noopt/doc/html/io-classes/src"><span class="hs-identifier">Control.Monad.Class.MonadTime</span></a></span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Monad.Class.MonadTime</span></span><span>
 </span><span id="line-12"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Tracer</span></span><span>
 </span><span id="line-13"></span><span>
-</span><span id="line-14"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Functor.Identity</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Identity</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Void</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Void</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Functor.Identity</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Identity</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Void</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Void</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-16"></span><span>
 </span><span id="line-17"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.ErrorPolicy.html"><span class="hs-identifier">Ouroboros.Network.ErrorPolicy</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.ErrorPolicy.html#ErrorPolicies"><span class="hs-identifier">ErrorPolicies</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.ErrorPolicy.html#ErrorPolicyTrace"><span class="hs-identifier">ErrorPolicyTrace</span></a></span><span class="hs-special">,</span><span>
 </span><span id="line-18"></span><span>                     </span><span class="annot"><a href="Ouroboros.Network.ErrorPolicy.html#WithAddr"><span class="hs-identifier">WithAddr</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.ErrorPolicy.html#completeApplicationTx"><span class="hs-identifier">completeApplicationTx</span></a></span><span class="hs-special">)</span><span>
@@ -24,12 +24,12 @@
 </span><span id="line-24"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.Subscription.Worker.html"><span class="hs-identifier">Ouroboros.Network.Subscription.Worker</span></a></span><span>
 </span><span id="line-25"></span><span>
 </span><span id="line-26"></span><span>
-</span><span id="line-27"></span><span class="hs-keyword">data</span><span> </span><span id="ClientSubscriptionParams"><span class="annot"><a href="Ouroboros.Network.Subscription.Client.html#ClientSubscriptionParams"><span class="hs-identifier hs-var">ClientSubscriptionParams</span></a></span></span><span> </span><span id="local-6989586621679176711"><span class="annot"><a href="#local-6989586621679176711"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ClientSubscriptionParams"><span class="annot"><a href="Ouroboros.Network.Subscription.Client.html#ClientSubscriptionParams"><span class="hs-identifier hs-var">ClientSubscriptionParams</span></a></span></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">data</span><span> </span><span id="ClientSubscriptionParams"><span class="annot"><a href="Ouroboros.Network.Subscription.Client.html#ClientSubscriptionParams"><span class="hs-identifier hs-var">ClientSubscriptionParams</span></a></span></span><span> </span><span id="local-6989586621679195236"><span class="annot"><a href="#local-6989586621679195236"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ClientSubscriptionParams"><span class="annot"><a href="Ouroboros.Network.Subscription.Client.html#ClientSubscriptionParams"><span class="hs-identifier hs-var">ClientSubscriptionParams</span></a></span></span><span>
 </span><span id="line-28"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="cspAddress"><span class="annot"><span class="annottext">ClientSubscriptionParams a -&gt; LocalAddress
 </span><a href="Ouroboros.Network.Subscription.Client.html#cspAddress"><span class="hs-identifier hs-var hs-var">cspAddress</span></a></span></span><span>                </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="Ouroboros.Network.Snocket.html#LocalAddress"><span class="hs-identifier hs-type">LocalAddress</span></a></span><span>
 </span><span id="line-29"></span><span>  </span><span class="hs-comment">-- ^ unix socket or named pipe address</span><span>
 </span><span id="line-30"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="cspConnectionAttemptDelay"><span class="annot"><span class="annottext">ClientSubscriptionParams a -&gt; Maybe DiffTime
-</span><a href="Ouroboros.Network.Subscription.Client.html#cspConnectionAttemptDelay"><span class="hs-identifier hs-var hs-var">cspConnectionAttemptDelay</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span class="hs-special">)</span><span>
+</span><a href="Ouroboros.Network.Subscription.Client.html#cspConnectionAttemptDelay"><span class="hs-identifier hs-var hs-var">cspConnectionAttemptDelay</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">DiffTime</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-31"></span><span>  </span><span class="hs-comment">-- ^ delay between connection attempts</span><span>
 </span><span id="line-32"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="cspErrorPolicies"><span class="annot"><span class="annottext">ClientSubscriptionParams a -&gt; ErrorPolicies
 </span><a href="Ouroboros.Network.Subscription.Client.html#cspErrorPolicies"><span class="hs-identifier hs-var hs-var">cspErrorPolicies</span></a></span></span><span>          </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="Ouroboros.Network.ErrorPolicy.html#ErrorPolicies"><span class="hs-identifier hs-type">ErrorPolicies</span></a></span><span>
@@ -39,14 +39,14 @@
 </span><span id="line-36"></span><span class="hs-comment">-- | Client subscription worker keeps subsribing to the 'LocalAddress' using</span><span>
 </span><span id="line-37"></span><span class="hs-comment">-- either unix socket or named pipe.</span><span>
 </span><span id="line-38"></span><span class="hs-comment">--</span><span>
-</span><span id="line-39"></span><span id="local-6989586621679176660"><span class="annot"><a href="Ouroboros.Network.Subscription.Client.html#clientSubscriptionWorker"><span class="hs-identifier hs-type">clientSubscriptionWorker</span></a></span><span>
+</span><span id="line-39"></span><span id="local-6989586621679195184"><span class="annot"><a href="Ouroboros.Network.Subscription.Client.html#clientSubscriptionWorker"><span class="hs-identifier hs-type">clientSubscriptionWorker</span></a></span><span>
 </span><span id="line-40"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Snocket.html#LocalSnocket"><span class="hs-identifier hs-type">LocalSnocket</span></a></span><span>
-</span><span id="line-41"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Tracer</span></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Subscription.Worker.html#SubscriptionTrace"><span class="hs-identifier hs-type">SubscriptionTrace</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Snocket.html#LocalAddress"><span class="hs-identifier hs-type">LocalAddress</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-42"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Tracer</span></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.ErrorPolicy.html#WithAddr"><span class="hs-identifier hs-type">WithAddr</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Snocket.html#LocalAddress"><span class="hs-identifier hs-type">LocalAddress</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.ErrorPolicy.html#ErrorPolicyTrace"><span class="hs-identifier hs-type">ErrorPolicyTrace</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-41"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Tracer</span></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Subscription.Worker.html#SubscriptionTrace"><span class="hs-identifier hs-type">SubscriptionTrace</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Snocket.html#LocalAddress"><span class="hs-identifier hs-type">LocalAddress</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-42"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Tracer</span></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.ErrorPolicy.html#WithAddr"><span class="hs-identifier hs-type">WithAddr</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Snocket.html#LocalAddress"><span class="hs-identifier hs-type">LocalAddress</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.ErrorPolicy.html#ErrorPolicyTrace"><span class="hs-identifier hs-type">ErrorPolicyTrace</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-43"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Socket.html#NetworkMutableState"><span class="hs-identifier hs-type">NetworkMutableState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Snocket.html#LocalAddress"><span class="hs-identifier hs-type">LocalAddress</span></a></span><span>
-</span><span id="line-44"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Subscription.Client.html#ClientSubscriptionParams"><span class="hs-identifier hs-type">ClientSubscriptionParams</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176660"><span class="hs-identifier hs-type">a</span></a></span><span>
-</span><span id="line-45"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Snocket.html#LocalSocket"><span class="hs-identifier hs-type">LocalSocket</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679176660"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-46"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Void</span></a></span></span><span>
+</span><span id="line-44"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Subscription.Client.html#ClientSubscriptionParams"><span class="hs-identifier hs-type">ClientSubscriptionParams</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679195184"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-45"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Snocket.html#LocalSocket"><span class="hs-identifier hs-type">LocalSocket</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679195184"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-46"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Void</span></a></span></span><span>
 </span><span id="line-47"></span><span id="clientSubscriptionWorker"><span class="annot"><span class="annottext">clientSubscriptionWorker :: LocalSnocket
 -&gt; Tracer IO (SubscriptionTrace LocalAddress)
 -&gt; Tracer IO (WithAddr LocalAddress ErrorPolicyTrace)
@@ -54,40 +54,41 @@
 -&gt; ClientSubscriptionParams a
 -&gt; (LocalSocket -&gt; IO a)
 -&gt; IO Void
-</span><a href="Ouroboros.Network.Subscription.Client.html#clientSubscriptionWorker"><span class="hs-identifier hs-var hs-var">clientSubscriptionWorker</span></a></span></span><span> </span><span id="local-6989586621679176659"><span class="annot"><span class="annottext">LocalSnocket
-</span><a href="#local-6989586621679176659"><span class="hs-identifier hs-var">snocket</span></a></span></span><span>
-</span><span id="line-48"></span><span>                         </span><span id="local-6989586621679176658"><span class="annot"><span class="annottext">Tracer IO (SubscriptionTrace LocalAddress)
-</span><a href="#local-6989586621679176658"><span class="hs-identifier hs-var">tracer</span></a></span></span><span>
-</span><span id="line-49"></span><span>                         </span><span id="local-6989586621679176657"><span class="annot"><span class="annottext">Tracer IO (WithAddr LocalAddress ErrorPolicyTrace)
-</span><a href="#local-6989586621679176657"><span class="hs-identifier hs-var">errorPolicyTracer</span></a></span></span><span>
-</span><span id="line-50"></span><span>                         </span><span class="annot"><a href="Ouroboros.Network.Socket.html#NetworkMutableState"><span class="hs-identifier hs-type">NetworkMutableState</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679176655"><span class="annot"><span class="annottext">ConnectionTable IO LocalAddress
+</span><a href="Ouroboros.Network.Subscription.Client.html#clientSubscriptionWorker"><span class="hs-identifier hs-var hs-var">clientSubscriptionWorker</span></a></span></span><span> </span><span id="local-6989586621679195183"><span class="annot"><span class="annottext">LocalSnocket
+</span><a href="#local-6989586621679195183"><span class="hs-identifier hs-var">snocket</span></a></span></span><span>
+</span><span id="line-48"></span><span>                         </span><span id="local-6989586621679195182"><span class="annot"><span class="annottext">Tracer IO (SubscriptionTrace LocalAddress)
+</span><a href="#local-6989586621679195182"><span class="hs-identifier hs-var">tracer</span></a></span></span><span>
+</span><span id="line-49"></span><span>                         </span><span id="local-6989586621679195181"><span class="annot"><span class="annottext">Tracer IO (WithAddr LocalAddress ErrorPolicyTrace)
+</span><a href="#local-6989586621679195181"><span class="hs-identifier hs-var">errorPolicyTracer</span></a></span></span><span>
+</span><span id="line-50"></span><span>                         </span><span class="annot"><a href="Ouroboros.Network.Socket.html#NetworkMutableState"><span class="hs-identifier hs-type">NetworkMutableState</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679195179"><span class="annot"><span class="annottext">ConnectionTable IO LocalAddress
 nmsConnectionTable :: forall addr. NetworkMutableState addr -&gt; ConnectionTable IO addr
 nmsConnectionTable :: ConnectionTable IO LocalAddress
-</span><a href="Ouroboros.Network.Socket.html#nmsConnectionTable"><span class="hs-identifier hs-var hs-var">nmsConnectionTable</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679176653"><span class="annot"><span class="annottext">StrictTVar IO (PeerStates IO LocalAddress)
+</span><a href="Ouroboros.Network.Socket.html#nmsConnectionTable"><span class="hs-identifier hs-var hs-var">nmsConnectionTable</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679195177"><span class="annot"><span class="annottext">StrictTVar IO (PeerStates IO LocalAddress)
 nmsPeerStates :: forall addr.
 NetworkMutableState addr -&gt; StrictTVar IO (PeerStates IO addr)
 nmsPeerStates :: StrictTVar IO (PeerStates IO LocalAddress)
 </span><a href="Ouroboros.Network.Socket.html#nmsPeerStates"><span class="hs-identifier hs-var hs-var">nmsPeerStates</span></a></span></span><span> </span><span class="hs-special">}</span><span>
-</span><span id="line-51"></span><span>                         </span><span class="annot"><a href="Ouroboros.Network.Subscription.Client.html#ClientSubscriptionParams"><span class="hs-identifier hs-type">ClientSubscriptionParams</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679176651"><span class="annot"><span class="annottext">LocalAddress
+</span><span id="line-51"></span><span>                         </span><span class="annot"><a href="Ouroboros.Network.Subscription.Client.html#ClientSubscriptionParams"><span class="hs-identifier hs-type">ClientSubscriptionParams</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679195175"><span class="annot"><span class="annottext">LocalAddress
 cspAddress :: LocalAddress
 cspAddress :: forall a. ClientSubscriptionParams a -&gt; LocalAddress
-</span><a href="#local-6989586621679176651"><span class="hs-identifier hs-var hs-var">cspAddress</span></a></span></span><span>
-</span><span id="line-52"></span><span>                                                  </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679176650"><span class="annot"><span class="annottext">Maybe DiffTime
+</span><a href="#local-6989586621679195175"><span class="hs-identifier hs-var hs-var">cspAddress</span></a></span></span><span>
+</span><span id="line-52"></span><span>                                                  </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679195174"><span class="annot"><span class="annottext">Maybe DiffTime
 cspConnectionAttemptDelay :: Maybe DiffTime
 cspConnectionAttemptDelay :: forall a. ClientSubscriptionParams a -&gt; Maybe DiffTime
-</span><a href="#local-6989586621679176650"><span class="hs-identifier hs-var hs-var">cspConnectionAttemptDelay</span></a></span></span><span>
-</span><span id="line-53"></span><span>                                                  </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679176649"><span class="annot"><span class="annottext">ErrorPolicies
+</span><a href="#local-6989586621679195174"><span class="hs-identifier hs-var hs-var">cspConnectionAttemptDelay</span></a></span></span><span>
+</span><span id="line-53"></span><span>                                                  </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679195173"><span class="annot"><span class="annottext">ErrorPolicies
 cspErrorPolicies :: ErrorPolicies
 cspErrorPolicies :: forall a. ClientSubscriptionParams a -&gt; ErrorPolicies
-</span><a href="#local-6989586621679176649"><span class="hs-identifier hs-var hs-var">cspErrorPolicies</span></a></span></span><span>
+</span><a href="#local-6989586621679195173"><span class="hs-identifier hs-var hs-var">cspErrorPolicies</span></a></span></span><span>
 </span><span id="line-54"></span><span>                                                  </span><span class="hs-special">}</span><span>
-</span><span id="line-55"></span><span>                         </span><span id="local-6989586621679176648"><span class="annot"><span class="annottext">LocalSocket -&gt; IO a
-</span><a href="#local-6989586621679176648"><span class="hs-identifier hs-var">k</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-55"></span><span>                         </span><span id="local-6989586621679195172"><span class="annot"><span class="annottext">LocalSocket -&gt; IO a
+</span><a href="#local-6989586621679195172"><span class="hs-identifier hs-var">k</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-56"></span><span>    </span><span class="annot"><span class="annottext">Tracer IO (SubscriptionTrace LocalAddress)
 -&gt; Tracer IO (WithAddr LocalAddress ErrorPolicyTrace)
 -&gt; ConnectionTable IO LocalAddress
 -&gt; StrictTVar IO (PeerStates IO LocalAddress)
 -&gt; LocalSnocket
+-&gt; (LocalSocket -&gt; LocalAddress -&gt; IO ())
 -&gt; WorkerCallbacks
      IO (PeerStates IO LocalAddress) LocalAddress a Void
 -&gt; WorkerParams IO Identity LocalAddress
@@ -100,33 +101,37 @@ Tracer IO (SubscriptionTrace addr)
 -&gt; ConnectionTable IO addr
 -&gt; StateVar IO s
 -&gt; Snocket IO sock addr
+-&gt; (sock -&gt; addr -&gt; IO ())
 -&gt; WorkerCallbacks IO s addr a x
 -&gt; WorkerParams IO localAddrs addr
 -&gt; (sock -&gt; IO a)
 -&gt; IO x
 </span><a href="Ouroboros.Network.Subscription.Worker.html#worker"><span class="hs-identifier hs-var">worker</span></a></span><span> </span><span class="annot"><span class="annottext">Tracer IO (SubscriptionTrace LocalAddress)
-</span><a href="#local-6989586621679176658"><span class="hs-identifier hs-var">tracer</span></a></span><span>
+</span><a href="#local-6989586621679195182"><span class="hs-identifier hs-var">tracer</span></a></span><span>
 </span><span id="line-57"></span><span>           </span><span class="annot"><span class="annottext">Tracer IO (WithAddr LocalAddress ErrorPolicyTrace)
-</span><a href="#local-6989586621679176657"><span class="hs-identifier hs-var">errorPolicyTracer</span></a></span><span>
+</span><a href="#local-6989586621679195181"><span class="hs-identifier hs-var">errorPolicyTracer</span></a></span><span>
 </span><span id="line-58"></span><span>           </span><span class="annot"><span class="annottext">ConnectionTable IO LocalAddress
-</span><a href="#local-6989586621679176655"><span class="hs-identifier hs-var">nmsConnectionTable</span></a></span><span>
+</span><a href="#local-6989586621679195179"><span class="hs-identifier hs-var">nmsConnectionTable</span></a></span><span>
 </span><span id="line-59"></span><span>           </span><span class="annot"><span class="annottext">StrictTVar IO (PeerStates IO LocalAddress)
-</span><a href="#local-6989586621679176653"><span class="hs-identifier hs-var">nmsPeerStates</span></a></span><span>
+</span><a href="#local-6989586621679195177"><span class="hs-identifier hs-var">nmsPeerStates</span></a></span><span>
 </span><span id="line-60"></span><span>           </span><span class="annot"><span class="annottext">LocalSnocket
-</span><a href="#local-6989586621679176659"><span class="hs-identifier hs-var">snocket</span></a></span><span>
-</span><span id="line-61"></span><span>           </span><span class="annot"><span class="annottext">WorkerCallbacks :: forall (m :: * -&gt; *) s addr a t.
+</span><a href="#local-6989586621679195183"><span class="hs-identifier hs-var">snocket</span></a></span><span>
+</span><span id="line-61"></span><span>           </span><span class="annot"><span class="annottext">LocalSocket -&gt; LocalAddress -&gt; IO ()
+forall a. Monoid a =&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">mempty</span></a></span><span>
+</span><span id="line-62"></span><span>           </span><span class="annot"><span class="annottext">WorkerCallbacks :: forall (m :: * -&gt; *) s addr a t.
 SocketStateChange m s addr
 -&gt; CompleteApplication m s addr a
 -&gt; Main m s t
 -&gt; WorkerCallbacks m s addr a t
 </span><a href="Ouroboros.Network.Subscription.Worker.html#WorkerCallbacks"><span class="hs-identifier hs-type">WorkerCallbacks</span></a></span><span>
-</span><span id="line-62"></span><span>            </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">wcSocketStateChangeTx :: SocketStateChange IO (PeerStates IO LocalAddress) LocalAddress
+</span><span id="line-63"></span><span>            </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">wcSocketStateChangeTx :: SocketStateChange IO (PeerStates IO LocalAddress) LocalAddress
 </span><a href="Ouroboros.Network.Subscription.Worker.html#wcSocketStateChangeTx"><span class="hs-identifier hs-var">wcSocketStateChangeTx</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SocketStateChange IO (PeerStates IO LocalAddress) LocalAddress
 forall addr.
 Ord addr =&gt;
 SocketStateChange IO (PeerStates IO addr) addr
 </span><a href="Ouroboros.Network.Subscription.Ip.html#socketStateChangeTx"><span class="hs-identifier hs-var">socketStateChangeTx</span></a></span><span>
-</span><span id="line-63"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">wcCompleteApplicationTx :: CompleteApplication IO (PeerStates IO LocalAddress) LocalAddress a
+</span><span id="line-64"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">wcCompleteApplicationTx :: CompleteApplication IO (PeerStates IO LocalAddress) LocalAddress a
 </span><a href="Ouroboros.Network.Subscription.Worker.html#wcCompleteApplicationTx"><span class="hs-identifier hs-var">wcCompleteApplicationTx</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ErrorPolicies
 -&gt; CompleteApplication
      IO (PeerStates IO LocalAddress) LocalAddress a
@@ -134,22 +139,22 @@ forall (m :: * -&gt; *) addr a.
 (MonadAsync m, Ord addr, Ord (Async m ())) =&gt;
 ErrorPolicies -&gt; CompleteApplication m (PeerStates m addr) addr a
 </span><a href="Ouroboros.Network.ErrorPolicy.html#completeApplicationTx"><span class="hs-identifier hs-var">completeApplicationTx</span></a></span><span> </span><span class="annot"><span class="annottext">ErrorPolicies
-</span><a href="#local-6989586621679176649"><span class="hs-identifier hs-var">cspErrorPolicies</span></a></span><span>
-</span><span id="line-64"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">wcMainTx :: Main IO (PeerStates IO LocalAddress) Void
+</span><a href="#local-6989586621679195173"><span class="hs-identifier hs-var">cspErrorPolicies</span></a></span><span>
+</span><span id="line-65"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">wcMainTx :: Main IO (PeerStates IO LocalAddress) Void
 </span><a href="Ouroboros.Network.Subscription.Worker.html#wcMainTx"><span class="hs-identifier hs-var">wcMainTx</span></a></span><span>                </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Main IO (PeerStates IO LocalAddress) Void
 forall (m :: * -&gt; *) addr.
 (MonadThrow (STM m), MonadSTM m) =&gt;
 Main m (PeerStates m addr) Void
 </span><a href="Ouroboros.Network.Subscription.Ip.html#mainTx"><span class="hs-identifier hs-var">mainTx</span></a></span><span>
-</span><span id="line-65"></span><span>            </span><span class="hs-special">}</span><span>
-</span><span id="line-66"></span><span>           </span><span class="annot"><span class="annottext">WorkerParams IO Identity LocalAddress
-</span><a href="#local-6989586621679176642"><span class="hs-identifier hs-var">workerParams</span></a></span><span>
-</span><span id="line-67"></span><span>           </span><span class="annot"><span class="annottext">LocalSocket -&gt; IO a
-</span><a href="#local-6989586621679176648"><span class="hs-identifier hs-var">k</span></a></span><span>
-</span><span id="line-68"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-69"></span><span>    </span><span class="annot"><a href="#local-6989586621679176642"><span class="hs-identifier hs-type">workerParams</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Subscription.Worker.html#WorkerParams"><span class="hs-identifier hs-type">WorkerParams</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Identity</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Snocket.html#LocalAddress"><span class="hs-identifier hs-type">LocalAddress</span></a></span><span>
-</span><span id="line-70"></span><span>    </span><span id="local-6989586621679176642"><span class="annot"><span class="annottext">workerParams :: WorkerParams IO Identity LocalAddress
-</span><a href="#local-6989586621679176642"><span class="hs-identifier hs-var hs-var">workerParams</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">WorkerParams :: forall (m :: * -&gt; *) (localAddrs :: * -&gt; *) addr.
+</span><span id="line-66"></span><span>            </span><span class="hs-special">}</span><span>
+</span><span id="line-67"></span><span>           </span><span class="annot"><span class="annottext">WorkerParams IO Identity LocalAddress
+</span><a href="#local-6989586621679195166"><span class="hs-identifier hs-var">workerParams</span></a></span><span>
+</span><span id="line-68"></span><span>           </span><span class="annot"><span class="annottext">LocalSocket -&gt; IO a
+</span><a href="#local-6989586621679195172"><span class="hs-identifier hs-var">k</span></a></span><span>
+</span><span id="line-69"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-70"></span><span>    </span><span class="annot"><a href="#local-6989586621679195166"><span class="hs-identifier hs-type">workerParams</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Subscription.Worker.html#WorkerParams"><span class="hs-identifier hs-type">WorkerParams</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Identity</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Snocket.html#LocalAddress"><span class="hs-identifier hs-type">LocalAddress</span></a></span><span>
+</span><span id="line-71"></span><span>    </span><span id="local-6989586621679195166"><span class="annot"><span class="annottext">workerParams :: WorkerParams IO Identity LocalAddress
+</span><a href="#local-6989586621679195166"><span class="hs-identifier hs-var hs-var">workerParams</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">WorkerParams :: forall (m :: * -&gt; *) (localAddrs :: * -&gt; *) addr.
 localAddrs addr
 -&gt; (addr -&gt; localAddrs addr -&gt; Maybe addr)
 -&gt; (addr -&gt; Maybe DiffTime)
@@ -157,35 +162,35 @@ localAddrs addr
 -&gt; Int
 -&gt; WorkerParams m localAddrs addr
 </span><a href="Ouroboros.Network.Subscription.Worker.html#WorkerParams"><span class="hs-identifier hs-type">WorkerParams</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-71"></span><span>        </span><span class="annot"><span class="annottext">wpLocalAddresses :: Identity LocalAddress
+</span><span id="line-72"></span><span>        </span><span class="annot"><span class="annottext">wpLocalAddresses :: Identity LocalAddress
 </span><a href="Ouroboros.Network.Subscription.Worker.html#wpLocalAddresses"><span class="hs-identifier hs-var">wpLocalAddresses</span></a></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">LocalAddress -&gt; Identity LocalAddress
 forall a. a -&gt; Identity a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Identity</span></a></span><span> </span><span class="annot"><span class="annottext">LocalAddress
-</span><a href="#local-6989586621679176651"><span class="hs-identifier hs-var">cspAddress</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-72"></span><span>        </span><span class="annot"><span class="annottext">wpSelectAddress :: LocalAddress -&gt; Identity LocalAddress -&gt; Maybe LocalAddress
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Identity</span></a></span><span> </span><span class="annot"><span class="annottext">LocalAddress
+</span><a href="#local-6989586621679195175"><span class="hs-identifier hs-var">cspAddress</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-73"></span><span>        </span><span class="annot"><span class="annottext">wpSelectAddress :: LocalAddress -&gt; Identity LocalAddress -&gt; Maybe LocalAddress
 </span><a href="Ouroboros.Network.Subscription.Worker.html#wpSelectAddress"><span class="hs-identifier hs-var">wpSelectAddress</span></a></span><span>          </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="annot"><span class="annottext">LocalAddress
-</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Identity</span></a></span><span> </span><span id="local-6989586621679176637"><span class="annot"><span class="annottext">LocalAddress
-</span><a href="#local-6989586621679176637"><span class="hs-identifier hs-var">addr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">LocalAddress -&gt; Maybe LocalAddress
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Identity</span></a></span><span> </span><span id="local-6989586621679195161"><span class="annot"><span class="annottext">LocalAddress
+</span><a href="#local-6989586621679195161"><span class="hs-identifier hs-var">addr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">LocalAddress -&gt; Maybe LocalAddress
 forall a. a -&gt; Maybe a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">LocalAddress
-</span><a href="#local-6989586621679176637"><span class="hs-identifier hs-var">addr</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-73"></span><span>        </span><span class="annot"><span class="annottext">wpConnectionAttemptDelay :: LocalAddress -&gt; Maybe DiffTime
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">LocalAddress
+</span><a href="#local-6989586621679195161"><span class="hs-identifier hs-var">addr</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-74"></span><span>        </span><span class="annot"><span class="annottext">wpConnectionAttemptDelay :: LocalAddress -&gt; Maybe DiffTime
 </span><a href="Ouroboros.Network.Subscription.Worker.html#wpConnectionAttemptDelay"><span class="hs-identifier hs-var">wpConnectionAttemptDelay</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe DiffTime -&gt; LocalAddress -&gt; Maybe DiffTime
 forall a b. a -&gt; b -&gt; a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">const</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe DiffTime
-</span><a href="#local-6989586621679176650"><span class="hs-identifier hs-var">cspConnectionAttemptDelay</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-74"></span><span>        </span><span class="annot"><span class="annottext">wpSubscriptionTarget :: IO (SubscriptionTarget IO LocalAddress)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">const</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe DiffTime
+</span><a href="#local-6989586621679195174"><span class="hs-identifier hs-var">cspConnectionAttemptDelay</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-75"></span><span>        </span><span class="annot"><span class="annottext">wpSubscriptionTarget :: IO (SubscriptionTarget IO LocalAddress)
 </span><a href="Ouroboros.Network.Subscription.Worker.html#wpSubscriptionTarget"><span class="hs-identifier hs-var">wpSubscriptionTarget</span></a></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SubscriptionTarget IO LocalAddress
 -&gt; IO (SubscriptionTarget IO LocalAddress)
 forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[LocalAddress] -&gt; SubscriptionTarget IO LocalAddress
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[LocalAddress] -&gt; SubscriptionTarget IO LocalAddress
 forall (m :: * -&gt; *) target.
 Applicative m =&gt;
 [target] -&gt; SubscriptionTarget m target
 </span><a href="Ouroboros.Network.Subscription.Subscriber.html#listSubscriptionTarget"><span class="hs-identifier hs-var">listSubscriptionTarget</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">LocalAddress
-</span><a href="#local-6989586621679176651"><span class="hs-identifier hs-var">cspAddress</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
-</span><span id="line-75"></span><span>        </span><span class="annot"><span class="annottext">wpValency :: Int
+</span><a href="#local-6989586621679195175"><span class="hs-identifier hs-var">cspAddress</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-76"></span><span>        </span><span class="annot"><span class="annottext">wpValency :: Int
 </span><a href="Ouroboros.Network.Subscription.Worker.html#wpValency"><span class="hs-identifier hs-var">wpValency</span></a></span><span>                </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">1</span></span><span>
-</span><span id="line-76"></span><span>      </span><span class="hs-special">}</span><span>
-</span><span id="line-77"></span></pre></body></html>
+</span><span id="line-77"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-78"></span></pre></body></html>

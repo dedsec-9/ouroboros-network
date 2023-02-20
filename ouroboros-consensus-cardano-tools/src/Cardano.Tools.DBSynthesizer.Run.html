@@ -1,0 +1,736 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE NamedFieldPuns      #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables #-}</span><span>
+</span><span id="line-3"></span><span>
+</span><span id="line-4"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Cardano.Tools.DBSynthesizer.Run</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-5"></span><span>    </span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Run.html#initialize"><span class="hs-identifier">initialize</span></a></span><span>
+</span><span id="line-6"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Run.html#synthesize"><span class="hs-identifier">synthesize</span></a></span><span>
+</span><span id="line-7"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier">Control.Monad.Trans.Except</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier">ExceptT</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Monad.Trans.Except.Extra</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">firstExceptT</span></span><span class="hs-special">,</span><span>
+</span><span id="line-11"></span><span>                     </span><span class="annot"><span class="hs-identifier">handleIOExceptT</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">hoistEither</span></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier">runExceptT</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Aeson</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Aeson</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">FromJSON</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Result</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Value</span></span><span class="hs-special">,</span><span>
+</span><span id="line-13"></span><span>                     </span><span class="annot"><span class="hs-identifier">eitherDecodeFileStrict'</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">eitherDecodeStrict'</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">fromJSON</span></span><span class="hs-special">)</span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Bool</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">bool</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier">Data.ByteString</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">BS</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier">ByteString</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier">readFile</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/directory-1.3.6.0/src"><span class="hs-identifier">System.Directory</span></a></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/filepath-1.4.2.1/src"><span class="hs-identifier">System.FilePath</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/filepath-1.4.2.1/src"><span class="hs-identifier">takeDirectory</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/filepath-1.4.2.1/src"><span class="hs-operator">(&lt;/&gt;)</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Tracer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">nullTracer</span></span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Config</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">configSecurityParam</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">configStorage</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Fragment.InFuture</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">InFuture</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">dontCheck</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-diffusion-0.2.0.0/noopt/doc/html/ouroboros-consensus-diffusion/src"><span class="hs-identifier">Ouroboros.Consensus.Node</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Node</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-diffusion-0.2.0.0/noopt/doc/html/ouroboros-consensus-diffusion/src"><span class="hs-identifier">mkChainDbArgs</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-24"></span><span>                     </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-diffusion-0.2.0.0/noopt/doc/html/ouroboros-consensus-diffusion/src"><span class="hs-identifier">stdMkChainDbHasFS</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Node.InitStorage</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Node</span></span><span>
+</span><span id="line-26"></span><span>                     </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">nodeImmutableDbChunkInfo</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Node.ProtocolInfo</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">ProtocolInfo</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-shelley-0.3.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier">Ouroboros.Consensus.Shelley.Node</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">ShelleyGenesis</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-29"></span><span>                     </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-shelley-0.3.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier">validateGenesis</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Storage.ChainDB</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">ChainDB</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">defaultArgs</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-31"></span><span>                     </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">getTipPoint</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Storage.ChainDB.Impl</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">ChainDB</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">cdbTracer</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-33"></span><span>                     </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">withDB</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Storage.LedgerDB</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">SnapshotInterval</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-35"></span><span>                     </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">defaultDiskPolicy</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Util.IOLike</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">atomically</span></span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Util.ResourceRegistry</span></a></span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier">Ouroboros.Network.Block</span></a></span><span>
+</span><span id="line-39"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier">Ouroboros.Network.Point</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">WithOrigin</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-40"></span><span>
+</span><span id="line-41"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Cardano.Api.Any.html"><span class="hs-identifier">Cardano.Api.Any</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Any.html#displayError"><span class="hs-identifier">displayError</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-42"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Cardano.Api.Protocol.Types.html"><span class="hs-identifier">Cardano.Api.Protocol.Types</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Api.Protocol.Types.html#protocolInfo"><span class="hs-identifier">protocolInfo</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Cardano.Node.Protocol.html"><span class="hs-identifier">Cardano.Node.Protocol</span></a></span><span>
+</span><span id="line-44"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Cardano.Node.Types.html"><span class="hs-identifier">Cardano.Node.Types</span></a></span><span>
+</span><span id="line-45"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Forging.html"><span class="hs-identifier">Cardano.Tools.DBSynthesizer.Forging</span></a></span><span>
+</span><span id="line-46"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Orphans.html"><span class="hs-identifier">Cardano.Tools.DBSynthesizer.Orphans</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html"><span class="hs-identifier">Cardano.Tools.DBSynthesizer.Types</span></a></span><span>
+</span><span id="line-48"></span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Run.html#initialize"><span class="hs-identifier hs-type">initialize</span></a></span><span>
+</span><span id="line-51"></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#NodeFilePaths"><span class="hs-identifier hs-type">NodeFilePaths</span></a></span><span>
+</span><span id="line-52"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#NodeCredentials"><span class="hs-identifier hs-type">NodeCredentials</span></a></span><span>
+</span><span id="line-53"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#DBSynthesizerOptions"><span class="hs-identifier hs-type">DBSynthesizerOptions</span></a></span><span>
+</span><span id="line-54"></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Either</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">String</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#DBSynthesizerConfig"><span class="hs-identifier hs-type">DBSynthesizerConfig</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Cardano.Node.Protocol.Types.html#SomeConsensusProtocol"><span class="hs-identifier hs-type">SomeConsensusProtocol</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-55"></span><span id="initialize"><span class="annot"><span class="annottext">initialize :: NodeFilePaths
+-&gt; NodeCredentials
+-&gt; DBSynthesizerOptions
+-&gt; IO (Either String (DBSynthesizerConfig, SomeConsensusProtocol))
+</span><a href="Cardano.Tools.DBSynthesizer.Run.html#initialize"><span class="hs-identifier hs-var hs-var">initialize</span></a></span></span><span> </span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#NodeFilePaths"><span class="hs-identifier hs-type">NodeFilePaths</span></a></span><span class="hs-special">{</span><span id="local-6989586621679373419"><span class="annot"><span class="annottext">String
+nfpConfig :: NodeFilePaths -&gt; String
+nfpConfig :: String
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#nfpConfig"><span class="hs-identifier hs-var hs-var">nfpConfig</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679373417"><span class="annot"><span class="annottext">String
+nfpChainDB :: NodeFilePaths -&gt; String
+nfpChainDB :: String
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#nfpChainDB"><span class="hs-identifier hs-var hs-var">nfpChainDB</span></a></span></span><span class="hs-special">}</span><span> </span><span id="local-6989586621679373415"><span class="annot"><span class="annottext">NodeCredentials
+</span><a href="#local-6989586621679373415"><span class="hs-identifier hs-var">creds</span></a></span></span><span> </span><span id="local-6989586621679373414"><span class="annot"><span class="annottext">DBSynthesizerOptions
+</span><a href="#local-6989586621679373414"><span class="hs-identifier hs-var">synthOptions</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-56"></span><span>    </span><span id="local-6989586621679373413"><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="#local-6989586621679373413"><span class="hs-identifier hs-var">relativeToConfig</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-57"></span><span>        </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/filepath-1.4.2.1/src"><span class="hs-operator hs-var">(&lt;/&gt;)</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; String -&gt; String)
+-&gt; (String -&gt; String) -&gt; String -&gt; String -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/filepath-1.4.2.1/src"><span class="hs-identifier hs-var">takeDirectory</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; String -&gt; String) -&gt; IO String -&gt; IO (String -&gt; String)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; IO String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/directory-1.3.6.0/src"><span class="hs-identifier hs-var">makeAbsolute</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679373419"><span class="hs-identifier hs-var">nfpConfig</span></a></span><span>
+</span><span id="line-58"></span><span>    </span><span class="annot"><span class="annottext">ExceptT String IO (DBSynthesizerConfig, SomeConsensusProtocol)
+-&gt; IO (Either String (DBSynthesizerConfig, SomeConsensusProtocol))
+forall e (m :: * -&gt; *) a. ExceptT e m a -&gt; m (Either e a)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-var">runExceptT</span></a></span><span> </span><span class="annot"><span class="annottext">(ExceptT String IO (DBSynthesizerConfig, SomeConsensusProtocol)
+ -&gt; IO (Either String (DBSynthesizerConfig, SomeConsensusProtocol)))
+-&gt; ExceptT String IO (DBSynthesizerConfig, SomeConsensusProtocol)
+-&gt; IO (Either String (DBSynthesizerConfig, SomeConsensusProtocol))
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-59"></span><span>        </span><span id="local-6989586621679373408"><span class="annot"><span class="annottext">DBSynthesizerConfig
+</span><a href="#local-6989586621679373408"><span class="hs-identifier hs-var">conf</span></a></span></span><span>    </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(String -&gt; String) -&gt; ExceptT String IO DBSynthesizerConfig
+</span><a href="#local-6989586621679373407"><span class="hs-identifier hs-var">initConf</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="#local-6989586621679373413"><span class="hs-identifier hs-var">relativeToConfig</span></a></span><span>
+</span><span id="line-60"></span><span>        </span><span id="local-6989586621679373406"><span class="annot"><span class="annottext">SomeConsensusProtocol
+</span><a href="#local-6989586621679373406"><span class="hs-identifier hs-var">proto</span></a></span></span><span>   </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(String -&gt; String)
+-&gt; DBSynthesizerConfig -&gt; ExceptT String IO SomeConsensusProtocol
+</span><a href="#local-6989586621679373405"><span class="hs-identifier hs-var">initProtocol</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="#local-6989586621679373413"><span class="hs-identifier hs-var">relativeToConfig</span></a></span><span> </span><span class="annot"><span class="annottext">DBSynthesizerConfig
+</span><a href="#local-6989586621679373408"><span class="hs-identifier hs-var">conf</span></a></span><span>
+</span><span id="line-61"></span><span>        </span><span class="annot"><span class="annottext">(DBSynthesizerConfig, SomeConsensusProtocol)
+-&gt; ExceptT String IO (DBSynthesizerConfig, SomeConsensusProtocol)
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">DBSynthesizerConfig
+</span><a href="#local-6989586621679373408"><span class="hs-identifier hs-var">conf</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">SomeConsensusProtocol
+</span><a href="#local-6989586621679373406"><span class="hs-identifier hs-var">proto</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-62"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-63"></span><span>    </span><span class="annot"><a href="#local-6989586621679373407"><span class="hs-identifier hs-type">initConf</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-type">ExceptT</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">String</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#DBSynthesizerConfig"><span class="hs-identifier hs-type">DBSynthesizerConfig</span></a></span><span>
+</span><span id="line-64"></span><span>    </span><span id="local-6989586621679373407"><span class="annot"><span class="annottext">initConf :: (String -&gt; String) -&gt; ExceptT String IO DBSynthesizerConfig
+</span><a href="#local-6989586621679373407"><span class="hs-identifier hs-var hs-var">initConf</span></a></span></span><span> </span><span id="local-6989586621679373404"><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="#local-6989586621679373404"><span class="hs-identifier hs-var">relativeToConfig</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-65"></span><span>        </span><span id="local-6989586621679373403"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679373403"><span class="hs-identifier hs-var">inp</span></a></span></span><span>             </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(IOException -&gt; String)
+-&gt; IO ByteString -&gt; ExceptT String IO ByteString
+forall (m :: * -&gt; *) x a.
+MonadIO m =&gt;
+(IOException -&gt; x) -&gt; IO a -&gt; ExceptT x m a
+</span><span class="hs-identifier hs-var">handleIOExceptT</span></span><span> </span><span class="annot"><span class="annottext">IOException -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; IO ByteString
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-var">BS.readFile</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679373419"><span class="hs-identifier hs-var">nfpConfig</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-66"></span><span>        </span><span id="local-6989586621679373401"><span class="annot"><span class="annottext">NodeConfigStub
+</span><a href="#local-6989586621679373401"><span class="hs-identifier hs-var">configStub</span></a></span></span><span>      </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(String -&gt; String) -&gt; NodeConfigStub -&gt; NodeConfigStub
+forall a. AdjustFilePaths a =&gt; (String -&gt; String) -&gt; a -&gt; a
+</span><a href="Cardano.Node.Types.html#adjustFilePaths"><span class="hs-identifier hs-var">adjustFilePaths</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="#local-6989586621679373404"><span class="hs-identifier hs-var">relativeToConfig</span></a></span><span> </span><span class="annot"><span class="annottext">(NodeConfigStub -&gt; NodeConfigStub)
+-&gt; ExceptT String IO NodeConfigStub
+-&gt; ExceptT String IO NodeConfigStub
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; ExceptT String IO NodeConfigStub
+forall (m :: * -&gt; *) a.
+(Monad m, FromJSON a) =&gt;
+ByteString -&gt; ExceptT String m a
+</span><a href="Cardano.Tools.DBSynthesizer.Run.html#readJson"><span class="hs-identifier hs-var">readJson</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679373403"><span class="hs-identifier hs-var">inp</span></a></span><span>
+</span><span id="line-67"></span><span>        </span><span id="local-6989586621679373398"><span class="annot"><span class="annottext">ShelleyGenesis StandardShelley
+</span><a href="#local-6989586621679373398"><span class="hs-identifier hs-var">shelleyGenesis</span></a></span></span><span>  </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; ExceptT String IO (ShelleyGenesis StandardShelley)
+forall a. FromJSON a =&gt; String -&gt; ExceptT String IO a
+</span><a href="Cardano.Tools.DBSynthesizer.Run.html#readFileJson"><span class="hs-identifier hs-var">readFileJson</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; ExceptT String IO (ShelleyGenesis StandardShelley))
+-&gt; String -&gt; ExceptT String IO (ShelleyGenesis StandardShelley)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">NodeConfigStub -&gt; String
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#ncsShelleyGenesisFile"><span class="hs-identifier hs-var hs-var">ncsShelleyGenesisFile</span></a></span><span> </span><span class="annot"><span class="annottext">NodeConfigStub
+</span><a href="#local-6989586621679373401"><span class="hs-identifier hs-var">configStub</span></a></span><span>
+</span><span id="line-68"></span><span>        </span><span class="annot"><span class="annottext">()
+</span><span class="hs-identifier">_</span></span><span>               </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Either String () -&gt; ExceptT String IO ()
+forall (m :: * -&gt; *) x a. Monad m =&gt; Either x a -&gt; ExceptT x m a
+</span><span class="hs-identifier hs-var">hoistEither</span></span><span> </span><span class="annot"><span class="annottext">(Either String () -&gt; ExceptT String IO ())
+-&gt; Either String () -&gt; ExceptT String IO ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ShelleyGenesis StandardShelley -&gt; Either String ()
+forall era.
+ShelleyBasedEra era =&gt;
+ShelleyGenesis era -&gt; Either String ()
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-shelley-0.3.0.0/noopt/doc/html/ouroboros-consensus-shelley/src"><span class="hs-identifier hs-var">validateGenesis</span></a></span><span> </span><span class="annot"><span class="annottext">ShelleyGenesis StandardShelley
+</span><a href="#local-6989586621679373398"><span class="hs-identifier hs-var">shelleyGenesis</span></a></span><span>
+</span><span id="line-69"></span><span>        </span><span class="hs-keyword">let</span><span>
+</span><span id="line-70"></span><span>            </span><span id="local-6989586621679373395"><span class="annot"><span class="annottext">protocolCredentials :: ProtocolFilepaths
+</span><a href="#local-6989586621679373395"><span class="hs-identifier hs-var hs-var">protocolCredentials</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ProtocolFilepaths :: Maybe String
+-&gt; Maybe String
+-&gt; Maybe String
+-&gt; Maybe String
+-&gt; Maybe String
+-&gt; Maybe String
+-&gt; ProtocolFilepaths
+</span><a href="Cardano.Node.Types.html#ProtocolFilepaths"><span class="hs-identifier hs-type">ProtocolFilepaths</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-71"></span><span>              </span><span class="annot"><span class="annottext">byronCertFile :: Maybe String
+</span><a href="Cardano.Node.Types.html#byronCertFile"><span class="hs-identifier hs-var">byronCertFile</span></a></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe String
+forall a. Maybe a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span>
+</span><span id="line-72"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">byronKeyFile :: Maybe String
+</span><a href="Cardano.Node.Types.html#byronKeyFile"><span class="hs-identifier hs-var">byronKeyFile</span></a></span><span>          </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe String
+forall a. Maybe a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span>
+</span><span id="line-73"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">shelleyKESFile :: Maybe String
+</span><a href="Cardano.Node.Types.html#shelleyKESFile"><span class="hs-identifier hs-var">shelleyKESFile</span></a></span><span>        </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NodeCredentials -&gt; Maybe String
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#credKESFile"><span class="hs-identifier hs-var hs-var">credKESFile</span></a></span><span> </span><span class="annot"><span class="annottext">NodeCredentials
+</span><a href="#local-6989586621679373415"><span class="hs-identifier hs-var">creds</span></a></span><span>
+</span><span id="line-74"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">shelleyVRFFile :: Maybe String
+</span><a href="Cardano.Node.Types.html#shelleyVRFFile"><span class="hs-identifier hs-var">shelleyVRFFile</span></a></span><span>        </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NodeCredentials -&gt; Maybe String
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#credVRFFile"><span class="hs-identifier hs-var hs-var">credVRFFile</span></a></span><span> </span><span class="annot"><span class="annottext">NodeCredentials
+</span><a href="#local-6989586621679373415"><span class="hs-identifier hs-var">creds</span></a></span><span>
+</span><span id="line-75"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">shelleyCertFile :: Maybe String
+</span><a href="Cardano.Node.Types.html#shelleyCertFile"><span class="hs-identifier hs-var">shelleyCertFile</span></a></span><span>       </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NodeCredentials -&gt; Maybe String
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#credCertFile"><span class="hs-identifier hs-var hs-var">credCertFile</span></a></span><span> </span><span class="annot"><span class="annottext">NodeCredentials
+</span><a href="#local-6989586621679373415"><span class="hs-identifier hs-var">creds</span></a></span><span>
+</span><span id="line-76"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">shelleyBulkCredsFile :: Maybe String
+</span><a href="Cardano.Node.Types.html#shelleyBulkCredsFile"><span class="hs-identifier hs-var">shelleyBulkCredsFile</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NodeCredentials -&gt; Maybe String
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#credBulkFile"><span class="hs-identifier hs-var hs-var">credBulkFile</span></a></span><span> </span><span class="annot"><span class="annottext">NodeCredentials
+</span><a href="#local-6989586621679373415"><span class="hs-identifier hs-var">creds</span></a></span><span>
+</span><span id="line-77"></span><span>            </span><span class="hs-special">}</span><span>
+</span><span id="line-78"></span><span>        </span><span class="annot"><span class="annottext">DBSynthesizerConfig -&gt; ExceptT String IO DBSynthesizerConfig
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">DBSynthesizerConfig :: NodeConfigStub
+-&gt; DBSynthesizerOptions
+-&gt; ProtocolFilepaths
+-&gt; ShelleyGenesis StandardShelley
+-&gt; String
+-&gt; DBSynthesizerConfig
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#DBSynthesizerConfig"><span class="hs-identifier hs-type">DBSynthesizerConfig</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-79"></span><span>              </span><span class="annot"><span class="annottext">confConfigStub :: NodeConfigStub
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#confConfigStub"><span class="hs-identifier hs-var">confConfigStub</span></a></span><span>            </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NodeConfigStub
+</span><a href="#local-6989586621679373401"><span class="hs-identifier hs-var">configStub</span></a></span><span>
+</span><span id="line-80"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">confOptions :: DBSynthesizerOptions
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#confOptions"><span class="hs-identifier hs-var">confOptions</span></a></span><span>               </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DBSynthesizerOptions
+</span><a href="#local-6989586621679373414"><span class="hs-identifier hs-var">synthOptions</span></a></span><span>
+</span><span id="line-81"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">confProtocolCredentials :: ProtocolFilepaths
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#confProtocolCredentials"><span class="hs-identifier hs-var">confProtocolCredentials</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ProtocolFilepaths
+</span><a href="#local-6989586621679373395"><span class="hs-identifier hs-var">protocolCredentials</span></a></span><span>
+</span><span id="line-82"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">confShelleyGenesis :: ShelleyGenesis StandardShelley
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#confShelleyGenesis"><span class="hs-identifier hs-var">confShelleyGenesis</span></a></span><span>        </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ShelleyGenesis StandardShelley
+</span><a href="#local-6989586621679373398"><span class="hs-identifier hs-var">shelleyGenesis</span></a></span><span>
+</span><span id="line-83"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">confDbDir :: String
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#confDbDir"><span class="hs-identifier hs-var">confDbDir</span></a></span><span>                 </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679373417"><span class="hs-identifier hs-var">nfpChainDB</span></a></span><span>
+</span><span id="line-84"></span><span>            </span><span class="hs-special">}</span><span>
+</span><span id="line-85"></span><span>
+</span><span id="line-86"></span><span>    </span><span class="annot"><a href="#local-6989586621679373405"><span class="hs-identifier hs-type">initProtocol</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#DBSynthesizerConfig"><span class="hs-identifier hs-type">DBSynthesizerConfig</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-type">ExceptT</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">String</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="annot"><a href="Cardano.Node.Protocol.Types.html#SomeConsensusProtocol"><span class="hs-identifier hs-type">SomeConsensusProtocol</span></a></span><span>
+</span><span id="line-87"></span><span>    </span><span id="local-6989586621679373405"><span class="annot"><span class="annottext">initProtocol :: (String -&gt; String)
+-&gt; DBSynthesizerConfig -&gt; ExceptT String IO SomeConsensusProtocol
+</span><a href="#local-6989586621679373405"><span class="hs-identifier hs-var hs-var">initProtocol</span></a></span></span><span> </span><span id="local-6989586621679373377"><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="#local-6989586621679373377"><span class="hs-identifier hs-var">relativeToConfig</span></a></span></span><span> </span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#DBSynthesizerConfig"><span class="hs-identifier hs-type">DBSynthesizerConfig</span></a></span><span class="hs-special">{</span><span id="local-6989586621679373376"><span class="annot"><span class="annottext">NodeConfigStub
+confConfigStub :: NodeConfigStub
+confConfigStub :: DBSynthesizerConfig -&gt; NodeConfigStub
+</span><a href="#local-6989586621679373376"><span class="hs-identifier hs-var hs-var">confConfigStub</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679373375"><span class="annot"><span class="annottext">ProtocolFilepaths
+confProtocolCredentials :: ProtocolFilepaths
+confProtocolCredentials :: DBSynthesizerConfig -&gt; ProtocolFilepaths
+</span><a href="#local-6989586621679373375"><span class="hs-identifier hs-var hs-var">confProtocolCredentials</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-88"></span><span>        </span><span id="local-6989586621679373374"><span class="annot"><span class="annottext">NodeHardForkProtocolConfiguration
+</span><a href="#local-6989586621679373374"><span class="hs-identifier hs-var">hfConfig</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Cardano.Node.Types.html#NodeHardForkProtocolConfiguration"><span class="hs-identifier hs-type">NodeHardForkProtocolConfiguration</span></a></span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-89"></span><span>            </span><span class="annot"><span class="annottext">Either String NodeHardForkProtocolConfiguration
+-&gt; ExceptT String IO NodeHardForkProtocolConfiguration
+forall (m :: * -&gt; *) x a. Monad m =&gt; Either x a -&gt; ExceptT x m a
+</span><span class="hs-identifier hs-var">hoistEither</span></span><span> </span><span class="annot"><span class="annottext">Either String NodeHardForkProtocolConfiguration
+</span><a href="#local-6989586621679373373"><span class="hs-identifier hs-var">hfConfig_</span></a></span><span>
+</span><span id="line-90"></span><span>        </span><span id="local-6989586621679373372"><span class="annot"><span class="annottext">NodeByronProtocolConfiguration
+</span><a href="#local-6989586621679373372"><span class="hs-identifier hs-var">byronConfig</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Cardano.Node.Types.html#NodeByronProtocolConfiguration"><span class="hs-identifier hs-type">NodeByronProtocolConfiguration</span></a></span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-91"></span><span>            </span><span class="annot"><span class="annottext">(String -&gt; String)
+-&gt; NodeByronProtocolConfiguration -&gt; NodeByronProtocolConfiguration
+forall a. AdjustFilePaths a =&gt; (String -&gt; String) -&gt; a -&gt; a
+</span><a href="Cardano.Node.Types.html#adjustFilePaths"><span class="hs-identifier hs-var">adjustFilePaths</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="#local-6989586621679373377"><span class="hs-identifier hs-var">relativeToConfig</span></a></span><span> </span><span class="annot"><span class="annottext">(NodeByronProtocolConfiguration -&gt; NodeByronProtocolConfiguration)
+-&gt; ExceptT String IO NodeByronProtocolConfiguration
+-&gt; ExceptT String IO NodeByronProtocolConfiguration
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Either String NodeByronProtocolConfiguration
+-&gt; ExceptT String IO NodeByronProtocolConfiguration
+forall (m :: * -&gt; *) x a. Monad m =&gt; Either x a -&gt; ExceptT x m a
+</span><span class="hs-identifier hs-var">hoistEither</span></span><span> </span><span class="annot"><span class="annottext">Either String NodeByronProtocolConfiguration
+</span><a href="#local-6989586621679373371"><span class="hs-identifier hs-var">byConfig_</span></a></span><span>
+</span><span id="line-92"></span><span>
+</span><span id="line-93"></span><span>        </span><span class="hs-keyword">let</span><span>
+</span><span id="line-94"></span><span>            </span><span id="local-6989586621679373370"><span class="annot"><span class="annottext">cardanoConfig :: NodeProtocolConfiguration
+</span><a href="#local-6989586621679373370"><span class="hs-identifier hs-var hs-var">cardanoConfig</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NodeByronProtocolConfiguration
+-&gt; NodeShelleyProtocolConfiguration
+-&gt; NodeAlonzoProtocolConfiguration
+-&gt; NodeConwayProtocolConfiguration
+-&gt; NodeHardForkProtocolConfiguration
+-&gt; NodeProtocolConfiguration
+</span><a href="Cardano.Node.Types.html#NodeProtocolConfigurationCardano"><span class="hs-identifier hs-var">NodeProtocolConfigurationCardano</span></a></span><span> </span><span class="annot"><span class="annottext">NodeByronProtocolConfiguration
+</span><a href="#local-6989586621679373372"><span class="hs-identifier hs-var">byronConfig</span></a></span><span> </span><span class="annot"><span class="annottext">NodeShelleyProtocolConfiguration
+</span><a href="#local-6989586621679373368"><span class="hs-identifier hs-var">shelleyConfig</span></a></span><span> </span><span class="annot"><span class="annottext">NodeAlonzoProtocolConfiguration
+</span><a href="#local-6989586621679373367"><span class="hs-identifier hs-var">alonzoConfig</span></a></span><span> </span><span class="annot"><span class="annottext">NodeConwayProtocolConfiguration
+</span><a href="#local-6989586621679373366"><span class="hs-identifier hs-var">conwayConfig</span></a></span><span> </span><span class="annot"><span class="annottext">NodeHardForkProtocolConfiguration
+</span><a href="#local-6989586621679373374"><span class="hs-identifier hs-var">hfConfig</span></a></span><span>
+</span><span id="line-95"></span><span>        </span><span class="annot"><span class="annottext">(ProtocolInstantiationError -&gt; String)
+-&gt; ExceptT ProtocolInstantiationError IO SomeConsensusProtocol
+-&gt; ExceptT String IO SomeConsensusProtocol
+forall (m :: * -&gt; *) x y a.
+Functor m =&gt;
+(x -&gt; y) -&gt; ExceptT x m a -&gt; ExceptT y m a
+</span><span class="hs-identifier hs-var">firstExceptT</span></span><span> </span><span class="annot"><span class="annottext">ProtocolInstantiationError -&gt; String
+forall e. Error e =&gt; e -&gt; String
+</span><a href="Cardano.Api.Any.html#displayError"><span class="hs-identifier hs-var">displayError</span></a></span><span> </span><span class="annot"><span class="annottext">(ExceptT ProtocolInstantiationError IO SomeConsensusProtocol
+ -&gt; ExceptT String IO SomeConsensusProtocol)
+-&gt; ExceptT ProtocolInstantiationError IO SomeConsensusProtocol
+-&gt; ExceptT String IO SomeConsensusProtocol
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-96"></span><span>            </span><span class="annot"><span class="annottext">NodeProtocolConfiguration
+-&gt; Maybe ProtocolFilepaths
+-&gt; ExceptT ProtocolInstantiationError IO SomeConsensusProtocol
+</span><a href="Cardano.Node.Protocol.html#mkConsensusProtocol"><span class="hs-identifier hs-var">mkConsensusProtocol</span></a></span><span>
+</span><span id="line-97"></span><span>                </span><span class="annot"><span class="annottext">NodeProtocolConfiguration
+</span><a href="#local-6989586621679373370"><span class="hs-identifier hs-var">cardanoConfig</span></a></span><span>
+</span><span id="line-98"></span><span>                </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ProtocolFilepaths -&gt; Maybe ProtocolFilepaths
+forall a. a -&gt; Maybe a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">ProtocolFilepaths
+</span><a href="#local-6989586621679373375"><span class="hs-identifier hs-var">confProtocolCredentials</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-99"></span><span>      </span><span class="hs-keyword">where</span><span>
+</span><span id="line-100"></span><span>        </span><span id="local-6989586621679373368"><span class="annot"><span class="annottext">shelleyConfig :: NodeShelleyProtocolConfiguration
+</span><a href="#local-6989586621679373368"><span class="hs-identifier hs-var hs-var">shelleyConfig</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">GenesisFile
+-&gt; Maybe GenesisHash -&gt; NodeShelleyProtocolConfiguration
+</span><a href="Cardano.Node.Types.html#NodeShelleyProtocolConfiguration"><span class="hs-identifier hs-var">NodeShelleyProtocolConfiguration</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; GenesisFile
+</span><a href="Cardano.Node.Types.html#GenesisFile"><span class="hs-identifier hs-var">GenesisFile</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; GenesisFile) -&gt; String -&gt; GenesisFile
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">NodeConfigStub -&gt; String
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#ncsShelleyGenesisFile"><span class="hs-identifier hs-var hs-var">ncsShelleyGenesisFile</span></a></span><span> </span><span class="annot"><span class="annottext">NodeConfigStub
+</span><a href="#local-6989586621679373376"><span class="hs-identifier hs-var">confConfigStub</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Maybe GenesisHash
+forall a. Maybe a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span>
+</span><span id="line-101"></span><span>        </span><span id="local-6989586621679373367"><span class="annot"><span class="annottext">alonzoConfig :: NodeAlonzoProtocolConfiguration
+</span><a href="#local-6989586621679373367"><span class="hs-identifier hs-var hs-var">alonzoConfig</span></a></span></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">GenesisFile -&gt; Maybe GenesisHash -&gt; NodeAlonzoProtocolConfiguration
+</span><a href="Cardano.Node.Types.html#NodeAlonzoProtocolConfiguration"><span class="hs-identifier hs-var">NodeAlonzoProtocolConfiguration</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; GenesisFile
+</span><a href="Cardano.Node.Types.html#GenesisFile"><span class="hs-identifier hs-var">GenesisFile</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; GenesisFile) -&gt; String -&gt; GenesisFile
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">NodeConfigStub -&gt; String
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#ncsAlonzoGenesisFile"><span class="hs-identifier hs-var hs-var">ncsAlonzoGenesisFile</span></a></span><span> </span><span class="annot"><span class="annottext">NodeConfigStub
+</span><a href="#local-6989586621679373376"><span class="hs-identifier hs-var">confConfigStub</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Maybe GenesisHash
+forall a. Maybe a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span>
+</span><span id="line-102"></span><span>        </span><span id="local-6989586621679373366"><span class="annot"><span class="annottext">conwayConfig :: NodeConwayProtocolConfiguration
+</span><a href="#local-6989586621679373366"><span class="hs-identifier hs-var hs-var">conwayConfig</span></a></span></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">GenesisFile -&gt; Maybe GenesisHash -&gt; NodeConwayProtocolConfiguration
+</span><a href="Cardano.Node.Types.html#NodeConwayProtocolConfiguration"><span class="hs-identifier hs-var">NodeConwayProtocolConfiguration</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; GenesisFile
+</span><a href="Cardano.Node.Types.html#GenesisFile"><span class="hs-identifier hs-var">GenesisFile</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; GenesisFile) -&gt; String -&gt; GenesisFile
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">NodeConfigStub -&gt; String
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#ncsConwayGenesisFile"><span class="hs-identifier hs-var hs-var">ncsConwayGenesisFile</span></a></span><span> </span><span class="annot"><span class="annottext">NodeConfigStub
+</span><a href="#local-6989586621679373376"><span class="hs-identifier hs-var">confConfigStub</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Maybe GenesisHash
+forall a. Maybe a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span>
+</span><span id="line-103"></span><span>        </span><span id="local-6989586621679373373"><span class="annot"><span class="annottext">hfConfig_ :: Either String NodeHardForkProtocolConfiguration
+</span><a href="#local-6989586621679373373"><span class="hs-identifier hs-var hs-var">hfConfig_</span></a></span></span><span>       </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Value -&gt; Either String NodeHardForkProtocolConfiguration
+forall a. FromJSON a =&gt; Value -&gt; Either String a
+</span><a href="Cardano.Tools.DBSynthesizer.Run.html#eitherParseJson"><span class="hs-identifier hs-var">eitherParseJson</span></a></span><span> </span><span class="annot"><span class="annottext">(Value -&gt; Either String NodeHardForkProtocolConfiguration)
+-&gt; Value -&gt; Either String NodeHardForkProtocolConfiguration
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">NodeConfigStub -&gt; Value
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#ncsNodeConfig"><span class="hs-identifier hs-var hs-var">ncsNodeConfig</span></a></span><span> </span><span class="annot"><span class="annottext">NodeConfigStub
+</span><a href="#local-6989586621679373376"><span class="hs-identifier hs-var">confConfigStub</span></a></span><span>
+</span><span id="line-104"></span><span>        </span><span id="local-6989586621679373371"><span class="annot"><span class="annottext">byConfig_ :: Either String NodeByronProtocolConfiguration
+</span><a href="#local-6989586621679373371"><span class="hs-identifier hs-var hs-var">byConfig_</span></a></span></span><span>       </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Value -&gt; Either String NodeByronProtocolConfiguration
+forall a. FromJSON a =&gt; Value -&gt; Either String a
+</span><a href="Cardano.Tools.DBSynthesizer.Run.html#eitherParseJson"><span class="hs-identifier hs-var">eitherParseJson</span></a></span><span> </span><span class="annot"><span class="annottext">(Value -&gt; Either String NodeByronProtocolConfiguration)
+-&gt; Value -&gt; Either String NodeByronProtocolConfiguration
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">NodeConfigStub -&gt; Value
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#ncsNodeConfig"><span class="hs-identifier hs-var hs-var">ncsNodeConfig</span></a></span><span> </span><span class="annot"><span class="annottext">NodeConfigStub
+</span><a href="#local-6989586621679373376"><span class="hs-identifier hs-var">confConfigStub</span></a></span><span>
+</span><span id="line-105"></span><span>
+</span><span id="line-106"></span><span id="local-6989586621679373580"><span id="local-6989586621679373581"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Run.html#readJson"><span class="hs-identifier hs-type">readJson</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Monad</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679373581"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FromJSON</span></span><span> </span><span class="annot"><a href="#local-6989586621679373580"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-type">ByteString</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-type">ExceptT</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">String</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679373581"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679373580"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-107"></span><span id="readJson"><span class="annot"><span class="annottext">readJson :: ByteString -&gt; ExceptT String m a
+</span><a href="Cardano.Tools.DBSynthesizer.Run.html#readJson"><span class="hs-identifier hs-var hs-var">readJson</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Either String a -&gt; ExceptT String m a
+forall (m :: * -&gt; *) x a. Monad m =&gt; Either x a -&gt; ExceptT x m a
+</span><span class="hs-identifier hs-var">hoistEither</span></span><span> </span><span class="annot"><span class="annottext">(Either String a -&gt; ExceptT String m a)
+-&gt; (ByteString -&gt; Either String a)
+-&gt; ByteString
+-&gt; ExceptT String m a
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; Either String a
+forall a. FromJSON a =&gt; ByteString -&gt; Either String a
+</span><span class="hs-identifier hs-var">eitherDecodeStrict'</span></span><span>
+</span><span id="line-108"></span><span>
+</span><span id="line-109"></span><span id="local-6989586621679373576"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Run.html#readFileJson"><span class="hs-identifier hs-type">readFileJson</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FromJSON</span></span><span> </span><span class="annot"><a href="#local-6989586621679373576"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-type">ExceptT</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">String</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679373576"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-110"></span><span id="readFileJson"><span class="annot"><span class="annottext">readFileJson :: String -&gt; ExceptT String IO a
+</span><a href="Cardano.Tools.DBSynthesizer.Run.html#readFileJson"><span class="hs-identifier hs-var hs-var">readFileJson</span></a></span></span><span> </span><span id="local-6989586621679373356"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679373356"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(IOException -&gt; String)
+-&gt; IO (Either String a) -&gt; ExceptT String IO (Either String a)
+forall (m :: * -&gt; *) x a.
+MonadIO m =&gt;
+(IOException -&gt; x) -&gt; IO a -&gt; ExceptT x m a
+</span><span class="hs-identifier hs-var">handleIOExceptT</span></span><span> </span><span class="annot"><span class="annottext">IOException -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; IO (Either String a)
+forall a. FromJSON a =&gt; String -&gt; IO (Either String a)
+</span><span class="hs-identifier hs-var">eitherDecodeFileStrict'</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679373356"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">ExceptT String IO (Either String a)
+-&gt; (Either String a -&gt; ExceptT String IO a) -&gt; ExceptT String IO a
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&gt;&gt;=</span></a></span><span> </span><span class="annot"><span class="annottext">Either String a -&gt; ExceptT String IO a
+forall (m :: * -&gt; *) x a. Monad m =&gt; Either x a -&gt; ExceptT x m a
+</span><span class="hs-identifier hs-var">hoistEither</span></span><span>
+</span><span id="line-111"></span><span>
+</span><span id="line-112"></span><span id="local-6989586621679373552"><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Run.html#eitherParseJson"><span class="hs-identifier hs-type">eitherParseJson</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FromJSON</span></span><span> </span><span class="annot"><a href="#local-6989586621679373552"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Aeson.Value</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Either</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">String</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679373552"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-113"></span><span id="eitherParseJson"><span class="annot"><span class="annottext">eitherParseJson :: Value -&gt; Either String a
+</span><a href="Cardano.Tools.DBSynthesizer.Run.html#eitherParseJson"><span class="hs-identifier hs-var hs-var">eitherParseJson</span></a></span></span><span> </span><span id="local-6989586621679373355"><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679373355"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Value -&gt; Result a
+forall a. FromJSON a =&gt; Value -&gt; Result a
+</span><span class="hs-identifier hs-var">fromJSON</span></span><span> </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679373355"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-114"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Error</span></span><span> </span><span id="local-6989586621679373353"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679373353"><span class="hs-identifier hs-var">err</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; Either String a
+forall a b. a -&gt; Either a b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Left</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679373353"><span class="hs-identifier hs-var">err</span></a></span><span>
+</span><span id="line-115"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Success</span></span><span> </span><span id="local-6989586621679373351"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679373351"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">a -&gt; Either String a
+forall a b. b -&gt; Either a b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Right</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679373351"><span class="hs-identifier hs-var">a</span></a></span><span>
+</span><span id="line-116"></span><span>
+</span><span id="line-117"></span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Run.html#synthesize"><span class="hs-identifier hs-type">synthesize</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#DBSynthesizerConfig"><span class="hs-identifier hs-type">DBSynthesizerConfig</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Cardano.Node.Protocol.Types.html#SomeConsensusProtocol"><span class="hs-identifier hs-type">SomeConsensusProtocol</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#ForgeResult"><span class="hs-identifier hs-type">ForgeResult</span></a></span><span>
+</span><span id="line-118"></span><span id="synthesize"><span class="annot"><span class="annottext">synthesize :: DBSynthesizerConfig -&gt; SomeConsensusProtocol -&gt; IO ForgeResult
+</span><a href="Cardano.Tools.DBSynthesizer.Run.html#synthesize"><span class="hs-identifier hs-var hs-var">synthesize</span></a></span></span><span> </span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#DBSynthesizerConfig"><span class="hs-identifier hs-type">DBSynthesizerConfig</span></a></span><span class="hs-special">{</span><span id="local-6989586621679373350"><span class="annot"><span class="annottext">DBSynthesizerOptions
+confOptions :: DBSynthesizerOptions
+confOptions :: DBSynthesizerConfig -&gt; DBSynthesizerOptions
+</span><a href="#local-6989586621679373350"><span class="hs-identifier hs-var hs-var">confOptions</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679373349"><span class="annot"><span class="annottext">ShelleyGenesis StandardShelley
+confShelleyGenesis :: ShelleyGenesis StandardShelley
+confShelleyGenesis :: DBSynthesizerConfig -&gt; ShelleyGenesis StandardShelley
+</span><a href="#local-6989586621679373349"><span class="hs-identifier hs-var hs-var">confShelleyGenesis</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679373348"><span class="annot"><span class="annottext">String
+confDbDir :: String
+confDbDir :: DBSynthesizerConfig -&gt; String
+</span><a href="#local-6989586621679373348"><span class="hs-identifier hs-var hs-var">confDbDir</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Cardano.Node.Protocol.Types.html#SomeConsensusProtocol"><span class="hs-identifier hs-type">SomeConsensusProtocol</span></a></span><span> </span><span class="annot"><span class="annottext">BlockType blk
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679373346"><span class="annot"><span class="annottext">ProtocolInfoArgs IO blk
+</span><a href="#local-6989586621679373346"><span class="hs-identifier hs-var">runP</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-119"></span><span>    </span><span class="annot"><span class="annottext">(ResourceRegistry IO -&gt; IO ForgeResult) -&gt; IO ForgeResult
+forall (m :: * -&gt; *) a.
+(IOLike m, HasCallStack) =&gt;
+(ResourceRegistry m -&gt; m a) -&gt; m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">withRegistry</span></a></span><span> </span><span class="annot"><span class="annottext">((ResourceRegistry IO -&gt; IO ForgeResult) -&gt; IO ForgeResult)
+-&gt; (ResourceRegistry IO -&gt; IO ForgeResult) -&gt; IO ForgeResult
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679373344"><span class="annot"><span class="annottext">ResourceRegistry IO
+</span><a href="#local-6989586621679373344"><span class="hs-identifier hs-var">registry</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-120"></span><span>        </span><span class="hs-keyword">let</span><span>
+</span><span id="line-121"></span><span>            </span><span id="local-6989586621679373343"><span class="annot"><span class="annottext">epochSize :: EpochSize
+</span><a href="#local-6989586621679373343"><span class="hs-identifier hs-var hs-var">epochSize</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ShelleyGenesis StandardShelley -&gt; EpochSize
+forall era. ShelleyGenesis era -&gt; EpochSize
+</span><span class="hs-identifier hs-var hs-var">sgEpochLength</span></span><span> </span><span class="annot"><span class="annottext">ShelleyGenesis StandardShelley
+</span><a href="#local-6989586621679373349"><span class="hs-identifier hs-var">confShelleyGenesis</span></a></span><span>
+</span><span id="line-122"></span><span>            </span><span id="local-6989586621679373341"><span class="annot"><span class="annottext">chunkInfo :: ChunkInfo
+</span><a href="#local-6989586621679373341"><span class="hs-identifier hs-var hs-var">chunkInfo</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StorageConfig blk -&gt; ChunkInfo
+forall blk. NodeInitStorage blk =&gt; StorageConfig blk -&gt; ChunkInfo
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">Node.nodeImmutableDbChunkInfo</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TopLevelConfig blk -&gt; StorageConfig blk
+forall blk. TopLevelConfig blk -&gt; StorageConfig blk
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">configStorage</span></a></span><span> </span><span class="annot"><span class="annottext">TopLevelConfig blk
+</span><a href="#local-6989586621679373340"><span class="hs-identifier hs-var">pInfoConfig</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-123"></span><span>            </span><span id="local-6989586621679373339"><span class="annot"><span class="annottext">k :: SecurityParam
+</span><a href="#local-6989586621679373339"><span class="hs-identifier hs-var hs-var">k</span></a></span></span><span>           </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TopLevelConfig blk -&gt; SecurityParam
+forall blk.
+ConsensusProtocol (BlockProtocol blk) =&gt;
+TopLevelConfig blk -&gt; SecurityParam
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">configSecurityParam</span></a></span><span> </span><span class="annot"><span class="annottext">TopLevelConfig blk
+</span><a href="#local-6989586621679373340"><span class="hs-identifier hs-var">pInfoConfig</span></a></span><span>
+</span><span id="line-124"></span><span>            </span><span id="local-6989586621679373338"><span class="annot"><span class="annottext">diskPolicy :: DiskPolicy
+</span><a href="#local-6989586621679373338"><span class="hs-identifier hs-var hs-var">diskPolicy</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SecurityParam -&gt; SnapshotInterval -&gt; DiskPolicy
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">defaultDiskPolicy</span></a></span><span> </span><span class="annot"><span class="annottext">SecurityParam
+</span><a href="#local-6989586621679373339"><span class="hs-identifier hs-var">k</span></a></span><span> </span><span class="annot"><span class="annottext">SnapshotInterval
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">DefaultSnapshotInterval</span></a></span><span>
+</span><span id="line-125"></span><span>            </span><span id="local-6989586621679373336"><span class="annot"><span class="annottext">dbArgs :: ChainDbArgs Identity IO blk
+</span><a href="#local-6989586621679373336"><span class="hs-identifier hs-var hs-var">dbArgs</span></a></span></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ResourceRegistry IO
+-&gt; CheckInFuture IO blk
+-&gt; TopLevelConfig blk
+-&gt; ExtLedgerState blk
+-&gt; ChunkInfo
+-&gt; ChainDbArgs Defaults IO blk
+-&gt; ChainDbArgs Identity IO blk
+forall (m :: * -&gt; *) blk.
+(RunNode blk, IOLike m) =&gt;
+ResourceRegistry m
+-&gt; CheckInFuture m blk
+-&gt; TopLevelConfig blk
+-&gt; ExtLedgerState blk
+-&gt; ChunkInfo
+-&gt; ChainDbArgs Defaults m blk
+-&gt; ChainDbArgs Identity m blk
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-diffusion-0.2.0.0/noopt/doc/html/ouroboros-consensus-diffusion/src"><span class="hs-identifier hs-var">Node.mkChainDbArgs</span></a></span><span>
+</span><span id="line-126"></span><span>                </span><span class="annot"><span class="annottext">ResourceRegistry IO
+</span><a href="#local-6989586621679373344"><span class="hs-identifier hs-var">registry</span></a></span><span> </span><span class="annot"><span class="annottext">CheckInFuture IO blk
+forall (m :: * -&gt; *) blk. Monad m =&gt; CheckInFuture m blk
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">InFuture.dontCheck</span></a></span><span> </span><span class="annot"><span class="annottext">TopLevelConfig blk
+</span><a href="#local-6989586621679373340"><span class="hs-identifier hs-var">pInfoConfig</span></a></span><span> </span><span class="annot"><span class="annottext">ExtLedgerState blk
+</span><a href="#local-6989586621679373335"><span class="hs-identifier hs-var">pInfoInitLedger</span></a></span><span> </span><span class="annot"><span class="annottext">ChunkInfo
+</span><a href="#local-6989586621679373341"><span class="hs-identifier hs-var">chunkInfo</span></a></span><span> </span><span class="annot"><span class="annottext">(ChainDbArgs Defaults IO blk -&gt; ChainDbArgs Identity IO blk)
+-&gt; ChainDbArgs Defaults IO blk -&gt; ChainDbArgs Identity IO blk
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-127"></span><span>                    </span><span class="annot"><span class="annottext">(RelativeMountPoint -&gt; SomeHasFS IO)
+-&gt; DiskPolicy -&gt; ChainDbArgs Defaults IO blk
+forall (m :: * -&gt; *) blk.
+Monad m =&gt;
+(RelativeMountPoint -&gt; SomeHasFS m)
+-&gt; DiskPolicy -&gt; ChainDbArgs Defaults m blk
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">ChainDB.defaultArgs</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; RelativeMountPoint -&gt; SomeHasFS IO
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-diffusion-0.2.0.0/noopt/doc/html/ouroboros-consensus-diffusion/src"><span class="hs-identifier hs-var">Node.stdMkChainDbHasFS</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679373348"><span class="hs-identifier hs-var">confDbDir</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">DiskPolicy
+</span><a href="#local-6989586621679373338"><span class="hs-identifier hs-var">diskPolicy</span></a></span><span>
+</span><span id="line-128"></span><span>
+</span><span id="line-129"></span><span>        </span><span id="local-6989586621679373334"><span class="annot"><span class="annottext">[BlockForging IO blk]
+</span><a href="#local-6989586621679373334"><span class="hs-identifier hs-var">forgers</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">IO [BlockForging IO blk]
+</span><a href="#local-6989586621679373333"><span class="hs-identifier hs-var">pInfoBlockForging</span></a></span><span>
+</span><span id="line-130"></span><span>        </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679373332"><span class="annot"><span class="annottext">fCount :: Int
+</span><a href="#local-6989586621679373332"><span class="hs-identifier hs-var hs-var">fCount</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[BlockForging IO blk] -&gt; Int
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">length</span></a></span><span> </span><span class="annot"><span class="annottext">[BlockForging IO blk]
+</span><a href="#local-6989586621679373334"><span class="hs-identifier hs-var">forgers</span></a></span><span>
+</span><span id="line-131"></span><span>        </span><span class="annot"><span class="annottext">String -&gt; IO ()
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">putStrLn</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; IO ()) -&gt; String -&gt; IO ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;--&gt; forger count: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">++</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679373332"><span class="hs-identifier hs-var">fCount</span></a></span><span>
+</span><span id="line-132"></span><span>        </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679373332"><span class="hs-identifier hs-var">fCount</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-133"></span><span>            </span><span class="hs-keyword">then</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-134"></span><span>                </span><span class="annot"><span class="annottext">String -&gt; IO ()
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">putStrLn</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; IO ()) -&gt; String -&gt; IO ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;--&gt; opening ChainDB on file system with mode: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">++</span></a></span><span> </span><span class="annot"><span class="annottext">DBSynthesizerOpenMode -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="annot"><span class="annottext">DBSynthesizerOpenMode
+</span><a href="#local-6989586621679373328"><span class="hs-identifier hs-var">synthOpenMode</span></a></span><span>
+</span><span id="line-135"></span><span>                </span><span class="annot"><span class="annottext">DBSynthesizerOpenMode -&gt; String -&gt; IO ()
+</span><a href="Cardano.Tools.DBSynthesizer.Run.html#preOpenChainDB"><span class="hs-identifier hs-var">preOpenChainDB</span></a></span><span> </span><span class="annot"><span class="annottext">DBSynthesizerOpenMode
+</span><a href="#local-6989586621679373328"><span class="hs-identifier hs-var">synthOpenMode</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679373348"><span class="hs-identifier hs-var">confDbDir</span></a></span><span>
+</span><span id="line-136"></span><span>                </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679373326"><span class="annot"><span class="annottext">dbTracer :: Tracer IO a
+</span><a href="#local-6989586621679373326"><span class="hs-identifier hs-var hs-var">dbTracer</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer IO a
+forall (m :: * -&gt; *) a. Applicative m =&gt; Tracer m a
+</span><span class="hs-identifier hs-var">nullTracer</span></span><span>
+</span><span id="line-137"></span><span>                </span><span class="annot"><span class="annottext">ChainDbArgs Identity IO blk
+-&gt; (ChainDB IO blk -&gt; IO ForgeResult) -&gt; IO ForgeResult
+forall (m :: * -&gt; *) blk a.
+(IOLike m, LedgerSupportsProtocol blk, InspectLedger blk,
+ HasHardForkHistory blk, ConvertRawHash blk,
+ SerialiseDiskConstraints blk) =&gt;
+ChainDbArgs Identity m blk -&gt; (ChainDB m blk -&gt; m a) -&gt; m a
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">ChainDB.withDB</span></a></span><span> </span><span class="annot"><span class="annottext">ChainDbArgs Identity IO blk
+</span><a href="#local-6989586621679373336"><span class="hs-identifier hs-var">dbArgs</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">cdbTracer :: Tracer IO (TraceEvent blk)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">ChainDB.cdbTracer</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tracer IO (TraceEvent blk)
+forall a. Tracer IO a
+</span><a href="#local-6989586621679373326"><span class="hs-identifier hs-var">dbTracer</span></a></span><span class="hs-special">}</span><span> </span><span class="annot"><span class="annottext">((ChainDB IO blk -&gt; IO ForgeResult) -&gt; IO ForgeResult)
+-&gt; (ChainDB IO blk -&gt; IO ForgeResult) -&gt; IO ForgeResult
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679373325"><span class="annot"><span class="annottext">ChainDB IO blk
+</span><a href="#local-6989586621679373325"><span class="hs-identifier hs-var">chainDB</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-138"></span><span>                    </span><span id="local-6989586621679373324"><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679373324"><span class="hs-identifier hs-var">slotNo</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-139"></span><span>                        </span><span id="local-6989586621679373323"><span class="annot"><span class="annottext">Point blk
+</span><a href="#local-6989586621679373323"><span class="hs-identifier hs-var">tip</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">STM IO (Point blk) -&gt; IO (Point blk)
+forall (m :: * -&gt; *) a.
+(MonadSTM m, HasCallStack) =&gt;
+STM m a -&gt; m a
+</span><span class="hs-identifier hs-var">atomically</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ChainDB IO blk -&gt; STM IO (Point blk)
+forall (m :: * -&gt; *) blk. ChainDB m blk -&gt; STM m (Point blk)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var">ChainDB.getTipPoint</span></a></span><span> </span><span class="annot"><span class="annottext">ChainDB IO blk
+</span><a href="#local-6989586621679373325"><span class="hs-identifier hs-var">chainDB</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-140"></span><span>                        </span><span class="annot"><span class="annottext">SlotNo -&gt; IO SlotNo
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">(SlotNo -&gt; IO SlotNo) -&gt; SlotNo -&gt; IO SlotNo
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Point blk -&gt; WithOrigin SlotNo
+forall block. Point block -&gt; WithOrigin SlotNo
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">pointSlot</span></a></span><span> </span><span class="annot"><span class="annottext">Point blk
+</span><a href="#local-6989586621679373323"><span class="hs-identifier hs-var">tip</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-141"></span><span>                            </span><span class="annot"><span class="annottext">WithOrigin SlotNo
+</span><span class="hs-identifier hs-var">Origin</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SlotNo
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-142"></span><span>                            </span><span class="annot"><span class="hs-identifier hs-type">At</span></span><span> </span><span id="local-6989586621679373319"><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679373319"><span class="hs-identifier hs-var">s</span></a></span></span><span>   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; SlotNo
+forall a. Enum a =&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">succ</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679373319"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-143"></span><span>
+</span><span id="line-144"></span><span>                    </span><span class="annot"><span class="annottext">String -&gt; IO ()
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">putStrLn</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; IO ()) -&gt; String -&gt; IO ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;--&gt; starting at: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">++</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679373324"><span class="hs-identifier hs-var">slotNo</span></a></span><span>
+</span><span id="line-145"></span><span>                    </span><span class="annot"><span class="annottext">EpochSize
+-&gt; SlotNo
+-&gt; ForgeLimit
+-&gt; ChainDB IO blk
+-&gt; [BlockForging IO blk]
+-&gt; TopLevelConfig blk
+-&gt; IO ForgeResult
+forall blk.
+LedgerSupportsProtocol blk =&gt;
+EpochSize
+-&gt; SlotNo
+-&gt; ForgeLimit
+-&gt; ChainDB IO blk
+-&gt; [BlockForging IO blk]
+-&gt; TopLevelConfig blk
+-&gt; IO ForgeResult
+</span><a href="Cardano.Tools.DBSynthesizer.Forging.html#runForge"><span class="hs-identifier hs-var">runForge</span></a></span><span> </span><span class="annot"><span class="annottext">EpochSize
+</span><a href="#local-6989586621679373343"><span class="hs-identifier hs-var">epochSize</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679373324"><span class="hs-identifier hs-var">slotNo</span></a></span><span> </span><span class="annot"><span class="annottext">ForgeLimit
+</span><a href="#local-6989586621679373316"><span class="hs-identifier hs-var">synthLimit</span></a></span><span> </span><span class="annot"><span class="annottext">ChainDB IO blk
+</span><a href="#local-6989586621679373325"><span class="hs-identifier hs-var">chainDB</span></a></span><span> </span><span class="annot"><span class="annottext">[BlockForging IO blk]
+</span><a href="#local-6989586621679373334"><span class="hs-identifier hs-var">forgers</span></a></span><span> </span><span class="annot"><span class="annottext">TopLevelConfig blk
+</span><a href="#local-6989586621679373340"><span class="hs-identifier hs-var">pInfoConfig</span></a></span><span>
+</span><span id="line-146"></span><span>            </span><span class="hs-keyword">else</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-147"></span><span>                </span><span class="annot"><span class="annottext">String -&gt; IO ()
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">putStrLn</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;--&gt; no forgers found; leaving possibly existing ChainDB untouched&quot;</span></span><span>
+</span><span id="line-148"></span><span>                </span><span class="annot"><span class="annottext">ForgeResult -&gt; IO ForgeResult
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="annot"><span class="annottext">(ForgeResult -&gt; IO ForgeResult) -&gt; ForgeResult -&gt; IO ForgeResult
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; ForgeResult
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#ForgeResult"><span class="hs-identifier hs-var">ForgeResult</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-149"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-150"></span><span>    </span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#DBSynthesizerOptions"><span class="hs-identifier hs-type">DBSynthesizerOptions</span></a></span><span>
+</span><span id="line-151"></span><span>        </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679373328"><span class="annot"><span class="annottext">DBSynthesizerOpenMode
+synthOpenMode :: DBSynthesizerOptions -&gt; DBSynthesizerOpenMode
+synthOpenMode :: DBSynthesizerOpenMode
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#synthOpenMode"><span class="hs-identifier hs-var hs-var">synthOpenMode</span></a></span></span><span>
+</span><span id="line-152"></span><span>        </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679373316"><span class="annot"><span class="annottext">ForgeLimit
+synthLimit :: DBSynthesizerOptions -&gt; ForgeLimit
+synthLimit :: ForgeLimit
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#synthLimit"><span class="hs-identifier hs-var hs-var">synthLimit</span></a></span></span><span>
+</span><span id="line-153"></span><span>        </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DBSynthesizerOptions
+</span><a href="#local-6989586621679373350"><span class="hs-identifier hs-var">confOptions</span></a></span><span>
+</span><span id="line-154"></span><span>    </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">ProtocolInfo</span></a></span><span>
+</span><span id="line-155"></span><span>        </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679373340"><span class="annot"><span class="annottext">TopLevelConfig blk
+pInfoConfig :: forall (m :: * -&gt; *) b. ProtocolInfo m b -&gt; TopLevelConfig b
+pInfoConfig :: TopLevelConfig blk
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var">pInfoConfig</span></a></span></span><span>
+</span><span id="line-156"></span><span>        </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679373333"><span class="annot"><span class="annottext">IO [BlockForging IO blk]
+pInfoBlockForging :: forall (m :: * -&gt; *) b. ProtocolInfo m b -&gt; m [BlockForging m b]
+pInfoBlockForging :: IO [BlockForging IO blk]
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var">pInfoBlockForging</span></a></span></span><span>
+</span><span id="line-157"></span><span>        </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679373335"><span class="annot"><span class="annottext">ExtLedgerState blk
+pInfoInitLedger :: forall (m :: * -&gt; *) b. ProtocolInfo m b -&gt; ExtLedgerState b
+pInfoInitLedger :: ExtLedgerState blk
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var">pInfoInitLedger</span></a></span></span><span>
+</span><span id="line-158"></span><span>        </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ProtocolInfoArgs IO blk -&gt; ProtocolInfo IO blk
+forall (m :: * -&gt; *) blk.
+Protocol m blk =&gt;
+ProtocolInfoArgs m blk -&gt; ProtocolInfo m blk
+</span><a href="Cardano.Api.Protocol.Types.html#protocolInfo"><span class="hs-identifier hs-var">protocolInfo</span></a></span><span> </span><span class="annot"><span class="annottext">ProtocolInfoArgs IO blk
+</span><a href="#local-6989586621679373346"><span class="hs-identifier hs-var">runP</span></a></span><span>
+</span><span id="line-159"></span><span>
+</span><span id="line-160"></span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Run.html#preOpenChainDB"><span class="hs-identifier hs-type">preOpenChainDB</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Cardano.Tools.DBSynthesizer.Types.html#DBSynthesizerOpenMode"><span class="hs-identifier hs-type">DBSynthesizerOpenMode</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">FilePath</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">IO</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-161"></span><span id="preOpenChainDB"><span class="annot"><span class="annottext">preOpenChainDB :: DBSynthesizerOpenMode -&gt; String -&gt; IO ()
+</span><a href="Cardano.Tools.DBSynthesizer.Run.html#preOpenChainDB"><span class="hs-identifier hs-var hs-var">preOpenChainDB</span></a></span></span><span> </span><span id="local-6989586621679373307"><span class="annot"><span class="annottext">DBSynthesizerOpenMode
+</span><a href="#local-6989586621679373307"><span class="hs-identifier hs-var">mode</span></a></span></span><span> </span><span id="local-6989586621679373306"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679373306"><span class="hs-identifier hs-var">db</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-162"></span><span>    </span><span class="annot"><span class="annottext">String -&gt; IO Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/directory-1.3.6.0/src"><span class="hs-identifier hs-var">doesDirectoryExist</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679373306"><span class="hs-identifier hs-var">db</span></a></span><span> </span><span class="annot"><span class="annottext">IO Bool -&gt; (Bool -&gt; IO ()) -&gt; IO ()
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&gt;&gt;=</span></a></span><span> </span><span class="annot"><span class="annottext">IO () -&gt; IO () -&gt; Bool -&gt; IO ()
+forall a. a -&gt; a -&gt; Bool -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">bool</span></a></span><span> </span><span class="annot"><span class="annottext">IO ()
+</span><a href="#local-6989586621679373304"><span class="hs-identifier hs-var">create</span></a></span><span> </span><span class="annot"><span class="annottext">IO ()
+</span><a href="#local-6989586621679373303"><span class="hs-identifier hs-var">checkMode</span></a></span><span>
+</span><span id="line-163"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-164"></span><span>    </span><span id="local-6989586621679373302"><span class="annot"><span class="annottext">checkIsDB :: t String -&gt; Bool
+</span><a href="#local-6989586621679373302"><span class="hs-identifier hs-var hs-var">checkIsDB</span></a></span></span><span> </span><span id="local-6989586621679373301"><span class="annot"><span class="annottext">t String
+</span><a href="#local-6989586621679373301"><span class="hs-identifier hs-var">ls</span></a></span></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">t String -&gt; Int
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">length</span></a></span><span> </span><span class="annot"><span class="annottext">t String
+</span><a href="#local-6989586621679373301"><span class="hs-identifier hs-var">ls</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&lt;=</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">3</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&amp;&amp;</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Bool) -&gt; t String -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; (a -&gt; Bool) -&gt; t a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">all</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">`elem`</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;immutable&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;ledger&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;volatile&quot;</span></span><span class="hs-special">]</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">t String
+</span><a href="#local-6989586621679373301"><span class="hs-identifier hs-var">ls</span></a></span><span>
+</span><span id="line-165"></span><span>    </span><span id="local-6989586621679373296"><span class="annot"><span class="annottext">loc :: String
+</span><a href="#local-6989586621679373296"><span class="hs-identifier hs-var hs-var">loc</span></a></span></span><span>             </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;preOpenChainDB: '&quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">++</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679373306"><span class="hs-identifier hs-var">db</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">++</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;'&quot;</span></span><span>
+</span><span id="line-166"></span><span>    </span><span id="local-6989586621679373304"><span class="annot"><span class="annottext">create :: IO ()
+</span><a href="#local-6989586621679373304"><span class="hs-identifier hs-var hs-var">create</span></a></span></span><span>          </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; String -&gt; IO ()
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/directory-1.3.6.0/src"><span class="hs-identifier hs-var">createDirectoryIfMissing</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">True</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679373306"><span class="hs-identifier hs-var">db</span></a></span><span>
+</span><span id="line-167"></span><span>    </span><span id="local-6989586621679373303"><span class="annot"><span class="annottext">checkMode :: IO ()
+</span><a href="#local-6989586621679373303"><span class="hs-identifier hs-var hs-var">checkMode</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-168"></span><span>        </span><span id="local-6989586621679373294"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679373294"><span class="hs-identifier hs-var">isChainDB</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; Bool
+forall (t :: * -&gt; *). Foldable t =&gt; t String -&gt; Bool
+</span><a href="#local-6989586621679373302"><span class="hs-identifier hs-var">checkIsDB</span></a></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; Bool) -&gt; IO [String] -&gt; IO Bool
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; IO [String]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/directory-1.3.6.0/src"><span class="hs-identifier hs-var">listDirectory</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679373306"><span class="hs-identifier hs-var">db</span></a></span><span>
+</span><span id="line-169"></span><span>        </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">DBSynthesizerOpenMode
+</span><a href="#local-6989586621679373307"><span class="hs-identifier hs-var">mode</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-170"></span><span>            </span><span class="annot"><span class="annottext">DBSynthesizerOpenMode
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#OpenCreate"><span class="hs-identifier hs-var">OpenCreate</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-171"></span><span>                </span><span class="annot"><span class="annottext">String -&gt; IO ()
+forall (m :: * -&gt; *) a. MonadFail m =&gt; String -&gt; m a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fail</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; IO ()) -&gt; String -&gt; IO ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679373296"><span class="hs-identifier hs-var">loc</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">++</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot; already exists. Use -f to overwrite or -a to append.&quot;</span></span><span>
+</span><span id="line-172"></span><span>            </span><span class="annot"><span class="annottext">DBSynthesizerOpenMode
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#OpenAppend"><span class="hs-identifier hs-var">OpenAppend</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679373294"><span class="hs-identifier hs-var">isChainDB</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-173"></span><span>                </span><span class="annot"><span class="annottext">() -&gt; IO ()
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">pure</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-174"></span><span>            </span><span class="annot"><span class="annottext">DBSynthesizerOpenMode
+</span><a href="Cardano.Tools.DBSynthesizer.Types.html#OpenCreateForce"><span class="hs-identifier hs-var">OpenCreateForce</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679373294"><span class="hs-identifier hs-var">isChainDB</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-175"></span><span>                </span><span class="annot"><span class="annottext">String -&gt; IO ()
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/directory-1.3.6.0/src"><span class="hs-identifier hs-var">removePathForcibly</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679373306"><span class="hs-identifier hs-var">db</span></a></span><span> </span><span class="annot"><span class="annottext">IO () -&gt; IO () -&gt; IO ()
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; m b -&gt; m b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&gt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">IO ()
+</span><a href="#local-6989586621679373304"><span class="hs-identifier hs-var">create</span></a></span><span>
+</span><span id="line-176"></span><span>            </span><span class="annot"><span class="annottext">DBSynthesizerOpenMode
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-177"></span><span>                </span><span class="annot"><span class="annottext">String -&gt; IO ()
+forall (m :: * -&gt; *) a. MonadFail m =&gt; String -&gt; m a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fail</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; IO ()) -&gt; String -&gt; IO ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679373296"><span class="hs-identifier hs-var">loc</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">++</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot; is non-empty and does not look like a ChainDB. Aborting.&quot;</span></span><span>
+</span><span id="line-178"></span></pre></body></html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE BangPatterns       #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DerivingStrategies #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE RankNTypes         #-}</span><span>
+</span><span id="line-4"></span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- | Utilities to schedule actions per 'Tick'.</span><span>
+</span><span id="line-6"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Test.Util.Schedule</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-7"></span><span>    </span><span class="annot"><a href="Test.Util.Schedule.html#Schedule"><span class="hs-identifier">Schedule</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-8"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Test.Util.Schedule.html#genSchedule"><span class="hs-identifier">genSchedule</span></a></span><span>
+</span><span id="line-9"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Test.Util.Schedule.html#joinSchedule"><span class="hs-identifier">joinSchedule</span></a></span><span>
+</span><span id="line-10"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Test.Util.Schedule.html#lastTick"><span class="hs-identifier">lastTick</span></a></span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Test.Util.Schedule.html#shrinkSchedule"><span class="hs-identifier">shrinkSchedule</span></a></span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.List</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">intercalate</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">unfoldr</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier">Data.Map.Strict</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier">Map</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier">Data.Map.Strict</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Map</span></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Maybe</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">fromMaybe</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Test.QuickCheck</span></span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Util.Condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Condense</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Test.Util.LogicalClock.html"><span class="hs-identifier">Test.Util.LogicalClock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Util.LogicalClock.html#Tick"><span class="hs-identifier">Tick</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="hs-comment">-- | A schedule plans actions on certain times.</span><span>
+</span><span id="line-26"></span><span class="hs-comment">--</span><span>
+</span><span id="line-27"></span><span class="hs-comment">-- TODO Note that a schedule can't express delays between the actions</span><span>
+</span><span id="line-28"></span><span class="hs-comment">-- within a single tick. Generating such delays may expose more (most</span><span>
+</span><span id="line-29"></span><span class="hs-comment">-- likely concurrency-related) bugs.</span><span>
+</span><span id="line-30"></span><span class="hs-keyword">newtype</span><span> </span><span id="Schedule"><span class="annot"><a href="Test.Util.Schedule.html#Schedule"><span class="hs-identifier hs-var">Schedule</span></a></span></span><span> </span><span id="local-6989586621679276796"><span class="annot"><a href="#local-6989586621679276796"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Schedule"><span class="annot"><a href="Test.Util.Schedule.html#Schedule"><span class="hs-identifier hs-var">Schedule</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="getSchedule"><span class="annot"><span class="annottext">Schedule a -&gt; Map Tick [a]
+</span><a href="Test.Util.Schedule.html#getSchedule"><span class="hs-identifier hs-var hs-var">getSchedule</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier hs-type">Map</span></a></span><span> </span><span class="annot"><a href="Test.Util.LogicalClock.html#Tick"><span class="hs-identifier hs-type">Tick</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679276796"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-31"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679276742"><span id="local-6989586621679276744"><span id="local-6989586621679276746"><span class="annot"><span class="annottext">Int -&gt; Schedule a -&gt; ShowS
+[Schedule a] -&gt; ShowS
+Schedule a -&gt; String
+(Int -&gt; Schedule a -&gt; ShowS)
+-&gt; (Schedule a -&gt; String)
+-&gt; ([Schedule a] -&gt; ShowS)
+-&gt; Show (Schedule a)
+forall a. Show a =&gt; Int -&gt; Schedule a -&gt; ShowS
+forall a. Show a =&gt; [Schedule a] -&gt; ShowS
+forall a. Show a =&gt; Schedule a -&gt; String
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Schedule a] -&gt; ShowS
+$cshowList :: forall a. Show a =&gt; [Schedule a] -&gt; ShowS
+show :: Schedule a -&gt; String
+$cshow :: forall a. Show a =&gt; Schedule a -&gt; String
+showsPrec :: Int -&gt; Schedule a -&gt; ShowS
+$cshowsPrec :: forall a. Show a =&gt; Int -&gt; Schedule a -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276737"><span id="local-6989586621679276739"><span class="annot"><span class="annottext">Schedule a -&gt; Schedule a -&gt; Bool
+(Schedule a -&gt; Schedule a -&gt; Bool)
+-&gt; (Schedule a -&gt; Schedule a -&gt; Bool) -&gt; Eq (Schedule a)
+forall a. Eq a =&gt; Schedule a -&gt; Schedule a -&gt; Bool
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Schedule a -&gt; Schedule a -&gt; Bool
+$c/= :: forall a. Eq a =&gt; Schedule a -&gt; Schedule a -&gt; Bool
+== :: Schedule a -&gt; Schedule a -&gt; Bool
+$c== :: forall a. Eq a =&gt; Schedule a -&gt; Schedule a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span>
+</span><span id="line-33"></span><span id="local-6989586621679276735"><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276735"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">Condense</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Util.Schedule.html#Schedule"><span class="hs-identifier hs-type">Schedule</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276735"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-34"></span><span>  </span><span id="local-6989586621679276732"><span class="annot"><span class="annottext">condense :: Schedule a -&gt; String
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">condense</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-35"></span><span>        </span><span class="annot"><span class="annottext">[String] -&gt; String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">unlines</span></a></span><span>
+</span><span id="line-36"></span><span>      </span><span class="annot"><span class="annottext">([String] -&gt; String)
+-&gt; (Schedule a -&gt; [String]) -&gt; Schedule a -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">((Tick, [a]) -&gt; String) -&gt; [(Tick, [a])] -&gt; [String]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">map</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Tick -&gt; [a] -&gt; String) -&gt; (Tick, [a]) -&gt; String
+forall a b c. (a -&gt; b -&gt; c) -&gt; (a, b) -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">uncurry</span></a></span><span> </span><span class="annot"><span class="annottext">Tick -&gt; [a] -&gt; String
+forall a. Condense a =&gt; Tick -&gt; [a] -&gt; String
+</span><a href="#local-6989586621679276727"><span class="hs-identifier hs-var">showEntry</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span>      </span><span class="annot"><span class="annottext">([(Tick, [a])] -&gt; [String])
+-&gt; (Schedule a -&gt; [(Tick, [a])]) -&gt; Schedule a -&gt; [String]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">((Tick, [a]) -&gt; Bool) -&gt; [(Tick, [a])] -&gt; [(Tick, [a])]
+forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">filter</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">not</span></a></span><span> </span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; ((Tick, [a]) -&gt; Bool) -&gt; (Tick, [a]) -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">[a] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">null</span></a></span><span> </span><span class="annot"><span class="annottext">([a] -&gt; Bool) -&gt; ((Tick, [a]) -&gt; [a]) -&gt; (Tick, [a]) -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">(Tick, [a]) -&gt; [a]
+forall a b. (a, b) -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">snd</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span>      </span><span class="annot"><span class="annottext">([(Tick, [a])] -&gt; [(Tick, [a])])
+-&gt; (Schedule a -&gt; [(Tick, [a])]) -&gt; Schedule a -&gt; [(Tick, [a])]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Map Tick [a] -&gt; [(Tick, [a])]
+forall k a. Map k a -&gt; [(k, a)]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier hs-var">Map.toAscList</span></a></span><span>
+</span><span id="line-39"></span><span>      </span><span class="annot"><span class="annottext">(Map Tick [a] -&gt; [(Tick, [a])])
+-&gt; (Schedule a -&gt; Map Tick [a]) -&gt; Schedule a -&gt; [(Tick, [a])]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Schedule a -&gt; Map Tick [a]
+forall a. Schedule a -&gt; Map Tick [a]
+</span><a href="Test.Util.Schedule.html#getSchedule"><span class="hs-identifier hs-var hs-var">getSchedule</span></a></span><span>
+</span><span id="line-40"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-41"></span><span>      </span><span id="local-6989586621679276727"><span class="annot"><span class="annottext">showEntry :: Tick -&gt; [a] -&gt; String
+</span><a href="#local-6989586621679276727"><span class="hs-identifier hs-var hs-var">showEntry</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Util.LogicalClock.html#Tick"><span class="hs-identifier hs-type">Tick</span></a></span><span> </span><span id="local-6989586621679276722"><span class="annot"><span class="annottext">Word64
+</span><a href="#local-6989586621679276722"><span class="hs-identifier hs-var">tick</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679276721"><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679276721"><span class="hs-keyword hs-var">as</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><a href="#local-6989586621679276722"><span class="hs-identifier hs-var">tick</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span>
+</span><span id="line-42"></span><span>        </span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; String
+forall a. [a] -&gt; [[a]] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">intercalate</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;, &quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(a -&gt; String) -&gt; [a] -&gt; [String]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">map</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; String
+forall a. Condense a =&gt; a -&gt; String
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-var">condense</span></a></span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679276721"><span class="hs-keyword hs-var">as</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-43"></span><span>
+</span><span id="line-44"></span><span class="hs-comment">-- | Return the last tick at which an update is planned, if no updates</span><span>
+</span><span id="line-45"></span><span class="hs-comment">-- are planned, return 0.</span><span>
+</span><span id="line-46"></span><span id="local-6989586621679276719"><span class="annot"><a href="Test.Util.Schedule.html#lastTick"><span class="hs-identifier hs-type">lastTick</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Test.Util.Schedule.html#Schedule"><span class="hs-identifier hs-type">Schedule</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276719"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Test.Util.LogicalClock.html#Tick"><span class="hs-identifier hs-type">Tick</span></a></span></span><span>
+</span><span id="line-47"></span><span id="lastTick"><span class="annot"><span class="annottext">lastTick :: Schedule a -&gt; Tick
+</span><a href="Test.Util.Schedule.html#lastTick"><span class="hs-identifier hs-var hs-var">lastTick</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tick -&gt; Maybe Tick -&gt; Tick
+forall a. a -&gt; Maybe a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fromMaybe</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word64 -&gt; Tick
+</span><a href="Test.Util.LogicalClock.html#Tick"><span class="hs-identifier hs-var">Tick</span></a></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><span class="hs-number">0</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Maybe Tick -&gt; Tick)
+-&gt; (Schedule a -&gt; Maybe Tick) -&gt; Schedule a -&gt; Tick
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Map Tick [a] -&gt; Maybe Tick
+forall k v. Map k v -&gt; Maybe k
+</span><a href="#local-6989586621679276718"><span class="hs-identifier hs-var">maxKey</span></a></span><span> </span><span class="annot"><span class="annottext">(Map Tick [a] -&gt; Maybe Tick)
+-&gt; (Schedule a -&gt; Map Tick [a]) -&gt; Schedule a -&gt; Maybe Tick
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Schedule a -&gt; Map Tick [a]
+forall a. Schedule a -&gt; Map Tick [a]
+</span><a href="Test.Util.Schedule.html#getSchedule"><span class="hs-identifier hs-var hs-var">getSchedule</span></a></span><span>
+</span><span id="line-48"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-49"></span><span>    </span><span class="annot"><a href="#local-6989586621679276718"><span class="hs-identifier hs-type">maxKey</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679276791"><span class="annot"><a href="#local-6989586621679276791"><span class="hs-identifier hs-type">k</span></a></span></span><span> </span><span id="local-6989586621679276790"><span class="annot"><a href="#local-6989586621679276790"><span class="hs-identifier hs-type">v</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier hs-type">Map</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276791"><span class="hs-identifier hs-type">k</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276790"><span class="hs-identifier hs-type">v</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276791"><span class="hs-identifier hs-type">k</span></a></span><span>
+</span><span id="line-50"></span><span>    </span><span id="local-6989586621679276718"><span class="annot"><span class="annottext">maxKey :: Map k v -&gt; Maybe k
+</span><a href="#local-6989586621679276718"><span class="hs-identifier hs-var hs-var">maxKey</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(((k, v), Map k v) -&gt; k) -&gt; Maybe ((k, v), Map k v) -&gt; Maybe k
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fmap</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(k, v) -&gt; k
+forall a b. (a, b) -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fst</span></a></span><span> </span><span class="annot"><span class="annottext">((k, v) -&gt; k)
+-&gt; (((k, v), Map k v) -&gt; (k, v)) -&gt; ((k, v), Map k v) -&gt; k
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">((k, v), Map k v) -&gt; (k, v)
+forall a b. (a, b) -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fst</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Maybe ((k, v), Map k v) -&gt; Maybe k)
+-&gt; (Map k v -&gt; Maybe ((k, v), Map k v)) -&gt; Map k v -&gt; Maybe k
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Map k v -&gt; Maybe ((k, v), Map k v)
+forall k a. Map k a -&gt; Maybe ((k, a), Map k a)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier hs-var">Map.maxViewWithKey</span></a></span><span>
+</span><span id="line-51"></span><span>
+</span><span id="line-52"></span><span class="hs-comment">-- | Spread out elements over a schedule, i.e. schedule a number of</span><span>
+</span><span id="line-53"></span><span class="hs-comment">-- elements to be processed on each tick. Most ticks will have no</span><span>
+</span><span id="line-54"></span><span class="hs-comment">-- associated elements.</span><span>
+</span><span id="line-55"></span><span id="local-6989586621679276716"><span class="annot"><a href="Test.Util.Schedule.html#genSchedule"><span class="hs-identifier hs-type">genSchedule</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679276716"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Util.Schedule.html#Schedule"><span class="hs-identifier hs-type">Schedule</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276716"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-56"></span><span id="genSchedule"><span class="annot"><span class="annottext">genSchedule :: [a] -&gt; Gen (Schedule a)
+</span><a href="Test.Util.Schedule.html#genSchedule"><span class="hs-identifier hs-var hs-var">genSchedule</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Map Tick [a] -&gt; Schedule a)
+-&gt; Gen (Map Tick [a]) -&gt; Gen (Schedule a)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fmap</span></a></span><span> </span><span class="annot"><span class="annottext">Map Tick [a] -&gt; Schedule a
+forall a. Map Tick [a] -&gt; Schedule a
+</span><a href="Test.Util.Schedule.html#Schedule"><span class="hs-identifier hs-var">Schedule</span></a></span><span> </span><span class="annot"><span class="annottext">(Gen (Map Tick [a]) -&gt; Gen (Schedule a))
+-&gt; ([a] -&gt; Gen (Map Tick [a])) -&gt; [a] -&gt; Gen (Schedule a)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Map Tick [a] -&gt; Tick -&gt; [a] -&gt; Gen (Map Tick [a])
+forall a. Map Tick [a] -&gt; Tick -&gt; [a] -&gt; Gen (Map Tick [a])
+</span><a href="#local-6989586621679276715"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">Map Tick [a]
+forall k a. Map k a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier hs-var">Map.empty</span></a></span><span> </span><span class="annot"><span class="annottext">Tick
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-57"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-58"></span><span>    </span><span id="local-6989586621679276778"><span class="annot"><a href="#local-6989586621679276715"><span class="hs-identifier hs-type">go</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier hs-type">Map</span></a></span><span> </span><span class="annot"><a href="Test.Util.LogicalClock.html#Tick"><span class="hs-identifier hs-type">Tick</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679276778"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-59"></span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Test.Util.LogicalClock.html#Tick"><span class="hs-identifier hs-type">Tick</span></a></span><span>
+</span><span id="line-60"></span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679276778"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-61"></span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier hs-type">Map</span></a></span><span> </span><span class="annot"><a href="Test.Util.LogicalClock.html#Tick"><span class="hs-identifier hs-type">Tick</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679276778"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span></span><span>
+</span><span id="line-62"></span><span>    </span><span id="local-6989586621679276715"><span class="annot"><span class="annottext">go :: Map Tick [a] -&gt; Tick -&gt; [a] -&gt; Gen (Map Tick [a])
+</span><a href="#local-6989586621679276715"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span class="hs-glyph">!</span><span id="local-6989586621679276713"><span class="annot"><span class="annottext">Map Tick [a]
+</span><a href="#local-6989586621679276713"><span class="hs-identifier hs-var">schedule</span></a></span></span><span> </span><span id="local-6989586621679276712"><span class="annot"><span class="annottext">Tick
+</span><a href="#local-6989586621679276712"><span class="hs-identifier hs-var">tick</span></a></span></span><span> </span><span id="local-6989586621679276711"><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679276711"><span class="hs-keyword hs-var">as</span></a></span></span><span>
+</span><span id="line-63"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">[a] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">null</span></a></span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679276711"><span class="hs-keyword hs-var">as</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map Tick [a] -&gt; Gen (Map Tick [a])
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">Map Tick [a]
+</span><a href="#local-6989586621679276713"><span class="hs-identifier hs-var">schedule</span></a></span><span>
+</span><span id="line-64"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-65"></span><span>        </span><span id="local-6989586621679276710"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679276710"><span class="hs-identifier hs-var">nbAs</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[(Int, Gen Int)] -&gt; Gen Int
+forall a. [(Int, Gen a)] -&gt; Gen a
+</span><span class="hs-identifier hs-var">frequency</span></span><span> </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Gen Int
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(Int, Int) -&gt; Gen Int
+forall a. Random a =&gt; (a, a) -&gt; Gen a
+</span><span class="hs-identifier hs-var">choose</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">5</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-special">]</span><span>
+</span><span id="line-66"></span><span>        </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679276707"><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679276707"><span class="hs-identifier hs-var">this</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276706"><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679276706"><span class="hs-identifier hs-var">rest</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; [a] -&gt; ([a], [a])
+forall a. Int -&gt; [a] -&gt; ([a], [a])
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">splitAt</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679276710"><span class="hs-identifier hs-var">nbAs</span></a></span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679276711"><span class="hs-keyword hs-var">as</span></a></span><span>
+</span><span id="line-67"></span><span>        </span><span class="annot"><span class="annottext">Map Tick [a] -&gt; Tick -&gt; [a] -&gt; Gen (Map Tick [a])
+forall a. Map Tick [a] -&gt; Tick -&gt; [a] -&gt; Gen (Map Tick [a])
+</span><a href="#local-6989586621679276715"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Tick -&gt; [a] -&gt; Map Tick [a] -&gt; Map Tick [a]
+forall k a. Ord k =&gt; k -&gt; a -&gt; Map k a -&gt; Map k a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier hs-var">Map.insert</span></a></span><span> </span><span class="annot"><span class="annottext">Tick
+</span><a href="#local-6989586621679276712"><span class="hs-identifier hs-var">tick</span></a></span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679276707"><span class="hs-identifier hs-var">this</span></a></span><span> </span><span class="annot"><span class="annottext">Map Tick [a]
+</span><a href="#local-6989586621679276713"><span class="hs-identifier hs-var">schedule</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Tick -&gt; Tick
+forall a. Enum a =&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">succ</span></a></span><span> </span><span class="annot"><span class="annottext">Tick
+</span><a href="#local-6989586621679276712"><span class="hs-identifier hs-var">tick</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679276706"><span class="hs-identifier hs-var">rest</span></a></span><span>
+</span><span id="line-68"></span><span>
+</span><span id="line-69"></span><span class="hs-comment">-- | Repeatedly remove the last entry (highest 'Tick')</span><span>
+</span><span id="line-70"></span><span id="local-6989586621679276702"><span class="annot"><a href="Test.Util.Schedule.html#shrinkSchedule"><span class="hs-identifier hs-type">shrinkSchedule</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Test.Util.Schedule.html#Schedule"><span class="hs-identifier hs-type">Schedule</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276702"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Test.Util.Schedule.html#Schedule"><span class="hs-identifier hs-type">Schedule</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276702"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span></span><span>
+</span><span id="line-71"></span><span id="shrinkSchedule"><span class="annot"><span class="annottext">shrinkSchedule :: Schedule a -&gt; [Schedule a]
+</span><a href="Test.Util.Schedule.html#shrinkSchedule"><span class="hs-identifier hs-var hs-var">shrinkSchedule</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-72"></span><span>      </span><span class="annot"><span class="annottext">(Map Tick [a] -&gt; Maybe (Schedule a, Map Tick [a]))
+-&gt; Map Tick [a] -&gt; [Schedule a]
+forall b a. (b -&gt; Maybe (a, b)) -&gt; b -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">unfoldr</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(([a], Map Tick [a]) -&gt; (Schedule a, Map Tick [a]))
+-&gt; Maybe ([a], Map Tick [a]) -&gt; Maybe (Schedule a, Map Tick [a])
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fmap</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="annottext">[a]
+</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276701"><span class="annot"><span class="annottext">Map Tick [a]
+</span><a href="#local-6989586621679276701"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map Tick [a] -&gt; Schedule a
+forall a. Map Tick [a] -&gt; Schedule a
+</span><a href="Test.Util.Schedule.html#Schedule"><span class="hs-identifier hs-var">Schedule</span></a></span><span> </span><span class="annot"><span class="annottext">Map Tick [a]
+</span><a href="#local-6989586621679276701"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Map Tick [a]
+</span><a href="#local-6989586621679276701"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Maybe ([a], Map Tick [a]) -&gt; Maybe (Schedule a, Map Tick [a]))
+-&gt; (Map Tick [a] -&gt; Maybe ([a], Map Tick [a]))
+-&gt; Map Tick [a]
+-&gt; Maybe (Schedule a, Map Tick [a])
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Map Tick [a] -&gt; Maybe ([a], Map Tick [a])
+forall k a. Map k a -&gt; Maybe (a, Map k a)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier hs-var">Map.maxView</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-73"></span><span>    </span><span class="annot"><span class="annottext">(Map Tick [a] -&gt; [Schedule a])
+-&gt; (Schedule a -&gt; Map Tick [a]) -&gt; Schedule a -&gt; [Schedule a]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Schedule a -&gt; Map Tick [a]
+forall a. Schedule a -&gt; Map Tick [a]
+</span><a href="Test.Util.Schedule.html#getSchedule"><span class="hs-identifier hs-var hs-var">getSchedule</span></a></span><span>
+</span><span id="line-74"></span><span>
+</span><span id="line-75"></span><span class="hs-comment">-- | Inverse of 'genSchedule'</span><span>
+</span><span id="line-76"></span><span id="local-6989586621679276699"><span class="annot"><a href="Test.Util.Schedule.html#joinSchedule"><span class="hs-identifier hs-type">joinSchedule</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Test.Util.Schedule.html#Schedule"><span class="hs-identifier hs-type">Schedule</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276699"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679276699"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span></span><span>
+</span><span id="line-77"></span><span id="joinSchedule"><span class="annot"><span class="annottext">joinSchedule :: Schedule a -&gt; [a]
+</span><a href="Test.Util.Schedule.html#joinSchedule"><span class="hs-identifier hs-var hs-var">joinSchedule</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">((Tick, [a]) -&gt; [a]) -&gt; [(Tick, [a])] -&gt; [a]
+forall (t :: * -&gt; *) a b. Foldable t =&gt; (a -&gt; [b]) -&gt; t a -&gt; [b]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">concatMap</span></a></span><span> </span><span class="annot"><span class="annottext">(Tick, [a]) -&gt; [a]
+forall a b. (a, b) -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">snd</span></a></span><span> </span><span class="annot"><span class="annottext">([(Tick, [a])] -&gt; [a])
+-&gt; (Schedule a -&gt; [(Tick, [a])]) -&gt; Schedule a -&gt; [a]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Map Tick [a] -&gt; [(Tick, [a])]
+forall k a. Map k a -&gt; [(k, a)]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier hs-var">Map.toAscList</span></a></span><span> </span><span class="annot"><span class="annottext">(Map Tick [a] -&gt; [(Tick, [a])])
+-&gt; (Schedule a -&gt; Map Tick [a]) -&gt; Schedule a -&gt; [(Tick, [a])]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Schedule a -&gt; Map Tick [a]
+forall a. Schedule a -&gt; Map Tick [a]
+</span><a href="Test.Util.Schedule.html#getSchedule"><span class="hs-identifier hs-var hs-var">getSchedule</span></a></span><span>
+</span><span id="line-78"></span></pre></body></html>

@@ -1,0 +1,1247 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DeriveGeneric              #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE FlexibleContexts           #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE GeneralizedNewtypeDeriving #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE NamedFieldPuns             #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE StandaloneDeriving         #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE TypeFamilies               #-}</span><span>
+</span><span id="line-7"></span><span class="hs-pragma">{-# LANGUAGE UndecidableInstances       #-}</span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- This module is for examples and tests (not the library) so orphans are ok</span><span>
+</span><span id="line-10"></span><span class="hs-pragma">{-# OPTIONS_GHC -Wno-orphans #-}</span><span>
+</span><span id="line-11"></span><span>
+</span><span id="line-12"></span><span class="hs-comment">-- | Concrete block</span><span>
+</span><span id="line-13"></span><span class="hs-comment">--</span><span>
+</span><span id="line-14"></span><span class="hs-comment">-- The network library should not export a concrete block type at all, except</span><span>
+</span><span id="line-15"></span><span class="hs-comment">-- that it might need one in its tests (but not exported). Right now this module</span><span>
+</span><span id="line-16"></span><span class="hs-comment">-- serves to isolate this in a specific module so we can identify easily where</span><span>
+</span><span id="line-17"></span><span class="hs-comment">-- it is used; eventually it should be simplified and then moved to the</span><span>
+</span><span id="line-18"></span><span class="hs-comment">-- network layer tests; the more sophiscated block abstraction (abstracted over</span><span>
+</span><span id="line-19"></span><span class="hs-comment">-- an Ouroboros protocol) will live in the consensus layer.</span><span>
+</span><span id="line-20"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.Mock.ConcreteBlock</span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier">Block</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockHeader"><span class="hs-identifier">BlockHeader</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockBody"><span class="hs-identifier">BlockBody</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#hashHeader"><span class="hs-identifier">hashHeader</span></a></span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BodyHash"><span class="hs-identifier">BodyHash</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#ConcreteHeaderHash"><span class="hs-identifier">ConcreteHeaderHash</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#hashBody"><span class="hs-identifier">hashBody</span></a></span><span>
+</span><span id="line-28"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Converting slots to times</span></span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#convertSlotToTimeForTestsAssumingNoHardFork"><span class="hs-identifier">convertSlotToTimeForTestsAssumingNoHardFork</span></a></span><span>
+</span><span id="line-30"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Creating sample chains</span></span><span>
+</span><span id="line-31"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkChain"><span class="hs-identifier">mkChain</span></a></span><span>
+</span><span id="line-32"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkChainSimple"><span class="hs-identifier">mkChainSimple</span></a></span><span>
+</span><span id="line-33"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkAnchoredFragment"><span class="hs-identifier">mkAnchoredFragment</span></a></span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkAnchoredFragmentSimple"><span class="hs-identifier">mkAnchoredFragmentSimple</span></a></span><span>
+</span><span id="line-35"></span><span>    </span><span class="annot"><span class="hs-comment">-- * Generator utilities</span></span><span>
+</span><span id="line-36"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkPartialBlock"><span class="hs-identifier">mkPartialBlock</span></a></span><span>
+</span><span id="line-37"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkPartialBlockHeader"><span class="hs-identifier">mkPartialBlockHeader</span></a></span><span>
+</span><span id="line-38"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupBlock"><span class="hs-identifier">fixupBlock</span></a></span><span>
+</span><span id="line-39"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupBlockHeader"><span class="hs-identifier">fixupBlockHeader</span></a></span><span>
+</span><span id="line-40"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupBlockAfterBlock"><span class="hs-identifier">fixupBlockAfterBlock</span></a></span><span>
+</span><span id="line-41"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupChain"><span class="hs-identifier">fixupChain</span></a></span><span>
+</span><span id="line-42"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupAnchoredFragmentFrom"><span class="hs-identifier">fixupAnchoredFragmentFrom</span></a></span><span>
+</span><span id="line-43"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier">Data.ByteString</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier">ByteString</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-46"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Function</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">fix</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Hashable</span></span><span>
+</span><span id="line-48"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.String</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">IsString</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-49"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/time-1.9.3/src"><span class="hs-identifier">Data.Time.Calendar</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/time-1.9.3/src"><span class="hs-identifier">fromGregorian</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-50"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/time-1.9.3/src"><span class="hs-identifier">Data.Time.Clock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/time-1.9.3/src"><span class="hs-identifier">UTCTime</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/time-1.9.3/src"><span class="hs-identifier">addUTCTime</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-51"></span><span>                     </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/time-1.9.3/src"><span class="hs-identifier">secondsToNominalDiffTime</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-52"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">NoThunks.Class</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NoThunks</span></span><span class="hs-special">)</span><span>
+</span><span id="line-53"></span><span>
+</span><span id="line-54"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Codec.CBOR.Decoding</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">decodeBytes</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">decodeInt</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">decodeListLenOf</span></span><span class="hs-special">,</span><span>
+</span><span id="line-55"></span><span>                     </span><span class="annot"><span class="hs-identifier">decodeWord64</span></span><span class="hs-special">)</span><span>
+</span><span id="line-56"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Codec.CBOR.Encoding</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">encodeBytes</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">encodeInt</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">encodeListLen</span></span><span class="hs-special">,</span><span>
+</span><span id="line-57"></span><span>                     </span><span class="annot"><span class="hs-identifier">encodeWord64</span></span><span class="hs-special">)</span><span>
+</span><span id="line-58"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Codec.Serialise</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Serialise</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-59"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">GHC.Generics</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Generic</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-60"></span><span>
+</span><span id="line-61"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier">Ouroboros.Network.AnchoredFragment</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier">Anchor</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-62"></span><span>                     </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier">AnchoredFragment</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-63"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier">Ouroboros.Network.AnchoredFragment</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">AF</span></span><span>
+</span><span id="line-64"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier">Ouroboros.Network.Block</span></a></span><span>
+</span><span id="line-65"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.Mock.Chain.html"><span class="hs-identifier">Ouroboros.Network.Mock.Chain</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Mock.Chain.html#Chain"><span class="hs-identifier">Chain</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-66"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.Chain.html"><span class="hs-identifier">Ouroboros.Network.Mock.Chain</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">C</span></span><span>
+</span><span id="line-67"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier">Ouroboros.Network.Point</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">withOrigin</span></span><span class="hs-special">)</span><span>
+</span><span id="line-68"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier">Ouroboros.Network.Util.ShowProxy</span></a></span><span>
+</span><span id="line-69"></span><span>
+</span><span id="line-70"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+  Concrete block shape used currently in the network layer
+
+  This should only exist in the network layer /tests/.
+-------------------------------------------------------------------------------}</span><span>
+</span><span id="line-75"></span><span>
+</span><span id="line-76"></span><span class="hs-comment">-- | Our highly-simplified version of a block. It retains the separation</span><span>
+</span><span id="line-77"></span><span class="hs-comment">-- between a block header and body, which is a detail needed for the protocols.</span><span>
+</span><span id="line-78"></span><span class="hs-comment">--</span><span>
+</span><span id="line-79"></span><span id="local-6989586621679099504"><span id="local-6989586621679099505"></span></span><span class="hs-keyword">data</span><span> </span><span id="Block"><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-var">Block</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Block"><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-var">Block</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-80"></span><span>       </span><span id="blockHeader"><span class="annot"><span class="annottext">Block -&gt; BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#blockHeader"><span class="hs-identifier hs-var hs-var">blockHeader</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockHeader"><span class="hs-identifier hs-type">BlockHeader</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-81"></span><span>       </span><span id="blockBody"><span class="annot"><span class="annottext">Block -&gt; BlockBody
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#blockBody"><span class="hs-identifier hs-var hs-var">blockBody</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockBody"><span class="hs-identifier hs-type">BlockBody</span></a></span><span>
+</span><span id="line-82"></span><span>     </span><span class="hs-special">}</span><span>
+</span><span id="line-83"></span><span>   </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679099495"><span id="local-6989586621679099497"><span id="local-6989586621679099499"><span class="annot"><span class="annottext">Int -&gt; Block -&gt; ShowS
+[Block] -&gt; ShowS
+Block -&gt; String
+(Int -&gt; Block -&gt; ShowS)
+-&gt; (Block -&gt; String) -&gt; ([Block] -&gt; ShowS) -&gt; Show Block
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Block] -&gt; ShowS
+$cshowList :: [Block] -&gt; ShowS
+show :: Block -&gt; String
+$cshow :: Block -&gt; String
+showsPrec :: Int -&gt; Block -&gt; ShowS
+$cshowsPrec :: Int -&gt; Block -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679099490"><span id="local-6989586621679099492"><span class="annot"><span class="annottext">Block -&gt; Block -&gt; Bool
+(Block -&gt; Block -&gt; Bool) -&gt; (Block -&gt; Block -&gt; Bool) -&gt; Eq Block
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Block -&gt; Block -&gt; Bool
+$c/= :: Block -&gt; Block -&gt; Bool
+== :: Block -&gt; Block -&gt; Bool
+$c== :: Block -&gt; Block -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. Block -&gt; Rep Block x)
+-&gt; (forall x. Rep Block x -&gt; Block) -&gt; Generic Block
+forall x. Rep Block x -&gt; Block
+forall x. Block -&gt; Rep Block x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cto :: forall x. Rep Block x -&gt; Block
+$cfrom :: forall x. Block -&gt; Rep Block x
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-84"></span><span>
+</span><span id="line-85"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679099484"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">ShowProxy</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-type">Block</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-86"></span><span>
+</span><span id="line-87"></span><span id="local-6989586621679099481"><span id="local-6989586621679099482"></span></span><span class="hs-keyword">newtype</span><span> </span><span id="BlockBody"><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockBody"><span class="hs-identifier hs-var">BlockBody</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="BlockBody"><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockBody"><span class="hs-identifier hs-var">BlockBody</span></a></span></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-type">ByteString</span></a></span><span>
+</span><span id="line-88"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679099474"><span id="local-6989586621679099476"><span id="local-6989586621679099478"><span class="annot"><span class="annottext">Int -&gt; BlockBody -&gt; ShowS
+[BlockBody] -&gt; ShowS
+BlockBody -&gt; String
+(Int -&gt; BlockBody -&gt; ShowS)
+-&gt; (BlockBody -&gt; String)
+-&gt; ([BlockBody] -&gt; ShowS)
+-&gt; Show BlockBody
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [BlockBody] -&gt; ShowS
+$cshowList :: [BlockBody] -&gt; ShowS
+show :: BlockBody -&gt; String
+$cshow :: BlockBody -&gt; String
+showsPrec :: Int -&gt; BlockBody -&gt; ShowS
+$cshowsPrec :: Int -&gt; BlockBody -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679099470"><span id="local-6989586621679099472"><span class="annot"><span class="annottext">BlockBody -&gt; BlockBody -&gt; Bool
+(BlockBody -&gt; BlockBody -&gt; Bool)
+-&gt; (BlockBody -&gt; BlockBody -&gt; Bool) -&gt; Eq BlockBody
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: BlockBody -&gt; BlockBody -&gt; Bool
+$c/= :: BlockBody -&gt; BlockBody -&gt; Bool
+== :: BlockBody -&gt; BlockBody -&gt; Bool
+$c== :: BlockBody -&gt; BlockBody -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679099455"><span id="local-6989586621679099457"><span id="local-6989586621679099459"><span id="local-6989586621679099461"><span id="local-6989586621679099463"><span id="local-6989586621679099465"><span id="local-6989586621679099467"><span class="annot"><span class="annottext">Eq BlockBody
+Eq BlockBody
+-&gt; (BlockBody -&gt; BlockBody -&gt; Ordering)
+-&gt; (BlockBody -&gt; BlockBody -&gt; Bool)
+-&gt; (BlockBody -&gt; BlockBody -&gt; Bool)
+-&gt; (BlockBody -&gt; BlockBody -&gt; Bool)
+-&gt; (BlockBody -&gt; BlockBody -&gt; Bool)
+-&gt; (BlockBody -&gt; BlockBody -&gt; BlockBody)
+-&gt; (BlockBody -&gt; BlockBody -&gt; BlockBody)
+-&gt; Ord BlockBody
+BlockBody -&gt; BlockBody -&gt; Bool
+BlockBody -&gt; BlockBody -&gt; Ordering
+BlockBody -&gt; BlockBody -&gt; BlockBody
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: BlockBody -&gt; BlockBody -&gt; BlockBody
+$cmin :: BlockBody -&gt; BlockBody -&gt; BlockBody
+max :: BlockBody -&gt; BlockBody -&gt; BlockBody
+$cmax :: BlockBody -&gt; BlockBody -&gt; BlockBody
+&gt;= :: BlockBody -&gt; BlockBody -&gt; Bool
+$c&gt;= :: BlockBody -&gt; BlockBody -&gt; Bool
+&gt; :: BlockBody -&gt; BlockBody -&gt; Bool
+$c&gt; :: BlockBody -&gt; BlockBody -&gt; Bool
+&lt;= :: BlockBody -&gt; BlockBody -&gt; Bool
+$c&lt;= :: BlockBody -&gt; BlockBody -&gt; Bool
+&lt; :: BlockBody -&gt; BlockBody -&gt; Bool
+$c&lt; :: BlockBody -&gt; BlockBody -&gt; Bool
+compare :: BlockBody -&gt; BlockBody -&gt; Ordering
+$ccompare :: BlockBody -&gt; BlockBody -&gt; Ordering
+$cp1Ord :: Eq BlockBody
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></a></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679099452"><span class="annot"><span class="annottext">String -&gt; BlockBody
+(String -&gt; BlockBody) -&gt; IsString BlockBody
+forall a. (String -&gt; a) -&gt; IsString a
+fromString :: String -&gt; BlockBody
+$cfromString :: String -&gt; BlockBody
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">IsString</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. BlockBody -&gt; Rep BlockBody x)
+-&gt; (forall x. Rep BlockBody x -&gt; BlockBody) -&gt; Generic BlockBody
+forall x. Rep BlockBody x -&gt; BlockBody
+forall x. BlockBody -&gt; Rep BlockBody x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cto :: forall x. Rep BlockBody x -&gt; BlockBody
+$cfrom :: forall x. BlockBody -&gt; Rep BlockBody x
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-89"></span><span>
+</span><span id="line-90"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679099446"><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockBody"><span class="hs-identifier hs-type">BlockBody</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-91"></span><span>    </span><span id="local-6989586621679099443"><span class="annot"><span class="annottext">hash :: BlockBody -&gt; Int
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">hash</span></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockBody"><span class="hs-identifier hs-type">BlockBody</span></a></span><span> </span><span id="local-6989586621679099441"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679099441"><span class="hs-identifier hs-var">body</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; Int
+forall a. Hashable a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">hash</span></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679099441"><span class="hs-identifier hs-var">body</span></a></span><span>
+</span><span id="line-92"></span><span>
+</span><span id="line-93"></span><span id="local-6989586621679099622"><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#hashBody"><span class="hs-identifier hs-type">hashBody</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><a href="#local-6989586621679099622"><span class="hs-identifier hs-type">body</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679099622"><span class="hs-identifier hs-type">body</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BodyHash"><span class="hs-identifier hs-type">BodyHash</span></a></span></span><span>
+</span><span id="line-94"></span><span id="hashBody"><span class="annot"><span class="annottext">hashBody :: body -&gt; BodyHash
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#hashBody"><span class="hs-identifier hs-var hs-var">hashBody</span></a></span></span><span> </span><span id="local-6989586621679099440"><span class="annot"><span class="annottext">body
+</span><a href="#local-6989586621679099440"><span class="hs-identifier hs-var">body</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; BodyHash
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BodyHash"><span class="hs-identifier hs-var">BodyHash</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">body -&gt; Int
+forall a. Hashable a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">hash</span></span><span> </span><span class="annot"><span class="annottext">body
+</span><a href="#local-6989586621679099440"><span class="hs-identifier hs-var">body</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-95"></span><span>
+</span><span id="line-96"></span><span class="hs-comment">-- | A block header. It retains simplified versions of all the essential</span><span>
+</span><span id="line-97"></span><span class="hs-comment">-- elements.</span><span>
+</span><span id="line-98"></span><span class="hs-comment">--</span><span>
+</span><span id="line-99"></span><span id="local-6989586621679099437"><span id="local-6989586621679099438"></span></span><span class="hs-keyword">data</span><span> </span><span id="BlockHeader"><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockHeader"><span class="hs-identifier hs-var">BlockHeader</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="BlockHeader"><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockHeader"><span class="hs-identifier hs-var">BlockHeader</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-100"></span><span>       </span><span id="headerHash"><span class="annot"><span class="annottext">BlockHeader -&gt; HeaderHash BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerHash"><span class="hs-identifier hs-var hs-var">headerHash</span></a></span></span><span>     </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">HeaderHash</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockHeader"><span class="hs-identifier hs-type">BlockHeader</span></a></span><span class="hs-special">,</span><span>  </span><span class="hs-comment">-- ^ The cached 'HeaderHash' of this header.</span><span>
+</span><span id="line-101"></span><span>       </span><span id="headerPrevHash"><span class="annot"><span class="annottext">BlockHeader -&gt; ChainHash BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerPrevHash"><span class="hs-identifier hs-var hs-var">headerPrevHash</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">ChainHash</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockHeader"><span class="hs-identifier hs-type">BlockHeader</span></a></span><span class="hs-special">,</span><span>   </span><span class="hs-comment">-- ^ The 'headerHash' of the previous block header</span><span>
+</span><span id="line-102"></span><span>       </span><span id="headerSlot"><span class="annot"><span class="annottext">BlockHeader -&gt; SlotNo
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerSlot"><span class="hs-identifier hs-var hs-var">headerSlot</span></a></span></span><span>     </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span class="hs-special">,</span><span>                  </span><span class="hs-comment">-- ^ The Ouroboros time slot index of this block</span><span>
+</span><span id="line-103"></span><span>       </span><span id="headerBlockNo"><span class="annot"><span class="annottext">BlockHeader -&gt; BlockNo
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerBlockNo"><span class="hs-identifier hs-var hs-var">headerBlockNo</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span class="hs-special">,</span><span>                 </span><span class="hs-comment">-- ^ The block index from the Genesis</span><span>
+</span><span id="line-104"></span><span>       </span><span id="headerBodyHash"><span class="annot"><span class="annottext">BlockHeader -&gt; BodyHash
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerBodyHash"><span class="hs-identifier hs-var hs-var">headerBodyHash</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BodyHash"><span class="hs-identifier hs-type">BodyHash</span></a></span><span>                 </span><span class="hs-comment">-- ^ The hash of the corresponding block body</span><span>
+</span><span id="line-105"></span><span>     </span><span class="hs-special">}</span><span>
+</span><span id="line-106"></span><span>   </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679099425"><span id="local-6989586621679099427"><span id="local-6989586621679099429"><span class="annot"><span class="annottext">Int -&gt; BlockHeader -&gt; ShowS
+[BlockHeader] -&gt; ShowS
+BlockHeader -&gt; String
+(Int -&gt; BlockHeader -&gt; ShowS)
+-&gt; (BlockHeader -&gt; String)
+-&gt; ([BlockHeader] -&gt; ShowS)
+-&gt; Show BlockHeader
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [BlockHeader] -&gt; ShowS
+$cshowList :: [BlockHeader] -&gt; ShowS
+show :: BlockHeader -&gt; String
+$cshow :: BlockHeader -&gt; String
+showsPrec :: Int -&gt; BlockHeader -&gt; ShowS
+$cshowsPrec :: Int -&gt; BlockHeader -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679099421"><span id="local-6989586621679099423"><span class="annot"><span class="annottext">BlockHeader -&gt; BlockHeader -&gt; Bool
+(BlockHeader -&gt; BlockHeader -&gt; Bool)
+-&gt; (BlockHeader -&gt; BlockHeader -&gt; Bool) -&gt; Eq BlockHeader
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: BlockHeader -&gt; BlockHeader -&gt; Bool
+$c/= :: BlockHeader -&gt; BlockHeader -&gt; Bool
+== :: BlockHeader -&gt; BlockHeader -&gt; Bool
+$c== :: BlockHeader -&gt; BlockHeader -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. BlockHeader -&gt; Rep BlockHeader x)
+-&gt; (forall x. Rep BlockHeader x -&gt; BlockHeader)
+-&gt; Generic BlockHeader
+forall x. Rep BlockHeader x -&gt; BlockHeader
+forall x. BlockHeader -&gt; Rep BlockHeader x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cto :: forall x. Rep BlockHeader x -&gt; BlockHeader
+$cfrom :: forall x. BlockHeader -&gt; Rep BlockHeader x
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-107"></span><span>
+</span><span id="line-108"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679099417"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">ShowProxy</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockHeader"><span class="hs-identifier hs-type">BlockHeader</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-109"></span><span>
+</span><span id="line-110"></span><span class="hs-comment">-- | Compute the 'HeaderHash' of the 'BlockHeader'.</span><span>
+</span><span id="line-111"></span><span class="hs-comment">--</span><span>
+</span><span id="line-112"></span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#hashHeader"><span class="hs-identifier hs-type">hashHeader</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockHeader"><span class="hs-identifier hs-type">BlockHeader</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#ConcreteHeaderHash"><span class="hs-identifier hs-type">ConcreteHeaderHash</span></a></span><span>
+</span><span id="line-113"></span><span id="hashHeader"><span class="annot"><span class="annottext">hashHeader :: BlockHeader -&gt; ConcreteHeaderHash
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#hashHeader"><span class="hs-identifier hs-var hs-var">hashHeader</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockHeader"><span class="hs-identifier hs-type">BlockHeader</span></a></span><span> </span><span class="annot"><span class="annottext">HeaderHash BlockHeader
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679099416"><span class="annot"><span class="annottext">ChainHash BlockHeader
+</span><a href="#local-6989586621679099416"><span class="hs-identifier hs-var">b</span></a></span></span><span> </span><span id="local-6989586621679099415"><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679099415"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span id="local-6989586621679099414"><span class="annot"><span class="annottext">BlockNo
+</span><a href="#local-6989586621679099414"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span id="local-6989586621679099413"><span class="annot"><span class="annottext">BodyHash
+</span><a href="#local-6989586621679099413"><span class="hs-identifier hs-var">e</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; ConcreteHeaderHash
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#HeaderHash"><span class="hs-identifier hs-var">HeaderHash</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(ChainHash BlockHeader, SlotNo, BlockNo, BodyHash) -&gt; Int
+forall a. Hashable a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">hash</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ChainHash BlockHeader
+</span><a href="#local-6989586621679099416"><span class="hs-identifier hs-var">b</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679099415"><span class="hs-identifier hs-var">c</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">BlockNo
+</span><a href="#local-6989586621679099414"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">BodyHash
+</span><a href="#local-6989586621679099413"><span class="hs-identifier hs-var">e</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-114"></span><span>
+</span><span id="line-115"></span><span id="local-6989586621679099407"><span id="local-6989586621679099409"><span class="hs-keyword">deriving</span><span> </span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span></span></span><span>
+</span><span id="line-116"></span><span id="local-6989586621679099402"><span id="local-6989586621679099404"><span class="hs-keyword">deriving</span><span> </span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span></span></span><span>
+</span><span id="line-117"></span><span>
+</span><span id="line-118"></span><span class="hs-comment">-- | 'Hashable' instance for 'Hash'</span><span>
+</span><span id="line-119"></span><span class="hs-comment">--</span><span>
+</span><span id="line-120"></span><span class="hs-comment">-- We don't insist that 'Hashable' in 'StandardHash' because 'Hashable' is</span><span>
+</span><span id="line-121"></span><span class="hs-comment">-- only used in the network layer /tests/.</span><span>
+</span><span id="line-122"></span><span class="hs-comment">--</span><span>
+</span><span id="line-123"></span><span class="hs-comment">-- This requires @UndecidableInstances@ because @Hashable (HeaderHash b)@</span><span>
+</span><span id="line-124"></span><span class="hs-comment">-- is no smaller than @Hashable (ChainHash b)@.</span><span>
+</span><span id="line-125"></span><span id="local-6989586621679099401"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679099396"><span id="local-6989586621679099398"><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">StandardHash</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679099401"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">HeaderHash</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679099401"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Hashable</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">ChainHash</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679099401"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">)</span></span></span></span><span>
+</span><span id="line-126"></span><span> </span><span class="hs-comment">-- use generic instance</span><span>
+</span><span id="line-127"></span><span>
+</span><span id="line-128"></span><span class="hs-comment">-- | The hash of all the information in a 'BlockHeader'.</span><span>
+</span><span id="line-129"></span><span class="hs-comment">--</span><span>
+</span><span id="line-130"></span><span id="local-6989586621679099394"><span id="local-6989586621679099395"></span></span><span class="hs-keyword">newtype</span><span> </span><span id="ConcreteHeaderHash"><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#ConcreteHeaderHash"><span class="hs-identifier hs-var">ConcreteHeaderHash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="HeaderHash"><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#HeaderHash"><span class="hs-identifier hs-var">HeaderHash</span></a></span></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span>
+</span><span id="line-131"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679099388"><span id="local-6989586621679099390"><span id="local-6989586621679099392"><span class="annot"><span class="annottext">Int -&gt; ConcreteHeaderHash -&gt; ShowS
+[ConcreteHeaderHash] -&gt; ShowS
+ConcreteHeaderHash -&gt; String
+(Int -&gt; ConcreteHeaderHash -&gt; ShowS)
+-&gt; (ConcreteHeaderHash -&gt; String)
+-&gt; ([ConcreteHeaderHash] -&gt; ShowS)
+-&gt; Show ConcreteHeaderHash
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [ConcreteHeaderHash] -&gt; ShowS
+$cshowList :: [ConcreteHeaderHash] -&gt; ShowS
+show :: ConcreteHeaderHash -&gt; String
+$cshow :: ConcreteHeaderHash -&gt; String
+showsPrec :: Int -&gt; ConcreteHeaderHash -&gt; ShowS
+$cshowsPrec :: Int -&gt; ConcreteHeaderHash -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679099384"><span id="local-6989586621679099386"><span class="annot"><span class="annottext">ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Bool
+(ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Bool)
+-&gt; (ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Bool)
+-&gt; Eq ConcreteHeaderHash
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Bool
+$c/= :: ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Bool
+== :: ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Bool
+$c== :: ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679099369"><span id="local-6989586621679099371"><span id="local-6989586621679099373"><span id="local-6989586621679099375"><span id="local-6989586621679099377"><span id="local-6989586621679099379"><span id="local-6989586621679099381"><span class="annot"><span class="annottext">Eq ConcreteHeaderHash
+Eq ConcreteHeaderHash
+-&gt; (ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Ordering)
+-&gt; (ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Bool)
+-&gt; (ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Bool)
+-&gt; (ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Bool)
+-&gt; (ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Bool)
+-&gt; (ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; ConcreteHeaderHash)
+-&gt; (ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; ConcreteHeaderHash)
+-&gt; Ord ConcreteHeaderHash
+ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Bool
+ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Ordering
+ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; ConcreteHeaderHash
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; ConcreteHeaderHash
+$cmin :: ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; ConcreteHeaderHash
+max :: ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; ConcreteHeaderHash
+$cmax :: ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; ConcreteHeaderHash
+&gt;= :: ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Bool
+$c&gt;= :: ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Bool
+&gt; :: ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Bool
+$c&gt; :: ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Bool
+&lt;= :: ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Bool
+$c&lt;= :: ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Bool
+&lt; :: ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Bool
+$c&lt; :: ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Bool
+compare :: ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Ordering
+$ccompare :: ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Ordering
+$cp1Ord :: Eq ConcreteHeaderHash
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></a></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. ConcreteHeaderHash -&gt; Rep ConcreteHeaderHash x)
+-&gt; (forall x. Rep ConcreteHeaderHash x -&gt; ConcreteHeaderHash)
+-&gt; Generic ConcreteHeaderHash
+forall x. Rep ConcreteHeaderHash x -&gt; ConcreteHeaderHash
+forall x. ConcreteHeaderHash -&gt; Rep ConcreteHeaderHash x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cto :: forall x. Rep ConcreteHeaderHash x -&gt; ConcreteHeaderHash
+$cfrom :: forall x. ConcreteHeaderHash -&gt; Rep ConcreteHeaderHash x
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679099362"><span id="local-6989586621679099364"><span class="annot"><span class="annottext">Eq ConcreteHeaderHash
+Eq ConcreteHeaderHash
+-&gt; (Int -&gt; ConcreteHeaderHash -&gt; Int)
+-&gt; (ConcreteHeaderHash -&gt; Int)
+-&gt; Hashable ConcreteHeaderHash
+Int -&gt; ConcreteHeaderHash -&gt; Int
+ConcreteHeaderHash -&gt; Int
+forall a. Eq a -&gt; (Int -&gt; a -&gt; Int) -&gt; (a -&gt; Int) -&gt; Hashable a
+hash :: ConcreteHeaderHash -&gt; Int
+$chash :: ConcreteHeaderHash -&gt; Int
+hashWithSalt :: Int -&gt; ConcreteHeaderHash -&gt; Int
+$chashWithSalt :: Int -&gt; ConcreteHeaderHash -&gt; Int
+$cp1Hashable :: Eq ConcreteHeaderHash
+</span><a href="#local-6989586621679099362"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Hashable</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679099356"><span id="local-6989586621679099358"><span id="local-6989586621679099360"><span class="annot"><span class="annottext">Context -&gt; ConcreteHeaderHash -&gt; IO (Maybe ThunkInfo)
+Proxy ConcreteHeaderHash -&gt; String
+(Context -&gt; ConcreteHeaderHash -&gt; IO (Maybe ThunkInfo))
+-&gt; (Context -&gt; ConcreteHeaderHash -&gt; IO (Maybe ThunkInfo))
+-&gt; (Proxy ConcreteHeaderHash -&gt; String)
+-&gt; NoThunks ConcreteHeaderHash
+forall a.
+(Context -&gt; a -&gt; IO (Maybe ThunkInfo))
+-&gt; (Context -&gt; a -&gt; IO (Maybe ThunkInfo))
+-&gt; (Proxy a -&gt; String)
+-&gt; NoThunks a
+showTypeOf :: Proxy ConcreteHeaderHash -&gt; String
+$cshowTypeOf :: Proxy ConcreteHeaderHash -&gt; String
+wNoThunks :: Context -&gt; ConcreteHeaderHash -&gt; IO (Maybe ThunkInfo)
+$cwNoThunks :: Context -&gt; ConcreteHeaderHash -&gt; IO (Maybe ThunkInfo)
+noThunks :: Context -&gt; ConcreteHeaderHash -&gt; IO (Maybe ThunkInfo)
+$cnoThunks :: Context -&gt; ConcreteHeaderHash -&gt; IO (Maybe ThunkInfo)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">NoThunks</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-132"></span><span>
+</span><span id="line-133"></span><span class="hs-comment">-- | The hash of all the information in a 'BlockBody'.</span><span>
+</span><span id="line-134"></span><span class="hs-comment">--</span><span>
+</span><span id="line-135"></span><span id="local-6989586621679099353"><span id="local-6989586621679099354"></span></span><span class="hs-keyword">newtype</span><span> </span><span id="BodyHash"><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BodyHash"><span class="hs-identifier hs-var">BodyHash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="BodyHash"><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BodyHash"><span class="hs-identifier hs-var">BodyHash</span></a></span></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span>
+</span><span id="line-136"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679099347"><span id="local-6989586621679099349"><span id="local-6989586621679099351"><span class="annot"><span class="annottext">Int -&gt; BodyHash -&gt; ShowS
+[BodyHash] -&gt; ShowS
+BodyHash -&gt; String
+(Int -&gt; BodyHash -&gt; ShowS)
+-&gt; (BodyHash -&gt; String) -&gt; ([BodyHash] -&gt; ShowS) -&gt; Show BodyHash
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [BodyHash] -&gt; ShowS
+$cshowList :: [BodyHash] -&gt; ShowS
+show :: BodyHash -&gt; String
+$cshow :: BodyHash -&gt; String
+showsPrec :: Int -&gt; BodyHash -&gt; ShowS
+$cshowsPrec :: Int -&gt; BodyHash -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679099343"><span id="local-6989586621679099345"><span class="annot"><span class="annottext">BodyHash -&gt; BodyHash -&gt; Bool
+(BodyHash -&gt; BodyHash -&gt; Bool)
+-&gt; (BodyHash -&gt; BodyHash -&gt; Bool) -&gt; Eq BodyHash
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: BodyHash -&gt; BodyHash -&gt; Bool
+$c/= :: BodyHash -&gt; BodyHash -&gt; Bool
+== :: BodyHash -&gt; BodyHash -&gt; Bool
+$c== :: BodyHash -&gt; BodyHash -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679099328"><span id="local-6989586621679099330"><span id="local-6989586621679099332"><span id="local-6989586621679099334"><span id="local-6989586621679099336"><span id="local-6989586621679099338"><span id="local-6989586621679099340"><span class="annot"><span class="annottext">Eq BodyHash
+Eq BodyHash
+-&gt; (BodyHash -&gt; BodyHash -&gt; Ordering)
+-&gt; (BodyHash -&gt; BodyHash -&gt; Bool)
+-&gt; (BodyHash -&gt; BodyHash -&gt; Bool)
+-&gt; (BodyHash -&gt; BodyHash -&gt; Bool)
+-&gt; (BodyHash -&gt; BodyHash -&gt; Bool)
+-&gt; (BodyHash -&gt; BodyHash -&gt; BodyHash)
+-&gt; (BodyHash -&gt; BodyHash -&gt; BodyHash)
+-&gt; Ord BodyHash
+BodyHash -&gt; BodyHash -&gt; Bool
+BodyHash -&gt; BodyHash -&gt; Ordering
+BodyHash -&gt; BodyHash -&gt; BodyHash
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: BodyHash -&gt; BodyHash -&gt; BodyHash
+$cmin :: BodyHash -&gt; BodyHash -&gt; BodyHash
+max :: BodyHash -&gt; BodyHash -&gt; BodyHash
+$cmax :: BodyHash -&gt; BodyHash -&gt; BodyHash
+&gt;= :: BodyHash -&gt; BodyHash -&gt; Bool
+$c&gt;= :: BodyHash -&gt; BodyHash -&gt; Bool
+&gt; :: BodyHash -&gt; BodyHash -&gt; Bool
+$c&gt; :: BodyHash -&gt; BodyHash -&gt; Bool
+&lt;= :: BodyHash -&gt; BodyHash -&gt; Bool
+$c&lt;= :: BodyHash -&gt; BodyHash -&gt; Bool
+&lt; :: BodyHash -&gt; BodyHash -&gt; Bool
+$c&lt; :: BodyHash -&gt; BodyHash -&gt; Bool
+compare :: BodyHash -&gt; BodyHash -&gt; Ordering
+$ccompare :: BodyHash -&gt; BodyHash -&gt; Ordering
+$cp1Ord :: Eq BodyHash
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></a></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. BodyHash -&gt; Rep BodyHash x)
+-&gt; (forall x. Rep BodyHash x -&gt; BodyHash) -&gt; Generic BodyHash
+forall x. Rep BodyHash x -&gt; BodyHash
+forall x. BodyHash -&gt; Rep BodyHash x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cto :: forall x. Rep BodyHash x -&gt; BodyHash
+$cfrom :: forall x. BodyHash -&gt; Rep BodyHash x
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679099321"><span id="local-6989586621679099323"><span class="annot"><span class="annottext">Eq BodyHash
+Eq BodyHash
+-&gt; (Int -&gt; BodyHash -&gt; Int)
+-&gt; (BodyHash -&gt; Int)
+-&gt; Hashable BodyHash
+Int -&gt; BodyHash -&gt; Int
+BodyHash -&gt; Int
+forall a. Eq a -&gt; (Int -&gt; a -&gt; Int) -&gt; (a -&gt; Int) -&gt; Hashable a
+hash :: BodyHash -&gt; Int
+$chash :: BodyHash -&gt; Int
+hashWithSalt :: Int -&gt; BodyHash -&gt; Int
+$chashWithSalt :: Int -&gt; BodyHash -&gt; Int
+$cp1Hashable :: Eq BodyHash
+</span><a href="#local-6989586621679099321"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Hashable</span></a></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-137"></span><span>
+</span><span id="line-138"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+  HasHeader instances
+-------------------------------------------------------------------------------}</span><span>
+</span><span id="line-141"></span><span>
+</span><span id="line-142"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">StandardHash</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockHeader"><span class="hs-identifier hs-type">BlockHeader</span></a></span><span>
+</span><span id="line-143"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">StandardHash</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span>
+</span><span id="line-144"></span><span>
+</span><span id="line-145"></span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="HeaderHash"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">HeaderHash</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockHeader"><span class="hs-identifier hs-type">BlockHeader</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#ConcreteHeaderHash"><span class="hs-identifier hs-type">ConcreteHeaderHash</span></a></span><span>
+</span><span id="line-146"></span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="HeaderHash"><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">HeaderHash</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span>       </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#ConcreteHeaderHash"><span class="hs-identifier hs-type">ConcreteHeaderHash</span></a></span><span>
+</span><span id="line-147"></span><span>
+</span><span id="line-148"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">HasHeader</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockHeader"><span class="hs-identifier hs-type">BlockHeader</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-149"></span><span>  </span><span id="local-6989586621679099305"><span class="annot"><span class="annottext">getHeaderFields :: BlockHeader -&gt; HeaderFields BlockHeader
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">getHeaderFields</span></a></span></span><span> </span><span id="local-6989586621679099303"><span class="annot"><span class="annottext">BlockHeader
+</span><a href="#local-6989586621679099303"><span class="hs-identifier hs-var">hdr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">HeaderFields :: forall b. SlotNo -&gt; BlockNo -&gt; HeaderHash b -&gt; HeaderFields b
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">HeaderFields</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-150"></span><span>      </span><span class="annot"><span class="annottext">headerFieldHash :: HeaderHash BlockHeader
+</span><a href="#local-6989586621679099301"><span class="hs-identifier hs-var">headerFieldHash</span></a></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BlockHeader -&gt; HeaderHash BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerHash"><span class="hs-identifier hs-var hs-var">headerHash</span></a></span><span> </span><span class="annot"><span class="annottext">BlockHeader
+</span><a href="#local-6989586621679099303"><span class="hs-identifier hs-var">hdr</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-151"></span><span>      </span><span class="annot"><span class="annottext">headerFieldSlot :: SlotNo
+</span><a href="#local-6989586621679099300"><span class="hs-identifier hs-var">headerFieldSlot</span></a></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BlockHeader -&gt; SlotNo
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerSlot"><span class="hs-identifier hs-var hs-var">headerSlot</span></a></span><span> </span><span class="annot"><span class="annottext">BlockHeader
+</span><a href="#local-6989586621679099303"><span class="hs-identifier hs-var">hdr</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-152"></span><span>      </span><span class="annot"><span class="annottext">headerFieldBlockNo :: BlockNo
+</span><a href="#local-6989586621679099299"><span class="hs-identifier hs-var">headerFieldBlockNo</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BlockHeader -&gt; BlockNo
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerBlockNo"><span class="hs-identifier hs-var hs-var">headerBlockNo</span></a></span><span> </span><span class="annot"><span class="annottext">BlockHeader
+</span><a href="#local-6989586621679099303"><span class="hs-identifier hs-var">hdr</span></a></span><span>
+</span><span id="line-153"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-154"></span><span>
+</span><span id="line-155"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">HasFullHeader</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockHeader"><span class="hs-identifier hs-type">BlockHeader</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-156"></span><span>    </span><span id="local-6989586621679099294"><span class="annot"><span class="annottext">blockPrevHash :: BlockHeader -&gt; ChainHash BlockHeader
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">blockPrevHash</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BlockHeader -&gt; ChainHash BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerPrevHash"><span class="hs-identifier hs-var hs-var">headerPrevHash</span></a></span><span>
+</span><span id="line-157"></span><span>
+</span><span id="line-158"></span><span>    </span><span class="hs-comment">-- | The header invariant is that the cached header hash is correct.</span><span>
+</span><span id="line-159"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-160"></span><span>    </span><span id="local-6989586621679099292"><span class="annot"><span class="annottext">blockInvariant :: BlockHeader -&gt; Bool
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">blockInvariant</span></a></span></span><span> </span><span id="local-6989586621679099290"><span class="annot"><span class="annottext">BlockHeader
+</span><a href="#local-6989586621679099290"><span class="hs-identifier hs-var">b</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-161"></span><span>        </span><span class="annot"><span class="annottext">BlockHeader -&gt; ConcreteHeaderHash
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#hashHeader"><span class="hs-identifier hs-var">hashHeader</span></a></span><span> </span><span class="annot"><span class="annottext">BlockHeader
+</span><a href="#local-6989586621679099290"><span class="hs-identifier hs-var">b</span></a></span><span> </span><span class="annot"><span class="annottext">ConcreteHeaderHash -&gt; ConcreteHeaderHash -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">==</span></a></span><span> </span><span class="annot"><span class="annottext">BlockHeader -&gt; HeaderHash BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerHash"><span class="hs-identifier hs-var hs-var">headerHash</span></a></span><span> </span><span class="annot"><span class="annottext">BlockHeader
+</span><a href="#local-6989586621679099290"><span class="hs-identifier hs-var">b</span></a></span><span>
+</span><span id="line-162"></span><span>
+</span><span id="line-163"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">HasHeader</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-164"></span><span>  </span><span id="local-6989586621679099286"><span class="annot"><span class="annottext">getHeaderFields :: Block -&gt; HeaderFields Block
+</span><a href="#local-6989586621679099286"><span class="hs-identifier hs-var hs-var hs-var hs-var">getHeaderFields</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">HeaderFields BlockHeader -&gt; HeaderFields Block
+forall b b'.
+(HeaderHash b ~ HeaderHash b') =&gt;
+HeaderFields b -&gt; HeaderFields b'
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">castHeaderFields</span></a></span><span> </span><span class="annot"><span class="annottext">(HeaderFields BlockHeader -&gt; HeaderFields Block)
+-&gt; (Block -&gt; HeaderFields BlockHeader)
+-&gt; Block
+-&gt; HeaderFields Block
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">BlockHeader -&gt; HeaderFields BlockHeader
+forall b. HasHeader b =&gt; b -&gt; HeaderFields b
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">getHeaderFields</span></a></span><span> </span><span class="annot"><span class="annottext">(BlockHeader -&gt; HeaderFields BlockHeader)
+-&gt; (Block -&gt; BlockHeader) -&gt; Block -&gt; HeaderFields BlockHeader
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Block -&gt; BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#blockHeader"><span class="hs-identifier hs-var hs-var">blockHeader</span></a></span><span>
+</span><span id="line-165"></span><span>
+</span><span id="line-166"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">HasFullHeader</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-167"></span><span>    </span><span id="local-6989586621679099280"><span class="annot"><span class="annottext">blockPrevHash :: Block -&gt; ChainHash Block
+</span><a href="#local-6989586621679099280"><span class="hs-identifier hs-var hs-var hs-var hs-var">blockPrevHash</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ChainHash BlockHeader -&gt; ChainHash Block
+forall b b'.
+Coercible (HeaderHash b) (HeaderHash b') =&gt;
+ChainHash b -&gt; ChainHash b'
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">castHash</span></a></span><span> </span><span class="annot"><span class="annottext">(ChainHash BlockHeader -&gt; ChainHash Block)
+-&gt; (Block -&gt; ChainHash BlockHeader) -&gt; Block -&gt; ChainHash Block
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">BlockHeader -&gt; ChainHash BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerPrevHash"><span class="hs-identifier hs-var hs-var">headerPrevHash</span></a></span><span> </span><span class="annot"><span class="annottext">(BlockHeader -&gt; ChainHash BlockHeader)
+-&gt; (Block -&gt; BlockHeader) -&gt; Block -&gt; ChainHash BlockHeader
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Block -&gt; BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#blockHeader"><span class="hs-identifier hs-var hs-var">blockHeader</span></a></span><span>
+</span><span id="line-168"></span><span>
+</span><span id="line-169"></span><span>    </span><span class="hs-comment">-- | The block invariant is just that the actual block body hash matches the</span><span>
+</span><span id="line-170"></span><span>    </span><span class="hs-comment">-- body hash listed in the header.</span><span>
+</span><span id="line-171"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-172"></span><span>    </span><span id="local-6989586621679099278"><span class="annot"><span class="annottext">blockInvariant :: Block -&gt; Bool
+</span><a href="#local-6989586621679099278"><span class="hs-identifier hs-var hs-var hs-var hs-var">blockInvariant</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679099277"><span class="annot"><span class="annottext">BlockBody
+blockBody :: BlockBody
+blockBody :: Block -&gt; BlockBody
+</span><a href="#local-6989586621679099277"><span class="hs-identifier hs-var hs-var">blockBody</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679099276"><span class="annot"><span class="annottext">BlockHeader
+blockHeader :: BlockHeader
+blockHeader :: Block -&gt; BlockHeader
+</span><a href="#local-6989586621679099276"><span class="hs-identifier hs-var hs-var">blockHeader</span></a></span></span><span> </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-173"></span><span>        </span><span class="annot"><span class="annottext">BlockHeader -&gt; Bool
+forall b. HasFullHeader b =&gt; b -&gt; Bool
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">blockInvariant</span></a></span><span> </span><span class="annot"><span class="annottext">BlockHeader
+</span><a href="#local-6989586621679099276"><span class="hs-identifier hs-var">blockHeader</span></a></span><span>
+</span><span id="line-174"></span><span>     </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&amp;&amp;</span></a></span><span> </span><span class="annot"><span class="annottext">BlockHeader -&gt; BodyHash
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerBodyHash"><span class="hs-identifier hs-var hs-var">headerBodyHash</span></a></span><span> </span><span class="annot"><span class="annottext">BlockHeader
+</span><a href="#local-6989586621679099276"><span class="hs-identifier hs-var">blockHeader</span></a></span><span> </span><span class="annot"><span class="annottext">BodyHash -&gt; BodyHash -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">==</span></a></span><span> </span><span class="annot"><span class="annottext">BlockBody -&gt; BodyHash
+forall body. Hashable body =&gt; body -&gt; BodyHash
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#hashBody"><span class="hs-identifier hs-var">hashBody</span></a></span><span> </span><span class="annot"><span class="annottext">BlockBody
+</span><a href="#local-6989586621679099277"><span class="hs-identifier hs-var">blockBody</span></a></span><span>
+</span><span id="line-175"></span><span>
+</span><span id="line-176"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+  Constructing sample chains
+-------------------------------------------------------------------------------}</span><span>
+</span><span id="line-179"></span><span>
+</span><span id="line-180"></span><span class="hs-comment">-- | This takes the blocks in order from /oldest to newest/.</span><span>
+</span><span id="line-181"></span><span class="hs-comment">--</span><span>
+</span><span id="line-182"></span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkChain"><span class="hs-identifier hs-type">mkChain</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockBody"><span class="hs-identifier hs-type">BlockBody</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.Chain.html#Chain"><span class="hs-identifier hs-type">Chain</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span>
+</span><span id="line-183"></span><span id="mkChain"><span class="annot"><span class="annottext">mkChain :: [(SlotNo, BlockBody)] -&gt; Chain Block
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkChain"><span class="hs-identifier hs-var hs-var">mkChain</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-184"></span><span>    </span><span class="annot"><span class="annottext">(Anchor Block -&gt; Block -&gt; Block) -&gt; [Block] -&gt; Chain Block
+forall b. HasFullHeader b =&gt; (Anchor b -&gt; b -&gt; b) -&gt; [b] -&gt; Chain b
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupChain"><span class="hs-identifier hs-var">fixupChain</span></a></span><span> </span><span class="annot"><span class="annottext">Anchor Block -&gt; Block -&gt; Block
+forall block.
+(HeaderHash block ~ HeaderHash BlockHeader) =&gt;
+Anchor block -&gt; Block -&gt; Block
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupBlock"><span class="hs-identifier hs-var">fixupBlock</span></a></span><span>
+</span><span id="line-185"></span><span>  </span><span class="annot"><span class="annottext">([Block] -&gt; Chain Block)
+-&gt; ([(SlotNo, BlockBody)] -&gt; [Block])
+-&gt; [(SlotNo, BlockBody)]
+-&gt; Chain Block
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">((SlotNo, BlockBody) -&gt; Block) -&gt; [(SlotNo, BlockBody)] -&gt; [Block]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">map</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(SlotNo -&gt; BlockBody -&gt; Block) -&gt; (SlotNo, BlockBody) -&gt; Block
+forall a b c. (a -&gt; b -&gt; c) -&gt; (a, b) -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">uncurry</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; BlockBody -&gt; Block
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkPartialBlock"><span class="hs-identifier hs-var">mkPartialBlock</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-186"></span><span>  </span><span class="annot"><span class="annottext">([(SlotNo, BlockBody)] -&gt; [Block])
+-&gt; ([(SlotNo, BlockBody)] -&gt; [(SlotNo, BlockBody)])
+-&gt; [(SlotNo, BlockBody)]
+-&gt; [Block]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">[(SlotNo, BlockBody)] -&gt; [(SlotNo, BlockBody)]
+forall a. [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">reverse</span></a></span><span>
+</span><span id="line-187"></span><span>
+</span><span id="line-188"></span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkChainSimple"><span class="hs-identifier hs-type">mkChainSimple</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockBody"><span class="hs-identifier hs-type">BlockBody</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.Chain.html#Chain"><span class="hs-identifier hs-type">Chain</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span>
+</span><span id="line-189"></span><span id="mkChainSimple"><span class="annot"><span class="annottext">mkChainSimple :: [BlockBody] -&gt; Chain Block
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkChainSimple"><span class="hs-identifier hs-var hs-var">mkChainSimple</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(SlotNo, BlockBody)] -&gt; Chain Block
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkChain"><span class="hs-identifier hs-var">mkChain</span></a></span><span> </span><span class="annot"><span class="annottext">([(SlotNo, BlockBody)] -&gt; Chain Block)
+-&gt; ([BlockBody] -&gt; [(SlotNo, BlockBody)])
+-&gt; [BlockBody]
+-&gt; Chain Block
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">[SlotNo] -&gt; [BlockBody] -&gt; [(SlotNo, BlockBody)]
+forall a b. [a] -&gt; [b] -&gt; [(a, b)]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">zip</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SlotNo
+</span><span class="hs-number">1</span></span><span class="hs-glyph">..</span><span class="hs-special">]</span><span>
+</span><span id="line-190"></span><span>
+</span><span id="line-191"></span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkAnchoredFragment"><span class="hs-identifier hs-type">mkAnchoredFragment</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Anchor</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span>
+</span><span id="line-192"></span><span>                   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockBody"><span class="hs-identifier hs-type">BlockBody</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-193"></span><span>                   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">AnchoredFragment</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span>
+</span><span id="line-194"></span><span id="mkAnchoredFragment"><span class="annot"><span class="annottext">mkAnchoredFragment :: Anchor Block -&gt; [(SlotNo, BlockBody)] -&gt; AnchoredFragment Block
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkAnchoredFragment"><span class="hs-identifier hs-var hs-var">mkAnchoredFragment</span></a></span></span><span> </span><span id="local-6989586621679099272"><span class="annot"><span class="annottext">Anchor Block
+</span><a href="#local-6989586621679099272"><span class="hs-identifier hs-var">anchor</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-195"></span><span>    </span><span class="annot"><span class="annottext">Anchor Block
+-&gt; (Anchor Block -&gt; Block -&gt; Block)
+-&gt; [Block]
+-&gt; AnchoredFragment Block
+forall b.
+HasFullHeader b =&gt;
+Anchor b -&gt; (Anchor b -&gt; b -&gt; b) -&gt; [b] -&gt; AnchoredFragment b
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupAnchoredFragmentFrom"><span class="hs-identifier hs-var">fixupAnchoredFragmentFrom</span></a></span><span> </span><span class="annot"><span class="annottext">Anchor Block
+</span><a href="#local-6989586621679099272"><span class="hs-identifier hs-var">anchor</span></a></span><span> </span><span class="annot"><span class="annottext">Anchor Block -&gt; Block -&gt; Block
+forall block.
+(HeaderHash block ~ HeaderHash BlockHeader) =&gt;
+Anchor block -&gt; Block -&gt; Block
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupBlock"><span class="hs-identifier hs-var">fixupBlock</span></a></span><span>
+</span><span id="line-196"></span><span>  </span><span class="annot"><span class="annottext">([Block] -&gt; AnchoredFragment Block)
+-&gt; ([(SlotNo, BlockBody)] -&gt; [Block])
+-&gt; [(SlotNo, BlockBody)]
+-&gt; AnchoredFragment Block
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">((SlotNo, BlockBody) -&gt; Block) -&gt; [(SlotNo, BlockBody)] -&gt; [Block]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">map</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(SlotNo -&gt; BlockBody -&gt; Block) -&gt; (SlotNo, BlockBody) -&gt; Block
+forall a b c. (a -&gt; b -&gt; c) -&gt; (a, b) -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">uncurry</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; BlockBody -&gt; Block
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkPartialBlock"><span class="hs-identifier hs-var">mkPartialBlock</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-197"></span><span>  </span><span class="annot"><span class="annottext">([(SlotNo, BlockBody)] -&gt; [Block])
+-&gt; ([(SlotNo, BlockBody)] -&gt; [(SlotNo, BlockBody)])
+-&gt; [(SlotNo, BlockBody)]
+-&gt; [Block]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">[(SlotNo, BlockBody)] -&gt; [(SlotNo, BlockBody)]
+forall a. [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">reverse</span></a></span><span>
+</span><span id="line-198"></span><span>
+</span><span id="line-199"></span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkAnchoredFragmentSimple"><span class="hs-identifier hs-type">mkAnchoredFragmentSimple</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockBody"><span class="hs-identifier hs-type">BlockBody</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">AnchoredFragment</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span>
+</span><span id="line-200"></span><span id="mkAnchoredFragmentSimple"><span class="annot"><span class="annottext">mkAnchoredFragmentSimple :: [BlockBody] -&gt; AnchoredFragment Block
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkAnchoredFragmentSimple"><span class="hs-identifier hs-var hs-var">mkAnchoredFragmentSimple</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-201"></span><span>    </span><span class="annot"><span class="annottext">Anchor Block -&gt; [(SlotNo, BlockBody)] -&gt; AnchoredFragment Block
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkAnchoredFragment"><span class="hs-identifier hs-var">mkAnchoredFragment</span></a></span><span> </span><span class="annot"><span class="annottext">Anchor Block
+forall block. Anchor block
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">AnchorGenesis</span></a></span><span> </span><span class="annot"><span class="annottext">([(SlotNo, BlockBody)] -&gt; AnchoredFragment Block)
+-&gt; ([BlockBody] -&gt; [(SlotNo, BlockBody)])
+-&gt; [BlockBody]
+-&gt; AnchoredFragment Block
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">[SlotNo] -&gt; [BlockBody] -&gt; [(SlotNo, BlockBody)]
+forall a b. [a] -&gt; [b] -&gt; [(a, b)]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">zip</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SlotNo
+</span><span class="hs-number">1</span></span><span class="hs-glyph">..</span><span class="hs-special">]</span><span>
+</span><span id="line-202"></span><span>
+</span><span id="line-203"></span><span>
+</span><span id="line-204"></span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkPartialBlock"><span class="hs-identifier hs-type">mkPartialBlock</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockBody"><span class="hs-identifier hs-type">BlockBody</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span>
+</span><span id="line-205"></span><span id="mkPartialBlock"><span class="annot"><span class="annottext">mkPartialBlock :: SlotNo -&gt; BlockBody -&gt; Block
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkPartialBlock"><span class="hs-identifier hs-var hs-var">mkPartialBlock</span></a></span></span><span> </span><span id="local-6989586621679099270"><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679099270"><span class="hs-identifier hs-var">sl</span></a></span></span><span> </span><span id="local-6989586621679099269"><span class="annot"><span class="annottext">BlockBody
+</span><a href="#local-6989586621679099269"><span class="hs-identifier hs-var">body</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-206"></span><span>    </span><span class="annot"><span class="annottext">Block :: BlockHeader -&gt; BlockBody -&gt; Block
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-207"></span><span>      </span><span class="annot"><span class="annottext">blockHeader :: BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#blockHeader"><span class="hs-identifier hs-var">blockHeader</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; BlockBody -&gt; BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkPartialBlockHeader"><span class="hs-identifier hs-var">mkPartialBlockHeader</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679099270"><span class="hs-identifier hs-var">sl</span></a></span><span> </span><span class="annot"><span class="annottext">BlockBody
+</span><a href="#local-6989586621679099269"><span class="hs-identifier hs-var">body</span></a></span><span>
+</span><span id="line-208"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">blockBody :: BlockBody
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#blockBody"><span class="hs-identifier hs-var">blockBody</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BlockBody
+</span><a href="#local-6989586621679099269"><span class="hs-identifier hs-var">body</span></a></span><span>
+</span><span id="line-209"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-210"></span><span>
+</span><span id="line-211"></span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkPartialBlockHeader"><span class="hs-identifier hs-type">mkPartialBlockHeader</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockBody"><span class="hs-identifier hs-type">BlockBody</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockHeader"><span class="hs-identifier hs-type">BlockHeader</span></a></span><span>
+</span><span id="line-212"></span><span id="mkPartialBlockHeader"><span class="annot"><span class="annottext">mkPartialBlockHeader :: SlotNo -&gt; BlockBody -&gt; BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#mkPartialBlockHeader"><span class="hs-identifier hs-var hs-var">mkPartialBlockHeader</span></a></span></span><span> </span><span id="local-6989586621679099268"><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679099268"><span class="hs-identifier hs-var">sl</span></a></span></span><span> </span><span id="local-6989586621679099267"><span class="annot"><span class="annottext">BlockBody
+</span><a href="#local-6989586621679099267"><span class="hs-identifier hs-var">body</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-213"></span><span>    </span><span class="annot"><span class="annottext">BlockHeader :: HeaderHash BlockHeader
+-&gt; ChainHash BlockHeader
+-&gt; SlotNo
+-&gt; BlockNo
+-&gt; BodyHash
+-&gt; BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockHeader"><span class="hs-identifier hs-type">BlockHeader</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-214"></span><span>      </span><span class="annot"><span class="annottext">headerSlot :: SlotNo
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerSlot"><span class="hs-identifier hs-var">headerSlot</span></a></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679099268"><span class="hs-identifier hs-var">sl</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-215"></span><span>      </span><span class="annot"><span class="annottext">headerHash :: HeaderHash BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerHash"><span class="hs-identifier hs-var">headerHash</span></a></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; ConcreteHeaderHash
+forall a. String -&gt; a
+</span><a href="#local-6989586621679099266"><span class="hs-identifier hs-var">partialField</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;headerHash&quot;</span></span><span class="hs-special">,</span><span>
+</span><span id="line-216"></span><span>      </span><span class="annot"><span class="annottext">headerPrevHash :: ChainHash BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerPrevHash"><span class="hs-identifier hs-var">headerPrevHash</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; ChainHash BlockHeader
+forall a. String -&gt; a
+</span><a href="#local-6989586621679099266"><span class="hs-identifier hs-var">partialField</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;headerPrevHash&quot;</span></span><span class="hs-special">,</span><span>
+</span><span id="line-217"></span><span>      </span><span class="annot"><span class="annottext">headerBlockNo :: BlockNo
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerBlockNo"><span class="hs-identifier hs-var">headerBlockNo</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; BlockNo
+forall a. String -&gt; a
+</span><a href="#local-6989586621679099266"><span class="hs-identifier hs-var">partialField</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;headerBlockNo&quot;</span></span><span class="hs-special">,</span><span>
+</span><span id="line-218"></span><span>      </span><span class="annot"><span class="annottext">headerBodyHash :: BodyHash
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerBodyHash"><span class="hs-identifier hs-var">headerBodyHash</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BlockBody -&gt; BodyHash
+forall body. Hashable body =&gt; body -&gt; BodyHash
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#hashBody"><span class="hs-identifier hs-var">hashBody</span></a></span><span> </span><span class="annot"><span class="annottext">BlockBody
+</span><a href="#local-6989586621679099267"><span class="hs-identifier hs-var">body</span></a></span><span>
+</span><span id="line-219"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-220"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-221"></span><span>    </span><span id="local-6989586621679099266"><span class="annot"><span class="annottext">partialField :: String -&gt; a
+</span><a href="#local-6989586621679099266"><span class="hs-identifier hs-var hs-var">partialField</span></a></span></span><span> </span><span id="local-6989586621679099265"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679099265"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; a
+forall a. HasCallStack =&gt; String -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">error</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;mkPartialBlock: you didn't fill in field &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">++</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679099265"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-222"></span><span>
+</span><span id="line-223"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+  &quot;Fixup&quot; is used for chain construction in the network tests. These functions
+  don't make much sense for real chains.
+-------------------------------------------------------------------------------}</span><span>
+</span><span id="line-227"></span><span>
+</span><span id="line-228"></span><span class="hs-comment">-- | Fix up a block so that it fits on top of the given anchor. Only the block</span><span>
+</span><span id="line-229"></span><span class="hs-comment">-- number, the previous hash and the block hash are updated; the slot number and</span><span>
+</span><span id="line-230"></span><span class="hs-comment">-- the signers are kept intact.</span><span>
+</span><span id="line-231"></span><span class="hs-comment">--</span><span>
+</span><span id="line-232"></span><span id="local-6989586621679099618"><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupBlock"><span class="hs-identifier hs-type">fixupBlock</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">HeaderHash</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679099618"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">~</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">HeaderHash</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockHeader"><span class="hs-identifier hs-type">BlockHeader</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-233"></span><span>           </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Anchor</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679099618"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-type">Block</span></a></span></span><span>
+</span><span id="line-234"></span><span id="fixupBlock"><span class="annot"><span class="annottext">fixupBlock :: Anchor block -&gt; Block -&gt; Block
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupBlock"><span class="hs-identifier hs-var hs-var">fixupBlock</span></a></span></span><span> </span><span id="local-6989586621679099263"><span class="annot"><span class="annottext">Anchor block
+</span><a href="#local-6989586621679099263"><span class="hs-identifier hs-var">prev</span></a></span></span><span> </span><span id="local-6989586621679099262"><span class="annot"><span class="annottext">b :: Block
+</span><a href="#local-6989586621679099262"><span class="hs-identifier hs-var">b</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span class="hs-special">{</span><span id="local-6989586621679099261"><span class="annot"><span class="annottext">BlockBody
+blockBody :: BlockBody
+blockBody :: Block -&gt; BlockBody
+</span><a href="#local-6989586621679099261"><span class="hs-identifier hs-var hs-var">blockBody</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679099260"><span class="annot"><span class="annottext">BlockHeader
+blockHeader :: BlockHeader
+blockHeader :: Block -&gt; BlockHeader
+</span><a href="#local-6989586621679099260"><span class="hs-identifier hs-var hs-var">blockHeader</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-235"></span><span>    </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679099262"><span class="hs-identifier hs-var">b</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-236"></span><span>      </span><span class="annot"><span class="annottext">blockHeader :: BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#blockHeader"><span class="hs-identifier hs-var">blockHeader</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Anchor block -&gt; BlockHeader -&gt; BlockHeader
+forall block.
+(HeaderHash block ~ HeaderHash BlockHeader) =&gt;
+Anchor block -&gt; BlockHeader -&gt; BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupBlockHeader"><span class="hs-identifier hs-var">fixupBlockHeader</span></a></span><span> </span><span class="annot"><span class="annottext">Anchor block
+</span><a href="#local-6989586621679099263"><span class="hs-identifier hs-var">prev</span></a></span><span> </span><span class="annot"><span class="annottext">BlockHeader
+</span><a href="#local-6989586621679099260"><span class="hs-identifier hs-var">blockHeader</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-237"></span><span>                      </span><span class="annot"><span class="annottext">headerBodyHash :: BodyHash
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerBodyHash"><span class="hs-identifier hs-var">headerBodyHash</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BlockBody -&gt; BodyHash
+forall body. Hashable body =&gt; body -&gt; BodyHash
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#hashBody"><span class="hs-identifier hs-var">hashBody</span></a></span><span> </span><span class="annot"><span class="annottext">BlockBody
+</span><a href="#local-6989586621679099261"><span class="hs-identifier hs-var">blockBody</span></a></span><span>
+</span><span id="line-238"></span><span>                    </span><span class="hs-special">}</span><span>
+</span><span id="line-239"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-240"></span><span>
+</span><span id="line-241"></span><span class="hs-comment">-- | Fixup block header to fit it on top of a chain.  Only block number and</span><span>
+</span><span id="line-242"></span><span class="hs-comment">-- previous hash are updated; the slot and signer are kept unchanged.</span><span>
+</span><span id="line-243"></span><span class="hs-comment">--</span><span>
+</span><span id="line-244"></span><span id="local-6989586621679099600"><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupBlockHeader"><span class="hs-identifier hs-type">fixupBlockHeader</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">HeaderHash</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679099600"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">~</span></a></span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">HeaderHash</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockHeader"><span class="hs-identifier hs-type">BlockHeader</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-245"></span><span>                 </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Anchor</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679099600"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockHeader"><span class="hs-identifier hs-type">BlockHeader</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockHeader"><span class="hs-identifier hs-type">BlockHeader</span></a></span></span><span>
+</span><span id="line-246"></span><span id="fixupBlockHeader"><span class="annot"><span class="annottext">fixupBlockHeader :: Anchor block -&gt; BlockHeader -&gt; BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupBlockHeader"><span class="hs-identifier hs-var hs-var">fixupBlockHeader</span></a></span></span><span> </span><span id="local-6989586621679099259"><span class="annot"><span class="annottext">Anchor block
+</span><a href="#local-6989586621679099259"><span class="hs-identifier hs-var">prev</span></a></span></span><span> </span><span id="local-6989586621679099258"><span class="annot"><span class="annottext">BlockHeader
+</span><a href="#local-6989586621679099258"><span class="hs-identifier hs-var">b</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-247"></span><span>    </span><span class="annot"><span class="annottext">(BlockHeader -&gt; BlockHeader) -&gt; BlockHeader
+forall a. (a -&gt; a) -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fix</span></a></span><span> </span><span class="annot"><span class="annottext">((BlockHeader -&gt; BlockHeader) -&gt; BlockHeader)
+-&gt; (BlockHeader -&gt; BlockHeader) -&gt; BlockHeader
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679099257"><span class="annot"><span class="annottext">BlockHeader
+</span><a href="#local-6989586621679099257"><span class="hs-identifier hs-var">b'</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-248"></span><span>    </span><span class="annot"><span class="annottext">BlockHeader
+</span><a href="#local-6989586621679099258"><span class="hs-identifier hs-var">b</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-249"></span><span>      </span><span class="annot"><span class="annottext">headerHash :: HeaderHash BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerHash"><span class="hs-identifier hs-var">headerHash</span></a></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BlockHeader -&gt; ConcreteHeaderHash
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#hashHeader"><span class="hs-identifier hs-var">hashHeader</span></a></span><span> </span><span class="annot"><span class="annottext">BlockHeader
+</span><a href="#local-6989586621679099257"><span class="hs-identifier hs-var">b'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-250"></span><span>      </span><span class="annot"><span class="annottext">headerPrevHash :: ChainHash BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerPrevHash"><span class="hs-identifier hs-var">headerPrevHash</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ChainHash block -&gt; ChainHash BlockHeader
+forall b b'.
+Coercible (HeaderHash b) (HeaderHash b') =&gt;
+ChainHash b -&gt; ChainHash b'
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">castHash</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Anchor block -&gt; ChainHash block
+forall block. Anchor block -&gt; ChainHash block
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">AF.anchorToHash</span></a></span><span> </span><span class="annot"><span class="annottext">Anchor block
+</span><a href="#local-6989586621679099259"><span class="hs-identifier hs-var">prev</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-251"></span><span>      </span><span class="annot"><span class="annottext">headerBlockNo :: BlockNo
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerBlockNo"><span class="hs-identifier hs-var">headerBlockNo</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BlockNo -&gt; (BlockNo -&gt; BlockNo) -&gt; WithOrigin BlockNo -&gt; BlockNo
+forall b t. b -&gt; (t -&gt; b) -&gt; WithOrigin t -&gt; b
+</span><span class="hs-identifier hs-var">withOrigin</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word64 -&gt; BlockNo
+</span><span class="hs-identifier hs-var">BlockNo</span></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><span class="hs-number">0</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">BlockNo -&gt; BlockNo
+forall a. Enum a =&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">succ</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Anchor block -&gt; WithOrigin BlockNo
+forall block. Anchor block -&gt; WithOrigin BlockNo
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">AF.anchorToBlockNo</span></a></span><span> </span><span class="annot"><span class="annottext">Anchor block
+</span><a href="#local-6989586621679099259"><span class="hs-identifier hs-var">prev</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-252"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-253"></span><span>
+</span><span id="line-254"></span><span>
+</span><span id="line-255"></span><span class="hs-comment">-- | Fixup a block so to fit it on top of a given previous block.</span><span>
+</span><span id="line-256"></span><span>
+</span><span id="line-257"></span><span class="hs-comment">-- Like 'fixupBlock' but it takes the info from a given block.</span><span>
+</span><span id="line-258"></span><span class="hs-comment">--</span><span>
+</span><span id="line-259"></span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupBlockAfterBlock"><span class="hs-identifier hs-type">fixupBlockAfterBlock</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span>
+</span><span id="line-260"></span><span id="fixupBlockAfterBlock"><span class="annot"><span class="annottext">fixupBlockAfterBlock :: Block -&gt; Block -&gt; Block
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupBlockAfterBlock"><span class="hs-identifier hs-var hs-var">fixupBlockAfterBlock</span></a></span></span><span> </span><span id="local-6989586621679099252"><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679099252"><span class="hs-identifier hs-var">prev</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Anchor Block -&gt; Block -&gt; Block
+forall block.
+(HeaderHash block ~ HeaderHash BlockHeader) =&gt;
+Anchor block -&gt; Block -&gt; Block
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupBlock"><span class="hs-identifier hs-var">fixupBlock</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Block -&gt; Anchor Block
+forall block. HasHeader block =&gt; block -&gt; Anchor block
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">AF.anchorFromBlock</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679099252"><span class="hs-identifier hs-var">prev</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-261"></span><span>
+</span><span id="line-262"></span><span id="local-6989586621679099581"><span id="local-6989586621679099582"><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupBlocks"><span class="hs-identifier hs-type">fixupBlocks</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">HasFullHeader</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679099582"><span class="hs-identifier hs-type">b</span></a></span><span>
+</span><span id="line-263"></span><span>            </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679099581"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679099582"><span class="hs-identifier hs-type">b</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679099581"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-264"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679099581"><span class="hs-identifier hs-type">c</span></a></span><span>
+</span><span id="line-265"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Anchor</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679099582"><span class="hs-identifier hs-type">b</span></a></span><span> </span><span class="hs-comment">-- ^ Override prev hash and block number based on the anchor</span><span>
+</span><span id="line-266"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Anchor</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679099582"><span class="hs-identifier hs-type">b</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679099582"><span class="hs-identifier hs-type">b</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679099582"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-267"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679099582"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679099581"><span class="hs-identifier hs-type">c</span></a></span></span></span><span>
+</span><span id="line-268"></span><span id="fixupBlocks"><span class="annot"><span class="annottext">fixupBlocks :: (c -&gt; b -&gt; c) -&gt; c -&gt; Anchor b -&gt; (Anchor b -&gt; b -&gt; b) -&gt; [b] -&gt; c
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupBlocks"><span class="hs-identifier hs-var hs-var">fixupBlocks</span></a></span></span><span> </span><span id="local-6989586621679099249"><span class="annot"><span class="annottext">c -&gt; b -&gt; c
+</span><a href="#local-6989586621679099249"><span class="hs-identifier hs-var">_f</span></a></span></span><span> </span><span id="local-6989586621679099248"><span class="annot"><span class="annottext">c
+</span><a href="#local-6989586621679099248"><span class="hs-identifier hs-var">z</span></a></span></span><span> </span><span class="annot"><span class="annottext">Anchor b
+</span><span class="hs-identifier">_</span></span><span>     </span><span id="local-6989586621679099247"><span class="annot"><span class="annottext">Anchor b -&gt; b -&gt; b
+</span><a href="#local-6989586621679099247"><span class="hs-identifier hs-var">_fixup</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">c
+</span><a href="#local-6989586621679099248"><span class="hs-identifier hs-var">z</span></a></span><span>
+</span><span id="line-269"></span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupBlocks"><span class="hs-identifier hs-var">fixupBlocks</span></a></span><span>  </span><span id="local-6989586621679099246"><span class="annot"><span class="annottext">c -&gt; b -&gt; c
+</span><a href="#local-6989586621679099246"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679099245"><span class="annot"><span class="annottext">c
+</span><a href="#local-6989586621679099245"><span class="hs-identifier hs-var">z</span></a></span></span><span> </span><span id="local-6989586621679099244"><span class="annot"><span class="annottext">Anchor b
+</span><a href="#local-6989586621679099244"><span class="hs-identifier hs-var">anchor</span></a></span></span><span> </span><span id="local-6989586621679099243"><span class="annot"><span class="annottext">Anchor b -&gt; b -&gt; b
+</span><a href="#local-6989586621679099243"><span class="hs-identifier hs-var">fixup</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679099242"><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679099242"><span class="hs-identifier hs-var">b0</span></a></span></span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">:</span></a></span><span id="local-6989586621679099241"><span class="annot"><span class="annottext">[b]
+</span><a href="#local-6989586621679099241"><span class="hs-identifier hs-var">c0</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-270"></span><span>    </span><span class="annot"><span class="annottext">(c, b) -&gt; c
+forall a b. (a, b) -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fst</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">b -&gt; [b] -&gt; (c, b)
+</span><a href="#local-6989586621679099240"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679099242"><span class="hs-identifier hs-var">b0</span></a></span><span> </span><span class="annot"><span class="annottext">[b]
+</span><a href="#local-6989586621679099241"><span class="hs-identifier hs-var">c0</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-271"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-272"></span><span>    </span><span id="local-6989586621679099240"><span class="annot"><span class="annottext">go :: b -&gt; [b] -&gt; (c, b)
+</span><a href="#local-6989586621679099240"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span id="local-6989586621679099239"><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679099239"><span class="hs-identifier hs-var">b</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">c
+</span><a href="#local-6989586621679099245"><span class="hs-identifier hs-var">z</span></a></span><span> </span><span class="annot"><span class="annottext">c -&gt; b -&gt; c
+</span><a href="#local-6989586621679099246"><span class="hs-operator hs-var">`f`</span></a></span><span> </span><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679099238"><span class="hs-identifier hs-var">b'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679099238"><span class="hs-identifier hs-var">b'</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-273"></span><span>      </span><span class="hs-keyword">where</span><span>
+</span><span id="line-274"></span><span>        </span><span id="local-6989586621679099238"><span class="annot"><span class="annottext">b' :: b
+</span><a href="#local-6989586621679099238"><span class="hs-identifier hs-var hs-var">b'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Anchor b -&gt; b -&gt; b
+</span><a href="#local-6989586621679099243"><span class="hs-identifier hs-var">fixup</span></a></span><span> </span><span class="annot"><span class="annottext">Anchor b
+</span><a href="#local-6989586621679099244"><span class="hs-identifier hs-var">anchor</span></a></span><span> </span><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679099239"><span class="hs-identifier hs-var">b</span></a></span><span>
+</span><span id="line-275"></span><span>
+</span><span id="line-276"></span><span>    </span><span class="annot"><a href="#local-6989586621679099240"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679099237"><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679099237"><span class="hs-identifier hs-var">b</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679099236"><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679099236"><span class="hs-identifier hs-var">b1</span></a></span></span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-glyph hs-type">:</span></a></span><span id="local-6989586621679099235"><span class="annot"><span class="annottext">[b]
+</span><a href="#local-6989586621679099235"><span class="hs-identifier hs-var">c1</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">c
+</span><a href="#local-6989586621679099234"><span class="hs-identifier hs-var">c'</span></a></span><span> </span><span class="annot"><span class="annottext">c -&gt; b -&gt; c
+</span><a href="#local-6989586621679099246"><span class="hs-operator hs-var">`f`</span></a></span><span> </span><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679099233"><span class="hs-identifier hs-var">b'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679099233"><span class="hs-identifier hs-var">b'</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-277"></span><span>      </span><span class="hs-keyword">where</span><span>
+</span><span id="line-278"></span><span>        </span><span class="hs-special">(</span><span id="local-6989586621679099234"><span class="annot"><span class="annottext">c
+</span><a href="#local-6989586621679099234"><span class="hs-identifier hs-var">c'</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679099232"><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679099232"><span class="hs-identifier hs-var">b1'</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">b -&gt; [b] -&gt; (c, b)
+</span><a href="#local-6989586621679099240"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679099236"><span class="hs-identifier hs-var">b1</span></a></span><span> </span><span class="annot"><span class="annottext">[b]
+</span><a href="#local-6989586621679099235"><span class="hs-identifier hs-var">c1</span></a></span><span>
+</span><span id="line-279"></span><span>        </span><span id="local-6989586621679099233"><span class="annot"><span class="annottext">b' :: b
+</span><a href="#local-6989586621679099233"><span class="hs-identifier hs-var hs-var">b'</span></a></span></span><span>        </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Anchor b -&gt; b -&gt; b
+</span><a href="#local-6989586621679099243"><span class="hs-identifier hs-var">fixup</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">b -&gt; Anchor b
+forall block. HasHeader block =&gt; block -&gt; Anchor block
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">AF.anchorFromBlock</span></a></span><span> </span><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679099232"><span class="hs-identifier hs-var">b1'</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">b
+</span><a href="#local-6989586621679099237"><span class="hs-identifier hs-var">b</span></a></span><span>
+</span><span id="line-280"></span><span>
+</span><span id="line-281"></span><span class="hs-comment">-- | Fix up the block number and hashes of a 'Chain'. This also fixes up the</span><span>
+</span><span id="line-282"></span><span class="hs-comment">-- first block to chain-on from genesis, since by construction the 'Chain' type</span><span>
+</span><span id="line-283"></span><span class="hs-comment">-- starts from genesis.</span><span>
+</span><span id="line-284"></span><span class="hs-comment">--</span><span>
+</span><span id="line-285"></span><span id="local-6989586621679099619"><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupChain"><span class="hs-identifier hs-type">fixupChain</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">HasFullHeader</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679099619"><span class="hs-identifier hs-type">b</span></a></span><span>
+</span><span id="line-286"></span><span>           </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Anchor</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679099619"><span class="hs-identifier hs-type">b</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679099619"><span class="hs-identifier hs-type">b</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679099619"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-287"></span><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679099619"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.Chain.html#Chain"><span class="hs-identifier hs-type">Chain</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679099619"><span class="hs-identifier hs-type">b</span></a></span></span><span>
+</span><span id="line-288"></span><span id="fixupChain"><span class="annot"><span class="annottext">fixupChain :: (Anchor b -&gt; b -&gt; b) -&gt; [b] -&gt; Chain b
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupChain"><span class="hs-identifier hs-var hs-var">fixupChain</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-289"></span><span>    </span><span class="annot"><span class="annottext">(Chain b -&gt; b -&gt; Chain b)
+-&gt; Chain b -&gt; Anchor b -&gt; (Anchor b -&gt; b -&gt; b) -&gt; [b] -&gt; Chain b
+forall b c.
+HasFullHeader b =&gt;
+(c -&gt; b -&gt; c) -&gt; c -&gt; Anchor b -&gt; (Anchor b -&gt; b -&gt; b) -&gt; [b] -&gt; c
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupBlocks"><span class="hs-identifier hs-var">fixupBlocks</span></a></span><span>
+</span><span id="line-290"></span><span>      </span><span class="annot"><span class="annottext">Chain b -&gt; b -&gt; Chain b
+forall block. Chain block -&gt; block -&gt; Chain block
+</span><a href="Ouroboros.Network.Mock.Chain.html#%3A%3E"><span class="hs-operator hs-var">(C.:&gt;)</span></a></span><span> </span><span class="annot"><span class="annottext">Chain b
+forall block. Chain block
+</span><a href="Ouroboros.Network.Mock.Chain.html#Genesis"><span class="hs-identifier hs-var">C.Genesis</span></a></span><span>
+</span><span id="line-291"></span><span>      </span><span class="annot"><span class="annottext">Anchor b
+forall block. Anchor block
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">AnchorGenesis</span></a></span><span>
+</span><span id="line-292"></span><span>
+</span><span id="line-293"></span><span id="local-6989586621679099608"><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupAnchoredFragmentFrom"><span class="hs-identifier hs-type">fixupAnchoredFragmentFrom</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">HasFullHeader</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679099608"><span class="hs-identifier hs-type">b</span></a></span><span>
+</span><span id="line-294"></span><span>                          </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Anchor</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679099608"><span class="hs-identifier hs-type">b</span></a></span><span>
+</span><span id="line-295"></span><span>                          </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Anchor</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679099608"><span class="hs-identifier hs-type">b</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679099608"><span class="hs-identifier hs-type">b</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679099608"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-296"></span><span>                          </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679099608"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">AnchoredFragment</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679099608"><span class="hs-identifier hs-type">b</span></a></span></span><span>
+</span><span id="line-297"></span><span id="fixupAnchoredFragmentFrom"><span class="annot"><span class="annottext">fixupAnchoredFragmentFrom :: Anchor b -&gt; (Anchor b -&gt; b -&gt; b) -&gt; [b] -&gt; AnchoredFragment b
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupAnchoredFragmentFrom"><span class="hs-identifier hs-var hs-var">fixupAnchoredFragmentFrom</span></a></span></span><span> </span><span id="local-6989586621679099229"><span class="annot"><span class="annottext">Anchor b
+</span><a href="#local-6989586621679099229"><span class="hs-identifier hs-var">anchor</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-298"></span><span>    </span><span class="annot"><span class="annottext">(AnchoredFragment b -&gt; b -&gt; AnchoredFragment b)
+-&gt; AnchoredFragment b
+-&gt; Anchor b
+-&gt; (Anchor b -&gt; b -&gt; b)
+-&gt; [b]
+-&gt; AnchoredFragment b
+forall b c.
+HasFullHeader b =&gt;
+(c -&gt; b -&gt; c) -&gt; c -&gt; Anchor b -&gt; (Anchor b -&gt; b -&gt; b) -&gt; [b] -&gt; c
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#fixupBlocks"><span class="hs-identifier hs-var">fixupBlocks</span></a></span><span>
+</span><span id="line-299"></span><span>      </span><span class="annot"><span class="annottext">AnchoredFragment b -&gt; b -&gt; AnchoredFragment b
+forall v a b.
+Anchorable v a b =&gt;
+AnchoredSeq v a b -&gt; b -&gt; AnchoredSeq v a b
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-operator hs-var">(AF.:&gt;)</span></a></span><span>
+</span><span id="line-300"></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Anchor b -&gt; AnchoredFragment b
+forall v a b. Anchorable v a b =&gt; a -&gt; AnchoredSeq v a b
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">AF.Empty</span></a></span><span> </span><span class="annot"><span class="annottext">Anchor b
+</span><a href="#local-6989586621679099229"><span class="hs-identifier hs-var">anchor</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-301"></span><span>      </span><span class="annot"><span class="annottext">Anchor b
+</span><a href="#local-6989586621679099229"><span class="hs-identifier hs-var">anchor</span></a></span><span>
+</span><span id="line-302"></span><span>
+</span><span id="line-303"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+  Serialisation
+-------------------------------------------------------------------------------}</span><span>
+</span><span id="line-306"></span><span>
+</span><span id="line-307"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679099221"><span id="local-6989586621679099223"><span class="annot"><span class="hs-identifier hs-type">Serialise</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#ConcreteHeaderHash"><span class="hs-identifier hs-type">ConcreteHeaderHash</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-308"></span><span>  </span><span id="local-6989586621679099219"><span class="annot"><span class="annottext">encode :: ConcreteHeaderHash -&gt; Encoding
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">encode</span></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#HeaderHash"><span class="hs-identifier hs-type">HeaderHash</span></a></span><span> </span><span id="local-6989586621679099217"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679099217"><span class="hs-identifier hs-var">h</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Encoding
+</span><span class="hs-identifier hs-var">encodeInt</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679099217"><span class="hs-identifier hs-var">h</span></a></span><span>
+</span><span id="line-309"></span><span>  </span><span id="local-6989586621679099216"><span class="annot"><span class="annottext">decode :: Decoder s ConcreteHeaderHash
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">decode</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; ConcreteHeaderHash
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#HeaderHash"><span class="hs-identifier hs-var">HeaderHash</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; ConcreteHeaderHash)
+-&gt; Decoder s Int -&gt; Decoder s ConcreteHeaderHash
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Decoder s Int
+forall s. Decoder s Int
+</span><span class="hs-identifier hs-var">decodeInt</span></span><span>
+</span><span id="line-310"></span><span>
+</span><span id="line-311"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679099208"><span id="local-6989586621679099210"><span class="annot"><span class="hs-identifier hs-type">Serialise</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BodyHash"><span class="hs-identifier hs-type">BodyHash</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-312"></span><span>  </span><span id="local-6989586621679099207"><span class="annot"><span class="annottext">encode :: BodyHash -&gt; Encoding
+</span><a href="#local-6989586621679099207"><span class="hs-identifier hs-var hs-var hs-var hs-var">encode</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BodyHash"><span class="hs-identifier hs-type">BodyHash</span></a></span><span> </span><span id="local-6989586621679099206"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679099206"><span class="hs-identifier hs-var">h</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Encoding
+</span><span class="hs-identifier hs-var">encodeInt</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679099206"><span class="hs-identifier hs-var">h</span></a></span><span>
+</span><span id="line-313"></span><span>  </span><span id="local-6989586621679099205"><span class="annot"><span class="annottext">decode :: Decoder s BodyHash
+</span><a href="#local-6989586621679099205"><span class="hs-identifier hs-var hs-var hs-var hs-var">decode</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; BodyHash
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BodyHash"><span class="hs-identifier hs-var">BodyHash</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; BodyHash) -&gt; Decoder s Int -&gt; Decoder s BodyHash
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Decoder s Int
+forall s. Decoder s Int
+</span><span class="hs-identifier hs-var">decodeInt</span></span><span>
+</span><span id="line-314"></span><span>
+</span><span id="line-315"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679099199"><span id="local-6989586621679099201"><span class="annot"><span class="hs-identifier hs-type">Serialise</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-type">Block</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-316"></span><span>
+</span><span id="line-317"></span><span>  </span><span id="local-6989586621679099198"><span class="annot"><span class="annottext">encode :: Block -&gt; Encoding
+</span><a href="#local-6989586621679099198"><span class="hs-identifier hs-var hs-var hs-var hs-var">encode</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679099197"><span class="annot"><span class="annottext">BlockHeader
+blockHeader :: BlockHeader
+blockHeader :: Block -&gt; BlockHeader
+</span><a href="#local-6989586621679099197"><span class="hs-identifier hs-var hs-var">blockHeader</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679099196"><span class="annot"><span class="annottext">BlockBody
+blockBody :: BlockBody
+blockBody :: Block -&gt; BlockBody
+</span><a href="#local-6989586621679099196"><span class="hs-identifier hs-var hs-var">blockBody</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-318"></span><span>      </span><span class="annot"><span class="annottext">Word -&gt; Encoding
+</span><span class="hs-identifier hs-var">encodeListLen</span></span><span> </span><span class="annot"><span class="annottext">Word
+</span><span class="hs-number">2</span></span><span>
+</span><span id="line-319"></span><span>   </span><span class="annot"><span class="annottext">Encoding -&gt; Encoding -&gt; Encoding
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">BlockHeader -&gt; Encoding
+forall a. Serialise a =&gt; a -&gt; Encoding
+</span><span class="hs-identifier hs-var">encode</span></span><span> </span><span class="annot"><span class="annottext">BlockHeader
+</span><a href="#local-6989586621679099197"><span class="hs-identifier hs-var">blockHeader</span></a></span><span>
+</span><span id="line-320"></span><span>   </span><span class="annot"><span class="annottext">Encoding -&gt; Encoding -&gt; Encoding
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">BlockBody -&gt; Encoding
+forall a. Serialise a =&gt; a -&gt; Encoding
+</span><span class="hs-identifier hs-var">encode</span></span><span>   </span><span class="annot"><span class="annottext">BlockBody
+</span><a href="#local-6989586621679099196"><span class="hs-identifier hs-var">blockBody</span></a></span><span>
+</span><span id="line-321"></span><span>
+</span><span id="line-322"></span><span>  </span><span id="local-6989586621679099195"><span class="annot"><span class="annottext">decode :: Decoder s Block
+</span><a href="#local-6989586621679099195"><span class="hs-identifier hs-var hs-var hs-var hs-var">decode</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-323"></span><span>      </span><span class="annot"><span class="annottext">Int -&gt; Decoder s ()
+forall s. Int -&gt; Decoder s ()
+</span><span class="hs-identifier hs-var">decodeListLenOf</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span>
+</span><span id="line-324"></span><span>      </span><span class="annot"><span class="annottext">BlockHeader -&gt; BlockBody -&gt; Block
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="annot"><span class="annottext">(BlockHeader -&gt; BlockBody -&gt; Block)
+-&gt; Decoder s BlockHeader -&gt; Decoder s (BlockBody -&gt; Block)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Decoder s BlockHeader
+forall a s. Serialise a =&gt; Decoder s a
+</span><span class="hs-identifier hs-var">decode</span></span><span> </span><span class="annot"><span class="annottext">Decoder s (BlockBody -&gt; Block)
+-&gt; Decoder s BlockBody -&gt; Decoder s Block
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;*&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Decoder s BlockBody
+forall a s. Serialise a =&gt; Decoder s a
+</span><span class="hs-identifier hs-var">decode</span></span><span>
+</span><span id="line-325"></span><span>
+</span><span id="line-326"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679099189"><span id="local-6989586621679099191"><span class="annot"><span class="hs-identifier hs-type">Serialise</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockHeader"><span class="hs-identifier hs-type">BlockHeader</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-327"></span><span>
+</span><span id="line-328"></span><span>  </span><span id="local-6989586621679099188"><span class="annot"><span class="annottext">encode :: BlockHeader -&gt; Encoding
+</span><a href="#local-6989586621679099188"><span class="hs-identifier hs-var hs-var hs-var hs-var">encode</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockHeader"><span class="hs-identifier hs-type">BlockHeader</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-329"></span><span>         </span><span class="annot"><span class="annottext">headerHash :: BlockHeader -&gt; HeaderHash BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerHash"><span class="hs-identifier hs-var">headerHash</span></a></span><span>     </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679099187"><span class="annot"><span class="annottext">HeaderHash BlockHeader
+</span><a href="#local-6989586621679099187"><span class="hs-identifier hs-var">headerHash</span></a></span></span><span class="hs-special">,</span><span>
+</span><span id="line-330"></span><span>         </span><span class="annot"><span class="annottext">headerPrevHash :: BlockHeader -&gt; ChainHash BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerPrevHash"><span class="hs-identifier hs-var">headerPrevHash</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679099186"><span class="annot"><span class="annottext">ChainHash BlockHeader
+</span><a href="#local-6989586621679099186"><span class="hs-identifier hs-var">headerPrevHash</span></a></span></span><span class="hs-special">,</span><span>
+</span><span id="line-331"></span><span>         </span><span class="annot"><span class="annottext">headerSlot :: BlockHeader -&gt; SlotNo
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerSlot"><span class="hs-identifier hs-var">headerSlot</span></a></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span id="local-6989586621679099184"><span class="annot"><span class="annottext">Word64
+</span><a href="#local-6989586621679099184"><span class="hs-identifier hs-var">headerSlot</span></a></span></span><span class="hs-special">,</span><span>
+</span><span id="line-332"></span><span>         </span><span class="annot"><span class="annottext">headerBlockNo :: BlockHeader -&gt; BlockNo
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerBlockNo"><span class="hs-identifier hs-var">headerBlockNo</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span> </span><span id="local-6989586621679099183"><span class="annot"><span class="annottext">Word64
+</span><a href="#local-6989586621679099183"><span class="hs-identifier hs-var">headerBlockNo</span></a></span></span><span class="hs-special">,</span><span>
+</span><span id="line-333"></span><span>         </span><span class="annot"><span class="annottext">headerBodyHash :: BlockHeader -&gt; BodyHash
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#headerBodyHash"><span class="hs-identifier hs-var">headerBodyHash</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BodyHash"><span class="hs-identifier hs-type">BodyHash</span></a></span><span> </span><span id="local-6989586621679099182"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679099182"><span class="hs-identifier hs-var">headerBodyHash</span></a></span></span><span>
+</span><span id="line-334"></span><span>       </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-335"></span><span>      </span><span class="annot"><span class="annottext">Word -&gt; Encoding
+</span><span class="hs-identifier hs-var">encodeListLen</span></span><span> </span><span class="annot"><span class="annottext">Word
+</span><span class="hs-number">5</span></span><span>
+</span><span id="line-336"></span><span>   </span><span class="annot"><span class="annottext">Encoding -&gt; Encoding -&gt; Encoding
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">ConcreteHeaderHash -&gt; Encoding
+forall a. Serialise a =&gt; a -&gt; Encoding
+</span><span class="hs-identifier hs-var">encode</span></span><span>     </span><span class="annot"><span class="annottext">HeaderHash BlockHeader
+ConcreteHeaderHash
+</span><a href="#local-6989586621679099187"><span class="hs-identifier hs-var">headerHash</span></a></span><span>
+</span><span id="line-337"></span><span>   </span><span class="annot"><span class="annottext">Encoding -&gt; Encoding -&gt; Encoding
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">ChainHash BlockHeader -&gt; Encoding
+forall a. Serialise a =&gt; a -&gt; Encoding
+</span><span class="hs-identifier hs-var">encode</span></span><span>     </span><span class="annot"><span class="annottext">ChainHash BlockHeader
+</span><a href="#local-6989586621679099186"><span class="hs-identifier hs-var">headerPrevHash</span></a></span><span>
+</span><span id="line-338"></span><span>   </span><span class="annot"><span class="annottext">Encoding -&gt; Encoding -&gt; Encoding
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; Encoding
+</span><span class="hs-identifier hs-var">encodeWord64</span></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><a href="#local-6989586621679099184"><span class="hs-identifier hs-var">headerSlot</span></a></span><span>
+</span><span id="line-339"></span><span>   </span><span class="annot"><span class="annottext">Encoding -&gt; Encoding -&gt; Encoding
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; Encoding
+</span><span class="hs-identifier hs-var">encodeWord64</span></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><a href="#local-6989586621679099183"><span class="hs-identifier hs-var">headerBlockNo</span></a></span><span>
+</span><span id="line-340"></span><span>   </span><span class="annot"><span class="annottext">Encoding -&gt; Encoding -&gt; Encoding
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Encoding
+</span><span class="hs-identifier hs-var">encodeInt</span></span><span>  </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679099182"><span class="hs-identifier hs-var">headerBodyHash</span></a></span><span>
+</span><span id="line-341"></span><span>
+</span><span id="line-342"></span><span>  </span><span id="local-6989586621679099181"><span class="annot"><span class="annottext">decode :: Decoder s BlockHeader
+</span><a href="#local-6989586621679099181"><span class="hs-identifier hs-var hs-var hs-var hs-var">decode</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-343"></span><span>      </span><span class="annot"><span class="annottext">Int -&gt; Decoder s ()
+forall s. Int -&gt; Decoder s ()
+</span><span class="hs-identifier hs-var">decodeListLenOf</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">5</span></span><span>
+</span><span id="line-344"></span><span>      </span><span class="annot"><span class="annottext">HeaderHash BlockHeader
+-&gt; ChainHash BlockHeader
+-&gt; SlotNo
+-&gt; BlockNo
+-&gt; BodyHash
+-&gt; BlockHeader
+ConcreteHeaderHash
+-&gt; ChainHash BlockHeader
+-&gt; SlotNo
+-&gt; BlockNo
+-&gt; BodyHash
+-&gt; BlockHeader
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockHeader"><span class="hs-identifier hs-var">BlockHeader</span></a></span><span> </span><span class="annot"><span class="annottext">(ConcreteHeaderHash
+ -&gt; ChainHash BlockHeader
+ -&gt; SlotNo
+ -&gt; BlockNo
+ -&gt; BodyHash
+ -&gt; BlockHeader)
+-&gt; Decoder s ConcreteHeaderHash
+-&gt; Decoder
+     s
+     (ChainHash BlockHeader
+      -&gt; SlotNo -&gt; BlockNo -&gt; BodyHash -&gt; BlockHeader)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Decoder s ConcreteHeaderHash
+forall a s. Serialise a =&gt; Decoder s a
+</span><span class="hs-identifier hs-var">decode</span></span><span>
+</span><span id="line-345"></span><span>                  </span><span class="annot"><span class="annottext">Decoder
+  s
+  (ChainHash BlockHeader
+   -&gt; SlotNo -&gt; BlockNo -&gt; BodyHash -&gt; BlockHeader)
+-&gt; Decoder s (ChainHash BlockHeader)
+-&gt; Decoder s (SlotNo -&gt; BlockNo -&gt; BodyHash -&gt; BlockHeader)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;*&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Decoder s (ChainHash BlockHeader)
+forall a s. Serialise a =&gt; Decoder s a
+</span><span class="hs-identifier hs-var">decode</span></span><span>
+</span><span id="line-346"></span><span>                  </span><span class="annot"><span class="annottext">Decoder s (SlotNo -&gt; BlockNo -&gt; BodyHash -&gt; BlockHeader)
+-&gt; Decoder s SlotNo
+-&gt; Decoder s (BlockNo -&gt; BodyHash -&gt; BlockHeader)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;*&gt;</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word64 -&gt; SlotNo
+</span><span class="hs-identifier hs-var">SlotNo</span></span><span> </span><span class="annot"><span class="annottext">(Word64 -&gt; SlotNo) -&gt; Decoder s Word64 -&gt; Decoder s SlotNo
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Decoder s Word64
+forall s. Decoder s Word64
+</span><span class="hs-identifier hs-var">decodeWord64</span></span><span class="hs-special">)</span><span>
+</span><span id="line-347"></span><span>                  </span><span class="annot"><span class="annottext">Decoder s (BlockNo -&gt; BodyHash -&gt; BlockHeader)
+-&gt; Decoder s BlockNo -&gt; Decoder s (BodyHash -&gt; BlockHeader)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;*&gt;</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word64 -&gt; BlockNo
+</span><span class="hs-identifier hs-var">BlockNo</span></span><span> </span><span class="annot"><span class="annottext">(Word64 -&gt; BlockNo) -&gt; Decoder s Word64 -&gt; Decoder s BlockNo
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Decoder s Word64
+forall s. Decoder s Word64
+</span><span class="hs-identifier hs-var">decodeWord64</span></span><span class="hs-special">)</span><span>
+</span><span id="line-348"></span><span>                  </span><span class="annot"><span class="annottext">Decoder s (BodyHash -&gt; BlockHeader)
+-&gt; Decoder s BodyHash -&gt; Decoder s BlockHeader
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;*&gt;</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; BodyHash
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BodyHash"><span class="hs-identifier hs-var">BodyHash</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; BodyHash) -&gt; Decoder s Int -&gt; Decoder s BodyHash
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Decoder s Int
+forall s. Decoder s Int
+</span><span class="hs-identifier hs-var">decodeInt</span></span><span class="hs-special">)</span><span>
+</span><span id="line-349"></span><span>
+</span><span id="line-350"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679099175"><span id="local-6989586621679099177"><span class="annot"><span class="hs-identifier hs-type">Serialise</span></span><span> </span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockBody"><span class="hs-identifier hs-type">BlockBody</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-351"></span><span>
+</span><span id="line-352"></span><span>  </span><span id="local-6989586621679099174"><span class="annot"><span class="annottext">encode :: BlockBody -&gt; Encoding
+</span><a href="#local-6989586621679099174"><span class="hs-identifier hs-var hs-var hs-var hs-var">encode</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockBody"><span class="hs-identifier hs-type">BlockBody</span></a></span><span> </span><span id="local-6989586621679099173"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679099173"><span class="hs-identifier hs-var">b</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; Encoding
+</span><span class="hs-identifier hs-var">encodeBytes</span></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679099173"><span class="hs-identifier hs-var">b</span></a></span><span>
+</span><span id="line-353"></span><span>
+</span><span id="line-354"></span><span>  </span><span id="local-6989586621679099172"><span class="annot"><span class="annottext">decode :: Decoder s BlockBody
+</span><a href="#local-6989586621679099172"><span class="hs-identifier hs-var hs-var hs-var hs-var">decode</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; BlockBody
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#BlockBody"><span class="hs-identifier hs-var">BlockBody</span></a></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; BlockBody)
+-&gt; Decoder s ByteString -&gt; Decoder s BlockBody
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Decoder s ByteString
+forall s. Decoder s ByteString
+</span><span class="hs-identifier hs-var">decodeBytes</span></span><span>
+</span><span id="line-355"></span><span>
+</span><span id="line-356"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+  Simple static time conversions, since no HardFork
+-------------------------------------------------------------------------------}</span><span>
+</span><span id="line-359"></span><span>
+</span><span id="line-360"></span><span class="hs-comment">-- | Arbitrarily but consistently converts slots UTCTimes.</span><span>
+</span><span id="line-361"></span><span class="hs-comment">--</span><span>
+</span><span id="line-362"></span><span class="hs-comment">-- It is only intended for use in tests. Notably it assumes a fixed system</span><span>
+</span><span id="line-363"></span><span class="hs-comment">-- start time, slot length, and the absence of a hard fork (ie no</span><span>
+</span><span id="line-364"></span><span class="hs-comment">-- HardForkCombinator). This is how it's available as a pure function.</span><span>
+</span><span id="line-365"></span><span class="annot"><a href="Ouroboros.Network.Mock.ConcreteBlock.html#convertSlotToTimeForTestsAssumingNoHardFork"><span class="hs-identifier hs-type">convertSlotToTimeForTestsAssumingNoHardFork</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">UTCTime</span></a></span><span>
+</span><span id="line-366"></span><span id="convertSlotToTimeForTestsAssumingNoHardFork"><span class="annot"><span class="annottext">convertSlotToTimeForTestsAssumingNoHardFork :: SlotNo -&gt; UTCTime
+</span><a href="Ouroboros.Network.Mock.ConcreteBlock.html#convertSlotToTimeForTestsAssumingNoHardFork"><span class="hs-identifier hs-var hs-var">convertSlotToTimeForTestsAssumingNoHardFork</span></a></span></span><span> </span><span id="local-6989586621679099171"><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679099171"><span class="hs-identifier hs-var">sl</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-367"></span><span>    </span><span class="annot"><span class="annottext">(NominalDiffTime -&gt; UTCTime -&gt; UTCTime)
+-&gt; UTCTime -&gt; NominalDiffTime -&gt; UTCTime
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">flip</span></a></span><span> </span><span class="annot"><span class="annottext">NominalDiffTime -&gt; UTCTime -&gt; UTCTime
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-var">addUTCTime</span></a></span><span> </span><span class="annot"><span class="annottext">UTCTime
+</span><a href="#local-6989586621679099169"><span class="hs-identifier hs-var">startTime</span></a></span><span> </span><span class="annot"><span class="annottext">(NominalDiffTime -&gt; UTCTime) -&gt; NominalDiffTime -&gt; UTCTime
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-368"></span><span>      </span><span class="hs-comment">--   ^^^ arbitrary start time for testing</span><span>
+</span><span id="line-369"></span><span>    </span><span class="annot"><span class="annottext">Pico -&gt; NominalDiffTime
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-var">secondsToNominalDiffTime</span></a></span><span> </span><span class="annot"><span class="annottext">(Pico -&gt; NominalDiffTime) -&gt; Pico -&gt; NominalDiffTime
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-370"></span><span>    </span><span class="annot"><span class="annottext">Word64 -&gt; Pico
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="annot"><span class="annottext">(Word64 -&gt; Pico) -&gt; Word64 -&gt; Pico
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; Word64
+</span><span class="hs-identifier hs-var hs-var">unSlotNo</span></span><span> </span><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679099171"><span class="hs-identifier hs-var">sl</span></a></span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; Word64 -&gt; Word64
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">*</span></a></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><span class="hs-number">10</span></span><span>
+</span><span id="line-371"></span><span>      </span><span class="hs-comment">--   ^^^ arbitrary slot length for testing</span><span>
+</span><span id="line-372"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-373"></span><span>    </span><span id="local-6989586621679099169"><span class="annot"><span class="annottext">startTime :: UTCTime
+</span><a href="#local-6989586621679099169"><span class="hs-identifier hs-var hs-var">startTime</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">UTCTime :: Day -&gt; DiffTime -&gt; UTCTime
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">UTCTime</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-374"></span><span>        </span><span class="annot"><span class="annottext">utctDay :: Day
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-var">utctDay</span></a></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Int -&gt; Int -&gt; Day
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-var">fromGregorian</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">2000</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span>
+</span><span id="line-375"></span><span>        </span><span class="annot"><span class="annottext">utctDayTime :: DiffTime
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-var">utctDayTime</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DiffTime
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-376"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-377"></span></pre></body></html>

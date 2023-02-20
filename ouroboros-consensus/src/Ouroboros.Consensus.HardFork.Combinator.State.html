@@ -29,11 +29,11 @@
 </span><span id="line-29"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#extendToSlot"><span class="hs-identifier">extendToSlot</span></a></span><span>
 </span><span id="line-30"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-31"></span><span>
-</span><span id="line-32"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Prelude</span></a></span><span> </span><span class="hs-keyword">hiding</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">sequence</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Prelude</span></a></span><span> </span><span class="hs-keyword">hiding</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">sequence</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-33"></span><span>
-</span><span id="line-34"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Control.Monad</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">guard</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-35"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Functor.Product</span></a></span><span>
-</span><span id="line-36"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier">Data.Proxy</span></a></span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Control.Monad</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">guard</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Functor.Product</span></a></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Proxy</span></a></span><span>
 </span><span id="line-37"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Data.SOP.Strict.html"><span class="hs-identifier">Data.SOP.Strict</span></a></span><span> </span><span class="hs-keyword">hiding</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">shape</span></span><span class="hs-special">)</span><span>
 </span><span id="line-38"></span><span>
 </span><span id="line-39"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Consensus.Block.html"><span class="hs-identifier">Ouroboros.Consensus.Block</span></a></span><span>
@@ -62,13 +62,13 @@
   GetTip
 -------------------------------------------------------------------------------}</span><span>
 </span><span id="line-64"></span><span>
-</span><span id="line-65"></span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#getTip"><span class="hs-identifier hs-type">getTip</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621680012253"><span class="annot"><a href="#local-6989586621680012253"><span class="hs-identifier hs-type">f</span></a></span></span><span> </span><span id="local-6989586621680012252"><span class="annot"><a href="#local-6989586621680012252"><span class="hs-identifier hs-type">xs</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.CanHardFork.html#CanHardFork"><span class="hs-identifier hs-type">CanHardFork</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012252"><span class="hs-identifier hs-type">xs</span></a></span><span>
-</span><span id="line-66"></span><span>       </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621680012515"><span class="annot"><a href="#local-6989586621680012515"><span class="hs-identifier hs-type">blk</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.SingleEraBlock.html#SingleEraBlock"><span class="hs-identifier hs-type">SingleEraBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012515"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621680012253"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012515"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012515"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-67"></span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#HardForkState"><span class="hs-identifier hs-type">HardForkState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012253"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012252"><span class="hs-identifier hs-type">xs</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Basics.html#HardForkBlock"><span class="hs-identifier hs-type">HardForkBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012252"><span class="hs-identifier hs-type">xs</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-65"></span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#getTip"><span class="hs-identifier hs-type">getTip</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679991119"><span class="annot"><a href="#local-6989586621679991119"><span class="hs-identifier hs-type">f</span></a></span></span><span> </span><span id="local-6989586621679991118"><span class="annot"><a href="#local-6989586621679991118"><span class="hs-identifier hs-type">xs</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.CanHardFork.html#CanHardFork"><span class="hs-identifier hs-type">CanHardFork</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991118"><span class="hs-identifier hs-type">xs</span></a></span><span>
+</span><span id="line-66"></span><span>       </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679991383"><span class="annot"><a href="#local-6989586621679991383"><span class="hs-identifier hs-type">blk</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.SingleEraBlock.html#SingleEraBlock"><span class="hs-identifier hs-type">SingleEraBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991383"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679991119"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991383"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991383"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-67"></span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#HardForkState"><span class="hs-identifier hs-type">HardForkState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991119"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991118"><span class="hs-identifier hs-type">xs</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Basics.html#HardForkBlock"><span class="hs-identifier hs-type">HardForkBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991118"><span class="hs-identifier hs-type">xs</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-68"></span><span id="getTip"><span class="annot"><span class="annottext">getTip :: (forall blk. SingleEraBlock blk =&gt; f blk -&gt; Point blk)
 -&gt; HardForkState f xs -&gt; Point (HardForkBlock xs)
-</span><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#getTip"><span class="hs-identifier hs-var hs-var">getTip</span></a></span></span><span> </span><span id="local-6989586621680012251"><span class="annot"><span class="annottext">forall blk. SingleEraBlock blk =&gt; f blk -&gt; Point blk
-</span><a href="#local-6989586621680012251"><span class="hs-identifier hs-var">getLedgerTip</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#getTip"><span class="hs-identifier hs-var hs-var">getTip</span></a></span></span><span> </span><span id="local-6989586621679991117"><span class="annot"><span class="annottext">forall blk. SingleEraBlock blk =&gt; f blk -&gt; Point blk
+</span><a href="#local-6989586621679991117"><span class="hs-identifier hs-var">getLedgerTip</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-69"></span><span>      </span><span class="annot"><span class="annottext">NS (K (Point (HardForkBlock xs))) xs -&gt; Point (HardForkBlock xs)
 forall k l (h :: (k -&gt; *) -&gt; l -&gt; *) (xs :: l) a.
 (HCollapse h, SListIN h xs) =&gt;
@@ -79,7 +79,7 @@ h (K a) xs -&gt; CollapseTo h a
 -&gt; HardForkState f xs
 -&gt; Point (HardForkBlock xs)
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Proxy SingleEraBlock
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Proxy SingleEraBlock
 -&gt; (forall a.
     SingleEraBlock a =&gt;
     f a -&gt; K (Point (HardForkBlock xs)) a)
@@ -99,56 +99,56 @@ forall k a (b :: k). a -&gt; K a b
 -&gt; f a
 -&gt; K (Point (HardForkBlock xs)) a
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Point a -&gt; Point (HardForkBlock xs)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Point a -&gt; Point (HardForkBlock xs)
 forall blk.
 SingleEraBlock blk =&gt;
 Point blk -&gt; Point (HardForkBlock xs)
-</span><a href="#local-6989586621680012245"><span class="hs-identifier hs-var">injPoint</span></a></span><span> </span><span class="annot"><span class="annottext">(Point a -&gt; Point (HardForkBlock xs))
+</span><a href="#local-6989586621679991111"><span class="hs-identifier hs-var">injPoint</span></a></span><span> </span><span class="annot"><span class="annottext">(Point a -&gt; Point (HardForkBlock xs))
 -&gt; (f a -&gt; Point a) -&gt; f a -&gt; Point (HardForkBlock xs)
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">f a -&gt; Point a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">f a -&gt; Point a
 forall blk. SingleEraBlock blk =&gt; f blk -&gt; Point blk
-</span><a href="#local-6989586621680012251"><span class="hs-identifier hs-var">getLedgerTip</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679991117"><span class="hs-identifier hs-var">getLedgerTip</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-71"></span><span>    </span><span class="annot"><span class="annottext">(NS f xs -&gt; NS (K (Point (HardForkBlock xs))) xs)
 -&gt; (HardForkState f xs -&gt; NS f xs)
 -&gt; HardForkState f xs
 -&gt; NS (K (Point (HardForkBlock xs))) xs
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">HardForkState f xs -&gt; NS f xs
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">HardForkState f xs -&gt; NS f xs
 forall (xs :: [*]) (f :: * -&gt; *).
 SListI xs =&gt;
 HardForkState f xs -&gt; NS f xs
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.Infra.html#tip"><span class="hs-identifier hs-var">tip</span></a></span><span>
 </span><span id="line-72"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-73"></span><span>    </span><span class="annot"><a href="#local-6989586621680012245"><span class="hs-identifier hs-type">injPoint</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621680012478"><span class="annot"><a href="#local-6989586621680012478"><span class="hs-identifier hs-type">blk</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.SingleEraBlock.html#SingleEraBlock"><span class="hs-identifier hs-type">SingleEraBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012478"><span class="hs-identifier hs-type">blk</span></a></span><span>
-</span><span id="line-74"></span><span>             </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012478"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Basics.html#HardForkBlock"><span class="hs-identifier hs-type">HardForkBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012252"><span class="hs-identifier hs-type">xs</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-75"></span><span>    </span><span id="local-6989586621680012245"><span class="annot"><span class="annottext">injPoint :: Point blk -&gt; Point (HardForkBlock xs)
-</span><a href="#local-6989586621680012245"><span class="hs-identifier hs-var hs-var">injPoint</span></a></span></span><span> </span><span class="annot"><span class="annottext">Point blk
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">GenesisPoint</span></a></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Point (HardForkBlock xs)
+</span><span id="line-73"></span><span>    </span><span class="annot"><a href="#local-6989586621679991111"><span class="hs-identifier hs-type">injPoint</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679991346"><span class="annot"><a href="#local-6989586621679991346"><span class="hs-identifier hs-type">blk</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.SingleEraBlock.html#SingleEraBlock"><span class="hs-identifier hs-type">SingleEraBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991346"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-74"></span><span>             </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991346"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Basics.html#HardForkBlock"><span class="hs-identifier hs-type">HardForkBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991118"><span class="hs-identifier hs-type">xs</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-75"></span><span>    </span><span id="local-6989586621679991111"><span class="annot"><span class="annottext">injPoint :: Point blk -&gt; Point (HardForkBlock xs)
+</span><a href="#local-6989586621679991111"><span class="hs-identifier hs-var hs-var">injPoint</span></a></span></span><span> </span><span class="annot"><span class="annottext">Point blk
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">GenesisPoint</span></a></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Point (HardForkBlock xs)
 forall block. Point block
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">GenesisPoint</span></a></span><span>
-</span><span id="line-76"></span><span>    </span><span class="annot"><a href="#local-6989586621680012245"><span class="hs-identifier hs-var">injPoint</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-type">BlockPoint</span></a></span><span> </span><span id="local-6989586621680012241"><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621680012241"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span id="local-6989586621680012240"><span class="annot"><span class="annottext">HeaderHash blk
-</span><a href="#local-6989586621680012240"><span class="hs-identifier hs-var">h</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; HeaderHash (HardForkBlock xs) -&gt; Point (HardForkBlock xs)
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">GenesisPoint</span></a></span><span>
+</span><span id="line-76"></span><span>    </span><span class="annot"><a href="#local-6989586621679991111"><span class="hs-identifier hs-var">injPoint</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-type">BlockPoint</span></a></span><span> </span><span id="local-6989586621679991107"><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679991107"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span id="local-6989586621679991106"><span class="annot"><span class="annottext">HeaderHash blk
+</span><a href="#local-6989586621679991106"><span class="hs-identifier hs-var">h</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; HeaderHash (HardForkBlock xs) -&gt; Point (HardForkBlock xs)
 forall block. SlotNo -&gt; HeaderHash block -&gt; Point block
-</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.4/ouroboros-network-0.1.0.0/noopt/doc/html/ouroboros-network/src"><span class="hs-identifier hs-var">BlockPoint</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621680012241"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">(HeaderHash (HardForkBlock xs) -&gt; Point (HardForkBlock xs))
+</span><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-network-api-0.1.0.0/noopt/doc/html/ouroboros-network-api/src"><span class="hs-identifier hs-var">BlockPoint</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679991107"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">(HeaderHash (HardForkBlock xs) -&gt; Point (HardForkBlock xs))
 -&gt; HeaderHash (HardForkBlock xs) -&gt; Point (HardForkBlock xs)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ShortByteString -&gt; OneEraHash xs
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">ShortByteString -&gt; OneEraHash xs
 forall k (xs :: [k]). ShortByteString -&gt; OneEraHash xs
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.AcrossEras.html#OneEraHash"><span class="hs-identifier hs-var">OneEraHash</span></a></span><span> </span><span class="annot"><span class="annottext">(ShortByteString -&gt; OneEraHash xs)
 -&gt; ShortByteString -&gt; OneEraHash xs
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
 </span><span id="line-77"></span><span>                                  </span><span class="annot"><span class="annottext">Proxy blk -&gt; HeaderHash blk -&gt; ShortByteString
 forall blk (proxy :: * -&gt; *).
 ConvertRawHash blk =&gt;
 proxy blk -&gt; HeaderHash blk -&gt; ShortByteString
 </span><a href="Ouroboros.Consensus.Block.Abstract.html#toShortRawHash"><span class="hs-identifier hs-var">toShortRawHash</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Proxy blk
 forall k (t :: k). Proxy t
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Proxy</span></a></span><span> </span><span class="hs-glyph">@</span><span class="annot"><a href="#local-6989586621680012478"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">HeaderHash blk
-</span><a href="#local-6989586621680012240"><span class="hs-identifier hs-var">h</span></a></span><span>
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Proxy</span></a></span><span> </span><span class="hs-glyph">@</span><span class="annot"><a href="#local-6989586621679991346"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">HeaderHash blk
+</span><a href="#local-6989586621679991106"><span class="hs-identifier hs-var">h</span></a></span><span>
 </span><span id="line-78"></span><span>
 </span><span id="line-79"></span><span class="hs-comment">{-------------------------------------------------------------------------------
   Recovery
@@ -160,17 +160,17 @@ forall k (t :: k). Proxy t
 </span><span id="line-86"></span><span class="hs-comment">-- really only need to store the underlying @f@. It is not strictly essential</span><span>
 </span><span id="line-87"></span><span class="hs-comment">-- that this is possible but it helps with the unary hardfork case, and it may</span><span>
 </span><span id="line-88"></span><span class="hs-comment">-- in general help with binary compatibility.</span><span>
-</span><span id="line-89"></span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#recover"><span class="hs-identifier hs-type">recover</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621680012236"><span class="annot"><a href="#local-6989586621680012236"><span class="hs-identifier hs-type">f</span></a></span></span><span> </span><span id="local-6989586621680012235"><span class="annot"><a href="#local-6989586621680012235"><span class="hs-identifier hs-type">xs</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.CanHardFork.html#CanHardFork"><span class="hs-identifier hs-type">CanHardFork</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012235"><span class="hs-identifier hs-type">xs</span></a></span><span>
-</span><span id="line-90"></span><span>        </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Util.Telescope.html#Telescope"><span class="hs-identifier hs-type">Telescope</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">K</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Past"><span class="hs-identifier hs-type">Past</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="#local-6989586621680012236"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012235"><span class="hs-identifier hs-type">xs</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#HardForkState"><span class="hs-identifier hs-type">HardForkState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012236"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012235"><span class="hs-identifier hs-type">xs</span></a></span><span>
+</span><span id="line-89"></span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#recover"><span class="hs-identifier hs-type">recover</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679991102"><span class="annot"><a href="#local-6989586621679991102"><span class="hs-identifier hs-type">f</span></a></span></span><span> </span><span id="local-6989586621679991101"><span class="annot"><a href="#local-6989586621679991101"><span class="hs-identifier hs-type">xs</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.CanHardFork.html#CanHardFork"><span class="hs-identifier hs-type">CanHardFork</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991101"><span class="hs-identifier hs-type">xs</span></a></span><span>
+</span><span id="line-90"></span><span>        </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Util.Telescope.html#Telescope"><span class="hs-identifier hs-type">Telescope</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">K</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Past"><span class="hs-identifier hs-type">Past</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="#local-6989586621679991102"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991101"><span class="hs-identifier hs-type">xs</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#HardForkState"><span class="hs-identifier hs-type">HardForkState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991102"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991101"><span class="hs-identifier hs-type">xs</span></a></span><span>
 </span><span id="line-91"></span><span id="recover"><span class="annot"><span class="annottext">recover :: Telescope (K Past) f xs -&gt; HardForkState f xs
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#recover"><span class="hs-identifier hs-var hs-var">recover</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-92"></span><span>    </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Proxy xs -&gt; ProofNonEmpty xs
-forall (xs :: [*]) (proxy :: [*] -&gt; *).
+forall a (xs :: [a]) (proxy :: [a] -&gt; *).
 IsNonEmpty xs =&gt;
 proxy xs -&gt; ProofNonEmpty xs
 </span><a href="Ouroboros.Consensus.Util.SOP.html#isNonEmpty"><span class="hs-identifier hs-var">isNonEmpty</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Proxy xs
 forall k (t :: k). Proxy t
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Proxy</span></a></span><span> </span><span class="hs-glyph">@</span><span class="annot"><a href="#local-6989586621680012235"><span class="hs-identifier hs-type">xs</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">of</span><span>
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Proxy</span></a></span><span> </span><span class="hs-glyph">@</span><span class="annot"><a href="#local-6989586621679991101"><span class="hs-identifier hs-type">xs</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">of</span><span>
 </span><span id="line-93"></span><span>      </span><span class="annot"><a href="Ouroboros.Consensus.Util.SOP.html#ProofNonEmpty"><span class="hs-identifier hs-type">ProofNonEmpty</span></a></span><span> </span><span class="hs-special">{</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span>
 </span><span id="line-94"></span><span>          </span><span class="annot"><span class="annottext">Telescope (K Past) (Current f) (x : xs) -&gt; HardForkState f (x : xs)
 forall (f :: * -&gt; *) (xs :: [*]).
@@ -183,7 +183,7 @@ Telescope (K Past) (Current f) xs -&gt; HardForkState f xs
 -&gt; Telescope (K Past) f (x : xs)
 -&gt; HardForkState f (x : xs)
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">(forall x. Product (K Bound) (K Past) x -&gt; K Past x)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">(forall x. Product (K Bound) (K Past) x -&gt; K Past x)
 -&gt; (forall x. Product (K Bound) f x -&gt; Current f x)
 -&gt; Telescope
      (Product (K Bound) (K Past)) (Product (K Bound) f) (x : xs)
@@ -196,10 +196,10 @@ SListI xs =&gt;
 -&gt; Telescope g f xs
 -&gt; Telescope g' f' xs
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.Util.Telescope.html#bihmap"><span class="hs-identifier hs-var">Telescope.bihmap</span></a></span><span>
-</span><span id="line-96"></span><span>            </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Pair</span></a></span><span> </span><span class="annot"><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621680012229"><span class="annot"><a href="#local-6989586621680012229"><span class="hs-identifier hs-var">past</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">K Past x
-</span><a href="#local-6989586621680012229"><span class="hs-identifier hs-var">past</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-96"></span><span>            </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Pair</span></a></span><span> </span><span class="annot"><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679991095"><span class="annot"><a href="#local-6989586621679991095"><span class="hs-identifier hs-var">past</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">K Past x
+</span><a href="#local-6989586621679991095"><span class="hs-identifier hs-var">past</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-97"></span><span>            </span><span class="annot"><span class="annottext">forall x. Product (K Bound) f x -&gt; Current f x
-</span><a href="#local-6989586621680012228"><span class="hs-identifier hs-var">recoverCurrent</span></a></span><span>
+</span><a href="#local-6989586621679991094"><span class="hs-identifier hs-var">recoverCurrent</span></a></span><span>
 </span><span id="line-98"></span><span>        </span><span class="annot"><span class="annottext">(Telescope
    (Product (K Bound) (K Past)) (Product (K Bound) f) (x : xs)
  -&gt; Telescope (K Past) (Current f) (x : xs))
@@ -209,7 +209,7 @@ SListI xs =&gt;
 -&gt; Telescope (K Past) f (x : xs)
 -&gt; Telescope (K Past) (Current f) (x : xs)
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">InPairs (ScanNext (K Bound) (K Past)) (x : xs)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">InPairs (ScanNext (K Bound) (K Past)) (x : xs)
 -&gt; K Bound x
 -&gt; Telescope (K Past) f (x : xs)
 -&gt; Telescope
@@ -223,15 +223,15 @@ InPairs (ScanNext h g) (x : xs)
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.Util.Telescope.html#scanl"><span class="hs-identifier hs-var">Telescope.scanl</span></a></span><span>
 </span><span id="line-99"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(forall x y. ScanNext (K Bound) (K Past) x y)
 -&gt; InPairs (ScanNext (K Bound) (K Past)) (x : xs)
-forall (xs :: [*]) (f :: * -&gt; * -&gt; *).
+forall k (xs :: [k]) (f :: k -&gt; k -&gt; *).
 (SListI xs, IsNonEmpty xs) =&gt;
-(forall x y. f x y) -&gt; InPairs f xs
+(forall (x :: k) (y :: k). f x y) -&gt; InPairs f xs
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.Util.InPairs.html#hpure"><span class="hs-identifier hs-var">InPairs.hpure</span></a></span><span> </span><span class="annot"><span class="annottext">((forall x y. ScanNext (K Bound) (K Past) x y)
  -&gt; InPairs (ScanNext (K Bound) (K Past)) (x : xs))
 -&gt; (forall x y. ScanNext (K Bound) (K Past) x y)
 -&gt; InPairs (ScanNext (K Bound) (K Past)) (x : xs)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">(K Bound x -&gt; K Past x -&gt; K Bound y)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">(K Bound x -&gt; K Past x -&gt; K Bound y)
 -&gt; ScanNext (K Bound) (K Past) x y
 forall k (h :: k -&gt; *) (g :: k -&gt; *) (x :: k) (y :: k).
 (h x -&gt; g x -&gt; h y) -&gt; ScanNext h g x y
@@ -240,20 +240,20 @@ forall k (h :: k -&gt; *) (g :: k -&gt; *) (x :: k) (y :: k).
 -&gt; (K Bound x -&gt; K Past x -&gt; K Bound y)
 -&gt; ScanNext (K Bound) (K Past) x y
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">(K Past x -&gt; K Bound y) -&gt; K Bound x -&gt; K Past x -&gt; K Bound y
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">(K Past x -&gt; K Bound y) -&gt; K Bound x -&gt; K Past x -&gt; K Bound y
 forall a b. a -&gt; b -&gt; a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">const</span></a></span><span> </span><span class="annot"><span class="annottext">((K Past x -&gt; K Bound y) -&gt; K Bound x -&gt; K Past x -&gt; K Bound y)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">const</span></a></span><span> </span><span class="annot"><span class="annottext">((K Past x -&gt; K Bound y) -&gt; K Bound x -&gt; K Past x -&gt; K Bound y)
 -&gt; (K Past x -&gt; K Bound y) -&gt; K Bound x -&gt; K Past x -&gt; K Bound y
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Bound -&gt; K Bound y
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Bound -&gt; K Bound y
 forall k a (b :: k). a -&gt; K a b
 </span><span class="hs-identifier hs-var">K</span></span><span> </span><span class="annot"><span class="annottext">(Bound -&gt; K Bound y)
 -&gt; (K Past x -&gt; Bound) -&gt; K Past x -&gt; K Bound y
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Past -&gt; Bound
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">Past -&gt; Bound
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#pastEnd"><span class="hs-identifier hs-var hs-var">pastEnd</span></a></span><span> </span><span class="annot"><span class="annottext">(Past -&gt; Bound) -&gt; (K Past x -&gt; Past) -&gt; K Past x -&gt; Bound
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">K Past x -&gt; Past
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">K Past x -&gt; Past
 forall k a (b :: k). K a b -&gt; a
 </span><span class="hs-identifier hs-var">unK</span></span><span class="hs-special">)</span><span>
 </span><span id="line-100"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bound -&gt; K Bound x
@@ -261,39 +261,39 @@ forall k a (b :: k). a -&gt; K a b
 </span><span class="hs-identifier hs-var">K</span></span><span> </span><span class="annot"><span class="annottext">Bound
 </span><a href="Ouroboros.Consensus.HardFork.History.Summary.html#initBound"><span class="hs-identifier hs-var">History.initBound</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-101"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-102"></span><span>    </span><span id="local-6989586621680012220"><span class="annot"><a href="#local-6989586621680012228"><span class="hs-identifier hs-type">recoverCurrent</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Product</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">K</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Summary.html#Bound"><span class="hs-identifier hs-type">History.Bound</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="#local-6989586621680012236"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012220"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Current"><span class="hs-identifier hs-type">Current</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012236"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012220"><span class="hs-identifier hs-type">blk</span></a></span></span><span>
-</span><span id="line-103"></span><span>    </span><span id="local-6989586621680012228"><span class="annot"><span class="annottext">recoverCurrent :: Product (K Bound) f blk -&gt; Current f blk
-</span><a href="#local-6989586621680012228"><span class="hs-identifier hs-var hs-var">recoverCurrent</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Pair</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">K</span></span><span> </span><span id="local-6989586621680012219"><span class="annot"><span class="annottext">Bound
-</span><a href="#local-6989586621680012219"><span class="hs-identifier hs-var">prevEnd</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621680012218"><span class="annot"><span class="annottext">f blk
-</span><a href="#local-6989586621680012218"><span class="hs-identifier hs-var">st</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Current :: forall (f :: * -&gt; *) blk. Bound -&gt; f blk -&gt; Current f blk
+</span><span id="line-102"></span><span>    </span><span id="local-6989586621679991086"><span class="annot"><a href="#local-6989586621679991094"><span class="hs-identifier hs-type">recoverCurrent</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Product</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">K</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Summary.html#Bound"><span class="hs-identifier hs-type">History.Bound</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="#local-6989586621679991102"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991086"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Current"><span class="hs-identifier hs-type">Current</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991102"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991086"><span class="hs-identifier hs-type">blk</span></a></span></span><span>
+</span><span id="line-103"></span><span>    </span><span id="local-6989586621679991094"><span class="annot"><span class="annottext">recoverCurrent :: Product (K Bound) f blk -&gt; Current f blk
+</span><a href="#local-6989586621679991094"><span class="hs-identifier hs-var hs-var">recoverCurrent</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Pair</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">K</span></span><span> </span><span id="local-6989586621679991085"><span class="annot"><span class="annottext">Bound
+</span><a href="#local-6989586621679991085"><span class="hs-identifier hs-var">prevEnd</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679991084"><span class="annot"><span class="annottext">f blk
+</span><a href="#local-6989586621679991084"><span class="hs-identifier hs-var">st</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Current :: forall (f :: * -&gt; *) blk. Bound -&gt; f blk -&gt; Current f blk
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Current"><span class="hs-identifier hs-type">Current</span></a></span><span> </span><span class="hs-special">{</span><span>
 </span><span id="line-104"></span><span>          </span><span class="annot"><span class="annottext">currentStart :: Bound
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#currentStart"><span class="hs-identifier hs-var">currentStart</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bound
-</span><a href="#local-6989586621680012219"><span class="hs-identifier hs-var">prevEnd</span></a></span><span>
+</span><a href="#local-6989586621679991085"><span class="hs-identifier hs-var">prevEnd</span></a></span><span>
 </span><span id="line-105"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">currentState :: f blk
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#currentState"><span class="hs-identifier hs-var">currentState</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">f blk
-</span><a href="#local-6989586621680012218"><span class="hs-identifier hs-var">st</span></a></span><span>
+</span><a href="#local-6989586621679991084"><span class="hs-identifier hs-var">st</span></a></span><span>
 </span><span id="line-106"></span><span>        </span><span class="hs-special">}</span><span>
 </span><span id="line-107"></span><span>
 </span><span id="line-108"></span><span class="hs-comment">{-------------------------------------------------------------------------------
   Reconstruct EpochInfo
 -------------------------------------------------------------------------------}</span><span>
 </span><span id="line-111"></span><span>
-</span><span id="line-112"></span><span id="local-6989586621680012366"><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#mostRecentTransitionInfo"><span class="hs-identifier hs-type">mostRecentTransitionInfo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">All</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.SingleEraBlock.html#SingleEraBlock"><span class="hs-identifier hs-type">SingleEraBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012366"><span class="hs-identifier hs-type">xs</span></a></span><span>
-</span><span id="line-113"></span><span>                         </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Basics.html#HardForkLedgerConfig"><span class="hs-identifier hs-type">HardForkLedgerConfig</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012366"><span class="hs-identifier hs-type">xs</span></a></span><span>
-</span><span id="line-114"></span><span>                         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#HardForkState"><span class="hs-identifier hs-type">HardForkState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012366"><span class="hs-identifier hs-type">xs</span></a></span><span>
+</span><span id="line-112"></span><span id="local-6989586621679991232"><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#mostRecentTransitionInfo"><span class="hs-identifier hs-type">mostRecentTransitionInfo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">All</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.SingleEraBlock.html#SingleEraBlock"><span class="hs-identifier hs-type">SingleEraBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991232"><span class="hs-identifier hs-type">xs</span></a></span><span>
+</span><span id="line-113"></span><span>                         </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Basics.html#HardForkLedgerConfig"><span class="hs-identifier hs-type">HardForkLedgerConfig</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991232"><span class="hs-identifier hs-type">xs</span></a></span><span>
+</span><span id="line-114"></span><span>                         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#HardForkState"><span class="hs-identifier hs-type">HardForkState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991232"><span class="hs-identifier hs-type">xs</span></a></span><span>
 </span><span id="line-115"></span><span>                         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#TransitionInfo"><span class="hs-identifier hs-type">TransitionInfo</span></a></span></span><span>
 </span><span id="line-116"></span><span id="mostRecentTransitionInfo"><span class="annot"><span class="annottext">mostRecentTransitionInfo :: HardForkLedgerConfig xs
 -&gt; HardForkState LedgerState xs -&gt; TransitionInfo
-</span><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#mostRecentTransitionInfo"><span class="hs-identifier hs-var hs-var">mostRecentTransitionInfo</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Basics.html#HardForkLedgerConfig"><span class="hs-identifier hs-type">HardForkLedgerConfig</span></a></span><span class="hs-special">{</span><span id="local-6989586621680012212"><span id="local-6989586621680012213"><span class="annot"><span class="annottext">Shape xs
+</span><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#mostRecentTransitionInfo"><span class="hs-identifier hs-var hs-var">mostRecentTransitionInfo</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Basics.html#HardForkLedgerConfig"><span class="hs-identifier hs-type">HardForkLedgerConfig</span></a></span><span class="hs-special">{</span><span id="local-6989586621679991078"><span id="local-6989586621679991079"><span class="annot"><span class="annottext">Shape xs
 PerEraLedgerConfig xs
 hardForkLedgerConfigPerEra :: forall (xs :: [*]).
 HardForkLedgerConfig xs -&gt; PerEraLedgerConfig xs
 hardForkLedgerConfigShape :: forall (xs :: [*]). HardForkLedgerConfig xs -&gt; Shape xs
 hardForkLedgerConfigPerEra :: PerEraLedgerConfig xs
 hardForkLedgerConfigShape :: Shape xs
-</span><a href="Ouroboros.Consensus.HardFork.Combinator.Basics.html#hardForkLedgerConfigPerEra"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span> </span><span id="local-6989586621680012209"><span class="annot"><span class="annottext">HardForkState LedgerState xs
-</span><a href="#local-6989586621680012209"><span class="hs-identifier hs-var">st</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="Ouroboros.Consensus.HardFork.Combinator.Basics.html#hardForkLedgerConfigPerEra"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span> </span><span id="local-6989586621679991075"><span class="annot"><span class="annottext">HardForkState LedgerState xs
+</span><a href="#local-6989586621679991075"><span class="hs-identifier hs-var">st</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-117"></span><span>    </span><span class="annot"><span class="annottext">NS (K TransitionInfo) xs -&gt; CollapseTo NS TransitionInfo
 forall k l (h :: (k -&gt; *) -&gt; l -&gt; *) (xs :: l) a.
 (HCollapse h, SListIN h xs) =&gt;
@@ -301,7 +301,7 @@ h (K a) xs -&gt; CollapseTo h a
 </span><span class="hs-identifier hs-var">hcollapse</span></span><span> </span><span class="annot"><span class="annottext">(NS (K TransitionInfo) xs -&gt; CollapseTo NS TransitionInfo)
 -&gt; NS (K TransitionInfo) xs -&gt; CollapseTo NS TransitionInfo
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
 </span><span id="line-118"></span><span>      </span><span class="annot"><span class="annottext">Proxy SingleEraBlock
 -&gt; (forall a.
     SingleEraBlock a =&gt;
@@ -328,16 +328,16 @@ proxy c
 SingleEraBlock a =&gt;
 WrapPartialLedgerConfig a
 -&gt; K EraParams a -&gt; Current LedgerState a -&gt; K TransitionInfo a
-</span><a href="#local-6989586621680012207"><span class="hs-identifier hs-var">getTransition</span></a></span><span>
+</span><a href="#local-6989586621679991073"><span class="hs-identifier hs-var">getTransition</span></a></span><span>
 </span><span id="line-121"></span><span>        </span><span class="annot"><span class="annottext">Prod NS WrapPartialLedgerConfig xs
 NP WrapPartialLedgerConfig xs
-</span><a href="#local-6989586621680012206"><span class="hs-identifier hs-var">cfgs</span></a></span><span>
+</span><a href="#local-6989586621679991072"><span class="hs-identifier hs-var">cfgs</span></a></span><span>
 </span><span id="line-122"></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Exactly xs EraParams -&gt; NP (K EraParams) xs
 forall (xs :: [*]) a. Exactly xs a -&gt; NP (K a) xs
 </span><a href="Ouroboros.Consensus.Util.Counting.html#getExactly"><span class="hs-identifier hs-var hs-var">getExactly</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Shape xs -&gt; Exactly xs EraParams
 forall (xs :: [*]). Shape xs -&gt; Exactly xs EraParams
 </span><a href="Ouroboros.Consensus.HardFork.History.Summary.html#getShape"><span class="hs-identifier hs-var hs-var">History.getShape</span></a></span><span> </span><span class="annot"><span class="annottext">Shape xs
-</span><a href="#local-6989586621680012213"><span class="hs-identifier hs-var">hardForkLedgerConfigShape</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679991079"><span class="hs-identifier hs-var">hardForkLedgerConfigShape</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-123"></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Telescope (K Past) (Current LedgerState) xs
 -&gt; NS (Current LedgerState) xs
 forall k (g :: k -&gt; *) (f :: k -&gt; *) (xs :: [k]).
@@ -347,38 +347,38 @@ Telescope g f xs -&gt; NS f xs
 forall (f :: * -&gt; *) (xs :: [*]).
 HardForkState f xs -&gt; Telescope (K Past) (Current f) xs
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#getHardForkState"><span class="hs-identifier hs-var hs-var">getHardForkState</span></a></span><span> </span><span class="annot"><span class="annottext">HardForkState LedgerState xs
-</span><a href="#local-6989586621680012209"><span class="hs-identifier hs-var">st</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679991075"><span class="hs-identifier hs-var">st</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-124"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-125"></span><span>    </span><span id="local-6989586621680012206"><span class="annot"><span class="annottext">cfgs :: NP WrapPartialLedgerConfig xs
-</span><a href="#local-6989586621680012206"><span class="hs-identifier hs-var hs-var">cfgs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PerEraLedgerConfig xs -&gt; NP WrapPartialLedgerConfig xs
+</span><span id="line-125"></span><span>    </span><span id="local-6989586621679991072"><span class="annot"><span class="annottext">cfgs :: NP WrapPartialLedgerConfig xs
+</span><a href="#local-6989586621679991072"><span class="hs-identifier hs-var hs-var">cfgs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PerEraLedgerConfig xs -&gt; NP WrapPartialLedgerConfig xs
 forall (xs :: [*]).
 PerEraLedgerConfig xs -&gt; NP WrapPartialLedgerConfig xs
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.AcrossEras.html#getPerEraLedgerConfig"><span class="hs-identifier hs-var hs-var">getPerEraLedgerConfig</span></a></span><span> </span><span class="annot"><span class="annottext">PerEraLedgerConfig xs
-</span><a href="#local-6989586621680012212"><span class="hs-identifier hs-var">hardForkLedgerConfigPerEra</span></a></span><span>
+</span><a href="#local-6989586621679991078"><span class="hs-identifier hs-var">hardForkLedgerConfigPerEra</span></a></span><span>
 </span><span id="line-126"></span><span>
-</span><span id="line-127"></span><span>    </span><span id="local-6989586621680012201"><span class="annot"><a href="#local-6989586621680012207"><span class="hs-identifier hs-type">getTransition</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.SingleEraBlock.html#SingleEraBlock"><span class="hs-identifier hs-type">SingleEraBlock</span></a></span><span>          </span><span class="annot"><a href="#local-6989586621680012201"><span class="hs-identifier hs-type">blk</span></a></span><span>
-</span><span id="line-128"></span><span>                  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.PartialConfig.html#WrapPartialLedgerConfig"><span class="hs-identifier hs-type">WrapPartialLedgerConfig</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012201"><span class="hs-identifier hs-type">blk</span></a></span><span>
-</span><span id="line-129"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">K</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.EraParams.html#EraParams"><span class="hs-identifier hs-type">History.EraParams</span></a></span><span>     </span><span class="annot"><a href="#local-6989586621680012201"><span class="hs-identifier hs-type">blk</span></a></span><span>
-</span><span id="line-130"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Current"><span class="hs-identifier hs-type">Current</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span>     </span><span class="annot"><a href="#local-6989586621680012201"><span class="hs-identifier hs-type">blk</span></a></span><span>
-</span><span id="line-131"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">K</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#TransitionInfo"><span class="hs-identifier hs-type">TransitionInfo</span></a></span><span>        </span><span class="annot"><a href="#local-6989586621680012201"><span class="hs-identifier hs-type">blk</span></a></span></span><span>
-</span><span id="line-132"></span><span>    </span><span id="local-6989586621680012207"><span class="annot"><span class="annottext">getTransition :: WrapPartialLedgerConfig blk
+</span><span id="line-127"></span><span>    </span><span id="local-6989586621679991067"><span class="annot"><a href="#local-6989586621679991073"><span class="hs-identifier hs-type">getTransition</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.SingleEraBlock.html#SingleEraBlock"><span class="hs-identifier hs-type">SingleEraBlock</span></a></span><span>          </span><span class="annot"><a href="#local-6989586621679991067"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-128"></span><span>                  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.PartialConfig.html#WrapPartialLedgerConfig"><span class="hs-identifier hs-type">WrapPartialLedgerConfig</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991067"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-129"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">K</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.EraParams.html#EraParams"><span class="hs-identifier hs-type">History.EraParams</span></a></span><span>     </span><span class="annot"><a href="#local-6989586621679991067"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-130"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Current"><span class="hs-identifier hs-type">Current</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span>     </span><span class="annot"><a href="#local-6989586621679991067"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-131"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">K</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#TransitionInfo"><span class="hs-identifier hs-type">TransitionInfo</span></a></span><span>        </span><span class="annot"><a href="#local-6989586621679991067"><span class="hs-identifier hs-type">blk</span></a></span></span><span>
+</span><span id="line-132"></span><span>    </span><span id="local-6989586621679991073"><span class="annot"><span class="annottext">getTransition :: WrapPartialLedgerConfig blk
 -&gt; K EraParams blk
 -&gt; Current LedgerState blk
 -&gt; K TransitionInfo blk
-</span><a href="#local-6989586621680012207"><span class="hs-identifier hs-var hs-var">getTransition</span></a></span></span><span> </span><span id="local-6989586621680012200"><span class="annot"><span class="annottext">WrapPartialLedgerConfig blk
-</span><a href="#local-6989586621680012200"><span class="hs-identifier hs-var">cfg</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">K</span></span><span> </span><span id="local-6989586621680012199"><span class="annot"><span class="annottext">EraParams
-</span><a href="#local-6989586621680012199"><span class="hs-identifier hs-var">eraParams</span></a></span></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Current"><span class="hs-identifier hs-type">Current</span></a></span><span class="hs-special">{</span><span id="local-6989586621680012197"><span id="local-6989586621680012198"><span class="annot"><span class="annottext">LedgerState blk
+</span><a href="#local-6989586621679991073"><span class="hs-identifier hs-var hs-var">getTransition</span></a></span></span><span> </span><span id="local-6989586621679991066"><span class="annot"><span class="annottext">WrapPartialLedgerConfig blk
+</span><a href="#local-6989586621679991066"><span class="hs-identifier hs-var">cfg</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">K</span></span><span> </span><span id="local-6989586621679991065"><span class="annot"><span class="annottext">EraParams
+</span><a href="#local-6989586621679991065"><span class="hs-identifier hs-var">eraParams</span></a></span></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Current"><span class="hs-identifier hs-type">Current</span></a></span><span class="hs-special">{</span><span id="local-6989586621679991063"><span id="local-6989586621679991064"><span class="annot"><span class="annottext">LedgerState blk
 Bound
 currentState :: LedgerState blk
 currentStart :: Bound
 currentState :: forall (f :: * -&gt; *) blk. Current f blk -&gt; f blk
 currentStart :: forall (f :: * -&gt; *) blk. Current f blk -&gt; Bound
-</span><a href="#local-6989586621680012197"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TransitionInfo -&gt; K TransitionInfo blk
+</span><a href="#local-6989586621679991063"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TransitionInfo -&gt; K TransitionInfo blk
 forall k a (b :: k). a -&gt; K a b
 </span><span class="hs-identifier hs-var">K</span></span><span> </span><span class="annot"><span class="annottext">(TransitionInfo -&gt; K TransitionInfo blk)
 -&gt; TransitionInfo -&gt; K TransitionInfo blk
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
 </span><span id="line-133"></span><span>        </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">WrapPartialLedgerConfig blk
 -&gt; EraParams -&gt; Bound -&gt; LedgerState blk -&gt; Maybe EpochNo
 forall blk.
@@ -386,46 +386,46 @@ SingleEraBlock blk =&gt;
 WrapPartialLedgerConfig blk
 -&gt; EraParams -&gt; Bound -&gt; LedgerState blk -&gt; Maybe EpochNo
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.SingleEraBlock.html#singleEraTransition%27"><span class="hs-identifier hs-var">singleEraTransition'</span></a></span><span> </span><span class="annot"><span class="annottext">WrapPartialLedgerConfig blk
-</span><a href="#local-6989586621680012200"><span class="hs-identifier hs-var">cfg</span></a></span><span> </span><span class="annot"><span class="annottext">EraParams
-</span><a href="#local-6989586621680012199"><span class="hs-identifier hs-var">eraParams</span></a></span><span> </span><span class="annot"><span class="annottext">Bound
-</span><a href="#local-6989586621680012198"><span class="hs-identifier hs-var">currentStart</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerState blk
-</span><a href="#local-6989586621680012197"><span class="hs-identifier hs-var">currentState</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><a href="#local-6989586621679991066"><span class="hs-identifier hs-var">cfg</span></a></span><span> </span><span class="annot"><span class="annottext">EraParams
+</span><a href="#local-6989586621679991065"><span class="hs-identifier hs-var">eraParams</span></a></span><span> </span><span class="annot"><span class="annottext">Bound
+</span><a href="#local-6989586621679991064"><span class="hs-identifier hs-var">currentStart</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerState blk
+</span><a href="#local-6989586621679991063"><span class="hs-identifier hs-var">currentState</span></a></span><span> </span><span class="hs-keyword">of</span><span>
 </span><span id="line-134"></span><span>          </span><span class="annot"><span class="annottext">Maybe EpochNo
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">WithOrigin SlotNo -&gt; TransitionInfo
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">WithOrigin SlotNo -&gt; TransitionInfo
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#TransitionUnknown"><span class="hs-identifier hs-var">TransitionUnknown</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">LedgerState blk -&gt; WithOrigin SlotNo
 forall blk.
 UpdateLedger blk =&gt;
 LedgerState blk -&gt; WithOrigin SlotNo
 </span><a href="Ouroboros.Consensus.Ledger.Abstract.html#ledgerTipSlot"><span class="hs-identifier hs-var">ledgerTipSlot</span></a></span><span> </span><span class="annot"><span class="annottext">LedgerState blk
-</span><a href="#local-6989586621680012197"><span class="hs-identifier hs-var">currentState</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-135"></span><span>          </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Just</span></a></span><span> </span><span id="local-6989586621680012193"><span class="annot"><span class="annottext">EpochNo
-</span><a href="#local-6989586621680012193"><span class="hs-identifier hs-var">e</span></a></span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">EpochNo -&gt; TransitionInfo
+</span><a href="#local-6989586621679991063"><span class="hs-identifier hs-var">currentState</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-135"></span><span>          </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Just</span></a></span><span> </span><span id="local-6989586621679991059"><span class="annot"><span class="annottext">EpochNo
+</span><a href="#local-6989586621679991059"><span class="hs-identifier hs-var">e</span></a></span></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">EpochNo -&gt; TransitionInfo
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#TransitionKnown"><span class="hs-identifier hs-var">TransitionKnown</span></a></span><span> </span><span class="annot"><span class="annottext">EpochNo
-</span><a href="#local-6989586621680012193"><span class="hs-identifier hs-var">e</span></a></span><span>
+</span><a href="#local-6989586621679991059"><span class="hs-identifier hs-var">e</span></a></span><span>
 </span><span id="line-136"></span><span>
-</span><span id="line-137"></span><span id="local-6989586621680012359"><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#reconstructSummaryLedger"><span class="hs-identifier hs-type">reconstructSummaryLedger</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">All</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.SingleEraBlock.html#SingleEraBlock"><span class="hs-identifier hs-type">SingleEraBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012359"><span class="hs-identifier hs-type">xs</span></a></span><span>
-</span><span id="line-138"></span><span>                         </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Basics.html#HardForkLedgerConfig"><span class="hs-identifier hs-type">HardForkLedgerConfig</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012359"><span class="hs-identifier hs-type">xs</span></a></span><span>
-</span><span id="line-139"></span><span>                         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#HardForkState"><span class="hs-identifier hs-type">HardForkState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012359"><span class="hs-identifier hs-type">xs</span></a></span><span>
-</span><span id="line-140"></span><span>                         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Summary.html#Summary"><span class="hs-identifier hs-type">History.Summary</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012359"><span class="hs-identifier hs-type">xs</span></a></span></span><span>
+</span><span id="line-137"></span><span id="local-6989586621679991225"><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#reconstructSummaryLedger"><span class="hs-identifier hs-type">reconstructSummaryLedger</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">All</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.SingleEraBlock.html#SingleEraBlock"><span class="hs-identifier hs-type">SingleEraBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991225"><span class="hs-identifier hs-type">xs</span></a></span><span>
+</span><span id="line-138"></span><span>                         </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Basics.html#HardForkLedgerConfig"><span class="hs-identifier hs-type">HardForkLedgerConfig</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991225"><span class="hs-identifier hs-type">xs</span></a></span><span>
+</span><span id="line-139"></span><span>                         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#HardForkState"><span class="hs-identifier hs-type">HardForkState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991225"><span class="hs-identifier hs-type">xs</span></a></span><span>
+</span><span id="line-140"></span><span>                         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Summary.html#Summary"><span class="hs-identifier hs-type">History.Summary</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991225"><span class="hs-identifier hs-type">xs</span></a></span></span><span>
 </span><span id="line-141"></span><span id="reconstructSummaryLedger"><span class="annot"><span class="annottext">reconstructSummaryLedger :: HardForkLedgerConfig xs
 -&gt; HardForkState LedgerState xs -&gt; Summary xs
-</span><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#reconstructSummaryLedger"><span class="hs-identifier hs-var hs-var">reconstructSummaryLedger</span></a></span></span><span> </span><span id="local-6989586621680012191"><span class="annot"><span class="annottext">cfg :: HardForkLedgerConfig xs
-</span><a href="#local-6989586621680012191"><span class="hs-identifier hs-var">cfg</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Basics.html#HardForkLedgerConfig"><span class="hs-identifier hs-type">HardForkLedgerConfig</span></a></span><span class="hs-special">{</span><span id="local-6989586621680012189"><span id="local-6989586621680012190"><span class="annot"><span class="annottext">Shape xs
+</span><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#reconstructSummaryLedger"><span class="hs-identifier hs-var hs-var">reconstructSummaryLedger</span></a></span></span><span> </span><span id="local-6989586621679991057"><span class="annot"><span class="annottext">cfg :: HardForkLedgerConfig xs
+</span><a href="#local-6989586621679991057"><span class="hs-identifier hs-var">cfg</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Basics.html#HardForkLedgerConfig"><span class="hs-identifier hs-type">HardForkLedgerConfig</span></a></span><span class="hs-special">{</span><span id="local-6989586621679991055"><span id="local-6989586621679991056"><span class="annot"><span class="annottext">Shape xs
 PerEraLedgerConfig xs
 hardForkLedgerConfigPerEra :: PerEraLedgerConfig xs
 hardForkLedgerConfigShape :: Shape xs
 hardForkLedgerConfigPerEra :: forall (xs :: [*]).
 HardForkLedgerConfig xs -&gt; PerEraLedgerConfig xs
 hardForkLedgerConfigShape :: forall (xs :: [*]). HardForkLedgerConfig xs -&gt; Shape xs
-</span><a href="#local-6989586621680012189"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span> </span><span id="local-6989586621680012188"><span class="annot"><span class="annottext">HardForkState LedgerState xs
-</span><a href="#local-6989586621680012188"><span class="hs-identifier hs-var">st</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="#local-6989586621679991055"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span> </span><span id="local-6989586621679991054"><span class="annot"><span class="annottext">HardForkState LedgerState xs
+</span><a href="#local-6989586621679991054"><span class="hs-identifier hs-var">st</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-142"></span><span>    </span><span class="annot"><span class="annottext">Shape xs
 -&gt; TransitionInfo -&gt; HardForkState LedgerState xs -&gt; Summary xs
 forall (xs :: [*]) (f :: * -&gt; *).
 Shape xs -&gt; TransitionInfo -&gt; HardForkState f xs -&gt; Summary xs
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.Infra.html#reconstructSummary"><span class="hs-identifier hs-var">reconstructSummary</span></a></span><span>
 </span><span id="line-143"></span><span>      </span><span class="annot"><span class="annottext">Shape xs
-</span><a href="#local-6989586621680012190"><span class="hs-identifier hs-var">hardForkLedgerConfigShape</span></a></span><span>
+</span><a href="#local-6989586621679991056"><span class="hs-identifier hs-var">hardForkLedgerConfigShape</span></a></span><span>
 </span><span id="line-144"></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="annottext">HardForkLedgerConfig xs
 -&gt; HardForkState LedgerState xs -&gt; TransitionInfo
 forall (xs :: [*]).
@@ -433,32 +433,32 @@ All SingleEraBlock xs =&gt;
 HardForkLedgerConfig xs
 -&gt; HardForkState LedgerState xs -&gt; TransitionInfo
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#mostRecentTransitionInfo"><span class="hs-identifier hs-var">mostRecentTransitionInfo</span></a></span><span> </span><span class="annot"><span class="annottext">HardForkLedgerConfig xs
-</span><a href="#local-6989586621680012191"><span class="hs-identifier hs-var">cfg</span></a></span><span> </span><span class="annot"><span class="annottext">HardForkState LedgerState xs
-</span><a href="#local-6989586621680012188"><span class="hs-identifier hs-var">st</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679991057"><span class="hs-identifier hs-var">cfg</span></a></span><span> </span><span class="annot"><span class="annottext">HardForkState LedgerState xs
+</span><a href="#local-6989586621679991054"><span class="hs-identifier hs-var">st</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-145"></span><span>      </span><span class="annot"><span class="annottext">HardForkState LedgerState xs
-</span><a href="#local-6989586621680012188"><span class="hs-identifier hs-var">st</span></a></span><span>
+</span><a href="#local-6989586621679991054"><span class="hs-identifier hs-var">st</span></a></span><span>
 </span><span id="line-146"></span><span>
 </span><span id="line-147"></span><span class="hs-comment">-- | Construct 'EpochInfo' from the ledger state</span><span>
 </span><span id="line-148"></span><span class="hs-comment">--</span><span>
 </span><span id="line-149"></span><span class="hs-comment">-- NOTE: The resulting 'EpochInfo' is a snapshot only, with a limited range.</span><span>
 </span><span id="line-150"></span><span class="hs-comment">-- It should not be stored.</span><span>
-</span><span id="line-151"></span><span id="local-6989586621680012295"><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#epochInfoLedger"><span class="hs-identifier hs-type">epochInfoLedger</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">All</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.SingleEraBlock.html#SingleEraBlock"><span class="hs-identifier hs-type">SingleEraBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012295"><span class="hs-identifier hs-type">xs</span></a></span><span>
-</span><span id="line-152"></span><span>                </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Basics.html#HardForkLedgerConfig"><span class="hs-identifier hs-type">HardForkLedgerConfig</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012295"><span class="hs-identifier hs-type">xs</span></a></span><span>
-</span><span id="line-153"></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#HardForkState"><span class="hs-identifier hs-type">HardForkState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012295"><span class="hs-identifier hs-type">xs</span></a></span><span>
-</span><span id="line-154"></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">EpochInfo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-type">Except</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Qry.html#PastHorizonException"><span class="hs-identifier hs-type">PastHorizonException</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-151"></span><span id="local-6989586621679991161"><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#epochInfoLedger"><span class="hs-identifier hs-type">epochInfoLedger</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">All</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.SingleEraBlock.html#SingleEraBlock"><span class="hs-identifier hs-type">SingleEraBlock</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991161"><span class="hs-identifier hs-type">xs</span></a></span><span>
+</span><span id="line-152"></span><span>                </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Basics.html#HardForkLedgerConfig"><span class="hs-identifier hs-type">HardForkLedgerConfig</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991161"><span class="hs-identifier hs-type">xs</span></a></span><span>
+</span><span id="line-153"></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#HardForkState"><span class="hs-identifier hs-type">HardForkState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991161"><span class="hs-identifier hs-type">xs</span></a></span><span>
+</span><span id="line-154"></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">EpochInfo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-type">Except</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Qry.html#PastHorizonException"><span class="hs-identifier hs-type">PastHorizonException</span></a></span><span class="hs-special">)</span></span><span>
 </span><span id="line-155"></span><span id="epochInfoLedger"><span class="annot"><span class="annottext">epochInfoLedger :: HardForkLedgerConfig xs
 -&gt; HardForkState LedgerState xs
 -&gt; EpochInfo (Except PastHorizonException)
-</span><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#epochInfoLedger"><span class="hs-identifier hs-var hs-var">epochInfoLedger</span></a></span></span><span> </span><span id="local-6989586621680012186"><span class="annot"><span class="annottext">HardForkLedgerConfig xs
-</span><a href="#local-6989586621680012186"><span class="hs-identifier hs-var">cfg</span></a></span></span><span> </span><span id="local-6989586621680012185"><span class="annot"><span class="annottext">HardForkState LedgerState xs
-</span><a href="#local-6989586621680012185"><span class="hs-identifier hs-var">st</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#epochInfoLedger"><span class="hs-identifier hs-var hs-var">epochInfoLedger</span></a></span></span><span> </span><span id="local-6989586621679991052"><span class="annot"><span class="annottext">HardForkLedgerConfig xs
+</span><a href="#local-6989586621679991052"><span class="hs-identifier hs-var">cfg</span></a></span></span><span> </span><span id="local-6989586621679991051"><span class="annot"><span class="annottext">HardForkState LedgerState xs
+</span><a href="#local-6989586621679991051"><span class="hs-identifier hs-var">st</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-156"></span><span>    </span><span class="annot"><span class="annottext">Summary xs -&gt; EpochInfo (Except PastHorizonException)
 forall (xs :: [*]).
 Summary xs -&gt; EpochInfo (Except PastHorizonException)
 </span><a href="Ouroboros.Consensus.HardFork.History.EpochInfo.html#summaryToEpochInfo"><span class="hs-identifier hs-var">History.summaryToEpochInfo</span></a></span><span> </span><span class="annot"><span class="annottext">(Summary xs -&gt; EpochInfo (Except PastHorizonException))
 -&gt; Summary xs -&gt; EpochInfo (Except PastHorizonException)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
 </span><span id="line-157"></span><span>      </span><span class="annot"><span class="annottext">HardForkLedgerConfig xs
 -&gt; HardForkState LedgerState xs -&gt; Summary xs
 forall (xs :: [*]).
@@ -466,64 +466,67 @@ All SingleEraBlock xs =&gt;
 HardForkLedgerConfig xs
 -&gt; HardForkState LedgerState xs -&gt; Summary xs
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#reconstructSummaryLedger"><span class="hs-identifier hs-var">reconstructSummaryLedger</span></a></span><span> </span><span class="annot"><span class="annottext">HardForkLedgerConfig xs
-</span><a href="#local-6989586621680012186"><span class="hs-identifier hs-var">cfg</span></a></span><span> </span><span class="annot"><span class="annottext">HardForkState LedgerState xs
-</span><a href="#local-6989586621680012185"><span class="hs-identifier hs-var">st</span></a></span><span>
+</span><a href="#local-6989586621679991052"><span class="hs-identifier hs-var">cfg</span></a></span><span> </span><span class="annot"><span class="annottext">HardForkState LedgerState xs
+</span><a href="#local-6989586621679991051"><span class="hs-identifier hs-var">st</span></a></span><span>
 </span><span id="line-158"></span><span>
 </span><span id="line-159"></span><span class="hs-comment">-- | Construct 'EpochInfo' given precomputed 'TransitionInfo'</span><span>
-</span><span id="line-160"></span><span id="local-6989586621680012182"><span id="local-6989586621680012183"><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#epochInfoPrecomputedTransitionInfo"><span class="hs-identifier hs-type">epochInfoPrecomputedTransitionInfo</span></a></span><span> </span><span class="hs-glyph">::</span><span>
-</span><span id="line-161"></span><span>     </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Summary.html#Shape"><span class="hs-identifier hs-type">History.Shape</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012183"><span class="hs-identifier hs-type">xs</span></a></span><span>
-</span><span id="line-162"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#TransitionInfo"><span class="hs-identifier hs-type">TransitionInfo</span></a></span><span>
-</span><span id="line-163"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#HardForkState"><span class="hs-identifier hs-type">HardForkState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012182"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012183"><span class="hs-identifier hs-type">xs</span></a></span><span>
-</span><span id="line-164"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">EpochInfo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-type">Except</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Qry.html#PastHorizonException"><span class="hs-identifier hs-type">PastHorizonException</span></a></span><span class="hs-special">)</span></span></span><span>
-</span><span id="line-165"></span><span id="epochInfoPrecomputedTransitionInfo"><span class="annot"><span class="annottext">epochInfoPrecomputedTransitionInfo :: Shape xs
+</span><span id="line-160"></span><span class="hs-comment">--</span><span>
+</span><span id="line-161"></span><span class="hs-comment">-- The transition and state arguments are acquired either from a ticked ledger</span><span>
+</span><span id="line-162"></span><span class="hs-comment">-- state or a ticked ledger view.</span><span>
+</span><span id="line-163"></span><span id="local-6989586621679991048"><span id="local-6989586621679991049"><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#epochInfoPrecomputedTransitionInfo"><span class="hs-identifier hs-type">epochInfoPrecomputedTransitionInfo</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-164"></span><span>     </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Summary.html#Shape"><span class="hs-identifier hs-type">History.Shape</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991049"><span class="hs-identifier hs-type">xs</span></a></span><span>
+</span><span id="line-165"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#TransitionInfo"><span class="hs-identifier hs-type">TransitionInfo</span></a></span><span>
+</span><span id="line-166"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#HardForkState"><span class="hs-identifier hs-type">HardForkState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991048"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991049"><span class="hs-identifier hs-type">xs</span></a></span><span>
+</span><span id="line-167"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">EpochInfo</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/transformers-0.5.6.2/src"><span class="hs-identifier hs-type">Except</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Qry.html#PastHorizonException"><span class="hs-identifier hs-type">PastHorizonException</span></a></span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-168"></span><span id="epochInfoPrecomputedTransitionInfo"><span class="annot"><span class="annottext">epochInfoPrecomputedTransitionInfo :: Shape xs
 -&gt; TransitionInfo
 -&gt; HardForkState f xs
 -&gt; EpochInfo (Except PastHorizonException)
-</span><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#epochInfoPrecomputedTransitionInfo"><span class="hs-identifier hs-var hs-var">epochInfoPrecomputedTransitionInfo</span></a></span></span><span> </span><span id="local-6989586621680012181"><span class="annot"><span class="annottext">Shape xs
-</span><a href="#local-6989586621680012181"><span class="hs-identifier hs-var">shape</span></a></span></span><span> </span><span id="local-6989586621680012180"><span class="annot"><span class="annottext">TransitionInfo
-</span><a href="#local-6989586621680012180"><span class="hs-identifier hs-var">transition</span></a></span></span><span> </span><span id="local-6989586621680012179"><span class="annot"><span class="annottext">HardForkState f xs
-</span><a href="#local-6989586621680012179"><span class="hs-identifier hs-var">st</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-166"></span><span>    </span><span class="annot"><span class="annottext">Summary xs -&gt; EpochInfo (Except PastHorizonException)
+</span><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#epochInfoPrecomputedTransitionInfo"><span class="hs-identifier hs-var hs-var">epochInfoPrecomputedTransitionInfo</span></a></span></span><span> </span><span id="local-6989586621679991047"><span class="annot"><span class="annottext">Shape xs
+</span><a href="#local-6989586621679991047"><span class="hs-identifier hs-var">shape</span></a></span></span><span> </span><span id="local-6989586621679991046"><span class="annot"><span class="annottext">TransitionInfo
+</span><a href="#local-6989586621679991046"><span class="hs-identifier hs-var">transition</span></a></span></span><span> </span><span id="local-6989586621679991045"><span class="annot"><span class="annottext">HardForkState f xs
+</span><a href="#local-6989586621679991045"><span class="hs-identifier hs-var">st</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-169"></span><span>    </span><span class="annot"><span class="annottext">Summary xs -&gt; EpochInfo (Except PastHorizonException)
 forall (xs :: [*]).
 Summary xs -&gt; EpochInfo (Except PastHorizonException)
 </span><a href="Ouroboros.Consensus.HardFork.History.EpochInfo.html#summaryToEpochInfo"><span class="hs-identifier hs-var">History.summaryToEpochInfo</span></a></span><span> </span><span class="annot"><span class="annottext">(Summary xs -&gt; EpochInfo (Except PastHorizonException))
 -&gt; Summary xs -&gt; EpochInfo (Except PastHorizonException)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
-</span><span id="line-167"></span><span>      </span><span class="annot"><span class="annottext">Shape xs -&gt; TransitionInfo -&gt; HardForkState f xs -&gt; Summary xs
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-170"></span><span>      </span><span class="annot"><span class="annottext">Shape xs -&gt; TransitionInfo -&gt; HardForkState f xs -&gt; Summary xs
 forall (xs :: [*]) (f :: * -&gt; *).
 Shape xs -&gt; TransitionInfo -&gt; HardForkState f xs -&gt; Summary xs
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.Infra.html#reconstructSummary"><span class="hs-identifier hs-var">reconstructSummary</span></a></span><span> </span><span class="annot"><span class="annottext">Shape xs
-</span><a href="#local-6989586621680012181"><span class="hs-identifier hs-var">shape</span></a></span><span> </span><span class="annot"><span class="annottext">TransitionInfo
-</span><a href="#local-6989586621680012180"><span class="hs-identifier hs-var">transition</span></a></span><span> </span><span class="annot"><span class="annottext">HardForkState f xs
-</span><a href="#local-6989586621680012179"><span class="hs-identifier hs-var">st</span></a></span><span>
-</span><span id="line-168"></span><span>
-</span><span id="line-169"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+</span><a href="#local-6989586621679991047"><span class="hs-identifier hs-var">shape</span></a></span><span> </span><span class="annot"><span class="annottext">TransitionInfo
+</span><a href="#local-6989586621679991046"><span class="hs-identifier hs-var">transition</span></a></span><span> </span><span class="annot"><span class="annottext">HardForkState f xs
+</span><a href="#local-6989586621679991045"><span class="hs-identifier hs-var">st</span></a></span><span>
+</span><span id="line-171"></span><span>
+</span><span id="line-172"></span><span class="hs-comment">{-------------------------------------------------------------------------------
   Extending
 -------------------------------------------------------------------------------}</span><span>
-</span><span id="line-172"></span><span>
-</span><span id="line-173"></span><span class="hs-comment">-- | Extend the telescope until the specified slot is within the era at the tip</span><span>
-</span><span id="line-174"></span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#extendToSlot"><span class="hs-identifier hs-type">extendToSlot</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621680012178"><span class="annot"><a href="#local-6989586621680012178"><span class="hs-identifier hs-type">xs</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.CanHardFork.html#CanHardFork"><span class="hs-identifier hs-type">CanHardFork</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012178"><span class="hs-identifier hs-type">xs</span></a></span><span>
-</span><span id="line-175"></span><span>             </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Basics.html#HardForkLedgerConfig"><span class="hs-identifier hs-type">HardForkLedgerConfig</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012178"><span class="hs-identifier hs-type">xs</span></a></span><span>
-</span><span id="line-176"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span>
-</span><span id="line-177"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#HardForkState"><span class="hs-identifier hs-type">HardForkState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012178"><span class="hs-identifier hs-type">xs</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#HardForkState"><span class="hs-identifier hs-type">HardForkState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012178"><span class="hs-identifier hs-type">xs</span></a></span><span>
-</span><span id="line-178"></span><span id="extendToSlot"><span class="annot"><span class="annottext">extendToSlot :: HardForkLedgerConfig xs
+</span><span id="line-175"></span><span>
+</span><span id="line-176"></span><span class="hs-comment">-- | Extend the telescope until the specified slot is within the era at the tip</span><span>
+</span><span id="line-177"></span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#extendToSlot"><span class="hs-identifier hs-type">extendToSlot</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679991044"><span class="annot"><a href="#local-6989586621679991044"><span class="hs-identifier hs-type">xs</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.CanHardFork.html#CanHardFork"><span class="hs-identifier hs-type">CanHardFork</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991044"><span class="hs-identifier hs-type">xs</span></a></span><span>
+</span><span id="line-178"></span><span>             </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Basics.html#HardForkLedgerConfig"><span class="hs-identifier hs-type">HardForkLedgerConfig</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991044"><span class="hs-identifier hs-type">xs</span></a></span><span>
+</span><span id="line-179"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span>
+</span><span id="line-180"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#HardForkState"><span class="hs-identifier hs-type">HardForkState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991044"><span class="hs-identifier hs-type">xs</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#HardForkState"><span class="hs-identifier hs-type">HardForkState</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991044"><span class="hs-identifier hs-type">xs</span></a></span><span>
+</span><span id="line-181"></span><span id="extendToSlot"><span class="annot"><span class="annottext">extendToSlot :: HardForkLedgerConfig xs
 -&gt; SlotNo
 -&gt; HardForkState LedgerState xs
 -&gt; HardForkState LedgerState xs
-</span><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#extendToSlot"><span class="hs-identifier hs-var hs-var">extendToSlot</span></a></span></span><span> </span><span id="local-6989586621680012177"><span class="annot"><span class="annottext">ledgerCfg :: HardForkLedgerConfig xs
-</span><a href="#local-6989586621680012177"><span class="hs-identifier hs-var">ledgerCfg</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Basics.html#HardForkLedgerConfig"><span class="hs-identifier hs-type">HardForkLedgerConfig</span></a></span><span class="hs-special">{</span><span id="local-6989586621680012175"><span id="local-6989586621680012176"><span class="annot"><span class="annottext">Shape xs
+</span><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#extendToSlot"><span class="hs-identifier hs-var hs-var">extendToSlot</span></a></span></span><span> </span><span id="local-6989586621679991043"><span class="annot"><span class="annottext">ledgerCfg :: HardForkLedgerConfig xs
+</span><a href="#local-6989586621679991043"><span class="hs-identifier hs-var">ledgerCfg</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Basics.html#HardForkLedgerConfig"><span class="hs-identifier hs-type">HardForkLedgerConfig</span></a></span><span class="hs-special">{</span><span id="local-6989586621679991041"><span id="local-6989586621679991042"><span class="annot"><span class="annottext">Shape xs
 PerEraLedgerConfig xs
 hardForkLedgerConfigPerEra :: PerEraLedgerConfig xs
 hardForkLedgerConfigShape :: Shape xs
 hardForkLedgerConfigPerEra :: forall (xs :: [*]).
 HardForkLedgerConfig xs -&gt; PerEraLedgerConfig xs
 hardForkLedgerConfigShape :: forall (xs :: [*]). HardForkLedgerConfig xs -&gt; Shape xs
-</span><a href="#local-6989586621680012175"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span> </span><span id="local-6989586621680012174"><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621680012174"><span class="hs-identifier hs-var">slot</span></a></span></span><span> </span><span id="local-6989586621680012173"><span class="annot"><span class="annottext">ledgerSt :: HardForkState LedgerState xs
-</span><a href="#local-6989586621680012173"><span class="hs-identifier hs-var">ledgerSt</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#HardForkState"><span class="hs-identifier hs-type">HardForkState</span></a></span><span> </span><span id="local-6989586621680012172"><span class="annot"><span class="annottext">Telescope (K Past) (Current LedgerState) xs
-</span><a href="#local-6989586621680012172"><span class="hs-identifier hs-var">st</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-179"></span><span>      </span><span class="annot"><span class="annottext">Telescope (K Past) (Current LedgerState) xs
+</span><a href="#local-6989586621679991041"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span> </span><span id="local-6989586621679991040"><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679991040"><span class="hs-identifier hs-var">slot</span></a></span></span><span> </span><span id="local-6989586621679991039"><span class="annot"><span class="annottext">ledgerSt :: HardForkState LedgerState xs
+</span><a href="#local-6989586621679991039"><span class="hs-identifier hs-var">ledgerSt</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#HardForkState"><span class="hs-identifier hs-type">HardForkState</span></a></span><span> </span><span id="local-6989586621679991038"><span class="annot"><span class="annottext">Telescope (K Past) (Current LedgerState) xs
+</span><a href="#local-6989586621679991038"><span class="hs-identifier hs-var">st</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-182"></span><span>      </span><span class="annot"><span class="annottext">Telescope (K Past) (Current LedgerState) xs
 -&gt; HardForkState LedgerState xs
 forall (f :: * -&gt; *) (xs :: [*]).
 Telescope (K Past) (Current f) xs -&gt; HardForkState f xs
@@ -534,18 +537,18 @@ Telescope (K Past) (Current f) xs -&gt; HardForkState f xs
 -&gt; Telescope (K Past) (Current LedgerState) xs
 -&gt; HardForkState LedgerState xs
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">I (Telescope (K Past) (Current LedgerState) xs)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">I (Telescope (K Past) (Current LedgerState) xs)
 -&gt; Telescope (K Past) (Current LedgerState) xs
 forall a. I a -&gt; a
 </span><span class="hs-identifier hs-var">unI</span></span><span>
-</span><span id="line-180"></span><span>    </span><span class="annot"><span class="annottext">(I (Telescope (K Past) (Current LedgerState) xs)
+</span><span id="line-183"></span><span>    </span><span class="annot"><span class="annottext">(I (Telescope (K Past) (Current LedgerState) xs)
  -&gt; Telescope (K Past) (Current LedgerState) xs)
 -&gt; (Telescope (K Past) (Current LedgerState) xs
     -&gt; I (Telescope (K Past) (Current LedgerState) xs))
 -&gt; Telescope (K Past) (Current LedgerState) xs
 -&gt; Telescope (K Past) (Current LedgerState) xs
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">InPairs
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">InPairs
   (Requiring (K Bound) (Extend I (K Past) (Current LedgerState))) xs
 -&gt; NP (Current LedgerState -.-&gt; (Maybe :.: K Bound)) xs
 -&gt; Telescope (K Past) (Current LedgerState) xs
@@ -558,7 +561,7 @@ InPairs (Requiring h (Extend m g f)) xs
 -&gt; Telescope g f xs
 -&gt; m (Telescope g f xs)
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.Util.Telescope.html#extend"><span class="hs-identifier hs-var">Telescope.extend</span></a></span><span>
-</span><span id="line-181"></span><span>        </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">(forall x y.
+</span><span id="line-184"></span><span>        </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">(forall x y.
  Translate LedgerState x y
  -&gt; Requiring
       (K Bound) (Extend I (K Past) (Current LedgerState)) x y)
@@ -569,8 +572,8 @@ forall k (xs :: [k]) (f :: k -&gt; k -&gt; *) (g :: k -&gt; k -&gt; *).
 SListI xs =&gt;
 (forall (x :: k) (y :: k). f x y -&gt; g x y)
 -&gt; InPairs f xs -&gt; InPairs g xs
-</span><a href="Ouroboros.Consensus.HardFork.Combinator.Util.InPairs.html#hmap"><span class="hs-identifier hs-var">InPairs.hmap</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621680012168"><span class="annot"><span class="annottext">Translate LedgerState x y
-</span><a href="#local-6989586621680012168"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(K Bound x -&gt; Extend I (K Past) (Current LedgerState) x y)
+</span><a href="Ouroboros.Consensus.HardFork.Combinator.Util.InPairs.html#hmap"><span class="hs-identifier hs-var">InPairs.hmap</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679991034"><span class="annot"><span class="annottext">Translate LedgerState x y
+</span><a href="#local-6989586621679991034"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(K Bound x -&gt; Extend I (K Past) (Current LedgerState) x y)
 -&gt; Requiring
      (K Bound) (Extend I (K Past) (Current LedgerState)) x y
 forall k k (h :: k -&gt; *) (f :: k -&gt; k -&gt; *) (x :: k) (y :: k).
@@ -582,9 +585,9 @@ forall k k (h :: k -&gt; *) (f :: k -&gt; k -&gt; *) (x :: k) (y :: k).
 -&gt; Requiring
      (K Bound) (Extend I (K Past) (Current LedgerState)) x y
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">K</span></span><span> </span><span id="local-6989586621680012166"><span class="annot"><span class="annottext">Bound
-</span><a href="#local-6989586621680012166"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span>
-</span><span id="line-182"></span><span>                           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Current LedgerState x -&gt; I (K Past x, Current LedgerState y))
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">K</span></span><span> </span><span id="local-6989586621679991032"><span class="annot"><span class="annottext">Bound
+</span><a href="#local-6989586621679991032"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span>
+</span><span id="line-185"></span><span>                           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Current LedgerState x -&gt; I (K Past x, Current LedgerState y))
 -&gt; Extend I (K Past) (Current LedgerState) x y
 forall k (m :: * -&gt; *) (g :: k -&gt; *) (f :: k -&gt; *) (x :: k)
        (y :: k).
@@ -594,9 +597,9 @@ forall k (m :: * -&gt; *) (g :: k -&gt; *) (f :: k -&gt; *) (x :: k)
 -&gt; (Current LedgerState x -&gt; I (K Past x, Current LedgerState y))
 -&gt; Extend I (K Past) (Current LedgerState) x y
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621680012164"><span class="annot"><span class="annottext">Current LedgerState x
-</span><a href="#local-6989586621680012164"><span class="hs-identifier hs-var">cur</span></a></span></span><span>
-</span><span id="line-183"></span><span>                           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(K Past x, Current LedgerState y)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679991030"><span class="annot"><span class="annottext">Current LedgerState x
+</span><a href="#local-6989586621679991030"><span class="hs-identifier hs-var">cur</span></a></span></span><span>
+</span><span id="line-186"></span><span>                           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(K Past x, Current LedgerState y)
 -&gt; I (K Past x, Current LedgerState y)
 forall a. a -&gt; I a
 </span><span class="hs-identifier hs-var">I</span></span><span> </span><span class="annot"><span class="annottext">((K Past x, Current LedgerState y)
@@ -604,7 +607,7 @@ forall a. a -&gt; I a
 -&gt; (K Past x, Current LedgerState y)
 -&gt; I (K Past x, Current LedgerState y)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Translate LedgerState x y
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Translate LedgerState x y
 -&gt; Bound
 -&gt; Current LedgerState x
 -&gt; (K Past x, Current LedgerState y)
@@ -613,21 +616,21 @@ Translate LedgerState blk blk'
 -&gt; Bound
 -&gt; Current LedgerState blk
 -&gt; (K Past blk, Current LedgerState blk')
-</span><a href="#local-6989586621680012162"><span class="hs-identifier hs-var">howExtend</span></a></span><span> </span><span class="annot"><span class="annottext">Translate LedgerState x y
-</span><a href="#local-6989586621680012168"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Bound
-</span><a href="#local-6989586621680012166"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">Current LedgerState x
-</span><a href="#local-6989586621680012164"><span class="hs-identifier hs-var">cur</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-184"></span><span>        </span><span class="annot"><span class="annottext">(InPairs (Translate LedgerState) xs
+</span><a href="#local-6989586621679991028"><span class="hs-identifier hs-var">howExtend</span></a></span><span> </span><span class="annot"><span class="annottext">Translate LedgerState x y
+</span><a href="#local-6989586621679991034"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Bound
+</span><a href="#local-6989586621679991032"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">Current LedgerState x
+</span><a href="#local-6989586621679991030"><span class="hs-identifier hs-var">cur</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-187"></span><span>        </span><span class="annot"><span class="annottext">(InPairs (Translate LedgerState) xs
  -&gt; InPairs
       (Requiring (K Bound) (Extend I (K Past) (Current LedgerState))) xs)
 -&gt; InPairs (Translate LedgerState) xs
 -&gt; InPairs
      (Requiring (K Bound) (Extend I (K Past) (Current LedgerState))) xs
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">InPairs (Translate LedgerState) xs
-</span><a href="#local-6989586621680012161"><span class="hs-identifier hs-var">translate</span></a></span><span>
-</span><span id="line-185"></span><span>        </span><span class="hs-special">)</span><span>
-</span><span id="line-186"></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Proxy SingleEraBlock
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">InPairs (Translate LedgerState) xs
+</span><a href="#local-6989586621679991027"><span class="hs-identifier hs-var">translate</span></a></span><span>
+</span><span id="line-188"></span><span>        </span><span class="hs-special">)</span><span>
+</span><span id="line-189"></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Proxy SingleEraBlock
 -&gt; (forall a.
     SingleEraBlock a =&gt;
     WrapPartialLedgerConfig a
@@ -646,9 +649,9 @@ proxy c
 -&gt; h f' xs
 -&gt; h f'' xs
 </span><span class="hs-identifier hs-var">hczipWith</span></span><span>
-</span><span id="line-187"></span><span>           </span><span class="annot"><span class="annottext">Proxy SingleEraBlock
+</span><span id="line-190"></span><span>           </span><span class="annot"><span class="annottext">Proxy SingleEraBlock
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.SingleEraBlock.html#proxySingle"><span class="hs-identifier hs-var">proxySingle</span></a></span><span>
-</span><span id="line-188"></span><span>           </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Current LedgerState a -&gt; (:.:) Maybe (K Bound) a)
+</span><span id="line-191"></span><span>           </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Current LedgerState a -&gt; (:.:) Maybe (K Bound) a)
 -&gt; (-.-&gt;) (Current LedgerState) (Maybe :.: K Bound) a
 forall k (f :: k -&gt; *) (a :: k) (f' :: k -&gt; *).
 (f a -&gt; f' a) -&gt; (-.-&gt;) f f' a
@@ -672,32 +675,32 @@ WrapPartialLedgerConfig blk
 -&gt; K EraParams blk
 -&gt; Current LedgerState blk
 -&gt; (:.:) Maybe (K Bound) blk
-</span><a href="#local-6989586621680012158"><span class="hs-identifier hs-var">whenExtend</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-189"></span><span>           </span><span class="annot"><span class="annottext">Prod NP WrapPartialLedgerConfig xs
+</span><a href="#local-6989586621679991024"><span class="hs-identifier hs-var">whenExtend</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-192"></span><span>           </span><span class="annot"><span class="annottext">Prod NP WrapPartialLedgerConfig xs
 NP WrapPartialLedgerConfig xs
-</span><a href="#local-6989586621680012157"><span class="hs-identifier hs-var">pcfgs</span></a></span><span>
-</span><span id="line-190"></span><span>           </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Exactly xs EraParams -&gt; NP (K EraParams) xs
+</span><a href="#local-6989586621679991023"><span class="hs-identifier hs-var">pcfgs</span></a></span><span>
+</span><span id="line-193"></span><span>           </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Exactly xs EraParams -&gt; NP (K EraParams) xs
 forall (xs :: [*]) a. Exactly xs a -&gt; NP (K a) xs
 </span><a href="Ouroboros.Consensus.Util.Counting.html#getExactly"><span class="hs-identifier hs-var hs-var">getExactly</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Shape xs -&gt; Exactly xs EraParams
 forall (xs :: [*]). Shape xs -&gt; Exactly xs EraParams
 </span><a href="Ouroboros.Consensus.HardFork.History.Summary.html#getShape"><span class="hs-identifier hs-var hs-var">History.getShape</span></a></span><span> </span><span class="annot"><span class="annottext">Shape xs
-</span><a href="#local-6989586621680012176"><span class="hs-identifier hs-var">hardForkLedgerConfigShape</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-191"></span><span>    </span><span class="annot"><span class="annottext">(Telescope (K Past) (Current LedgerState) xs
+</span><a href="#local-6989586621679991042"><span class="hs-identifier hs-var">hardForkLedgerConfigShape</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-194"></span><span>    </span><span class="annot"><span class="annottext">(Telescope (K Past) (Current LedgerState) xs
  -&gt; HardForkState LedgerState xs)
 -&gt; Telescope (K Past) (Current LedgerState) xs
 -&gt; HardForkState LedgerState xs
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Telescope (K Past) (Current LedgerState) xs
-</span><a href="#local-6989586621680012172"><span class="hs-identifier hs-var">st</span></a></span><span>
-</span><span id="line-192"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-193"></span><span>    </span><span id="local-6989586621680012157"><span class="annot"><span class="annottext">pcfgs :: NP WrapPartialLedgerConfig xs
-</span><a href="#local-6989586621680012157"><span class="hs-identifier hs-var hs-var">pcfgs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PerEraLedgerConfig xs -&gt; NP WrapPartialLedgerConfig xs
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Telescope (K Past) (Current LedgerState) xs
+</span><a href="#local-6989586621679991038"><span class="hs-identifier hs-var">st</span></a></span><span>
+</span><span id="line-195"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-196"></span><span>    </span><span id="local-6989586621679991023"><span class="annot"><span class="annottext">pcfgs :: NP WrapPartialLedgerConfig xs
+</span><a href="#local-6989586621679991023"><span class="hs-identifier hs-var hs-var">pcfgs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PerEraLedgerConfig xs -&gt; NP WrapPartialLedgerConfig xs
 forall (xs :: [*]).
 PerEraLedgerConfig xs -&gt; NP WrapPartialLedgerConfig xs
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.AcrossEras.html#getPerEraLedgerConfig"><span class="hs-identifier hs-var hs-var">getPerEraLedgerConfig</span></a></span><span> </span><span class="annot"><span class="annottext">PerEraLedgerConfig xs
-</span><a href="#local-6989586621680012175"><span class="hs-identifier hs-var">hardForkLedgerConfigPerEra</span></a></span><span>
-</span><span id="line-194"></span><span>    </span><span id="local-6989586621680012156"><span class="annot"><span class="annottext">cfgs :: NP WrapLedgerConfig xs
-</span><a href="#local-6989586621680012156"><span class="hs-identifier hs-var hs-var">cfgs</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Proxy SingleEraBlock
+</span><a href="#local-6989586621679991041"><span class="hs-identifier hs-var">hardForkLedgerConfigPerEra</span></a></span><span>
+</span><span id="line-197"></span><span>    </span><span id="local-6989586621679991022"><span class="annot"><span class="annottext">cfgs :: NP WrapLedgerConfig xs
+</span><a href="#local-6989586621679991022"><span class="hs-identifier hs-var hs-var">cfgs</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Proxy SingleEraBlock
 -&gt; (forall a.
     SingleEraBlock a =&gt;
     WrapPartialLedgerConfig a -&gt; WrapLedgerConfig a)
@@ -717,10 +720,10 @@ HasPartialLedgerConfig blk =&gt;
 EpochInfo (Except PastHorizonException)
 -&gt; WrapPartialLedgerConfig blk -&gt; WrapLedgerConfig blk
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.Basics.html#completeLedgerConfig%27%27"><span class="hs-identifier hs-var">completeLedgerConfig''</span></a></span><span> </span><span class="annot"><span class="annottext">EpochInfo (Except PastHorizonException)
-</span><a href="#local-6989586621680012154"><span class="hs-identifier hs-var">ei</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">NP WrapPartialLedgerConfig xs
-</span><a href="#local-6989586621680012157"><span class="hs-identifier hs-var">pcfgs</span></a></span><span>
-</span><span id="line-195"></span><span>    </span><span id="local-6989586621680012154"><span class="annot"><span class="annottext">ei :: EpochInfo (Except PastHorizonException)
-</span><a href="#local-6989586621680012154"><span class="hs-identifier hs-var hs-var">ei</span></a></span></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">HardForkLedgerConfig xs
+</span><a href="#local-6989586621679991020"><span class="hs-identifier hs-var">ei</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">NP WrapPartialLedgerConfig xs
+</span><a href="#local-6989586621679991023"><span class="hs-identifier hs-var">pcfgs</span></a></span><span>
+</span><span id="line-198"></span><span>    </span><span id="local-6989586621679991020"><span class="annot"><span class="annottext">ei :: EpochInfo (Except PastHorizonException)
+</span><a href="#local-6989586621679991020"><span class="hs-identifier hs-var hs-var">ei</span></a></span></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">HardForkLedgerConfig xs
 -&gt; HardForkState LedgerState xs
 -&gt; EpochInfo (Except PastHorizonException)
 forall (xs :: [*]).
@@ -729,142 +732,142 @@ HardForkLedgerConfig xs
 -&gt; HardForkState LedgerState xs
 -&gt; EpochInfo (Except PastHorizonException)
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.html#epochInfoLedger"><span class="hs-identifier hs-var">epochInfoLedger</span></a></span><span> </span><span class="annot"><span class="annottext">HardForkLedgerConfig xs
-</span><a href="#local-6989586621680012177"><span class="hs-identifier hs-var">ledgerCfg</span></a></span><span> </span><span class="annot"><span class="annottext">HardForkState LedgerState xs
-</span><a href="#local-6989586621680012173"><span class="hs-identifier hs-var">ledgerSt</span></a></span><span>
-</span><span id="line-196"></span><span>
-</span><span id="line-197"></span><span>    </span><span class="hs-comment">-- Return the end of this era if we should transition to the next</span><span>
-</span><span id="line-198"></span><span>    </span><span id="local-6989586621680012300"><span class="annot"><a href="#local-6989586621680012158"><span class="hs-identifier hs-type">whenExtend</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.SingleEraBlock.html#SingleEraBlock"><span class="hs-identifier hs-type">SingleEraBlock</span></a></span><span>              </span><span class="annot"><a href="#local-6989586621680012300"><span class="hs-identifier hs-type">blk</span></a></span><span>
-</span><span id="line-199"></span><span>               </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.PartialConfig.html#WrapPartialLedgerConfig"><span class="hs-identifier hs-type">WrapPartialLedgerConfig</span></a></span><span>     </span><span class="annot"><a href="#local-6989586621680012300"><span class="hs-identifier hs-type">blk</span></a></span><span>
-</span><span id="line-200"></span><span>               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">K</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.EraParams.html#EraParams"><span class="hs-identifier hs-type">History.EraParams</span></a></span><span>         </span><span class="annot"><a href="#local-6989586621680012300"><span class="hs-identifier hs-type">blk</span></a></span><span>
-</span><span id="line-201"></span><span>               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Current"><span class="hs-identifier hs-type">Current</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span>         </span><span class="annot"><a href="#local-6989586621680012300"><span class="hs-identifier hs-type">blk</span></a></span><span>
-</span><span id="line-202"></span><span>               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="annot"><span class="hs-operator hs-type">:.:</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">K</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Summary.html#Bound"><span class="hs-identifier hs-type">History.Bound</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="#local-6989586621680012300"><span class="hs-identifier hs-type">blk</span></a></span></span><span>
-</span><span id="line-203"></span><span>    </span><span id="local-6989586621680012158"><span class="annot"><span class="annottext">whenExtend :: WrapPartialLedgerConfig blk
+</span><a href="#local-6989586621679991043"><span class="hs-identifier hs-var">ledgerCfg</span></a></span><span> </span><span class="annot"><span class="annottext">HardForkState LedgerState xs
+</span><a href="#local-6989586621679991039"><span class="hs-identifier hs-var">ledgerSt</span></a></span><span>
+</span><span id="line-199"></span><span>
+</span><span id="line-200"></span><span>    </span><span class="hs-comment">-- Return the end of this era if we should transition to the next</span><span>
+</span><span id="line-201"></span><span>    </span><span id="local-6989586621679991166"><span class="annot"><a href="#local-6989586621679991024"><span class="hs-identifier hs-type">whenExtend</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.SingleEraBlock.html#SingleEraBlock"><span class="hs-identifier hs-type">SingleEraBlock</span></a></span><span>              </span><span class="annot"><a href="#local-6989586621679991166"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-202"></span><span>               </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.PartialConfig.html#WrapPartialLedgerConfig"><span class="hs-identifier hs-type">WrapPartialLedgerConfig</span></a></span><span>     </span><span class="annot"><a href="#local-6989586621679991166"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-203"></span><span>               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">K</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.EraParams.html#EraParams"><span class="hs-identifier hs-type">History.EraParams</span></a></span><span>         </span><span class="annot"><a href="#local-6989586621679991166"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-204"></span><span>               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Current"><span class="hs-identifier hs-type">Current</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span>         </span><span class="annot"><a href="#local-6989586621679991166"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-205"></span><span>               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="annot"><span class="hs-operator hs-type">:.:</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">K</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Summary.html#Bound"><span class="hs-identifier hs-type">History.Bound</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="#local-6989586621679991166"><span class="hs-identifier hs-type">blk</span></a></span></span><span>
+</span><span id="line-206"></span><span>    </span><span id="local-6989586621679991024"><span class="annot"><span class="annottext">whenExtend :: WrapPartialLedgerConfig blk
 -&gt; K EraParams blk
 -&gt; Current LedgerState blk
 -&gt; (:.:) Maybe (K Bound) blk
-</span><a href="#local-6989586621680012158"><span class="hs-identifier hs-var hs-var">whenExtend</span></a></span></span><span> </span><span id="local-6989586621680012153"><span class="annot"><span class="annottext">WrapPartialLedgerConfig blk
-</span><a href="#local-6989586621680012153"><span class="hs-identifier hs-var">pcfg</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">K</span></span><span> </span><span id="local-6989586621680012152"><span class="annot"><span class="annottext">EraParams
-</span><a href="#local-6989586621680012152"><span class="hs-identifier hs-var">eraParams</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621680012151"><span class="annot"><span class="annottext">Current LedgerState blk
-</span><a href="#local-6989586621680012151"><span class="hs-identifier hs-var">cur</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe (K Bound blk) -&gt; (:.:) Maybe (K Bound) blk
+</span><a href="#local-6989586621679991024"><span class="hs-identifier hs-var hs-var">whenExtend</span></a></span></span><span> </span><span id="local-6989586621679991019"><span class="annot"><span class="annottext">WrapPartialLedgerConfig blk
+</span><a href="#local-6989586621679991019"><span class="hs-identifier hs-var">pcfg</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">K</span></span><span> </span><span id="local-6989586621679991018"><span class="annot"><span class="annottext">EraParams
+</span><a href="#local-6989586621679991018"><span class="hs-identifier hs-var">eraParams</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679991017"><span class="annot"><span class="annottext">Current LedgerState blk
+</span><a href="#local-6989586621679991017"><span class="hs-identifier hs-var">cur</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe (K Bound blk) -&gt; (:.:) Maybe (K Bound) blk
 forall l k (f :: l -&gt; *) (g :: k -&gt; l) (p :: k).
 f (g p) -&gt; (:.:) f g p
 </span><span class="hs-identifier hs-var">Comp</span></span><span> </span><span class="annot"><span class="annottext">(Maybe (K Bound blk) -&gt; (:.:) Maybe (K Bound) blk)
 -&gt; Maybe (K Bound blk) -&gt; (:.:) Maybe (K Bound) blk
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Bound -&gt; K Bound blk
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Bound -&gt; K Bound blk
 forall k a (b :: k). a -&gt; K a b
 </span><span class="hs-identifier hs-var">K</span></span><span> </span><span class="annot"><span class="annottext">(Bound -&gt; K Bound blk) -&gt; Maybe Bound -&gt; Maybe (K Bound blk)
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-204"></span><span>        </span><span id="local-6989586621680012148"><span class="annot"><span class="annottext">EpochNo
-</span><a href="#local-6989586621680012148"><span class="hs-identifier hs-var">transition</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">WrapPartialLedgerConfig blk
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;$&gt;</span></a></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-207"></span><span>        </span><span id="local-6989586621679991014"><span class="annot"><span class="annottext">EpochNo
+</span><a href="#local-6989586621679991014"><span class="hs-identifier hs-var">transition</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">WrapPartialLedgerConfig blk
 -&gt; EraParams -&gt; Bound -&gt; LedgerState blk -&gt; Maybe EpochNo
 forall blk.
 SingleEraBlock blk =&gt;
 WrapPartialLedgerConfig blk
 -&gt; EraParams -&gt; Bound -&gt; LedgerState blk -&gt; Maybe EpochNo
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.SingleEraBlock.html#singleEraTransition%27"><span class="hs-identifier hs-var">singleEraTransition'</span></a></span><span>
-</span><span id="line-205"></span><span>                        </span><span class="annot"><span class="annottext">WrapPartialLedgerConfig blk
-</span><a href="#local-6989586621680012153"><span class="hs-identifier hs-var">pcfg</span></a></span><span>
-</span><span id="line-206"></span><span>                        </span><span class="annot"><span class="annottext">EraParams
-</span><a href="#local-6989586621680012152"><span class="hs-identifier hs-var">eraParams</span></a></span><span>
-</span><span id="line-207"></span><span>                        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Current LedgerState blk -&gt; Bound
+</span><span id="line-208"></span><span>                        </span><span class="annot"><span class="annottext">WrapPartialLedgerConfig blk
+</span><a href="#local-6989586621679991019"><span class="hs-identifier hs-var">pcfg</span></a></span><span>
+</span><span id="line-209"></span><span>                        </span><span class="annot"><span class="annottext">EraParams
+</span><a href="#local-6989586621679991018"><span class="hs-identifier hs-var">eraParams</span></a></span><span>
+</span><span id="line-210"></span><span>                        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Current LedgerState blk -&gt; Bound
 forall (f :: * -&gt; *) blk. Current f blk -&gt; Bound
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#currentStart"><span class="hs-identifier hs-var hs-var">currentStart</span></a></span><span> </span><span class="annot"><span class="annottext">Current LedgerState blk
-</span><a href="#local-6989586621680012151"><span class="hs-identifier hs-var">cur</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-208"></span><span>                        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Current LedgerState blk -&gt; LedgerState blk
+</span><a href="#local-6989586621679991017"><span class="hs-identifier hs-var">cur</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-211"></span><span>                        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Current LedgerState blk -&gt; LedgerState blk
 forall (f :: * -&gt; *) blk. Current f blk -&gt; f blk
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#currentState"><span class="hs-identifier hs-var hs-var">currentState</span></a></span><span> </span><span class="annot"><span class="annottext">Current LedgerState blk
-</span><a href="#local-6989586621680012151"><span class="hs-identifier hs-var">cur</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-209"></span><span>        </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621680012147"><span class="annot"><span class="annottext">endBound :: Bound
-</span><a href="#local-6989586621680012147"><span class="hs-identifier hs-var hs-var">endBound</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">HasCallStack =&gt; EraParams -&gt; Bound -&gt; EpochNo -&gt; Bound
+</span><a href="#local-6989586621679991017"><span class="hs-identifier hs-var">cur</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-212"></span><span>        </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679991013"><span class="annot"><span class="annottext">endBound :: Bound
+</span><a href="#local-6989586621679991013"><span class="hs-identifier hs-var hs-var">endBound</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">HasCallStack =&gt; EraParams -&gt; Bound -&gt; EpochNo -&gt; Bound
 EraParams -&gt; Bound -&gt; EpochNo -&gt; Bound
 </span><a href="Ouroboros.Consensus.HardFork.History.Summary.html#mkUpperBound"><span class="hs-identifier hs-var">History.mkUpperBound</span></a></span><span>
-</span><span id="line-210"></span><span>                         </span><span class="annot"><span class="annottext">EraParams
-</span><a href="#local-6989586621680012152"><span class="hs-identifier hs-var">eraParams</span></a></span><span>
-</span><span id="line-211"></span><span>                         </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Current LedgerState blk -&gt; Bound
+</span><span id="line-213"></span><span>                         </span><span class="annot"><span class="annottext">EraParams
+</span><a href="#local-6989586621679991018"><span class="hs-identifier hs-var">eraParams</span></a></span><span>
+</span><span id="line-214"></span><span>                         </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Current LedgerState blk -&gt; Bound
 forall (f :: * -&gt; *) blk. Current f blk -&gt; Bound
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#currentStart"><span class="hs-identifier hs-var hs-var">currentStart</span></a></span><span> </span><span class="annot"><span class="annottext">Current LedgerState blk
-</span><a href="#local-6989586621680012151"><span class="hs-identifier hs-var">cur</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-212"></span><span>                         </span><span class="annot"><span class="annottext">EpochNo
-</span><a href="#local-6989586621680012148"><span class="hs-identifier hs-var">transition</span></a></span><span>
-</span><span id="line-213"></span><span>        </span><span class="annot"><span class="annottext">Bool -&gt; Maybe ()
+</span><a href="#local-6989586621679991017"><span class="hs-identifier hs-var">cur</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-215"></span><span>                         </span><span class="annot"><span class="annottext">EpochNo
+</span><a href="#local-6989586621679991014"><span class="hs-identifier hs-var">transition</span></a></span><span>
+</span><span id="line-216"></span><span>        </span><span class="annot"><span class="annottext">Bool -&gt; Maybe ()
 forall (f :: * -&gt; *). Alternative f =&gt; Bool -&gt; f ()
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">guard</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SlotNo
-</span><a href="#local-6989586621680012174"><span class="hs-identifier hs-var">slot</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; SlotNo -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">guard</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">SlotNo
+</span><a href="#local-6989586621679991040"><span class="hs-identifier hs-var">slot</span></a></span><span> </span><span class="annot"><span class="annottext">SlotNo -&gt; SlotNo -&gt; Bool
 forall a. Ord a =&gt; a -&gt; a -&gt; Bool
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;=</span></a></span><span> </span><span class="annot"><span class="annottext">Bound -&gt; SlotNo
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;=</span></a></span><span> </span><span class="annot"><span class="annottext">Bound -&gt; SlotNo
 </span><a href="Ouroboros.Consensus.HardFork.History.Summary.html#boundSlot"><span class="hs-identifier hs-var hs-var">History.boundSlot</span></a></span><span> </span><span class="annot"><span class="annottext">Bound
-</span><a href="#local-6989586621680012147"><span class="hs-identifier hs-var">endBound</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-214"></span><span>        </span><span class="annot"><span class="annottext">Bound -&gt; Maybe Bound
+</span><a href="#local-6989586621679991013"><span class="hs-identifier hs-var">endBound</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-217"></span><span>        </span><span class="annot"><span class="annottext">Bound -&gt; Maybe Bound
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">Bound
-</span><a href="#local-6989586621680012147"><span class="hs-identifier hs-var">endBound</span></a></span><span>
-</span><span id="line-215"></span><span>
-</span><span id="line-216"></span><span>    </span><span id="local-6989586621680012320"><span id="local-6989586621680012321"><span class="annot"><a href="#local-6989586621680012162"><span class="hs-identifier hs-type">howExtend</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Translate"><span class="hs-identifier hs-type">Translate</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012321"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012320"><span class="hs-identifier hs-type">blk'</span></a></span><span>
-</span><span id="line-217"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Summary.html#Bound"><span class="hs-identifier hs-type">History.Bound</span></a></span><span>
-</span><span id="line-218"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Current"><span class="hs-identifier hs-type">Current</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012321"><span class="hs-identifier hs-type">blk</span></a></span><span>
-</span><span id="line-219"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">K</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Past"><span class="hs-identifier hs-type">Past</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012321"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Current"><span class="hs-identifier hs-type">Current</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621680012320"><span class="hs-identifier hs-type">blk'</span></a></span><span class="hs-special">)</span></span></span><span>
-</span><span id="line-220"></span><span>    </span><span id="local-6989586621680012162"><span class="annot"><span class="annottext">howExtend :: Translate LedgerState blk blk'
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">return</span></a></span><span> </span><span class="annot"><span class="annottext">Bound
+</span><a href="#local-6989586621679991013"><span class="hs-identifier hs-var">endBound</span></a></span><span>
+</span><span id="line-218"></span><span>
+</span><span id="line-219"></span><span>    </span><span id="local-6989586621679991186"><span id="local-6989586621679991187"><span class="annot"><a href="#local-6989586621679991028"><span class="hs-identifier hs-type">howExtend</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Translate"><span class="hs-identifier hs-type">Translate</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991187"><span class="hs-identifier hs-type">blk</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991186"><span class="hs-identifier hs-type">blk'</span></a></span><span>
+</span><span id="line-220"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.History.Summary.html#Bound"><span class="hs-identifier hs-type">History.Bound</span></a></span><span>
+</span><span id="line-221"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Current"><span class="hs-identifier hs-type">Current</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991187"><span class="hs-identifier hs-type">blk</span></a></span><span>
+</span><span id="line-222"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">K</span></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Past"><span class="hs-identifier hs-type">Past</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991187"><span class="hs-identifier hs-type">blk</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Current"><span class="hs-identifier hs-type">Current</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679991186"><span class="hs-identifier hs-type">blk'</span></a></span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-223"></span><span>    </span><span id="local-6989586621679991028"><span class="annot"><span class="annottext">howExtend :: Translate LedgerState blk blk'
 -&gt; Bound
 -&gt; Current LedgerState blk
 -&gt; (K Past blk, Current LedgerState blk')
-</span><a href="#local-6989586621680012162"><span class="hs-identifier hs-var hs-var">howExtend</span></a></span></span><span> </span><span id="local-6989586621680012144"><span class="annot"><span class="annottext">Translate LedgerState blk blk'
-</span><a href="#local-6989586621680012144"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621680012143"><span class="annot"><span class="annottext">Bound
-</span><a href="#local-6989586621680012143"><span class="hs-identifier hs-var">currentEnd</span></a></span></span><span> </span><span id="local-6989586621680012142"><span class="annot"><span class="annottext">Current LedgerState blk
-</span><a href="#local-6989586621680012142"><span class="hs-identifier hs-var">cur</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span>
-</span><span id="line-221"></span><span>          </span><span class="annot"><span class="annottext">Past -&gt; K Past blk
+</span><a href="#local-6989586621679991028"><span class="hs-identifier hs-var hs-var">howExtend</span></a></span></span><span> </span><span id="local-6989586621679991010"><span class="annot"><span class="annottext">Translate LedgerState blk blk'
+</span><a href="#local-6989586621679991010"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679991009"><span class="annot"><span class="annottext">Bound
+</span><a href="#local-6989586621679991009"><span class="hs-identifier hs-var">currentEnd</span></a></span></span><span> </span><span id="local-6989586621679991008"><span class="annot"><span class="annottext">Current LedgerState blk
+</span><a href="#local-6989586621679991008"><span class="hs-identifier hs-var">cur</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-224"></span><span>          </span><span class="annot"><span class="annottext">Past -&gt; K Past blk
 forall k a (b :: k). a -&gt; K a b
 </span><span class="hs-identifier hs-var">K</span></span><span> </span><span class="annot"><span class="annottext">Past :: Bound -&gt; Bound -&gt; Past
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Past"><span class="hs-identifier hs-type">Past</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-222"></span><span>              </span><span class="annot"><span class="annottext">pastStart :: Bound
+</span><span id="line-225"></span><span>              </span><span class="annot"><span class="annottext">pastStart :: Bound
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#pastStart"><span class="hs-identifier hs-var">pastStart</span></a></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Current LedgerState blk -&gt; Bound
 forall (f :: * -&gt; *) blk. Current f blk -&gt; Bound
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#currentStart"><span class="hs-identifier hs-var hs-var">currentStart</span></a></span><span> </span><span class="annot"><span class="annottext">Current LedgerState blk
-</span><a href="#local-6989586621680012142"><span class="hs-identifier hs-var">cur</span></a></span><span>
-</span><span id="line-223"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">pastEnd :: Bound
+</span><a href="#local-6989586621679991008"><span class="hs-identifier hs-var">cur</span></a></span><span>
+</span><span id="line-226"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">pastEnd :: Bound
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#pastEnd"><span class="hs-identifier hs-var">pastEnd</span></a></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bound
-</span><a href="#local-6989586621680012143"><span class="hs-identifier hs-var">currentEnd</span></a></span><span>
-</span><span id="line-224"></span><span>            </span><span class="hs-special">}</span><span>
-</span><span id="line-225"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Current :: forall (f :: * -&gt; *) blk. Bound -&gt; f blk -&gt; Current f blk
+</span><a href="#local-6989586621679991009"><span class="hs-identifier hs-var">currentEnd</span></a></span><span>
+</span><span id="line-227"></span><span>            </span><span class="hs-special">}</span><span>
+</span><span id="line-228"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Current :: forall (f :: * -&gt; *) blk. Bound -&gt; f blk -&gt; Current f blk
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Current"><span class="hs-identifier hs-type">Current</span></a></span><span> </span><span class="hs-special">{</span><span>
-</span><span id="line-226"></span><span>              </span><span class="annot"><span class="annottext">currentStart :: Bound
+</span><span id="line-229"></span><span>              </span><span class="annot"><span class="annottext">currentStart :: Bound
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#currentStart"><span class="hs-identifier hs-var">currentStart</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bound
-</span><a href="#local-6989586621680012143"><span class="hs-identifier hs-var">currentEnd</span></a></span><span>
-</span><span id="line-227"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">currentState :: LedgerState blk'
+</span><a href="#local-6989586621679991009"><span class="hs-identifier hs-var">currentEnd</span></a></span><span>
+</span><span id="line-230"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">currentState :: LedgerState blk'
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#currentState"><span class="hs-identifier hs-var">currentState</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Translate LedgerState blk blk'
 -&gt; EpochNo -&gt; LedgerState blk -&gt; LedgerState blk'
 forall (f :: * -&gt; *) x y. Translate f x y -&gt; EpochNo -&gt; f x -&gt; f y
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#translateWith"><span class="hs-identifier hs-var hs-var">translateWith</span></a></span><span> </span><span class="annot"><span class="annottext">Translate LedgerState blk blk'
-</span><a href="#local-6989586621680012144"><span class="hs-identifier hs-var">f</span></a></span><span>
-</span><span id="line-228"></span><span>                               </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bound -&gt; EpochNo
+</span><a href="#local-6989586621679991010"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-231"></span><span>                               </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bound -&gt; EpochNo
 </span><a href="Ouroboros.Consensus.HardFork.History.Summary.html#boundEpoch"><span class="hs-identifier hs-var hs-var">History.boundEpoch</span></a></span><span> </span><span class="annot"><span class="annottext">Bound
-</span><a href="#local-6989586621680012143"><span class="hs-identifier hs-var">currentEnd</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-229"></span><span>                               </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Current LedgerState blk -&gt; LedgerState blk
+</span><a href="#local-6989586621679991009"><span class="hs-identifier hs-var">currentEnd</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-232"></span><span>                               </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Current LedgerState blk -&gt; LedgerState blk
 forall (f :: * -&gt; *) blk. Current f blk -&gt; f blk
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#currentState"><span class="hs-identifier hs-var hs-var">currentState</span></a></span><span> </span><span class="annot"><span class="annottext">Current LedgerState blk
-</span><a href="#local-6989586621680012142"><span class="hs-identifier hs-var">cur</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-230"></span><span>            </span><span class="hs-special">}</span><span>
-</span><span id="line-231"></span><span>        </span><span class="hs-special">)</span><span>
-</span><span id="line-232"></span><span>
-</span><span id="line-233"></span><span>    </span><span class="annot"><a href="#local-6989586621680012161"><span class="hs-identifier hs-type">translate</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Util.InPairs.html#InPairs"><span class="hs-identifier hs-type">InPairs</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Translate"><span class="hs-identifier hs-type">Translate</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="#local-6989586621680012178"><span class="hs-identifier hs-type">xs</span></a></span><span>
-</span><span id="line-234"></span><span>    </span><span id="local-6989586621680012161"><span class="annot"><span class="annottext">translate :: InPairs (Translate LedgerState) xs
-</span><a href="#local-6989586621680012161"><span class="hs-identifier hs-var hs-var">translate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NP WrapLedgerConfig xs
+</span><a href="#local-6989586621679991008"><span class="hs-identifier hs-var">cur</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-233"></span><span>            </span><span class="hs-special">}</span><span>
+</span><span id="line-234"></span><span>        </span><span class="hs-special">)</span><span>
+</span><span id="line-235"></span><span>
+</span><span id="line-236"></span><span>    </span><span class="annot"><a href="#local-6989586621679991027"><span class="hs-identifier hs-type">translate</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.Util.InPairs.html#InPairs"><span class="hs-identifier hs-type">InPairs</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.HardFork.Combinator.State.Types.html#Translate"><span class="hs-identifier hs-type">Translate</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Ledger.Basics.html#LedgerState"><span class="hs-identifier hs-type">LedgerState</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="#local-6989586621679991044"><span class="hs-identifier hs-type">xs</span></a></span><span>
+</span><span id="line-237"></span><span>    </span><span id="local-6989586621679991027"><span class="annot"><span class="annottext">translate :: InPairs (Translate LedgerState) xs
+</span><a href="#local-6989586621679991027"><span class="hs-identifier hs-var hs-var">translate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NP WrapLedgerConfig xs
 -&gt; InPairs
      (RequiringBoth WrapLedgerConfig (Translate LedgerState)) xs
 -&gt; InPairs (Translate LedgerState) xs
 forall k (h :: k -&gt; *) (xs :: [k]) (f :: k -&gt; k -&gt; *).
 NP h xs -&gt; InPairs (RequiringBoth h f) xs -&gt; InPairs f xs
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.Util.InPairs.html#requiringBoth"><span class="hs-identifier hs-var">InPairs.requiringBoth</span></a></span><span> </span><span class="annot"><span class="annottext">NP WrapLedgerConfig xs
-</span><a href="#local-6989586621680012156"><span class="hs-identifier hs-var">cfgs</span></a></span><span> </span><span class="annot"><span class="annottext">(InPairs
+</span><a href="#local-6989586621679991022"><span class="hs-identifier hs-var">cfgs</span></a></span><span> </span><span class="annot"><span class="annottext">(InPairs
    (RequiringBoth WrapLedgerConfig (Translate LedgerState)) xs
  -&gt; InPairs (Translate LedgerState) xs)
 -&gt; InPairs
      (RequiringBoth WrapLedgerConfig (Translate LedgerState)) xs
 -&gt; InPairs (Translate LedgerState) xs
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
-</span><span id="line-235"></span><span>                  </span><span class="annot"><span class="annottext">EraTranslation xs
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span>
+</span><span id="line-238"></span><span>                  </span><span class="annot"><span class="annottext">EraTranslation xs
 -&gt; InPairs
      (RequiringBoth WrapLedgerConfig (Translate LedgerState)) xs
 forall (xs :: [*]).
@@ -874,4 +877,4 @@ EraTranslation xs
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.Translation.html#translateLedgerState"><span class="hs-identifier hs-var hs-var">translateLedgerState</span></a></span><span> </span><span class="annot"><span class="annottext">EraTranslation xs
 forall (xs :: [*]). CanHardFork xs =&gt; EraTranslation xs
 </span><a href="Ouroboros.Consensus.HardFork.Combinator.Abstract.CanHardFork.html#hardForkEraTranslation"><span class="hs-identifier hs-var">hardForkEraTranslation</span></a></span><span>
-</span><span id="line-236"></span></pre></body></html>
+</span><span id="line-239"></span></pre></body></html>

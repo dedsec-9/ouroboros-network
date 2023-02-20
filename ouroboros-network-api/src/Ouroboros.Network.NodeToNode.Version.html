@@ -1,0 +1,570 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="%24maxtag_Jl4s2HJoRRTDkSWu0vXbig"><span id="%24tag2con_Jl4s2HJoRRTDkSWu0vXbig"><span id="%24con2tag_Jl4s2HJoRRTDkSWu0vXbig"><span id="%24con2tag_GEGEj0AW5uhAXgK9mOCKyi"></span></span></span></span><span class="hs-pragma">{-# LANGUAGE NamedFieldPuns #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.NodeToNode.Version</span><span>
+</span><span id="line-4"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeVersion"><span class="hs-identifier">NodeToNodeVersion</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-5"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeVersionData"><span class="hs-identifier">NodeToNodeVersionData</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-6"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#DiffusionMode"><span class="hs-identifier">DiffusionMode</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-7"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#ConnectionMode"><span class="hs-identifier">ConnectionMode</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-8"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#nodeToNodeVersionCodec"><span class="hs-identifier">nodeToNodeVersionCodec</span></a></span><span>
+</span><span id="line-9"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#nodeToNodeCodecCBORTerm"><span class="hs-identifier">nodeToNodeCodecCBORTerm</span></a></span><span>
+</span><span id="line-10"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#isPipeliningEnabled"><span class="hs-identifier">isPipeliningEnabled</span></a></span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/text-1.2.4.1/src"><span class="hs-identifier">Data.Text</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/text-1.2.4.1/src"><span class="hs-identifier">Text</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/text-1.2.4.1/src"><span class="hs-identifier">Data.Text</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">T</span></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Typeable</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Typeable</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Codec.CBOR.Term</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">CBOR</span></span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html"><span class="hs-identifier">Ouroboros.Network.BlockFetch.ConsensusInterface</span></a></span><span>
+</span><span id="line-20"></span><span>                     </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#WhetherReceivingTentativeBlocks"><span class="hs-identifier">WhetherReceivingTentativeBlocks</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.CodecCBORTerm.html"><span class="hs-identifier">Ouroboros.Network.CodecCBORTerm</span></a></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.Handshake.Acceptable.html"><span class="hs-identifier">Ouroboros.Network.Handshake.Acceptable</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Handshake.Acceptable.html#Accept"><span class="hs-identifier">Accept</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-23"></span><span>                     </span><span class="annot"><a href="Ouroboros.Network.Handshake.Acceptable.html#Acceptable"><span class="hs-identifier">Acceptable</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.Magic.html"><span class="hs-identifier">Ouroboros.Network.Magic</span></a></span><span>
+</span><span id="line-25"></span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span class="hs-comment">-- | Enumeration of node to node protocol versions.</span><span>
+</span><span id="line-28"></span><span class="hs-comment">--</span><span>
+</span><span id="line-29"></span><span class="hs-keyword">data</span><span> </span><span id="NodeToNodeVersion"><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeVersion"><span class="hs-identifier hs-var">NodeToNodeVersion</span></a></span></span><span>
+</span><span id="line-30"></span><span>    </span><span class="hs-glyph">=</span><span> </span><span id="NodeToNodeV_7"><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeV_7"><span class="hs-identifier hs-var">NodeToNodeV_7</span></a></span></span><span>
+</span><span id="line-31"></span><span>    </span><span class="hs-comment">-- ^ Changes:</span><span>
+</span><span id="line-32"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-33"></span><span>    </span><span class="hs-comment">-- * new 'KeepAlive' codec</span><span>
+</span><span id="line-34"></span><span>    </span><span class="hs-comment">-- * Enable @CardanoNodeToNodeVersion5@, i.e., Alonzo</span><span>
+</span><span id="line-35"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="NodeToNodeV_8"><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeV_8"><span class="hs-identifier hs-var">NodeToNodeV_8</span></a></span></span><span>
+</span><span id="line-36"></span><span>    </span><span class="hs-comment">-- ^ Changes:</span><span>
+</span><span id="line-37"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-38"></span><span>    </span><span class="hs-comment">-- * Enable block diffusion pipelining in ChainSync and BlockFetch logic.</span><span>
+</span><span id="line-39"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="NodeToNodeV_9"><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeV_9"><span class="hs-identifier hs-var">NodeToNodeV_9</span></a></span></span><span>
+</span><span id="line-40"></span><span>    </span><span class="hs-comment">-- ^ Changes:</span><span>
+</span><span id="line-41"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-42"></span><span>    </span><span class="hs-comment">-- * Enable @CardanoNodeToNodeVersion6@, i.e., Babbage</span><span>
+</span><span id="line-43"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="NodeToNodeV_10"><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeV_10"><span class="hs-identifier hs-var">NodeToNodeV_10</span></a></span></span><span>
+</span><span id="line-44"></span><span>    </span><span class="hs-comment">-- ^ Changes:</span><span>
+</span><span id="line-45"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-46"></span><span>    </span><span class="hs-comment">-- * Enable full duplex connections.</span><span>
+</span><span id="line-47"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="NodeToNodeV_11"><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeV_11"><span class="hs-identifier hs-var">NodeToNodeV_11</span></a></span></span><span>
+</span><span id="line-48"></span><span>    </span><span class="hs-comment">-- ^ Changes:</span><span>
+</span><span id="line-49"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-50"></span><span>    </span><span class="hs-comment">-- * Enable @CardanoNodeToNodeVersion7@, i.e., Conway</span><span>
+</span><span id="line-51"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679130174"><span id="local-6989586621679130176"><span class="annot"><span class="annottext">NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Bool
+(NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Bool)
+-&gt; (NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Bool)
+-&gt; Eq NodeToNodeVersion
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Bool
+$c/= :: NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Bool
+== :: NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Bool
+$c== :: NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679130158"><span id="local-6989586621679130160"><span id="local-6989586621679130162"><span id="local-6989586621679130164"><span id="local-6989586621679130166"><span id="local-6989586621679130168"><span id="local-6989586621679130170"><span class="annot"><span class="annottext">Eq NodeToNodeVersion
+Eq NodeToNodeVersion
+-&gt; (NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Ordering)
+-&gt; (NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Bool)
+-&gt; (NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Bool)
+-&gt; (NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Bool)
+-&gt; (NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Bool)
+-&gt; (NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; NodeToNodeVersion)
+-&gt; (NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; NodeToNodeVersion)
+-&gt; Ord NodeToNodeVersion
+NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Bool
+NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Ordering
+NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; NodeToNodeVersion
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; NodeToNodeVersion
+$cmin :: NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; NodeToNodeVersion
+max :: NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; NodeToNodeVersion
+$cmax :: NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; NodeToNodeVersion
+&gt;= :: NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Bool
+$c&gt;= :: NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Bool
+&gt; :: NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Bool
+$c&gt; :: NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Bool
+&lt;= :: NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Bool
+$c&lt;= :: NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Bool
+&lt; :: NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Bool
+$c&lt; :: NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Bool
+compare :: NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Ordering
+$ccompare :: NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Ordering
+$cp1Ord :: Eq NodeToNodeVersion
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></a></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679130141"><span id="local-6989586621679130143"><span id="local-6989586621679130145"><span id="local-6989586621679130147"><span id="local-6989586621679130149"><span id="local-6989586621679130151"><span id="local-6989586621679130153"><span id="local-6989586621679130155"><span class="annot"><span class="annottext">Int -&gt; NodeToNodeVersion
+NodeToNodeVersion -&gt; Int
+NodeToNodeVersion -&gt; [NodeToNodeVersion]
+NodeToNodeVersion -&gt; NodeToNodeVersion
+NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; [NodeToNodeVersion]
+NodeToNodeVersion
+-&gt; NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; [NodeToNodeVersion]
+(NodeToNodeVersion -&gt; NodeToNodeVersion)
+-&gt; (NodeToNodeVersion -&gt; NodeToNodeVersion)
+-&gt; (Int -&gt; NodeToNodeVersion)
+-&gt; (NodeToNodeVersion -&gt; Int)
+-&gt; (NodeToNodeVersion -&gt; [NodeToNodeVersion])
+-&gt; (NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; [NodeToNodeVersion])
+-&gt; (NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; [NodeToNodeVersion])
+-&gt; (NodeToNodeVersion
+    -&gt; NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; [NodeToNodeVersion])
+-&gt; Enum NodeToNodeVersion
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+enumFromThenTo :: NodeToNodeVersion
+-&gt; NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; [NodeToNodeVersion]
+$cenumFromThenTo :: NodeToNodeVersion
+-&gt; NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; [NodeToNodeVersion]
+enumFromTo :: NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; [NodeToNodeVersion]
+$cenumFromTo :: NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; [NodeToNodeVersion]
+enumFromThen :: NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; [NodeToNodeVersion]
+$cenumFromThen :: NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; [NodeToNodeVersion]
+enumFrom :: NodeToNodeVersion -&gt; [NodeToNodeVersion]
+$cenumFrom :: NodeToNodeVersion -&gt; [NodeToNodeVersion]
+fromEnum :: NodeToNodeVersion -&gt; Int
+$cfromEnum :: NodeToNodeVersion -&gt; Int
+toEnum :: Int -&gt; NodeToNodeVersion
+$ctoEnum :: Int -&gt; NodeToNodeVersion
+pred :: NodeToNodeVersion -&gt; NodeToNodeVersion
+$cpred :: NodeToNodeVersion -&gt; NodeToNodeVersion
+succ :: NodeToNodeVersion -&gt; NodeToNodeVersion
+$csucc :: NodeToNodeVersion -&gt; NodeToNodeVersion
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></a></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679130136"><span id="local-6989586621679130138"><span class="annot"><span class="annottext">NodeToNodeVersion
+NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Bounded NodeToNodeVersion
+forall a. a -&gt; a -&gt; Bounded a
+maxBound :: NodeToNodeVersion
+$cmaxBound :: NodeToNodeVersion
+minBound :: NodeToNodeVersion
+$cminBound :: NodeToNodeVersion
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Bounded</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679130129"><span id="local-6989586621679130131"><span id="local-6989586621679130133"><span class="annot"><span class="annottext">Int -&gt; NodeToNodeVersion -&gt; ShowS
+[NodeToNodeVersion] -&gt; ShowS
+NodeToNodeVersion -&gt; String
+(Int -&gt; NodeToNodeVersion -&gt; ShowS)
+-&gt; (NodeToNodeVersion -&gt; String)
+-&gt; ([NodeToNodeVersion] -&gt; ShowS)
+-&gt; Show NodeToNodeVersion
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [NodeToNodeVersion] -&gt; ShowS
+$cshowList :: [NodeToNodeVersion] -&gt; ShowS
+show :: NodeToNodeVersion -&gt; String
+$cshow :: NodeToNodeVersion -&gt; String
+showsPrec :: Int -&gt; NodeToNodeVersion -&gt; ShowS
+$cshowsPrec :: Int -&gt; NodeToNodeVersion -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Typeable</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-52"></span><span>
+</span><span id="line-53"></span><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#nodeToNodeVersionCodec"><span class="hs-identifier hs-type">nodeToNodeVersionCodec</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.CodecCBORTerm.html#CodecCBORTerm"><span class="hs-identifier hs-type">CodecCBORTerm</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-type">Text</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Maybe</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Int</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeVersion"><span class="hs-identifier hs-type">NodeToNodeVersion</span></a></span><span>
+</span><span id="line-54"></span><span id="nodeToNodeVersionCodec"><span class="annot"><span class="annottext">nodeToNodeVersionCodec :: CodecCBORTerm (Text, Maybe Int) NodeToNodeVersion
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#nodeToNodeVersionCodec"><span class="hs-identifier hs-var hs-var">nodeToNodeVersionCodec</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">CodecCBORTerm :: forall fail a.
+(a -&gt; Term) -&gt; (Term -&gt; Either fail a) -&gt; CodecCBORTerm fail a
+</span><a href="Ouroboros.Network.CodecCBORTerm.html#CodecCBORTerm"><span class="hs-identifier hs-type">CodecCBORTerm</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersion -&gt; Term
+encodeTerm :: NodeToNodeVersion -&gt; Term
+encodeTerm :: NodeToNodeVersion -&gt; Term
+</span><a href="Ouroboros.Network.CodecCBORTerm.html#encodeTerm"><span class="hs-identifier hs-var hs-var">encodeTerm</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term -&gt; Either (Text, Maybe Int) NodeToNodeVersion
+decodeTerm :: Term -&gt; Either (Text, Maybe Int) NodeToNodeVersion
+decodeTerm :: Term -&gt; Either (Text, Maybe Int) NodeToNodeVersion
+</span><a href="Ouroboros.Network.CodecCBORTerm.html#decodeTerm"><span class="hs-identifier hs-var hs-var">decodeTerm</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-56"></span><span>    </span><span id="local-6989586621679130126"><span class="annot"><span class="annottext">encodeTerm :: NodeToNodeVersion -&gt; Term
+</span><a href="#local-6989586621679130126"><span class="hs-identifier hs-var hs-var">encodeTerm</span></a></span></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersion
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeV_7"><span class="hs-identifier hs-var">NodeToNodeV_7</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Term
+</span><span class="hs-identifier hs-var">CBOR.TInt</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">7</span></span><span>
+</span><span id="line-57"></span><span>    </span><span class="annot"><a href="#local-6989586621679130126"><span class="hs-identifier hs-var">encodeTerm</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersion
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeV_8"><span class="hs-identifier hs-var">NodeToNodeV_8</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Term
+</span><span class="hs-identifier hs-var">CBOR.TInt</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">8</span></span><span>
+</span><span id="line-58"></span><span>    </span><span class="annot"><a href="#local-6989586621679130126"><span class="hs-identifier hs-var">encodeTerm</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersion
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeV_9"><span class="hs-identifier hs-var">NodeToNodeV_9</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Term
+</span><span class="hs-identifier hs-var">CBOR.TInt</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">9</span></span><span>
+</span><span id="line-59"></span><span>    </span><span class="annot"><a href="#local-6989586621679130126"><span class="hs-identifier hs-var">encodeTerm</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersion
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeV_10"><span class="hs-identifier hs-var">NodeToNodeV_10</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Term
+</span><span class="hs-identifier hs-var">CBOR.TInt</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">10</span></span><span>
+</span><span id="line-60"></span><span>    </span><span class="annot"><a href="#local-6989586621679130126"><span class="hs-identifier hs-var">encodeTerm</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersion
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeV_11"><span class="hs-identifier hs-var">NodeToNodeV_11</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Term
+</span><span class="hs-identifier hs-var">CBOR.TInt</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">11</span></span><span>
+</span><span id="line-61"></span><span>
+</span><span id="line-62"></span><span>    </span><span id="local-6989586621679130124"><span class="annot"><span class="annottext">decodeTerm :: Term -&gt; Either (Text, Maybe Int) NodeToNodeVersion
+</span><a href="#local-6989586621679130124"><span class="hs-identifier hs-var hs-var">decodeTerm</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CBOR.TInt</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">7</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersion -&gt; Either (Text, Maybe Int) NodeToNodeVersion
+forall a b. b -&gt; Either a b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Right</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersion
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeV_7"><span class="hs-identifier hs-var">NodeToNodeV_7</span></a></span><span>
+</span><span id="line-63"></span><span>    </span><span class="annot"><a href="#local-6989586621679130124"><span class="hs-identifier hs-var">decodeTerm</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CBOR.TInt</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">8</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersion -&gt; Either (Text, Maybe Int) NodeToNodeVersion
+forall a b. b -&gt; Either a b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Right</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersion
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeV_8"><span class="hs-identifier hs-var">NodeToNodeV_8</span></a></span><span>
+</span><span id="line-64"></span><span>    </span><span class="annot"><a href="#local-6989586621679130124"><span class="hs-identifier hs-var">decodeTerm</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CBOR.TInt</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">9</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersion -&gt; Either (Text, Maybe Int) NodeToNodeVersion
+forall a b. b -&gt; Either a b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Right</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersion
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeV_9"><span class="hs-identifier hs-var">NodeToNodeV_9</span></a></span><span>
+</span><span id="line-65"></span><span>    </span><span class="annot"><a href="#local-6989586621679130124"><span class="hs-identifier hs-var">decodeTerm</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CBOR.TInt</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">10</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersion -&gt; Either (Text, Maybe Int) NodeToNodeVersion
+forall a b. b -&gt; Either a b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Right</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersion
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeV_10"><span class="hs-identifier hs-var">NodeToNodeV_10</span></a></span><span>
+</span><span id="line-66"></span><span>    </span><span class="annot"><a href="#local-6989586621679130124"><span class="hs-identifier hs-var">decodeTerm</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CBOR.TInt</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">11</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersion -&gt; Either (Text, Maybe Int) NodeToNodeVersion
+forall a b. b -&gt; Either a b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Right</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersion
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeV_11"><span class="hs-identifier hs-var">NodeToNodeV_11</span></a></span><span>
+</span><span id="line-67"></span><span>    </span><span class="annot"><a href="#local-6989586621679130124"><span class="hs-identifier hs-var">decodeTerm</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CBOR.TInt</span></span><span> </span><span id="local-6989586621679130121"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679130121"><span class="hs-identifier hs-var">n</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text, Maybe Int) -&gt; Either (Text, Maybe Int) NodeToNodeVersion
+forall a b. a -&gt; Either a b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Left</span></a></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">String -&gt; Text
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-var">T.pack</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;decode NodeToNodeVersion: unknonw tag: &quot;</span></span><span>
+</span><span id="line-68"></span><span>                                        </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; Text
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-var">T.pack</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679130121"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-69"></span><span>                                    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Maybe Int
+forall a. a -&gt; Maybe a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Just</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679130121"><span class="hs-identifier hs-var">n</span></a></span><span>
+</span><span id="line-70"></span><span>                                    </span><span class="hs-special">)</span><span>
+</span><span id="line-71"></span><span>    </span><span class="annot"><a href="#local-6989586621679130124"><span class="hs-identifier hs-var">decodeTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Term
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text, Maybe Int) -&gt; Either (Text, Maybe Int) NodeToNodeVersion
+forall a b. a -&gt; Either a b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Left</span></a></span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">String -&gt; Text
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-var">T.pack</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;decode NodeToNodeVersion: unexpected term&quot;</span></span><span>
+</span><span id="line-72"></span><span>                        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Maybe Int
+forall a. Maybe a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Nothing</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-73"></span><span>
+</span><span id="line-74"></span><span>
+</span><span id="line-75"></span><span>
+</span><span id="line-76"></span><span class="hs-comment">-- | The flag which indicates whether the node runs only initiator or both</span><span>
+</span><span id="line-77"></span><span class="hs-comment">-- initiator or responder node.</span><span>
+</span><span id="line-78"></span><span class="hs-comment">--</span><span>
+</span><span id="line-79"></span><span class="hs-comment">-- This data structure has two proposes:</span><span>
+</span><span id="line-80"></span><span class="hs-comment">--</span><span>
+</span><span id="line-81"></span><span class="hs-comment">-- * instruct the diffusion layer if it should listen on incoming connections;</span><span>
+</span><span id="line-82"></span><span class="hs-comment">--</span><span>
+</span><span id="line-83"></span><span class="hs-comment">-- * it is communicated via 'NodeToNodeVersionData' during handshake</span><span>
+</span><span id="line-84"></span><span class="hs-comment">--   negotiation. In non-p2p mode we always send 'InitiatorOnlyDiffusionMode',</span><span>
+</span><span id="line-85"></span><span class="hs-comment">--   in p2p mode we send exactly what the diffusion is given.  In non-p2p mode</span><span>
+</span><span id="line-86"></span><span class="hs-comment">--   every connection outbound port is ephemeral, the remote side cannot connect</span><span>
+</span><span id="line-87"></span><span class="hs-comment">--   to it, however in p2p mode the outbound port is actually the port on which</span><span>
+</span><span id="line-88"></span><span class="hs-comment">--   the node is listening (if it runs in 'InitiatorAndResponderDiffusionMode').</span><span>
+</span><span id="line-89"></span><span class="hs-comment">--</span><span>
+</span><span id="line-90"></span><span class="hs-keyword">data</span><span> </span><span id="DiffusionMode"><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#DiffusionMode"><span class="hs-identifier hs-var">DiffusionMode</span></a></span></span><span>
+</span><span id="line-91"></span><span>    </span><span class="hs-glyph">=</span><span> </span><span id="InitiatorOnlyDiffusionMode"><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#InitiatorOnlyDiffusionMode"><span class="hs-identifier hs-var">InitiatorOnlyDiffusionMode</span></a></span></span><span>
+</span><span id="line-92"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span id="InitiatorAndResponderDiffusionMode"><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#InitiatorAndResponderDiffusionMode"><span class="hs-identifier hs-var">InitiatorAndResponderDiffusionMode</span></a></span></span><span>
+</span><span id="line-93"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Typeable</span></a></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679130113"><span id="local-6989586621679130115"><span class="annot"><span class="annottext">DiffusionMode -&gt; DiffusionMode -&gt; Bool
+(DiffusionMode -&gt; DiffusionMode -&gt; Bool)
+-&gt; (DiffusionMode -&gt; DiffusionMode -&gt; Bool) -&gt; Eq DiffusionMode
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: DiffusionMode -&gt; DiffusionMode -&gt; Bool
+$c/= :: DiffusionMode -&gt; DiffusionMode -&gt; Bool
+== :: DiffusionMode -&gt; DiffusionMode -&gt; Bool
+$c== :: DiffusionMode -&gt; DiffusionMode -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679130098"><span id="local-6989586621679130100"><span id="local-6989586621679130102"><span id="local-6989586621679130104"><span id="local-6989586621679130106"><span id="local-6989586621679130108"><span id="local-6989586621679130110"><span class="annot"><span class="annottext">Eq DiffusionMode
+Eq DiffusionMode
+-&gt; (DiffusionMode -&gt; DiffusionMode -&gt; Ordering)
+-&gt; (DiffusionMode -&gt; DiffusionMode -&gt; Bool)
+-&gt; (DiffusionMode -&gt; DiffusionMode -&gt; Bool)
+-&gt; (DiffusionMode -&gt; DiffusionMode -&gt; Bool)
+-&gt; (DiffusionMode -&gt; DiffusionMode -&gt; Bool)
+-&gt; (DiffusionMode -&gt; DiffusionMode -&gt; DiffusionMode)
+-&gt; (DiffusionMode -&gt; DiffusionMode -&gt; DiffusionMode)
+-&gt; Ord DiffusionMode
+DiffusionMode -&gt; DiffusionMode -&gt; Bool
+DiffusionMode -&gt; DiffusionMode -&gt; Ordering
+DiffusionMode -&gt; DiffusionMode -&gt; DiffusionMode
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: DiffusionMode -&gt; DiffusionMode -&gt; DiffusionMode
+$cmin :: DiffusionMode -&gt; DiffusionMode -&gt; DiffusionMode
+max :: DiffusionMode -&gt; DiffusionMode -&gt; DiffusionMode
+$cmax :: DiffusionMode -&gt; DiffusionMode -&gt; DiffusionMode
+&gt;= :: DiffusionMode -&gt; DiffusionMode -&gt; Bool
+$c&gt;= :: DiffusionMode -&gt; DiffusionMode -&gt; Bool
+&gt; :: DiffusionMode -&gt; DiffusionMode -&gt; Bool
+$c&gt; :: DiffusionMode -&gt; DiffusionMode -&gt; Bool
+&lt;= :: DiffusionMode -&gt; DiffusionMode -&gt; Bool
+$c&lt;= :: DiffusionMode -&gt; DiffusionMode -&gt; Bool
+&lt; :: DiffusionMode -&gt; DiffusionMode -&gt; Bool
+$c&lt; :: DiffusionMode -&gt; DiffusionMode -&gt; Bool
+compare :: DiffusionMode -&gt; DiffusionMode -&gt; Ordering
+$ccompare :: DiffusionMode -&gt; DiffusionMode -&gt; Ordering
+$cp1Ord :: Eq DiffusionMode
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></a></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679130092"><span id="local-6989586621679130094"><span id="local-6989586621679130096"><span class="annot"><span class="annottext">Int -&gt; DiffusionMode -&gt; ShowS
+[DiffusionMode] -&gt; ShowS
+DiffusionMode -&gt; String
+(Int -&gt; DiffusionMode -&gt; ShowS)
+-&gt; (DiffusionMode -&gt; String)
+-&gt; ([DiffusionMode] -&gt; ShowS)
+-&gt; Show DiffusionMode
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [DiffusionMode] -&gt; ShowS
+$cshowList :: [DiffusionMode] -&gt; ShowS
+show :: DiffusionMode -&gt; String
+$cshow :: DiffusionMode -&gt; String
+showsPrec :: Int -&gt; DiffusionMode -&gt; ShowS
+$cshowsPrec :: Int -&gt; DiffusionMode -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-94"></span><span>
+</span><span id="line-95"></span><span>
+</span><span id="line-96"></span><span class="hs-comment">-- | Version data for NodeToNode protocol</span><span>
+</span><span id="line-97"></span><span class="hs-comment">--</span><span>
+</span><span id="line-98"></span><span class="hs-keyword">data</span><span> </span><span id="NodeToNodeVersionData"><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeVersionData"><span class="hs-identifier hs-var">NodeToNodeVersionData</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="NodeToNodeVersionData"><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeVersionData"><span class="hs-identifier hs-var">NodeToNodeVersionData</span></a></span></span><span>
+</span><span id="line-99"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="networkMagic"><span class="annot"><span class="annottext">NodeToNodeVersionData -&gt; NetworkMagic
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#networkMagic"><span class="hs-identifier hs-var hs-var">networkMagic</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="Ouroboros.Network.Magic.html#NetworkMagic"><span class="hs-identifier hs-type">NetworkMagic</span></a></span><span>
+</span><span id="line-100"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="diffusionMode"><span class="annot"><span class="annottext">NodeToNodeVersionData -&gt; DiffusionMode
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#diffusionMode"><span class="hs-identifier hs-var hs-var">diffusionMode</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#DiffusionMode"><span class="hs-identifier hs-type">DiffusionMode</span></a></span><span>
+</span><span id="line-101"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-102"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679130083"><span id="local-6989586621679130085"><span id="local-6989586621679130087"><span class="annot"><span class="annottext">Int -&gt; NodeToNodeVersionData -&gt; ShowS
+[NodeToNodeVersionData] -&gt; ShowS
+NodeToNodeVersionData -&gt; String
+(Int -&gt; NodeToNodeVersionData -&gt; ShowS)
+-&gt; (NodeToNodeVersionData -&gt; String)
+-&gt; ([NodeToNodeVersionData] -&gt; ShowS)
+-&gt; Show NodeToNodeVersionData
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [NodeToNodeVersionData] -&gt; ShowS
+$cshowList :: [NodeToNodeVersionData] -&gt; ShowS
+show :: NodeToNodeVersionData -&gt; String
+$cshow :: NodeToNodeVersionData -&gt; String
+showsPrec :: Int -&gt; NodeToNodeVersionData -&gt; ShowS
+$cshowsPrec :: Int -&gt; NodeToNodeVersionData -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Typeable</span></a></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679130079"><span id="local-6989586621679130081"><span class="annot"><span class="annottext">NodeToNodeVersionData -&gt; NodeToNodeVersionData -&gt; Bool
+(NodeToNodeVersionData -&gt; NodeToNodeVersionData -&gt; Bool)
+-&gt; (NodeToNodeVersionData -&gt; NodeToNodeVersionData -&gt; Bool)
+-&gt; Eq NodeToNodeVersionData
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: NodeToNodeVersionData -&gt; NodeToNodeVersionData -&gt; Bool
+$c/= :: NodeToNodeVersionData -&gt; NodeToNodeVersionData -&gt; Bool
+== :: NodeToNodeVersionData -&gt; NodeToNodeVersionData -&gt; Bool
+$c== :: NodeToNodeVersionData -&gt; NodeToNodeVersionData -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-103"></span><span>  </span><span class="hs-comment">-- 'Eq' instance is not provided, it is not what we need in version</span><span>
+</span><span id="line-104"></span><span>  </span><span class="hs-comment">-- negotiation (see 'Acceptable' instance below).</span><span>
+</span><span id="line-105"></span><span>
+</span><span id="line-106"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="Ouroboros.Network.Handshake.Acceptable.html#Acceptable"><span class="hs-identifier hs-type">Acceptable</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeVersionData"><span class="hs-identifier hs-type">NodeToNodeVersionData</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-107"></span><span>    </span><span class="hs-comment">-- | Check that both side use the same 'networkMagic'.  Choose smaller one</span><span>
+</span><span id="line-108"></span><span>    </span><span class="hs-comment">-- from both 'diffusionMode's, e.g. if one is running in 'InitiatorOnlyMode'</span><span>
+</span><span id="line-109"></span><span>    </span><span class="hs-comment">-- agree on it.</span><span>
+</span><span id="line-110"></span><span>    </span><span id="local-6989586621679130076"><span class="annot"><span class="annottext">acceptableVersion :: NodeToNodeVersionData
+-&gt; NodeToNodeVersionData -&gt; Accept NodeToNodeVersionData
+</span><a href="Ouroboros.Network.Handshake.Acceptable.html#acceptableVersion"><span class="hs-identifier hs-var hs-var hs-var hs-var">acceptableVersion</span></a></span></span><span> </span><span id="local-6989586621679130074"><span class="annot"><span class="annottext">NodeToNodeVersionData
+</span><a href="#local-6989586621679130074"><span class="hs-identifier hs-var">local</span></a></span></span><span> </span><span id="local-6989586621679130073"><span class="annot"><span class="annottext">NodeToNodeVersionData
+</span><a href="#local-6989586621679130073"><span class="hs-identifier hs-var">remote</span></a></span></span><span>
+</span><span id="line-111"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersionData -&gt; NetworkMagic
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#networkMagic"><span class="hs-identifier hs-var hs-var">networkMagic</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersionData
+</span><a href="#local-6989586621679130074"><span class="hs-identifier hs-var">local</span></a></span><span> </span><span class="annot"><span class="annottext">NetworkMagic -&gt; NetworkMagic -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">==</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersionData -&gt; NetworkMagic
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#networkMagic"><span class="hs-identifier hs-var hs-var">networkMagic</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersionData
+</span><a href="#local-6989586621679130073"><span class="hs-identifier hs-var">remote</span></a></span><span>
+</span><span id="line-112"></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersionData -&gt; Accept NodeToNodeVersionData
+forall vData. vData -&gt; Accept vData
+</span><a href="Ouroboros.Network.Handshake.Acceptable.html#Accept"><span class="hs-identifier hs-var">Accept</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersionData :: NetworkMagic -&gt; DiffusionMode -&gt; NodeToNodeVersionData
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeVersionData"><span class="hs-identifier hs-type">NodeToNodeVersionData</span></a></span><span>
+</span><span id="line-113"></span><span>          </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">networkMagic :: NetworkMagic
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#networkMagic"><span class="hs-identifier hs-var">networkMagic</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersionData -&gt; NetworkMagic
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#networkMagic"><span class="hs-identifier hs-var hs-var">networkMagic</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersionData
+</span><a href="#local-6989586621679130074"><span class="hs-identifier hs-var">local</span></a></span><span>
+</span><span id="line-114"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">diffusionMode :: DiffusionMode
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#diffusionMode"><span class="hs-identifier hs-var">diffusionMode</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersionData -&gt; DiffusionMode
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#diffusionMode"><span class="hs-identifier hs-var hs-var">diffusionMode</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersionData
+</span><a href="#local-6989586621679130074"><span class="hs-identifier hs-var">local</span></a></span><span> </span><span class="annot"><span class="annottext">DiffusionMode -&gt; DiffusionMode -&gt; DiffusionMode
+forall a. Ord a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">`min`</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersionData -&gt; DiffusionMode
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#diffusionMode"><span class="hs-identifier hs-var hs-var">diffusionMode</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersionData
+</span><a href="#local-6989586621679130073"><span class="hs-identifier hs-var">remote</span></a></span><span>
+</span><span id="line-115"></span><span>          </span><span class="hs-special">}</span><span>
+</span><span id="line-116"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>
+</span><span id="line-117"></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Accept NodeToNodeVersionData
+forall vData. Text -&gt; Accept vData
+</span><a href="Ouroboros.Network.Handshake.Acceptable.html#Refuse"><span class="hs-identifier hs-var">Refuse</span></a></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Accept NodeToNodeVersionData)
+-&gt; Text -&gt; Accept NodeToNodeVersionData
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; Text
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-var">T.pack</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Text) -&gt; String -&gt; Text
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;version data mismatch: &quot;</span></span><span>
+</span><span id="line-118"></span><span>                       </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">++</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersionData -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersionData
+</span><a href="#local-6989586621679130074"><span class="hs-identifier hs-var">local</span></a></span><span>
+</span><span id="line-119"></span><span>                       </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">++</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot; /= &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">++</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersionData -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersionData
+</span><a href="#local-6989586621679130073"><span class="hs-identifier hs-var">remote</span></a></span><span>
+</span><span id="line-120"></span><span>
+</span><span id="line-121"></span><span>
+</span><span id="line-122"></span><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#nodeToNodeCodecCBORTerm"><span class="hs-identifier hs-type">nodeToNodeCodecCBORTerm</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeVersion"><span class="hs-identifier hs-type">NodeToNodeVersion</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.CodecCBORTerm.html#CodecCBORTerm"><span class="hs-identifier hs-type">CodecCBORTerm</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-type">Text</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeVersionData"><span class="hs-identifier hs-type">NodeToNodeVersionData</span></a></span><span>
+</span><span id="line-123"></span><span id="nodeToNodeCodecCBORTerm"><span class="annot"><span class="annottext">nodeToNodeCodecCBORTerm :: NodeToNodeVersion -&gt; CodecCBORTerm Text NodeToNodeVersionData
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#nodeToNodeCodecCBORTerm"><span class="hs-identifier hs-var hs-var">nodeToNodeCodecCBORTerm</span></a></span></span><span> </span><span id="local-6989586621679130069"><span class="annot"><span class="annottext">NodeToNodeVersion
+</span><a href="#local-6989586621679130069"><span class="hs-identifier hs-var">_version</span></a></span></span><span>
+</span><span id="line-124"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">let</span><span> </span><span class="annot"><a href="#local-6989586621679130068"><span class="hs-identifier hs-type">encodeTerm</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeVersionData"><span class="hs-identifier hs-type">NodeToNodeVersionData</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CBOR.Term</span></span><span>
+</span><span id="line-125"></span><span>        </span><span id="local-6989586621679130068"><span class="annot"><span class="annottext">encodeTerm :: NodeToNodeVersionData -&gt; Term
+</span><a href="#local-6989586621679130068"><span class="hs-identifier hs-var hs-var">encodeTerm</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeVersionData"><span class="hs-identifier hs-type">NodeToNodeVersionData</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span id="local-6989586621679130067"><span class="annot"><span class="annottext">NetworkMagic
+networkMagic :: NetworkMagic
+networkMagic :: NodeToNodeVersionData -&gt; NetworkMagic
+</span><a href="#local-6989586621679130067"><span class="hs-identifier hs-var hs-var">networkMagic</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679130066"><span class="annot"><span class="annottext">DiffusionMode
+diffusionMode :: DiffusionMode
+diffusionMode :: NodeToNodeVersionData -&gt; DiffusionMode
+</span><a href="#local-6989586621679130066"><span class="hs-identifier hs-var hs-var">diffusionMode</span></a></span></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-126"></span><span>          </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Term] -&gt; Term
+</span><span class="hs-identifier hs-var">CBOR.TList</span></span><span>
+</span><span id="line-127"></span><span>              </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Term
+</span><span class="hs-identifier hs-var">CBOR.TInt</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word32 -&gt; Int
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="annot"><span class="annottext">(Word32 -&gt; Int) -&gt; Word32 -&gt; Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">NetworkMagic -&gt; Word32
+</span><a href="Ouroboros.Network.Magic.html#unNetworkMagic"><span class="hs-identifier hs-var hs-var">unNetworkMagic</span></a></span><span> </span><span class="annot"><span class="annottext">NetworkMagic
+</span><a href="#local-6989586621679130067"><span class="hs-identifier hs-var">networkMagic</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-128"></span><span>              </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Term
+</span><span class="hs-identifier hs-var">CBOR.TBool</span></span><span> </span><span class="hs-special">(</span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">DiffusionMode
+</span><a href="#local-6989586621679130066"><span class="hs-identifier hs-var">diffusionMode</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-129"></span><span>                             </span><span class="annot"><span class="annottext">DiffusionMode
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#InitiatorOnlyDiffusionMode"><span class="hs-identifier hs-var">InitiatorOnlyDiffusionMode</span></a></span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">True</span></a></span><span>
+</span><span id="line-130"></span><span>                             </span><span class="annot"><span class="annottext">DiffusionMode
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#InitiatorAndResponderDiffusionMode"><span class="hs-identifier hs-var">InitiatorAndResponderDiffusionMode</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">False</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-131"></span><span>              </span><span class="hs-special">]</span><span>
+</span><span id="line-132"></span><span>
+</span><span id="line-133"></span><span>        </span><span class="annot"><a href="#local-6989586621679130062"><span class="hs-identifier hs-type">decodeTerm</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CBOR.Term</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Either</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-type">Text</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeVersionData"><span class="hs-identifier hs-type">NodeToNodeVersionData</span></a></span><span>
+</span><span id="line-134"></span><span>        </span><span id="local-6989586621679130062"><span class="annot"><span class="annottext">decodeTerm :: Term -&gt; Either Text NodeToNodeVersionData
+</span><a href="#local-6989586621679130062"><span class="hs-identifier hs-var hs-var">decodeTerm</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CBOR.TList</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">CBOR.TInt</span></span><span> </span><span id="local-6989586621679130061"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679130061"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CBOR.TBool</span></span><span> </span><span id="local-6989586621679130060"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679130060"><span class="hs-identifier hs-var">diffusionMode</span></a></span></span><span class="hs-special">]</span><span class="hs-special">)</span><span>
+</span><span id="line-135"></span><span>          </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679130061"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;=</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-136"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679130061"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&lt;=</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0xffffffff</span></span><span>
+</span><span id="line-137"></span><span>          </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersionData -&gt; Either Text NodeToNodeVersionData
+forall a b. b -&gt; Either a b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Right</span></a></span><span>
+</span><span id="line-138"></span><span>              </span><span class="annot"><span class="annottext">NodeToNodeVersionData :: NetworkMagic -&gt; DiffusionMode -&gt; NodeToNodeVersionData
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeVersionData"><span class="hs-identifier hs-type">NodeToNodeVersionData</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-139"></span><span>                  </span><span class="annot"><span class="annottext">networkMagic :: NetworkMagic
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#networkMagic"><span class="hs-identifier hs-var">networkMagic</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; NetworkMagic
+</span><a href="Ouroboros.Network.Magic.html#NetworkMagic"><span class="hs-identifier hs-var">NetworkMagic</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Word32
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679130061"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-140"></span><span>                  </span><span class="annot"><span class="annottext">diffusionMode :: DiffusionMode
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#diffusionMode"><span class="hs-identifier hs-var">diffusionMode</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679130060"><span class="hs-identifier hs-var">diffusionMode</span></a></span><span>
+</span><span id="line-141"></span><span>                                  </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">DiffusionMode
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#InitiatorOnlyDiffusionMode"><span class="hs-identifier hs-var">InitiatorOnlyDiffusionMode</span></a></span><span>
+</span><span id="line-142"></span><span>                                  </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">DiffusionMode
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#InitiatorAndResponderDiffusionMode"><span class="hs-identifier hs-var">InitiatorAndResponderDiffusionMode</span></a></span><span>
+</span><span id="line-143"></span><span>                </span><span class="hs-special">}</span><span>
+</span><span id="line-144"></span><span>          </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>
+</span><span id="line-145"></span><span>          </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Either Text NodeToNodeVersionData
+forall a b. a -&gt; Either a b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Left</span></a></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Either Text NodeToNodeVersionData)
+-&gt; Text -&gt; Either Text NodeToNodeVersionData
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; Text
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-var">T.pack</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Text) -&gt; String -&gt; Text
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;networkMagic out of bound: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679130061"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-146"></span><span>        </span><span class="annot"><a href="#local-6989586621679130062"><span class="hs-identifier hs-var">decodeTerm</span></a></span><span> </span><span id="local-6989586621679130057"><span class="annot"><span class="annottext">Term
+</span><a href="#local-6989586621679130057"><span class="hs-identifier hs-var">t</span></a></span></span><span>
+</span><span id="line-147"></span><span>          </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Either Text NodeToNodeVersionData
+forall a b. a -&gt; Either a b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Left</span></a></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Either Text NodeToNodeVersionData)
+-&gt; Text -&gt; Either Text NodeToNodeVersionData
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; Text
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/text-1.2.4.1/src"><span class="hs-identifier hs-var">T.pack</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Text) -&gt; String -&gt; Text
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;unknown encoding: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">++</span></a></span><span> </span><span class="annot"><span class="annottext">Term -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="annot"><span class="annottext">Term
+</span><a href="#local-6989586621679130057"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-148"></span><span>    </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">CodecCBORTerm :: forall fail a.
+(a -&gt; Term) -&gt; (Term -&gt; Either fail a) -&gt; CodecCBORTerm fail a
+</span><a href="Ouroboros.Network.CodecCBORTerm.html#CodecCBORTerm"><span class="hs-identifier hs-type">CodecCBORTerm</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">NodeToNodeVersionData -&gt; Term
+encodeTerm :: NodeToNodeVersionData -&gt; Term
+encodeTerm :: NodeToNodeVersionData -&gt; Term
+</span><a href="#local-6989586621679130068"><span class="hs-identifier hs-var hs-var">encodeTerm</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Term -&gt; Either Text NodeToNodeVersionData
+decodeTerm :: Term -&gt; Either Text NodeToNodeVersionData
+decodeTerm :: Term -&gt; Either Text NodeToNodeVersionData
+</span><a href="#local-6989586621679130062"><span class="hs-identifier hs-var hs-var">decodeTerm</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-149"></span><span>
+</span><span id="line-150"></span><span>
+</span><span id="line-151"></span><span class="hs-keyword">data</span><span> </span><span id="ConnectionMode"><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#ConnectionMode"><span class="hs-identifier hs-var">ConnectionMode</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="UnidirectionalMode"><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#UnidirectionalMode"><span class="hs-identifier hs-var">UnidirectionalMode</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="DuplexMode"><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#DuplexMode"><span class="hs-identifier hs-var">DuplexMode</span></a></span></span><span>
+</span><span id="line-152"></span><span>
+</span><span id="line-153"></span><span>
+</span><span id="line-154"></span><span class="hs-comment">-- | Check whether a version enabling diffusion pipelining has been</span><span>
+</span><span id="line-155"></span><span class="hs-comment">-- negotiated.</span><span>
+</span><span id="line-156"></span><span class="hs-comment">--</span><span>
+</span><span id="line-157"></span><span class="hs-comment">-- TODO: this ought to be defined in `ouroboros-consensus` or</span><span>
+</span><span id="line-158"></span><span class="hs-comment">-- `ouroboros-consensus-diffusion`</span><span>
+</span><span id="line-159"></span><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#isPipeliningEnabled"><span class="hs-identifier hs-type">isPipeliningEnabled</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeVersion"><span class="hs-identifier hs-type">NodeToNodeVersion</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#WhetherReceivingTentativeBlocks"><span class="hs-identifier hs-type">WhetherReceivingTentativeBlocks</span></a></span><span>
+</span><span id="line-160"></span><span id="isPipeliningEnabled"><span class="annot"><span class="annottext">isPipeliningEnabled :: NodeToNodeVersion -&gt; WhetherReceivingTentativeBlocks
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#isPipeliningEnabled"><span class="hs-identifier hs-var hs-var">isPipeliningEnabled</span></a></span></span><span> </span><span id="local-6989586621679130054"><span class="annot"><span class="annottext">NodeToNodeVersion
+</span><a href="#local-6989586621679130054"><span class="hs-identifier hs-var">v</span></a></span></span><span>
+</span><span id="line-161"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersion
+</span><a href="#local-6989586621679130054"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersion -&gt; NodeToNodeVersion -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">&gt;=</span></a></span><span> </span><span class="annot"><span class="annottext">NodeToNodeVersion
+</span><a href="Ouroboros.Network.NodeToNode.Version.html#NodeToNodeV_8"><span class="hs-identifier hs-var">NodeToNodeV_8</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">WhetherReceivingTentativeBlocks
+</span><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#ReceivingTentativeBlocks"><span class="hs-identifier hs-var">ReceivingTentativeBlocks</span></a></span><span>
+</span><span id="line-162"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>          </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">WhetherReceivingTentativeBlocks
+</span><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#NotReceivingTentativeBlocks"><span class="hs-identifier hs-var">NotReceivingTentativeBlocks</span></a></span><span>
+</span><span id="line-163"></span></pre></body></html>

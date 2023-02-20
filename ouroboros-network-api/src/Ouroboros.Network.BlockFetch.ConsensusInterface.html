@@ -1,0 +1,258 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DeriveFunctor #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE RankNTypes    #-}</span><span>
+</span><span id="line-3"></span><span>
+</span><span id="line-4"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Network.BlockFetch.ConsensusInterface</span><span>
+</span><span id="line-5"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#FetchMode"><span class="hs-identifier">FetchMode</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-6"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#BlockFetchConsensusInterface"><span class="hs-identifier">BlockFetchConsensusInterface</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-7"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#WhetherReceivingTentativeBlocks"><span class="hs-identifier">WhetherReceivingTentativeBlocks</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-8"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#FromConsensus"><span class="hs-identifier">FromConsensus</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-9"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-10"></span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Monad.Class.MonadSTM</span></span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Monad.Class.MonadTime</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/time-1.9.3/src"><span class="hs-identifier">UTCTime</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier">Data.Map.Strict</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier">Map</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">GHC.Stack</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">HasCallStack</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.AnchoredFragment.html"><span class="hs-identifier">Ouroboros.Network.AnchoredFragment</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.AnchoredFragment.html#AnchoredFragment"><span class="hs-identifier">AnchoredFragment</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.Block.html"><span class="hs-identifier">Ouroboros.Network.Block</span></a></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Ouroboros.Network.SizeInBytes.html"><span class="hs-identifier">Ouroboros.Network.SizeInBytes</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.SizeInBytes.html#SizeInBytes"><span class="hs-identifier">SizeInBytes</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">data</span><span> </span><span id="FetchMode"><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#FetchMode"><span class="hs-identifier hs-var">FetchMode</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-23"></span><span>       </span><span class="hs-comment">-- | Use this mode when we are catching up on the chain but are stil</span><span>
+</span><span id="line-24"></span><span>       </span><span class="hs-comment">-- well behind. In this mode the fetch logic will optimise for</span><span>
+</span><span id="line-25"></span><span>       </span><span class="hs-comment">-- throughput rather than latency.</span><span>
+</span><span id="line-26"></span><span>       </span><span class="hs-comment">--</span><span>
+</span><span id="line-27"></span><span>       </span><span id="FetchModeBulkSync"><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#FetchModeBulkSync"><span class="hs-identifier hs-var">FetchModeBulkSync</span></a></span></span><span>
+</span><span id="line-28"></span><span>
+</span><span id="line-29"></span><span>       </span><span class="hs-comment">-- | Use this mode for block-producing nodes that have a known deadline</span><span>
+</span><span id="line-30"></span><span>       </span><span class="hs-comment">-- to produce a block and need to get the best chain before that. In</span><span>
+</span><span id="line-31"></span><span>       </span><span class="hs-comment">-- this mode the fetch logic will optimise for picking the best chain</span><span>
+</span><span id="line-32"></span><span>       </span><span class="hs-comment">-- within the given deadline.</span><span>
+</span><span id="line-33"></span><span>     </span><span class="hs-glyph">|</span><span> </span><span id="FetchModeDeadline"><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#FetchModeDeadline"><span class="hs-identifier hs-var">FetchModeDeadline</span></a></span></span><span>
+</span><span id="line-34"></span><span>
+</span><span id="line-35"></span><span>       </span><span class="hs-comment">-- TODO: add an additional mode for in-between: when we are a core node</span><span>
+</span><span id="line-36"></span><span>       </span><span class="hs-comment">-- following the chain but do not have an imminent deadline, or are a</span><span>
+</span><span id="line-37"></span><span>       </span><span class="hs-comment">-- relay forwarding chains within the network.</span><span>
+</span><span id="line-38"></span><span>       </span><span class="hs-comment">--</span><span>
+</span><span id="line-39"></span><span>       </span><span class="hs-comment">-- This is a mixed mode because we have to combine the distribution of</span><span>
+</span><span id="line-40"></span><span>       </span><span class="hs-comment">-- time to next block under praos, with the distribution of latency of</span><span>
+</span><span id="line-41"></span><span>       </span><span class="hs-comment">-- our peers, and also the consensus preference.</span><span>
+</span><span id="line-42"></span><span>
+</span><span id="line-43"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679129951"><span id="local-6989586621679129953"><span class="annot"><span class="annottext">FetchMode -&gt; FetchMode -&gt; Bool
+(FetchMode -&gt; FetchMode -&gt; Bool)
+-&gt; (FetchMode -&gt; FetchMode -&gt; Bool) -&gt; Eq FetchMode
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: FetchMode -&gt; FetchMode -&gt; Bool
+$c/= :: FetchMode -&gt; FetchMode -&gt; Bool
+== :: FetchMode -&gt; FetchMode -&gt; Bool
+$c== :: FetchMode -&gt; FetchMode -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679129944"><span id="local-6989586621679129946"><span id="local-6989586621679129948"><span class="annot"><span class="annottext">Int -&gt; FetchMode -&gt; ShowS
+[FetchMode] -&gt; ShowS
+FetchMode -&gt; String
+(Int -&gt; FetchMode -&gt; ShowS)
+-&gt; (FetchMode -&gt; String)
+-&gt; ([FetchMode] -&gt; ShowS)
+-&gt; Show FetchMode
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [FetchMode] -&gt; ShowS
+$cshowList :: [FetchMode] -&gt; ShowS
+show :: FetchMode -&gt; String
+$cshow :: FetchMode -&gt; String
+showsPrec :: Int -&gt; FetchMode -&gt; ShowS
+$cshowsPrec :: Int -&gt; FetchMode -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span>
+</span><span id="line-46"></span><span class="hs-comment">-- | The consensus layer functionality that the block fetch logic requires.</span><span>
+</span><span id="line-47"></span><span class="hs-comment">--</span><span>
+</span><span id="line-48"></span><span class="hs-comment">-- These are provided as input to the block fetch by the consensus layer.</span><span>
+</span><span id="line-49"></span><span class="hs-comment">--</span><span>
+</span><span id="line-50"></span><span class="hs-keyword">data</span><span> </span><span id="BlockFetchConsensusInterface"><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#BlockFetchConsensusInterface"><span class="hs-identifier hs-var">BlockFetchConsensusInterface</span></a></span></span><span> </span><span id="local-6989586621679129942"><span class="annot"><a href="#local-6989586621679129942"><span class="hs-identifier hs-type">peer</span></a></span></span><span> </span><span id="local-6989586621679129941"><span class="annot"><a href="#local-6989586621679129941"><span class="hs-identifier hs-type">header</span></a></span></span><span> </span><span id="local-6989586621679129940"><span class="annot"><a href="#local-6989586621679129940"><span class="hs-identifier hs-type">block</span></a></span></span><span> </span><span id="local-6989586621679129939"><span class="annot"><a href="#local-6989586621679129939"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-51"></span><span>     </span><span id="BlockFetchConsensusInterface"><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#BlockFetchConsensusInterface"><span class="hs-identifier hs-var">BlockFetchConsensusInterface</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-52"></span><span>
+</span><span id="line-53"></span><span>       </span><span class="hs-comment">-- | Read the K-suffixes of the candidate chains.</span><span>
+</span><span id="line-54"></span><span>       </span><span class="hs-comment">--</span><span>
+</span><span id="line-55"></span><span>       </span><span class="hs-comment">-- Assumptions:</span><span>
+</span><span id="line-56"></span><span>       </span><span class="hs-comment">-- * Their headers must be already validated.</span><span>
+</span><span id="line-57"></span><span>       </span><span class="hs-comment">-- * They may contain /fewer/ than @K@ blocks.</span><span>
+</span><span id="line-58"></span><span>       </span><span class="hs-comment">-- * Their anchor does not have to intersect with the current chain.</span><span>
+</span><span id="line-59"></span><span>       </span><span id="readCandidateChains"><span class="annot"><span class="annottext">BlockFetchConsensusInterface peer header block m
+-&gt; STM m (Map peer (AnchoredFragment header))
+</span><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#readCandidateChains"><span class="hs-identifier hs-var hs-var">readCandidateChains</span></a></span></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">STM</span></span><span> </span><span class="annot"><a href="#local-6989586621679129939"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier hs-type">Map</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679129942"><span class="hs-identifier hs-type">peer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.AnchoredFragment.html#AnchoredFragment"><span class="hs-identifier hs-type">AnchoredFragment</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679129941"><span class="hs-identifier hs-type">header</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-60"></span><span>
+</span><span id="line-61"></span><span>       </span><span class="hs-comment">-- | Read the K-suffix of the current chain.</span><span>
+</span><span id="line-62"></span><span>       </span><span class="hs-comment">--</span><span>
+</span><span id="line-63"></span><span>       </span><span class="hs-comment">-- This must contain info on the last @K@ blocks (unless we're near</span><span>
+</span><span id="line-64"></span><span>       </span><span class="hs-comment">-- the chain genesis of course).</span><span>
+</span><span id="line-65"></span><span>       </span><span class="hs-comment">--</span><span>
+</span><span id="line-66"></span><span>       </span><span id="readCurrentChain"><span class="annot"><span class="annottext">BlockFetchConsensusInterface peer header block m
+-&gt; STM m (AnchoredFragment header)
+</span><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#readCurrentChain"><span class="hs-identifier hs-var hs-var">readCurrentChain</span></a></span></span><span>       </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">STM</span></span><span> </span><span class="annot"><a href="#local-6989586621679129939"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.AnchoredFragment.html#AnchoredFragment"><span class="hs-identifier hs-type">AnchoredFragment</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679129941"><span class="hs-identifier hs-type">header</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-67"></span><span>
+</span><span id="line-68"></span><span>       </span><span class="hs-comment">-- | Read the current fetch mode that the block fetch logic should use.</span><span>
+</span><span id="line-69"></span><span>       </span><span class="hs-comment">--</span><span>
+</span><span id="line-70"></span><span>       </span><span class="hs-comment">-- The fetch mode is a dynamic part of the block fetch policy. In</span><span>
+</span><span id="line-71"></span><span>       </span><span class="hs-comment">-- 'FetchModeBulkSync' it follows a policy that optimises for expected</span><span>
+</span><span id="line-72"></span><span>       </span><span class="hs-comment">-- bandwidth over latency to fetch any particular block, whereas in</span><span>
+</span><span id="line-73"></span><span>       </span><span class="hs-comment">-- 'FetchModeDeadline' it follows a policy optimises for the latency</span><span>
+</span><span id="line-74"></span><span>       </span><span class="hs-comment">-- to fetch blocks, at the expense of wasting bandwidth.</span><span>
+</span><span id="line-75"></span><span>       </span><span class="hs-comment">--</span><span>
+</span><span id="line-76"></span><span>       </span><span class="hs-comment">-- This mode should be set so that when the node's current chain is near</span><span>
+</span><span id="line-77"></span><span>       </span><span class="hs-comment">-- to \&quot;now\&quot; it uses the deadline mode, and when it is far away it uses</span><span>
+</span><span id="line-78"></span><span>       </span><span class="hs-comment">-- the bulk sync mode.</span><span>
+</span><span id="line-79"></span><span>       </span><span class="hs-comment">--</span><span>
+</span><span id="line-80"></span><span>       </span><span id="readFetchMode"><span class="annot"><span class="annottext">BlockFetchConsensusInterface peer header block m -&gt; STM m FetchMode
+</span><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#readFetchMode"><span class="hs-identifier hs-var hs-var">readFetchMode</span></a></span></span><span>          </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">STM</span></span><span> </span><span class="annot"><a href="#local-6989586621679129939"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#FetchMode"><span class="hs-identifier hs-type">FetchMode</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-81"></span><span>
+</span><span id="line-82"></span><span>       </span><span class="hs-comment">-- | Recent, only within last K</span><span>
+</span><span id="line-83"></span><span>       </span><span id="readFetchedBlocks"><span class="annot"><span class="annottext">BlockFetchConsensusInterface peer header block m
+-&gt; STM m (Point block -&gt; Bool)
+</span><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#readFetchedBlocks"><span class="hs-identifier hs-var hs-var">readFetchedBlocks</span></a></span></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">STM</span></span><span> </span><span class="annot"><a href="#local-6989586621679129939"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Block.html#Point"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679129940"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Bool</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-84"></span><span>
+</span><span id="line-85"></span><span>       </span><span class="hs-comment">-- | This method allocates an @addFetchedBlock@ function per client.</span><span>
+</span><span id="line-86"></span><span>       </span><span class="hs-comment">-- That function and 'readFetchedBlocks' are required to be linked. Upon</span><span>
+</span><span id="line-87"></span><span>       </span><span class="hs-comment">-- successful completion of @addFetchedBlock@ it must be the case that</span><span>
+</span><span id="line-88"></span><span>       </span><span class="hs-comment">-- 'readFetchedBlocks' reports the block.</span><span>
+</span><span id="line-89"></span><span>       </span><span id="mkAddFetchedBlock"><span class="annot"><span class="annottext">BlockFetchConsensusInterface peer header block m
+-&gt; WhetherReceivingTentativeBlocks
+-&gt; STM m (Point block -&gt; block -&gt; m ())
+</span><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#mkAddFetchedBlock"><span class="hs-identifier hs-var hs-var">mkAddFetchedBlock</span></a></span></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#WhetherReceivingTentativeBlocks"><span class="hs-identifier hs-type">WhetherReceivingTentativeBlocks</span></a></span><span>
+</span><span id="line-90"></span><span>                              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">STM</span></span><span> </span><span class="annot"><a href="#local-6989586621679129939"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Network.Block.html#Point"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679129940"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679129940"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679129939"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-91"></span><span>
+</span><span id="line-92"></span><span>       </span><span class="hs-comment">-- | The highest stored/downloaded slot number.</span><span>
+</span><span id="line-93"></span><span>       </span><span class="hs-comment">--</span><span>
+</span><span id="line-94"></span><span>       </span><span class="hs-comment">-- This is used to optimise the filtering of fragments in the block</span><span>
+</span><span id="line-95"></span><span>       </span><span class="hs-comment">-- fetch logic: when removing already downloaded blocks from a</span><span>
+</span><span id="line-96"></span><span>       </span><span class="hs-comment">-- fragment, the filtering (with a linear cost) is stopped as soon as a</span><span>
+</span><span id="line-97"></span><span>       </span><span class="hs-comment">-- block has a slot number higher than this slot number, as it cannot</span><span>
+</span><span id="line-98"></span><span>       </span><span class="hs-comment">-- have been downloaded anyway.</span><span>
+</span><span id="line-99"></span><span>       </span><span id="readFetchedMaxSlotNo"><span class="annot"><span class="annottext">BlockFetchConsensusInterface peer header block m -&gt; STM m MaxSlotNo
+</span><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#readFetchedMaxSlotNo"><span class="hs-identifier hs-var hs-var">readFetchedMaxSlotNo</span></a></span></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">STM</span></span><span> </span><span class="annot"><a href="#local-6989586621679129939"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.Block.html#MaxSlotNo"><span class="hs-identifier hs-type">MaxSlotNo</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-100"></span><span>
+</span><span id="line-101"></span><span>       </span><span class="hs-comment">-- | Given the current chain, is the given chain plausible as a</span><span>
+</span><span id="line-102"></span><span>       </span><span class="hs-comment">-- candidate chain. Classically for Ouroboros this would simply</span><span>
+</span><span id="line-103"></span><span>       </span><span class="hs-comment">-- check if the candidate is strictly longer, but for Ouroboros</span><span>
+</span><span id="line-104"></span><span>       </span><span class="hs-comment">-- with operational key certificates there are also cases where</span><span>
+</span><span id="line-105"></span><span>       </span><span class="hs-comment">-- we would consider a chain of equal length to the current chain.</span><span>
+</span><span id="line-106"></span><span>       </span><span class="hs-comment">--</span><span>
+</span><span id="line-107"></span><span>       </span><span id="plausibleCandidateChain"><span class="annot"><span class="annottext">BlockFetchConsensusInterface peer header block m
+-&gt; HasCallStack =&gt;
+   AnchoredFragment header -&gt; AnchoredFragment header -&gt; Bool
+</span><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#plausibleCandidateChain"><span class="hs-identifier hs-var hs-var">plausibleCandidateChain</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">HasCallStack</span></a></span><span>
+</span><span id="line-108"></span><span>                               </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.AnchoredFragment.html#AnchoredFragment"><span class="hs-identifier hs-type">AnchoredFragment</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679129941"><span class="hs-identifier hs-type">header</span></a></span><span>
+</span><span id="line-109"></span><span>                               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.AnchoredFragment.html#AnchoredFragment"><span class="hs-identifier hs-type">AnchoredFragment</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679129941"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Bool</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-110"></span><span>
+</span><span id="line-111"></span><span>       </span><span class="hs-comment">-- | Compare two candidate chains and return a preference ordering.</span><span>
+</span><span id="line-112"></span><span>       </span><span class="hs-comment">-- This is used as part of selecting which chains to prioritise for</span><span>
+</span><span id="line-113"></span><span>       </span><span class="hs-comment">-- downloading block bodies.</span><span>
+</span><span id="line-114"></span><span>       </span><span class="hs-comment">--</span><span>
+</span><span id="line-115"></span><span>       </span><span id="compareCandidateChains"><span class="annot"><span class="annottext">BlockFetchConsensusInterface peer header block m
+-&gt; HasCallStack =&gt;
+   AnchoredFragment header -&gt; AnchoredFragment header -&gt; Ordering
+</span><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#compareCandidateChains"><span class="hs-identifier hs-var hs-var">compareCandidateChains</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">HasCallStack</span></a></span><span>
+</span><span id="line-116"></span><span>                               </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.AnchoredFragment.html#AnchoredFragment"><span class="hs-identifier hs-type">AnchoredFragment</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679129941"><span class="hs-identifier hs-type">header</span></a></span><span>
+</span><span id="line-117"></span><span>                               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.AnchoredFragment.html#AnchoredFragment"><span class="hs-identifier hs-type">AnchoredFragment</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679129941"><span class="hs-identifier hs-type">header</span></a></span><span>
+</span><span id="line-118"></span><span>                               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Ordering</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-119"></span><span>
+</span><span id="line-120"></span><span>       </span><span class="hs-comment">-- | Much of the logic for deciding which blocks to download from which</span><span>
+</span><span id="line-121"></span><span>       </span><span class="hs-comment">-- peer depends on making estimates based on recent performance metrics.</span><span>
+</span><span id="line-122"></span><span>       </span><span class="hs-comment">-- These estimates of course depend on the amount of data we will be</span><span>
+</span><span id="line-123"></span><span>       </span><span class="hs-comment">-- downloading.</span><span>
+</span><span id="line-124"></span><span>       </span><span class="hs-comment">--</span><span>
+</span><span id="line-125"></span><span>       </span><span id="blockFetchSize"><span class="annot"><span class="annottext">BlockFetchConsensusInterface peer header block m
+-&gt; header -&gt; SizeInBytes
+</span><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#blockFetchSize"><span class="hs-identifier hs-var hs-var">blockFetchSize</span></a></span></span><span>          </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679129941"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Network.SizeInBytes.html#SizeInBytes"><span class="hs-identifier hs-type">SizeInBytes</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-126"></span><span>
+</span><span id="line-127"></span><span>       </span><span class="hs-comment">-- | Given a block header, validate the supposed corresponding block</span><span>
+</span><span id="line-128"></span><span>       </span><span class="hs-comment">-- body.</span><span>
+</span><span id="line-129"></span><span>       </span><span class="hs-comment">--</span><span>
+</span><span id="line-130"></span><span>       </span><span id="blockMatchesHeader"><span class="annot"><span class="annottext">BlockFetchConsensusInterface peer header block m
+-&gt; header -&gt; block -&gt; Bool
+</span><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#blockMatchesHeader"><span class="hs-identifier hs-var hs-var">blockMatchesHeader</span></a></span></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679129941"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679129940"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Bool</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-131"></span><span>
+</span><span id="line-132"></span><span>       </span><span class="hs-comment">-- | Calculate when a header's block was forged.</span><span>
+</span><span id="line-133"></span><span>       </span><span class="hs-comment">--</span><span>
+</span><span id="line-134"></span><span>       </span><span class="hs-comment">-- PRECONDITION: This function will succeed and give a _correct_ result</span><span>
+</span><span id="line-135"></span><span>       </span><span class="hs-comment">-- when applied to headers obtained via this interface (ie via</span><span>
+</span><span id="line-136"></span><span>       </span><span class="hs-comment">-- Consensus, ie via 'readCurrentChain' or 'readCandidateChains').</span><span>
+</span><span id="line-137"></span><span>       </span><span class="hs-comment">--</span><span>
+</span><span id="line-138"></span><span>       </span><span class="hs-comment">-- WARNING: This function may fail or, worse, __give an incorrect result</span><span>
+</span><span id="line-139"></span><span>       </span><span class="hs-comment">-- (!!)__ if applied to headers obtained from sources outside of this</span><span>
+</span><span id="line-140"></span><span>       </span><span class="hs-comment">-- interface. The 'FromConsensus' newtype wrapper is intended to make it</span><span>
+</span><span id="line-141"></span><span>       </span><span class="hs-comment">-- difficult to make that mistake, so please pay that syntactic price</span><span>
+</span><span id="line-142"></span><span>       </span><span class="hs-comment">-- and consider its meaning at each call to this function. Relatedly,</span><span>
+</span><span id="line-143"></span><span>       </span><span class="hs-comment">-- preserve that argument wrapper as much as possible when deriving</span><span>
+</span><span id="line-144"></span><span>       </span><span class="hs-comment">-- ancillary functions\/interfaces from this function.</span><span>
+</span><span id="line-145"></span><span>       </span><span id="headerForgeUTCTime"><span class="annot"><span class="annottext">BlockFetchConsensusInterface peer header block m
+-&gt; FromConsensus header -&gt; STM m UTCTime
+</span><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#headerForgeUTCTime"><span class="hs-identifier hs-var hs-var">headerForgeUTCTime</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#FromConsensus"><span class="hs-identifier hs-type">FromConsensus</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679129941"><span class="hs-identifier hs-type">header</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">STM</span></span><span> </span><span class="annot"><a href="#local-6989586621679129939"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">UTCTime</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-146"></span><span>
+</span><span id="line-147"></span><span>       </span><span class="hs-comment">-- | Calculate when a block was forged.</span><span>
+</span><span id="line-148"></span><span>       </span><span class="hs-comment">--</span><span>
+</span><span id="line-149"></span><span>       </span><span class="hs-comment">-- PRECONDITION: Same as 'headerForgeUTCTime'.</span><span>
+</span><span id="line-150"></span><span>       </span><span class="hs-comment">--</span><span>
+</span><span id="line-151"></span><span>       </span><span class="hs-comment">-- WARNING: Same as 'headerForgeUTCTime'.</span><span>
+</span><span id="line-152"></span><span>       </span><span id="blockForgeUTCTime"><span class="annot"><span class="annottext">BlockFetchConsensusInterface peer header block m
+-&gt; FromConsensus block -&gt; STM m UTCTime
+</span><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#blockForgeUTCTime"><span class="hs-identifier hs-var hs-var">blockForgeUTCTime</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#FromConsensus"><span class="hs-identifier hs-type">FromConsensus</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679129940"><span class="hs-identifier hs-type">block</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">STM</span></span><span> </span><span class="annot"><a href="#local-6989586621679129939"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/time-1.9.3/src"><span class="hs-identifier hs-type">UTCTime</span></a></span><span>
+</span><span id="line-153"></span><span>     </span><span class="hs-special">}</span><span>
+</span><span id="line-154"></span><span>
+</span><span id="line-155"></span><span>
+</span><span id="line-156"></span><span class="hs-comment">-- | Whether the block fetch peer is sending tentative blocks, which are</span><span>
+</span><span id="line-157"></span><span class="hs-comment">-- understood to possibly be invalid</span><span>
+</span><span id="line-158"></span><span class="hs-keyword">data</span><span> </span><span id="WhetherReceivingTentativeBlocks"><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#WhetherReceivingTentativeBlocks"><span class="hs-identifier hs-var">WhetherReceivingTentativeBlocks</span></a></span></span><span>
+</span><span id="line-159"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="ReceivingTentativeBlocks"><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#ReceivingTentativeBlocks"><span class="hs-identifier hs-var">ReceivingTentativeBlocks</span></a></span></span><span>
+</span><span id="line-160"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="NotReceivingTentativeBlocks"><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#NotReceivingTentativeBlocks"><span class="hs-identifier hs-var">NotReceivingTentativeBlocks</span></a></span></span><span>
+</span><span id="line-161"></span><span>
+</span><span id="line-162"></span><span class="hs-comment">{-------------------------------------------------------------------------------
+  Syntactic indicator of key precondition about Consensus time conversions
+-------------------------------------------------------------------------------}</span><span>
+</span><span id="line-165"></span><span>
+</span><span id="line-166"></span><span class="hs-comment">-- | A new type used to emphasize the precondition of</span><span>
+</span><span id="line-167"></span><span class="hs-comment">-- 'Ouroboros.Network.BlockFetch.headerForgeUTCTime' and</span><span>
+</span><span id="line-168"></span><span class="hs-comment">-- 'Ouroboros.Network.BlockFetch.blockForgeUTCTime' at each call site.</span><span>
+</span><span id="line-169"></span><span class="hs-comment">--</span><span>
+</span><span id="line-170"></span><span class="hs-comment">-- At time of writing, the @a@ is either a header or a block. The headers are</span><span>
+</span><span id="line-171"></span><span class="hs-comment">-- literally from Consensus (ie provided by ChainSync). Blocks, on the other</span><span>
+</span><span id="line-172"></span><span class="hs-comment">-- hand, are indirectly from Consensus: they were fetched only because we</span><span>
+</span><span id="line-173"></span><span class="hs-comment">-- favored the corresponding header that Consensus provided.</span><span>
+</span><span id="line-174"></span><span class="hs-comment">--</span><span>
+</span><span id="line-175"></span><span class="hs-comment">-- NOTE: We define it here so that it can be used consistently throughout the</span><span>
+</span><span id="line-176"></span><span class="hs-comment">-- implementation; definiting it only in</span><span>
+</span><span id="line-177"></span><span class="hs-comment">-- 'Ouroboros.Network.BlockFetch.BlockFetchConsensusInterface' would be too</span><span>
+</span><span id="line-178"></span><span class="hs-comment">-- late.</span><span>
+</span><span id="line-179"></span><span class="hs-keyword">newtype</span><span> </span><span id="FromConsensus"><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#FromConsensus"><span class="hs-identifier hs-var">FromConsensus</span></a></span></span><span> </span><span id="local-6989586621679129923"><span class="annot"><a href="#local-6989586621679129923"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="FromConsensus"><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#FromConsensus"><span class="hs-identifier hs-var">FromConsensus</span></a></span></span><span> </span><span class="hs-special">{</span><span id="unFromConsensus"><span class="annot"><span class="annottext">FromConsensus a -&gt; a
+</span><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#unFromConsensus"><span class="hs-identifier hs-var hs-var">unFromConsensus</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679129923"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-180"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679129917"><span id="local-6989586621679129919"><span class="annot"><span class="annottext">a -&gt; FromConsensus b -&gt; FromConsensus a
+(a -&gt; b) -&gt; FromConsensus a -&gt; FromConsensus b
+(forall a b. (a -&gt; b) -&gt; FromConsensus a -&gt; FromConsensus b)
+-&gt; (forall a b. a -&gt; FromConsensus b -&gt; FromConsensus a)
+-&gt; Functor FromConsensus
+forall a b. a -&gt; FromConsensus b -&gt; FromConsensus a
+forall a b. (a -&gt; b) -&gt; FromConsensus a -&gt; FromConsensus b
+forall (f :: * -&gt; *).
+(forall a b. (a -&gt; b) -&gt; f a -&gt; f b)
+-&gt; (forall a b. a -&gt; f b -&gt; f a) -&gt; Functor f
+&lt;$ :: a -&gt; FromConsensus b -&gt; FromConsensus a
+$c&lt;$ :: forall a b. a -&gt; FromConsensus b -&gt; FromConsensus a
+fmap :: (a -&gt; b) -&gt; FromConsensus a -&gt; FromConsensus b
+$cfmap :: forall a b. (a -&gt; b) -&gt; FromConsensus a -&gt; FromConsensus b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Functor</span></a></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-181"></span><span>
+</span><span id="line-182"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679129907"><span id="local-6989586621679129909"><span id="local-6989586621679129911"><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Applicative</span></a></span><span> </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#FromConsensus"><span class="hs-identifier hs-type">FromConsensus</span></a></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-183"></span><span>  </span><span id="local-6989586621679129905"><span class="annot"><span class="annottext">pure :: a -&gt; FromConsensus a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">pure</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; FromConsensus a
+forall a. a -&gt; FromConsensus a
+</span><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#FromConsensus"><span class="hs-identifier hs-var">FromConsensus</span></a></span><span>
+</span><span id="line-184"></span><span>  </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#FromConsensus"><span class="hs-identifier hs-type">FromConsensus</span></a></span><span> </span><span id="local-6989586621679129904"><span class="annot"><span class="annottext">a -&gt; b
+</span><a href="#local-6989586621679129904"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679129903"><span class="annot"><span class="annottext">&lt;*&gt; :: FromConsensus (a -&gt; b) -&gt; FromConsensus a -&gt; FromConsensus b
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var hs-var hs-var hs-var">&lt;*&gt;</span></a></span></span><span> </span><span class="annot"><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#FromConsensus"><span class="hs-identifier hs-type">FromConsensus</span></a></span><span> </span><span id="local-6989586621679129902"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679129902"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">b -&gt; FromConsensus b
+forall a. a -&gt; FromConsensus a
+</span><a href="Ouroboros.Network.BlockFetch.ConsensusInterface.html#FromConsensus"><span class="hs-identifier hs-var">FromConsensus</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; b
+</span><a href="#local-6989586621679129904"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679129902"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-185"></span></pre></body></html>

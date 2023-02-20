@@ -14,13 +14,13 @@
 </span><span id="line-14"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Codec.CBOR.Term</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Term</span></span><span class="hs-special">)</span><span>
 </span><span id="line-15"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Codec.CBOR.Write</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">toLazyByteString</span></span><span class="hs-special">)</span><span>
 </span><span id="line-16"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Codec.Serialise</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">deserialise</span></span><span class="hs-special">)</span><span>
-</span><span id="line-17"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier">Data.ByteString.Lazy</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Lazy</span></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier">Data.ByteString.Lazy</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Lazy</span></span><span>
 </span><span id="line-18"></span><span>
 </span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Test.QuickCheck</span></span><span>
 </span><span id="line-20"></span><span>
 </span><span id="line-21"></span><span>
-</span><span id="line-22"></span><span class="hs-keyword">newtype</span><span> </span><span id="Corruption"><span class="annot"><a href="Test.Util.Corruption.html#Corruption"><span class="hs-identifier hs-var">Corruption</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Corruption"><span class="annot"><a href="Test.Util.Corruption.html#Corruption"><span class="hs-identifier hs-var">Corruption</span></a></span></span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Word</span></a></span><span>
-</span><span id="line-23"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span>   </span><span class="hs-special">(</span><span id="local-6989586621679257317"><span id="local-6989586621679257319"><span id="local-6989586621679257321"><span class="annot"><span class="annottext">Int -&gt; Corruption -&gt; ShowS
+</span><span id="line-22"></span><span class="hs-keyword">newtype</span><span> </span><span id="Corruption"><span class="annot"><a href="Test.Util.Corruption.html#Corruption"><span class="hs-identifier hs-var">Corruption</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Corruption"><span class="annot"><a href="Test.Util.Corruption.html#Corruption"><span class="hs-identifier hs-var">Corruption</span></a></span></span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Word</span></a></span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span>   </span><span class="hs-special">(</span><span id="local-6989586621679272644"><span id="local-6989586621679272646"><span id="local-6989586621679272648"><span class="annot"><span class="annottext">Int -&gt; Corruption -&gt; ShowS
 [Corruption] -&gt; ShowS
 Corruption -&gt; String
 (Int -&gt; Corruption -&gt; ShowS)
@@ -35,8 +35,8 @@ show :: Corruption -&gt; String
 $cshow :: Corruption -&gt; String
 showsPrec :: Int -&gt; Corruption -&gt; ShowS
 $cshowsPrec :: Int -&gt; Corruption -&gt; ShowS
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
-</span><span id="line-24"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679257312"><span id="local-6989586621679257314"><span class="annot"><span class="annottext">Gen Corruption
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679272639"><span id="local-6989586621679272641"><span class="annot"><span class="annottext">Gen Corruption
 Gen Corruption
 -&gt; (Corruption -&gt; [Corruption]) -&gt; Arbitrary Corruption
 Corruption -&gt; [Corruption]
@@ -51,60 +51,60 @@ $carbitrary :: Gen Corruption
 </span><span id="line-27"></span><span class="hs-comment">-- bytestring, where @i = n `mod` length bs@.</span><span>
 </span><span id="line-28"></span><span class="hs-comment">--</span><span>
 </span><span id="line-29"></span><span class="hs-comment">-- If the bytestring is empty, return it unmodified.</span><span>
-</span><span id="line-30"></span><span class="annot"><a href="Test.Util.Corruption.html#applyCorruption"><span class="hs-identifier hs-type">applyCorruption</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Test.Util.Corruption.html#Corruption"><span class="hs-identifier hs-type">Corruption</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-type">Lazy.ByteString</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-type">Lazy.ByteString</span></a></span><span>
+</span><span id="line-30"></span><span class="annot"><a href="Test.Util.Corruption.html#applyCorruption"><span class="hs-identifier hs-type">applyCorruption</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Test.Util.Corruption.html#Corruption"><span class="hs-identifier hs-type">Corruption</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-type">Lazy.ByteString</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-type">Lazy.ByteString</span></a></span><span>
 </span><span id="line-31"></span><span id="applyCorruption"><span class="annot"><span class="annottext">applyCorruption :: Corruption -&gt; ByteString -&gt; ByteString
-</span><a href="Test.Util.Corruption.html#applyCorruption"><span class="hs-identifier hs-var hs-var">applyCorruption</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Util.Corruption.html#Corruption"><span class="hs-identifier hs-type">Corruption</span></a></span><span> </span><span id="local-6989586621679257310"><span class="annot"><span class="annottext">Word
-</span><a href="#local-6989586621679257310"><span class="hs-identifier hs-var">n</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679257309"><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679257309"><span class="hs-identifier hs-var">bs</span></a></span></span><span>
+</span><a href="Test.Util.Corruption.html#applyCorruption"><span class="hs-identifier hs-var hs-var">applyCorruption</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Test.Util.Corruption.html#Corruption"><span class="hs-identifier hs-type">Corruption</span></a></span><span> </span><span id="local-6989586621679272637"><span class="annot"><span class="annottext">Word
+</span><a href="#local-6989586621679272637"><span class="hs-identifier hs-var">n</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679272636"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679272636"><span class="hs-identifier hs-var">bs</span></a></span></span><span>
 </span><span id="line-32"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; Bool
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-var">Lazy.null</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679257309"><span class="hs-identifier hs-var">bs</span></a></span><span>
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-var">Lazy.null</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679272636"><span class="hs-identifier hs-var">bs</span></a></span><span>
 </span><span id="line-33"></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679257309"><span class="hs-identifier hs-var">bs</span></a></span><span>
+</span><a href="#local-6989586621679272636"><span class="hs-identifier hs-var">bs</span></a></span><span>
 </span><span id="line-34"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>
 </span><span id="line-35"></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679257307"><span class="hs-identifier hs-var">before</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; ByteString -&gt; ByteString
+</span><a href="#local-6989586621679272634"><span class="hs-identifier hs-var">before</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; ByteString -&gt; ByteString
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Word8 -&gt; ByteString -&gt; ByteString
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-var">Lazy.cons</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ByteString -&gt; Word8
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-var">Lazy.head</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679257304"><span class="hs-identifier hs-var">atAfter</span></a></span><span> </span><span class="annot"><span class="annottext">Word8 -&gt; Word8 -&gt; Word8
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Word8 -&gt; ByteString -&gt; ByteString
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-var">Lazy.cons</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ByteString -&gt; Word8
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-var">Lazy.head</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679272631"><span class="hs-identifier hs-var">atAfter</span></a></span><span> </span><span class="annot"><span class="annottext">Word8 -&gt; Word8 -&gt; Word8
 forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="annot"><span class="annottext">Word8
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">+</span></a></span><span> </span><span class="annot"><span class="annottext">Word8
 </span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ByteString -&gt; ByteString
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-var">Lazy.tail</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679257304"><span class="hs-identifier hs-var">atAfter</span></a></span><span class="hs-special">)</span><span>
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-var">Lazy.tail</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679272631"><span class="hs-identifier hs-var">atAfter</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-36"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-37"></span><span>    </span><span id="local-6989586621679257301"><span class="annot"><span class="annottext">offset :: Int64
-</span><a href="#local-6989586621679257301"><span class="hs-identifier hs-var hs-var">offset</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word -&gt; Int64
+</span><span id="line-37"></span><span>    </span><span id="local-6989586621679272628"><span class="annot"><span class="annottext">offset :: Int64
+</span><a href="#local-6989586621679272628"><span class="hs-identifier hs-var hs-var">offset</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word -&gt; Int64
 forall a b. (Integral a, Num b) =&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="annot"><span class="annottext">Word
-</span><a href="#local-6989586621679257310"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Int64 -&gt; Int64 -&gt; Int64
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">fromIntegral</span></a></span><span> </span><span class="annot"><span class="annottext">Word
+</span><a href="#local-6989586621679272637"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Int64 -&gt; Int64 -&gt; Int64
 forall a. Integral a =&gt; a -&gt; a -&gt; a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">`mod`</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; Int64
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-var">Lazy.length</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679257309"><span class="hs-identifier hs-var">bs</span></a></span><span>
-</span><span id="line-38"></span><span>    </span><span class="hs-special">(</span><span id="local-6989586621679257307"><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679257307"><span class="hs-identifier hs-var">before</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679257304"><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679257304"><span class="hs-identifier hs-var">atAfter</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int64 -&gt; ByteString -&gt; (ByteString, ByteString)
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-var">Lazy.splitAt</span></a></span><span> </span><span class="annot"><span class="annottext">Int64
-</span><a href="#local-6989586621679257301"><span class="hs-identifier hs-var">offset</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679257309"><span class="hs-identifier hs-var">bs</span></a></span><span>
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">`mod`</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; Int64
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-var">Lazy.length</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679272636"><span class="hs-identifier hs-var">bs</span></a></span><span>
+</span><span id="line-38"></span><span>    </span><span class="hs-special">(</span><span id="local-6989586621679272634"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679272634"><span class="hs-identifier hs-var">before</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679272631"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679272631"><span class="hs-identifier hs-var">atAfter</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int64 -&gt; ByteString -&gt; (ByteString, ByteString)
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-var">Lazy.splitAt</span></a></span><span> </span><span class="annot"><span class="annottext">Int64
+</span><a href="#local-6989586621679272628"><span class="hs-identifier hs-var">offset</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679272636"><span class="hs-identifier hs-var">bs</span></a></span><span>
 </span><span id="line-39"></span><span>
 </span><span id="line-40"></span><span class="hs-comment">-- | Serialise @a@, apply the given corruption, deserialise it, when that</span><span>
 </span><span id="line-41"></span><span class="hs-comment">-- fails, the corruption was detected. When deserialising the corrupted</span><span>
 </span><span id="line-42"></span><span class="hs-comment">-- bytestring succeeds, pass the deserialised value to the integrity checking</span><span>
 </span><span id="line-43"></span><span class="hs-comment">-- function. If that function returns 'False', the corruption was detected, if</span><span>
 </span><span id="line-44"></span><span class="hs-comment">-- it returns 'True', the corruption was not detected and the test fails.</span><span>
-</span><span id="line-45"></span><span id="local-6989586621679257297"><span class="annot"><a href="Test.Util.Corruption.html#detectCorruption"><span class="hs-identifier hs-type">detectCorruption</span></a></span><span>
-</span><span id="line-46"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679257297"><span class="hs-identifier hs-type">a</span></a></span><span>
-</span><span id="line-47"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679257297"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Encoding</span></span><span class="hs-special">)</span><span>
-</span><span id="line-48"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679257343"><span class="annot"><a href="#local-6989586621679257343"><span class="hs-identifier hs-type">s</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Decoder</span></span><span> </span><span class="annot"><a href="#local-6989586621679257343"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-type">Lazy.ByteString</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679257297"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-49"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679257297"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Bool</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-45"></span><span id="local-6989586621679272624"><span class="annot"><a href="Test.Util.Corruption.html#detectCorruption"><span class="hs-identifier hs-type">detectCorruption</span></a></span><span>
+</span><span id="line-46"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Show</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679272624"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-47"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679272624"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Encoding</span></span><span class="hs-special">)</span><span>
+</span><span id="line-48"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679272670"><span class="annot"><a href="#local-6989586621679272670"><span class="hs-identifier hs-type">s</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Decoder</span></span><span> </span><span class="annot"><a href="#local-6989586621679272670"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-type">Lazy.ByteString</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679272624"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-49"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679272624"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Bool</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-50"></span><span>     </span><span class="hs-comment">-- ^ Integrity check that should detect the corruption. Return 'False'</span><span>
 </span><span id="line-51"></span><span>     </span><span class="hs-comment">-- when corrupt.</span><span>
-</span><span id="line-52"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679257297"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-52"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679272624"><span class="hs-identifier hs-type">a</span></a></span><span>
 </span><span id="line-53"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Test.Util.Corruption.html#Corruption"><span class="hs-identifier hs-type">Corruption</span></a></span><span>
 </span><span id="line-54"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Property</span></span></span><span>
 </span><span id="line-55"></span><span id="detectCorruption"><span class="annot"><span class="annottext">detectCorruption :: (a -&gt; Encoding)
@@ -113,12 +113,12 @@ forall a. Integral a =&gt; a -&gt; a -&gt; a
 -&gt; a
 -&gt; Corruption
 -&gt; Property
-</span><a href="Test.Util.Corruption.html#detectCorruption"><span class="hs-identifier hs-var hs-var">detectCorruption</span></a></span></span><span> </span><span id="local-6989586621679257296"><span class="annot"><span class="annottext">a -&gt; Encoding
-</span><a href="#local-6989586621679257296"><span class="hs-identifier hs-var">enc</span></a></span></span><span> </span><span id="local-6989586621679257295"><span class="annot"><span class="annottext">forall s. Decoder s (ByteString -&gt; a)
-</span><a href="#local-6989586621679257295"><span class="hs-identifier hs-var">dec</span></a></span></span><span> </span><span id="local-6989586621679257294"><span class="annot"><span class="annottext">a -&gt; Bool
-</span><a href="#local-6989586621679257294"><span class="hs-identifier hs-var">isValid</span></a></span></span><span> </span><span id="local-6989586621679257293"><span class="annot"><span class="annottext">a
-</span><a href="#local-6989586621679257293"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span id="local-6989586621679257292"><span class="annot"><span class="annottext">Corruption
-</span><a href="#local-6989586621679257292"><span class="hs-identifier hs-var">cor</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="Test.Util.Corruption.html#detectCorruption"><span class="hs-identifier hs-var hs-var">detectCorruption</span></a></span></span><span> </span><span id="local-6989586621679272623"><span class="annot"><span class="annottext">a -&gt; Encoding
+</span><a href="#local-6989586621679272623"><span class="hs-identifier hs-var">enc</span></a></span></span><span> </span><span id="local-6989586621679272622"><span class="annot"><span class="annottext">forall s. Decoder s (ByteString -&gt; a)
+</span><a href="#local-6989586621679272622"><span class="hs-identifier hs-var">dec</span></a></span></span><span> </span><span id="local-6989586621679272621"><span class="annot"><span class="annottext">a -&gt; Bool
+</span><a href="#local-6989586621679272621"><span class="hs-identifier hs-var">isValid</span></a></span></span><span> </span><span id="local-6989586621679272620"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679272620"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span id="local-6989586621679272619"><span class="annot"><span class="annottext">Corruption
+</span><a href="#local-6989586621679272619"><span class="hs-identifier hs-var">cor</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-56"></span><span>    </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">(forall s. Decoder s (ByteString -&gt; a))
 -&gt; ByteString
 -&gt; Either DeserialiseFailure (ByteString, ByteString -&gt; a)
@@ -126,127 +126,127 @@ forall a.
 (forall s. Decoder s a)
 -&gt; ByteString -&gt; Either DeserialiseFailure (ByteString, a)
 </span><span class="hs-identifier hs-var">deserialiseFromBytes</span></span><span> </span><span class="annot"><span class="annottext">forall s. Decoder s (ByteString -&gt; a)
-</span><a href="#local-6989586621679257295"><span class="hs-identifier hs-var">dec</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679257291"><span class="hs-identifier hs-var">corruptBytes</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-57"></span><span>      </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Right</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679257290"><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679257290"><span class="hs-identifier hs-var">leftover</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679257289"><span class="annot"><span class="annottext">ByteString -&gt; a
-</span><a href="#local-6989586621679257289"><span class="hs-identifier hs-var">mkA'</span></a></span></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679272622"><span class="hs-identifier hs-var">dec</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679272618"><span class="hs-identifier hs-var">corruptBytes</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-57"></span><span>      </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Right</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679272617"><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679272617"><span class="hs-identifier hs-var">leftover</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679272616"><span class="annot"><span class="annottext">ByteString -&gt; a
+</span><a href="#local-6989586621679272616"><span class="hs-identifier hs-var">mkA'</span></a></span></span><span class="hs-special">)</span><span>
 </span><span id="line-58"></span><span>          </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">not</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ByteString -&gt; Bool
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-var">Lazy.null</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679257290"><span class="hs-identifier hs-var">leftover</span></a></span><span class="hs-special">)</span><span>
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">not</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ByteString -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/bytestring-0.10.12.0/src"><span class="hs-identifier hs-var">Lazy.null</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679272617"><span class="hs-identifier hs-var">leftover</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-59"></span><span>          </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; Property -&gt; Property
 forall prop. Testable prop =&gt; String -&gt; prop -&gt; Property
 </span><span class="hs-keyword hs-var">label</span></span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;corruption detected by decoder&quot;</span></span><span> </span><span class="annot"><span class="annottext">(Property -&gt; Property) -&gt; Property -&gt; Property
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Property
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Property
 forall prop. Testable prop =&gt; prop -&gt; Property
 </span><span class="hs-identifier hs-var">property</span></span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">True</span></a></span><span>
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">True</span></a></span><span>
 </span><span id="line-60"></span><span>          </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">not</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; Bool
-</span><a href="#local-6989586621679257294"><span class="hs-identifier hs-var">isValid</span></a></span><span> </span><span class="annot"><span class="annottext">a
-</span><a href="#local-6989586621679257285"><span class="hs-identifier hs-var">a'</span></a></span><span class="hs-special">)</span><span>
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">not</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; Bool
+</span><a href="#local-6989586621679272621"><span class="hs-identifier hs-var">isValid</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679272612"><span class="hs-identifier hs-var">a'</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-61"></span><span>          </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; Property -&gt; Property
 forall prop. Testable prop =&gt; String -&gt; prop -&gt; Property
 </span><span class="hs-keyword hs-var">label</span></span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;corruption detected&quot;</span></span><span> </span><span class="annot"><span class="annottext">(Property -&gt; Property) -&gt; Property -&gt; Property
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Property
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Property
 forall prop. Testable prop =&gt; prop -&gt; Property
 </span><span class="hs-identifier hs-var">property</span></span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">True</span></a></span><span>
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">True</span></a></span><span>
 </span><span id="line-62"></span><span>          </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span>
 </span><span id="line-63"></span><span>          </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; Property -&gt; Property
 forall prop. Testable prop =&gt; String -&gt; prop -&gt; Property
 </span><span class="hs-identifier hs-var">counterexample</span></span><span>
 </span><span id="line-64"></span><span>               </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;Corruption not detected: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; String
 forall a. Show a =&gt; a -&gt; String
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="annot"><span class="annottext">a
-</span><a href="#local-6989586621679257285"><span class="hs-identifier hs-var">a'</span></a></span><span class="hs-special">)</span><span>
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679272612"><span class="hs-identifier hs-var">a'</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-65"></span><span>           </span><span class="annot"><span class="annottext">(Property -&gt; Property) -&gt; Property -&gt; Property
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; Property -&gt; Property
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; Property -&gt; Property
 forall prop. Testable prop =&gt; String -&gt; prop -&gt; Property
 </span><span class="hs-identifier hs-var">counterexample</span></span><span>
 </span><span id="line-66"></span><span>               </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;Original bytes: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; String
 forall a. Show a =&gt; a -&gt; String
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679257282"><span class="hs-identifier hs-var">origBytes</span></a></span><span class="hs-special">)</span><span>
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679272609"><span class="hs-identifier hs-var">origBytes</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-67"></span><span>           </span><span class="annot"><span class="annottext">(Property -&gt; Property) -&gt; Property -&gt; Property
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; Property -&gt; Property
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; Property -&gt; Property
 forall prop. Testable prop =&gt; String -&gt; prop -&gt; Property
 </span><span class="hs-identifier hs-var">counterexample</span></span><span>
 </span><span id="line-68"></span><span>               </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;Corrupt bytes: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; String
 forall a. Show a =&gt; a -&gt; String
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679257291"><span class="hs-identifier hs-var">corruptBytes</span></a></span><span class="hs-special">)</span><span>
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679272618"><span class="hs-identifier hs-var">corruptBytes</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-69"></span><span>           </span><span class="annot"><span class="annottext">(Property -&gt; Property) -&gt; Property -&gt; Property
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; Property -&gt; Property
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; Property -&gt; Property
 forall prop. Testable prop =&gt; String -&gt; prop -&gt; Property
 </span><span class="hs-identifier hs-var">counterexample</span></span><span>
 </span><span id="line-70"></span><span>               </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;Original CBOR: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Term -&gt; String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Term -&gt; String
 forall a. Show a =&gt; a -&gt; String
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ByteString -&gt; Term
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ByteString -&gt; Term
 forall a. Serialise a =&gt; ByteString -&gt; a
 </span><span class="hs-identifier hs-var">deserialise</span></span><span> </span><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679257282"><span class="hs-identifier hs-var">origBytes</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Term</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679272609"><span class="hs-identifier hs-var">origBytes</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Term</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-71"></span><span>           </span><span class="annot"><span class="annottext">(Property -&gt; Property) -&gt; Property -&gt; Property
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; Bool -&gt; Property
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; Bool -&gt; Property
 forall prop. Testable prop =&gt; String -&gt; prop -&gt; Property
 </span><span class="hs-identifier hs-var">counterexample</span></span><span>
 </span><span id="line-72"></span><span>               </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;Corrupt CBOR: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Term -&gt; String
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">&lt;&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Term -&gt; String
 forall a. Show a =&gt; a -&gt; String
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ByteString -&gt; Term
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">show</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ByteString -&gt; Term
 forall a. Serialise a =&gt; ByteString -&gt; a
 </span><span class="hs-identifier hs-var">deserialise</span></span><span> </span><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679257291"><span class="hs-identifier hs-var">corruptBytes</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Term</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679272618"><span class="hs-identifier hs-var">corruptBytes</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Term</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-73"></span><span>             </span><span class="annot"><span class="annottext">Bool
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">False</span></a></span><span>
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">False</span></a></span><span>
 </span><span id="line-74"></span><span>        </span><span class="hs-keyword">where</span><span>
-</span><span id="line-75"></span><span>          </span><span id="local-6989586621679257285"><span class="annot"><span class="annottext">a' :: a
-</span><a href="#local-6989586621679257285"><span class="hs-identifier hs-var hs-var">a'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; a
-</span><a href="#local-6989586621679257289"><span class="hs-identifier hs-var">mkA'</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679257291"><span class="hs-identifier hs-var">corruptBytes</span></a></span><span>
-</span><span id="line-76"></span><span>      </span><span class="annot"><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-identifier hs-type">Left</span></a></span><span> </span><span class="annot"><span class="annottext">DeserialiseFailure
+</span><span id="line-75"></span><span>          </span><span id="local-6989586621679272612"><span class="annot"><span class="annottext">a' :: a
+</span><a href="#local-6989586621679272612"><span class="hs-identifier hs-var hs-var">a'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; a
+</span><a href="#local-6989586621679272616"><span class="hs-identifier hs-var">mkA'</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679272618"><span class="hs-identifier hs-var">corruptBytes</span></a></span><span>
+</span><span id="line-76"></span><span>      </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Left</span></a></span><span> </span><span class="annot"><span class="annottext">DeserialiseFailure
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; Property -&gt; Property
 forall prop. Testable prop =&gt; String -&gt; prop -&gt; Property
 </span><span class="hs-keyword hs-var">label</span></span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;corruption detected by decoder&quot;</span></span><span> </span><span class="annot"><span class="annottext">(Property -&gt; Property) -&gt; Property -&gt; Property
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/base-4.14.1.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Property
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">$</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Property
 forall prop. Testable prop =&gt; prop -&gt; Property
 </span><span class="hs-identifier hs-var">property</span></span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="../file:///home/runner/.ghcup/ghc/8.10.4/share/doc/ghc-8.10.4/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">True</span></a></span><span>
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">True</span></a></span><span>
 </span><span id="line-77"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-78"></span><span>    </span><span id="local-6989586621679257282"><span class="annot"><span class="annottext">origBytes :: ByteString
-</span><a href="#local-6989586621679257282"><span class="hs-identifier hs-var hs-var">origBytes</span></a></span></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Encoding -&gt; ByteString
+</span><span id="line-78"></span><span>    </span><span id="local-6989586621679272609"><span class="annot"><span class="annottext">origBytes :: ByteString
+</span><a href="#local-6989586621679272609"><span class="hs-identifier hs-var hs-var">origBytes</span></a></span></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Encoding -&gt; ByteString
 </span><span class="hs-identifier hs-var">toLazyByteString</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; Encoding
-</span><a href="#local-6989586621679257296"><span class="hs-identifier hs-var">enc</span></a></span><span> </span><span class="annot"><span class="annottext">a
-</span><a href="#local-6989586621679257293"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-79"></span><span>    </span><span id="local-6989586621679257291"><span class="annot"><span class="annottext">corruptBytes :: ByteString
-</span><a href="#local-6989586621679257291"><span class="hs-identifier hs-var hs-var">corruptBytes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Corruption -&gt; ByteString -&gt; ByteString
+</span><a href="#local-6989586621679272623"><span class="hs-identifier hs-var">enc</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679272620"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-79"></span><span>    </span><span id="local-6989586621679272618"><span class="annot"><span class="annottext">corruptBytes :: ByteString
+</span><a href="#local-6989586621679272618"><span class="hs-identifier hs-var hs-var">corruptBytes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Corruption -&gt; ByteString -&gt; ByteString
 </span><a href="Test.Util.Corruption.html#applyCorruption"><span class="hs-identifier hs-var">applyCorruption</span></a></span><span> </span><span class="annot"><span class="annottext">Corruption
-</span><a href="#local-6989586621679257292"><span class="hs-identifier hs-var">cor</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
-</span><a href="#local-6989586621679257282"><span class="hs-identifier hs-var">origBytes</span></a></span><span>
+</span><a href="#local-6989586621679272619"><span class="hs-identifier hs-var">cor</span></a></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><a href="#local-6989586621679272609"><span class="hs-identifier hs-var">origBytes</span></a></span><span>
 </span><span id="line-80"></span></pre></body></html>

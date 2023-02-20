@@ -1,0 +1,340 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DataKinds                  #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DeriveAnyClass             #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE DeriveGeneric              #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE DerivingStrategies         #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE GeneralizedNewtypeDeriving #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE TypeFamilies               #-}</span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- | Various things common to iterations of the Praos protocol.</span><span>
+</span><span id="line-9"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ouroboros.Consensus.Protocol.Praos.Common</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-10"></span><span>    </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#MaxMajorProtVer"><span class="hs-identifier">MaxMajorProtVer</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#PraosCanBeLeader"><span class="hs-identifier">PraosCanBeLeader</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#PraosChainSelectView"><span class="hs-identifier">PraosChainSelectView</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-13"></span><span>    </span><span class="annot"><span class="hs-comment">-- * node support</span></span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#PraosNonces"><span class="hs-identifier">PraosNonces</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#PraosProtocolSupportsNode"><span class="hs-identifier">PraosProtocolSupportsNode</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Crypto.VRF</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">VRF</span></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.BaseTypes</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Nonce</span></span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Crypto</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Crypto</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">VRF</span></span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Keys</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">KeyHash</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">KeyRole</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">BlockIssuer</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Ledger.Shelley.API</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SL</span></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Protocol.TPraos.OCert</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">OCert</span></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Slotting.Block</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">BlockNo</span></span><span class="hs-special">)</span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Cardano.Slotting.Slot</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">SlotNo</span></span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Function</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">on</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier">Data.Map.Strict</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier">Map</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Ord</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Down</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Down</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Data.Word</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Word64</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">GHC.Generics</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Generic</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">NoThunks.Class</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NoThunks</span></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Numeric.Natural</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier">Natural</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier">Ouroboros.Consensus.Protocol.Abstract</span></a></span><span>
+</span><span id="line-34"></span><span>
+</span><span id="line-35"></span><span class="hs-comment">-- | The maximum major protocol version.</span><span>
+</span><span id="line-36"></span><span class="hs-comment">--</span><span>
+</span><span id="line-37"></span><span class="hs-comment">-- Must be at least the current major protocol version. For Cardano mainnet, the</span><span>
+</span><span id="line-38"></span><span class="hs-comment">-- Shelley era has major protocol verison __2__.</span><span>
+</span><span id="line-39"></span><span id="local-6989586621679276072"><span id="local-6989586621679276073"></span></span><span class="hs-keyword">newtype</span><span> </span><span id="MaxMajorProtVer"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#MaxMajorProtVer"><span class="hs-identifier hs-var">MaxMajorProtVer</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="MaxMajorProtVer"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#MaxMajorProtVer"><span class="hs-identifier hs-var">MaxMajorProtVer</span></a></span></span><span>
+</span><span id="line-40"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="getMaxMajorProtVer"><span class="annot"><span class="annottext">MaxMajorProtVer -&gt; Natural
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#getMaxMajorProtVer"><span class="hs-identifier hs-var hs-var">getMaxMajorProtVer</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Natural</span></a></span><span>
+</span><span id="line-41"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-42"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679276066"><span id="local-6989586621679276068"><span class="annot"><span class="annottext">MaxMajorProtVer -&gt; MaxMajorProtVer -&gt; Bool
+(MaxMajorProtVer -&gt; MaxMajorProtVer -&gt; Bool)
+-&gt; (MaxMajorProtVer -&gt; MaxMajorProtVer -&gt; Bool)
+-&gt; Eq MaxMajorProtVer
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: MaxMajorProtVer -&gt; MaxMajorProtVer -&gt; Bool
+$c/= :: MaxMajorProtVer -&gt; MaxMajorProtVer -&gt; Bool
+== :: MaxMajorProtVer -&gt; MaxMajorProtVer -&gt; Bool
+$c== :: MaxMajorProtVer -&gt; MaxMajorProtVer -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276059"><span id="local-6989586621679276061"><span id="local-6989586621679276063"><span class="annot"><span class="annottext">Int -&gt; MaxMajorProtVer -&gt; ShowS
+[MaxMajorProtVer] -&gt; ShowS
+MaxMajorProtVer -&gt; String
+(Int -&gt; MaxMajorProtVer -&gt; ShowS)
+-&gt; (MaxMajorProtVer -&gt; String)
+-&gt; ([MaxMajorProtVer] -&gt; ShowS)
+-&gt; Show MaxMajorProtVer
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [MaxMajorProtVer] -&gt; ShowS
+$cshowList :: [MaxMajorProtVer] -&gt; ShowS
+show :: MaxMajorProtVer -&gt; String
+$cshow :: MaxMajorProtVer -&gt; String
+showsPrec :: Int -&gt; MaxMajorProtVer -&gt; ShowS
+$cshowsPrec :: Int -&gt; MaxMajorProtVer -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. MaxMajorProtVer -&gt; Rep MaxMajorProtVer x)
+-&gt; (forall x. Rep MaxMajorProtVer x -&gt; MaxMajorProtVer)
+-&gt; Generic MaxMajorProtVer
+forall x. Rep MaxMajorProtVer x -&gt; MaxMajorProtVer
+forall x. MaxMajorProtVer -&gt; Rep MaxMajorProtVer x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cto :: forall x. Rep MaxMajorProtVer x -&gt; MaxMajorProtVer
+$cfrom :: forall x. MaxMajorProtVer -&gt; Rep MaxMajorProtVer x
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span id="local-6989586621679276049"><span id="local-6989586621679276051"><span id="local-6989586621679276053"><span class="annot"><span class="annottext">Context -&gt; MaxMajorProtVer -&gt; IO (Maybe ThunkInfo)
+Proxy MaxMajorProtVer -&gt; String
+(Context -&gt; MaxMajorProtVer -&gt; IO (Maybe ThunkInfo))
+-&gt; (Context -&gt; MaxMajorProtVer -&gt; IO (Maybe ThunkInfo))
+-&gt; (Proxy MaxMajorProtVer -&gt; String)
+-&gt; NoThunks MaxMajorProtVer
+forall a.
+(Context -&gt; a -&gt; IO (Maybe ThunkInfo))
+-&gt; (Context -&gt; a -&gt; IO (Maybe ThunkInfo))
+-&gt; (Proxy a -&gt; String)
+-&gt; NoThunks a
+showTypeOf :: Proxy MaxMajorProtVer -&gt; String
+$cshowTypeOf :: Proxy MaxMajorProtVer -&gt; String
+wNoThunks :: Context -&gt; MaxMajorProtVer -&gt; IO (Maybe ThunkInfo)
+$cwNoThunks :: Context -&gt; MaxMajorProtVer -&gt; IO (Maybe ThunkInfo)
+noThunks :: Context -&gt; MaxMajorProtVer -&gt; IO (Maybe ThunkInfo)
+$cnoThunks :: Context -&gt; MaxMajorProtVer -&gt; IO (Maybe ThunkInfo)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">NoThunks</span></span></span></span></span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span class="hs-comment">-- | View of the ledger tip for chain selection.</span><span>
+</span><span id="line-46"></span><span class="hs-comment">--</span><span>
+</span><span id="line-47"></span><span class="hs-comment">-- We order between chains as follows:</span><span>
+</span><span id="line-48"></span><span class="hs-comment">--</span><span>
+</span><span id="line-49"></span><span class="hs-comment">-- 1. By chain length, with longer chains always preferred.</span><span>
+</span><span id="line-50"></span><span class="hs-comment">-- 2. If the tip of each chain was issued by the same agent, then we prefer</span><span>
+</span><span id="line-51"></span><span class="hs-comment">--    the chain whose tip has the highest ocert issue number.</span><span>
+</span><span id="line-52"></span><span class="hs-comment">-- 3. By a VRF value from the chain tip, with lower values preferred. See</span><span>
+</span><span id="line-53"></span><span class="hs-comment">--    @pTieBreakVRFValue@ for which one is used.</span><span>
+</span><span id="line-54"></span><span id="local-6989586621679276046"><span id="local-6989586621679276047"></span></span><span class="hs-keyword">data</span><span> </span><span id="PraosChainSelectView"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#PraosChainSelectView"><span class="hs-identifier hs-var">PraosChainSelectView</span></a></span></span><span> </span><span id="local-6989586621679276101"><span class="annot"><a href="#local-6989586621679276101"><span class="hs-identifier hs-type">c</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="PraosChainSelectView"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#PraosChainSelectView"><span class="hs-identifier hs-var">PraosChainSelectView</span></a></span></span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="csvChainLength"><span class="annot"><span class="annottext">PraosChainSelectView c -&gt; BlockNo
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#csvChainLength"><span class="hs-identifier hs-var hs-var">csvChainLength</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">BlockNo</span></span><span class="hs-special">,</span><span>
+</span><span id="line-56"></span><span>    </span><span id="csvSlotNo"><span class="annot"><span class="annottext">PraosChainSelectView c -&gt; SlotNo
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#csvSlotNo"><span class="hs-identifier hs-var hs-var">csvSlotNo</span></a></span></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SlotNo</span></span><span class="hs-special">,</span><span>
+</span><span id="line-57"></span><span>    </span><span id="csvIssuer"><span class="annot"><span class="annottext">PraosChainSelectView c -&gt; VKey 'BlockIssuer c
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#csvIssuer"><span class="hs-identifier hs-var hs-var">csvIssuer</span></a></span></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SL.VKey</span></span><span> </span><span class="hs-special">'</span><span class="annot"><span class="hs-identifier hs-type">SL.BlockIssuer</span></span><span> </span><span class="annot"><a href="#local-6989586621679276101"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-58"></span><span>    </span><span id="csvIssueNo"><span class="annot"><span class="annottext">PraosChainSelectView c -&gt; Word64
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#csvIssueNo"><span class="hs-identifier hs-var hs-var">csvIssueNo</span></a></span></span><span>     </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Word64</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-59"></span><span>    </span><span id="csvTieBreakVRF"><span class="annot"><span class="annottext">PraosChainSelectView c -&gt; OutputVRF (VRF c)
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#csvTieBreakVRF"><span class="hs-identifier hs-var hs-var">csvTieBreakVRF</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">VRF.OutputVRF</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">VRF</span></span><span> </span><span class="annot"><a href="#local-6989586621679276101"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-60"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-61"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679276034"><span id="local-6989586621679276036"><span id="local-6989586621679276038"><span class="annot"><span class="annottext">Int -&gt; PraosChainSelectView c -&gt; ShowS
+[PraosChainSelectView c] -&gt; ShowS
+PraosChainSelectView c -&gt; String
+(Int -&gt; PraosChainSelectView c -&gt; ShowS)
+-&gt; (PraosChainSelectView c -&gt; String)
+-&gt; ([PraosChainSelectView c] -&gt; ShowS)
+-&gt; Show (PraosChainSelectView c)
+forall c. Crypto c =&gt; Int -&gt; PraosChainSelectView c -&gt; ShowS
+forall c. Crypto c =&gt; [PraosChainSelectView c] -&gt; ShowS
+forall c. Crypto c =&gt; PraosChainSelectView c -&gt; String
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [PraosChainSelectView c] -&gt; ShowS
+$cshowList :: forall c. Crypto c =&gt; [PraosChainSelectView c] -&gt; ShowS
+show :: PraosChainSelectView c -&gt; String
+$cshow :: forall c. Crypto c =&gt; PraosChainSelectView c -&gt; String
+showsPrec :: Int -&gt; PraosChainSelectView c -&gt; ShowS
+$cshowsPrec :: forall c. Crypto c =&gt; Int -&gt; PraosChainSelectView c -&gt; ShowS
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></a></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276030"><span id="local-6989586621679276032"><span class="annot"><span class="annottext">PraosChainSelectView c -&gt; PraosChainSelectView c -&gt; Bool
+(PraosChainSelectView c -&gt; PraosChainSelectView c -&gt; Bool)
+-&gt; (PraosChainSelectView c -&gt; PraosChainSelectView c -&gt; Bool)
+-&gt; Eq (PraosChainSelectView c)
+forall c.
+Crypto c =&gt;
+PraosChainSelectView c -&gt; PraosChainSelectView c -&gt; Bool
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: PraosChainSelectView c -&gt; PraosChainSelectView c -&gt; Bool
+$c/= :: forall c.
+Crypto c =&gt;
+PraosChainSelectView c -&gt; PraosChainSelectView c -&gt; Bool
+== :: PraosChainSelectView c -&gt; PraosChainSelectView c -&gt; Bool
+$c== :: forall c.
+Crypto c =&gt;
+PraosChainSelectView c -&gt; PraosChainSelectView c -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></a></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x.
+ PraosChainSelectView c -&gt; Rep (PraosChainSelectView c) x)
+-&gt; (forall x.
+    Rep (PraosChainSelectView c) x -&gt; PraosChainSelectView c)
+-&gt; Generic (PraosChainSelectView c)
+forall x. Rep (PraosChainSelectView c) x -&gt; PraosChainSelectView c
+forall x. PraosChainSelectView c -&gt; Rep (PraosChainSelectView c) x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+forall c x.
+Rep (PraosChainSelectView c) x -&gt; PraosChainSelectView c
+forall c x.
+PraosChainSelectView c -&gt; Rep (PraosChainSelectView c) x
+$cto :: forall c x.
+Rep (PraosChainSelectView c) x -&gt; PraosChainSelectView c
+$cfrom :: forall c x.
+PraosChainSelectView c -&gt; Rep (PraosChainSelectView c) x
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679276022"><span id="local-6989586621679276024"><span id="local-6989586621679276026"><span class="annot"><span class="annottext">Context -&gt; PraosChainSelectView c -&gt; IO (Maybe ThunkInfo)
+Proxy (PraosChainSelectView c) -&gt; String
+(Context -&gt; PraosChainSelectView c -&gt; IO (Maybe ThunkInfo))
+-&gt; (Context -&gt; PraosChainSelectView c -&gt; IO (Maybe ThunkInfo))
+-&gt; (Proxy (PraosChainSelectView c) -&gt; String)
+-&gt; NoThunks (PraosChainSelectView c)
+forall c.
+Crypto c =&gt;
+Context -&gt; PraosChainSelectView c -&gt; IO (Maybe ThunkInfo)
+forall c. Crypto c =&gt; Proxy (PraosChainSelectView c) -&gt; String
+forall a.
+(Context -&gt; a -&gt; IO (Maybe ThunkInfo))
+-&gt; (Context -&gt; a -&gt; IO (Maybe ThunkInfo))
+-&gt; (Proxy a -&gt; String)
+-&gt; NoThunks a
+showTypeOf :: Proxy (PraosChainSelectView c) -&gt; String
+$cshowTypeOf :: forall c. Crypto c =&gt; Proxy (PraosChainSelectView c) -&gt; String
+wNoThunks :: Context -&gt; PraosChainSelectView c -&gt; IO (Maybe ThunkInfo)
+$cwNoThunks :: forall c.
+Crypto c =&gt;
+Context -&gt; PraosChainSelectView c -&gt; IO (Maybe ThunkInfo)
+noThunks :: Context -&gt; PraosChainSelectView c -&gt; IO (Maybe ThunkInfo)
+$cnoThunks :: forall c.
+Crypto c =&gt;
+Context -&gt; PraosChainSelectView c -&gt; IO (Maybe ThunkInfo)
+</span><a href="#local-6989586621679276022"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">NoThunks</span></a></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-62"></span><span>
+</span><span id="line-63"></span><span id="local-6989586621679276021"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679276007"><span id="local-6989586621679276009"><span id="local-6989586621679276011"><span id="local-6989586621679276013"><span id="local-6989586621679276015"><span id="local-6989586621679276017"><span class="annot"><span class="hs-identifier hs-type">Crypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679276021"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Ord</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#PraosChainSelectView"><span class="hs-identifier hs-type">PraosChainSelectView</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276021"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span></span></span></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-64"></span><span>  </span><span id="local-6989586621679276005"><span class="annot"><span class="annottext">compare :: PraosChainSelectView c -&gt; PraosChainSelectView c -&gt; Ordering
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">compare</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-65"></span><span>    </span><span class="annot"><span class="annottext">[PraosChainSelectView c -&gt; PraosChainSelectView c -&gt; Ordering]
+-&gt; PraosChainSelectView c -&gt; PraosChainSelectView c -&gt; Ordering
+forall a. Monoid a =&gt; [a] -&gt; a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">mconcat</span></a></span><span>
+</span><span id="line-66"></span><span>      </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">BlockNo -&gt; BlockNo -&gt; Ordering
+forall a. Ord a =&gt; a -&gt; a -&gt; Ordering
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">compare</span></a></span><span> </span><span class="annot"><span class="annottext">(BlockNo -&gt; BlockNo -&gt; Ordering)
+-&gt; (PraosChainSelectView c -&gt; BlockNo)
+-&gt; PraosChainSelectView c
+-&gt; PraosChainSelectView c
+-&gt; Ordering
+forall b c a. (b -&gt; b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">`on`</span></a></span><span> </span><span class="annot"><span class="annottext">PraosChainSelectView c -&gt; BlockNo
+forall c. PraosChainSelectView c -&gt; BlockNo
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#csvChainLength"><span class="hs-identifier hs-var hs-var">csvChainLength</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-67"></span><span>        </span><span class="annot"><span class="annottext">(PraosChainSelectView c -&gt; VKey 'BlockIssuer c)
+-&gt; (PraosChainSelectView c -&gt; PraosChainSelectView c -&gt; Ordering)
+-&gt; PraosChainSelectView c
+-&gt; PraosChainSelectView c
+-&gt; Ordering
+forall a view.
+Eq a =&gt;
+(view -&gt; a)
+-&gt; (view -&gt; view -&gt; Ordering) -&gt; view -&gt; view -&gt; Ordering
+</span><a href="#local-6989586621679276003"><span class="hs-identifier hs-var">whenSame</span></a></span><span> </span><span class="annot"><span class="annottext">PraosChainSelectView c -&gt; VKey 'BlockIssuer c
+forall c. PraosChainSelectView c -&gt; VKey 'BlockIssuer c
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#csvIssuer"><span class="hs-identifier hs-var hs-var">csvIssuer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word64 -&gt; Word64 -&gt; Ordering
+forall a. Ord a =&gt; a -&gt; a -&gt; Ordering
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">compare</span></a></span><span> </span><span class="annot"><span class="annottext">(Word64 -&gt; Word64 -&gt; Ordering)
+-&gt; (PraosChainSelectView c -&gt; Word64)
+-&gt; PraosChainSelectView c
+-&gt; PraosChainSelectView c
+-&gt; Ordering
+forall b c a. (b -&gt; b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">`on`</span></a></span><span> </span><span class="annot"><span class="annottext">PraosChainSelectView c -&gt; Word64
+forall c. PraosChainSelectView c -&gt; Word64
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#csvIssueNo"><span class="hs-identifier hs-var hs-var">csvIssueNo</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-68"></span><span>        </span><span class="annot"><span class="annottext">Down (OutputVRF (VRF c)) -&gt; Down (OutputVRF (VRF c)) -&gt; Ordering
+forall a. Ord a =&gt; a -&gt; a -&gt; Ordering
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">compare</span></a></span><span> </span><span class="annot"><span class="annottext">(Down (OutputVRF (VRF c)) -&gt; Down (OutputVRF (VRF c)) -&gt; Ordering)
+-&gt; (PraosChainSelectView c -&gt; Down (OutputVRF (VRF c)))
+-&gt; PraosChainSelectView c
+-&gt; PraosChainSelectView c
+-&gt; Ordering
+forall b c a. (b -&gt; b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">`on`</span></a></span><span> </span><span class="annot"><span class="annottext">OutputVRF (VRF c) -&gt; Down (OutputVRF (VRF c))
+forall a. a -&gt; Down a
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">Down</span></a></span><span> </span><span class="annot"><span class="annottext">(OutputVRF (VRF c) -&gt; Down (OutputVRF (VRF c)))
+-&gt; (PraosChainSelectView c -&gt; OutputVRF (VRF c))
+-&gt; PraosChainSelectView c
+-&gt; Down (OutputVRF (VRF c))
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-operator hs-var">.</span></a></span><span> </span><span class="annot"><span class="annottext">PraosChainSelectView c -&gt; OutputVRF (VRF c)
+forall c. PraosChainSelectView c -&gt; OutputVRF (VRF c)
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#csvTieBreakVRF"><span class="hs-identifier hs-var hs-var">csvTieBreakVRF</span></a></span><span>
+</span><span id="line-69"></span><span>      </span><span class="hs-special">]</span><span>
+</span><span id="line-70"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-71"></span><span>      </span><span class="hs-comment">-- When the @a@s are equal, use the given comparison function,</span><span>
+</span><span id="line-72"></span><span>      </span><span class="hs-comment">-- otherwise, no preference.</span><span>
+</span><span id="line-73"></span><span>      </span><span id="local-6989586621679276099"><span id="local-6989586621679276100"><span class="annot"><a href="#local-6989586621679276003"><span class="hs-identifier hs-type">whenSame</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-74"></span><span>        </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Eq</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679276100"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-75"></span><span>        </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679276099"><span class="hs-identifier hs-type">view</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679276100"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-76"></span><span>        </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679276099"><span class="hs-identifier hs-type">view</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679276099"><span class="hs-identifier hs-type">view</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Ordering</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-77"></span><span>        </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679276099"><span class="hs-identifier hs-type">view</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679276099"><span class="hs-identifier hs-type">view</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-type">Ordering</span></a></span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-78"></span><span>      </span><span id="local-6989586621679276003"><span class="annot"><span class="annottext">whenSame :: (view -&gt; a)
+-&gt; (view -&gt; view -&gt; Ordering) -&gt; view -&gt; view -&gt; Ordering
+</span><a href="#local-6989586621679276003"><span class="hs-identifier hs-var hs-var">whenSame</span></a></span></span><span> </span><span id="local-6989586621679276001"><span class="annot"><span class="annottext">view -&gt; a
+</span><a href="#local-6989586621679276001"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679276000"><span class="annot"><span class="annottext">view -&gt; view -&gt; Ordering
+</span><a href="#local-6989586621679276000"><span class="hs-identifier hs-var">comp</span></a></span></span><span> </span><span id="local-6989586621679275999"><span class="annot"><span class="annottext">view
+</span><a href="#local-6989586621679275999"><span class="hs-identifier hs-var">v1</span></a></span></span><span> </span><span id="local-6989586621679275998"><span class="annot"><span class="annottext">view
+</span><a href="#local-6989586621679275998"><span class="hs-identifier hs-var">v2</span></a></span></span><span>
+</span><span id="line-79"></span><span>        </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">view -&gt; a
+</span><a href="#local-6989586621679276001"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">view
+</span><a href="#local-6989586621679275999"><span class="hs-identifier hs-var">v1</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-operator hs-var">==</span></a></span><span> </span><span class="annot"><span class="annottext">view -&gt; a
+</span><a href="#local-6989586621679276001"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">view
+</span><a href="#local-6989586621679275998"><span class="hs-identifier hs-var">v2</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-80"></span><span>            </span><span class="annot"><span class="annottext">view -&gt; view -&gt; Ordering
+</span><a href="#local-6989586621679276000"><span class="hs-identifier hs-var">comp</span></a></span><span> </span><span class="annot"><span class="annottext">view
+</span><a href="#local-6989586621679275999"><span class="hs-identifier hs-var">v1</span></a></span><span> </span><span class="annot"><span class="annottext">view
+</span><a href="#local-6989586621679275998"><span class="hs-identifier hs-var">v2</span></a></span><span>
+</span><span id="line-81"></span><span>        </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var">otherwise</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-82"></span><span>            </span><span class="annot"><span class="annottext">Ordering
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/ghc-prim-0.6.1/src"><span class="hs-identifier hs-var">EQ</span></a></span></span><span>
+</span><span id="line-83"></span><span>
+</span><span id="line-84"></span><span id="local-6989586621679275996"><span id="local-6989586621679275997"></span></span><span class="hs-keyword">data</span><span> </span><span id="PraosCanBeLeader"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#PraosCanBeLeader"><span class="hs-identifier hs-var">PraosCanBeLeader</span></a></span></span><span> </span><span id="local-6989586621679275995"><span class="annot"><a href="#local-6989586621679275995"><span class="hs-identifier hs-type">c</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="PraosCanBeLeader"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#PraosCanBeLeader"><span class="hs-identifier hs-var">PraosCanBeLeader</span></a></span></span><span>
+</span><span id="line-85"></span><span>  </span><span class="hs-special">{</span><span> </span><span class="hs-comment">-- | Certificate delegating rights from the stake pool cold key (or</span><span>
+</span><span id="line-86"></span><span>    </span><span class="hs-comment">-- genesis stakeholder delegate cold key) to the online KES key.</span><span>
+</span><span id="line-87"></span><span>    </span><span id="praosCanBeLeaderOpCert"><span class="annot"><span class="annottext">PraosCanBeLeader c -&gt; OCert c
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#praosCanBeLeaderOpCert"><span class="hs-identifier hs-var hs-var">praosCanBeLeaderOpCert</span></a></span></span><span>     </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">OCert.OCert</span></span><span> </span><span class="annot"><a href="#local-6989586621679275995"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-88"></span><span>    </span><span class="hs-comment">-- | Stake pool cold key or genesis stakeholder delegate cold key.</span><span>
+</span><span id="line-89"></span><span>    </span><span id="praosCanBeLeaderColdVerKey"><span class="annot"><span class="annottext">PraosCanBeLeader c -&gt; VKey 'BlockIssuer c
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#praosCanBeLeaderColdVerKey"><span class="hs-identifier hs-var hs-var">praosCanBeLeaderColdVerKey</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.VKey</span></span><span> </span><span class="hs-special">'</span><span class="annot"><span class="hs-identifier hs-type">SL.BlockIssuer</span></span><span> </span><span class="annot"><a href="#local-6989586621679275995"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-90"></span><span>    </span><span id="praosCanBeLeaderSignKeyVRF"><span class="annot"><span class="annottext">PraosCanBeLeader c -&gt; SignKeyVRF c
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#praosCanBeLeaderSignKeyVRF"><span class="hs-identifier hs-var hs-var">praosCanBeLeaderSignKeyVRF</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">SL.SignKeyVRF</span></span><span> </span><span class="annot"><a href="#local-6989586621679275995"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-91"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-92"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(forall x. PraosCanBeLeader c -&gt; Rep (PraosCanBeLeader c) x)
+-&gt; (forall x. Rep (PraosCanBeLeader c) x -&gt; PraosCanBeLeader c)
+-&gt; Generic (PraosCanBeLeader c)
+forall x. Rep (PraosCanBeLeader c) x -&gt; PraosCanBeLeader c
+forall x. PraosCanBeLeader c -&gt; Rep (PraosCanBeLeader c) x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+forall c x. Rep (PraosCanBeLeader c) x -&gt; PraosCanBeLeader c
+forall c x. PraosCanBeLeader c -&gt; Rep (PraosCanBeLeader c) x
+$cto :: forall c x. Rep (PraosCanBeLeader c) x -&gt; PraosCanBeLeader c
+$cfrom :: forall c x. PraosCanBeLeader c -&gt; Rep (PraosCanBeLeader c) x
+</span><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-93"></span><span>
+</span><span id="line-94"></span><span id="local-6989586621679275988"><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679275982"><span id="local-6989586621679275984"><span id="local-6989586621679275986"><span class="annot"><span class="hs-identifier hs-type">Crypto</span></span><span> </span><span class="annot"><a href="#local-6989586621679275988"><span class="hs-identifier hs-type">c</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NoThunks</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#PraosCanBeLeader"><span class="hs-identifier hs-type">PraosCanBeLeader</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679275988"><span class="hs-identifier hs-type">c</span></a></span><span class="hs-special">)</span></span></span></span></span><span>
+</span><span id="line-95"></span><span>
+</span><span id="line-96"></span><span class="hs-comment">-- | See 'PraosProtocolSupportsNode'</span><span>
+</span><span id="line-97"></span><span class="hs-keyword">data</span><span> </span><span id="PraosNonces"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#PraosNonces"><span class="hs-identifier hs-var">PraosNonces</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="PraosNonces"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#PraosNonces"><span class="hs-identifier hs-var">PraosNonces</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-98"></span><span>    </span><span id="candidateNonce"><span class="annot"><span class="annottext">PraosNonces -&gt; Nonce
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#candidateNonce"><span class="hs-identifier hs-var hs-var">candidateNonce</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><span class="hs-identifier hs-type">Nonce</span></span><span>
+</span><span id="line-99"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="epochNonce"><span class="annot"><span class="annottext">PraosNonces -&gt; Nonce
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#epochNonce"><span class="hs-identifier hs-var hs-var">epochNonce</span></a></span></span><span>       </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><span class="hs-identifier hs-type">Nonce</span></span><span>
+</span><span id="line-100"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="evolvingNonce"><span class="annot"><span class="annottext">PraosNonces -&gt; Nonce
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#evolvingNonce"><span class="hs-identifier hs-var hs-var">evolvingNonce</span></a></span></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><span class="hs-identifier hs-type">Nonce</span></span><span>
+</span><span id="line-101"></span><span>    </span><span class="hs-comment">-- | Nonce constructed from the hash of the Last Applied Block</span><span>
+</span><span id="line-102"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="labNonce"><span class="annot"><span class="annottext">PraosNonces -&gt; Nonce
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#labNonce"><span class="hs-identifier hs-var hs-var">labNonce</span></a></span></span><span>         </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><span class="hs-identifier hs-type">Nonce</span></span><span>
+</span><span id="line-103"></span><span>    </span><span class="hs-comment">-- | Nonce corresponding to the LAB nonce of the last block of the previous</span><span>
+</span><span id="line-104"></span><span>    </span><span class="hs-comment">-- epoch</span><span>
+</span><span id="line-105"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="previousLabNonce"><span class="annot"><span class="annottext">PraosNonces -&gt; Nonce
+</span><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#previousLabNonce"><span class="hs-identifier hs-var hs-var">previousLabNonce</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><span class="hs-identifier hs-type">Nonce</span></span><span>
+</span><span id="line-106"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-107"></span><span>
+</span><span id="line-108"></span><span class="hs-comment">-- | The node has Praos-aware code that inspects nonces in order to support</span><span>
+</span><span id="line-109"></span><span class="hs-comment">-- some Cardano API queries that are crucial to the user exprience</span><span>
+</span><span id="line-110"></span><span class="hs-comment">--</span><span>
+</span><span id="line-111"></span><span class="hs-comment">-- The interface being used for that has grown and needs review, but we're</span><span>
+</span><span id="line-112"></span><span class="hs-comment">-- adding to it here under time pressure. See</span><span>
+</span><span id="line-113"></span><span class="hs-comment">-- &lt;https://github.com/input-output-hk/cardano-node/issues/3864&gt;</span><span>
+</span><span id="line-114"></span><span class="hs-keyword">class</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">ConsensusProtocol</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679275974"><span class="hs-identifier hs-type">p</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span id="PraosProtocolSupportsNode"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#PraosProtocolSupportsNode"><span class="hs-identifier hs-var">PraosProtocolSupportsNode</span></a></span></span><span> </span><span id="local-6989586621679275974"><span class="annot"><a href="#local-6989586621679275974"><span class="hs-identifier hs-type">p</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-115"></span><span>  </span><span class="hs-keyword">type</span><span> </span><span id="PraosProtocolSupportsNodeCrypto"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#PraosProtocolSupportsNodeCrypto"><span class="hs-identifier hs-var">PraosProtocolSupportsNodeCrypto</span></a></span></span><span> </span><span id="local-6989586621679275974"><span class="annot"><a href="#local-6989586621679275974"><span class="hs-identifier hs-type">p</span></a></span></span><span>
+</span><span id="line-116"></span><span>
+</span><span id="line-117"></span><span>  </span><span id="local-6989586621679275972"><span id="getPraosNonces"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#getPraosNonces"><span class="hs-identifier hs-type">getPraosNonces</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679275972"><span class="hs-identifier hs-type">proxy</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679275974"><span class="hs-identifier hs-type">p</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">ChainDepState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679275974"><span class="hs-identifier hs-type">p</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#PraosNonces"><span class="hs-identifier hs-type">PraosNonces</span></a></span></span><span>
+</span><span id="line-118"></span><span>
+</span><span id="line-119"></span><span>  </span><span id="local-6989586621679275969"><span id="getOpCertCounters"><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#getOpCertCounters"><span class="hs-identifier hs-type">getOpCertCounters</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679275969"><span class="hs-identifier hs-type">proxy</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679275974"><span class="hs-identifier hs-type">p</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///home/runner/work/ouroboros-network/ouroboros-network/dist-newstyle/build/x86_64-linux/ghc-8.10.7/ouroboros-consensus-0.2.0.0/noopt/doc/html/ouroboros-consensus/src"><span class="hs-identifier hs-type">ChainDepState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679275974"><span class="hs-identifier hs-type">p</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/containers-0.6.5.1/src"><span class="hs-identifier hs-type">Map</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">KeyHash</span></span><span> </span><span class="hs-special">'</span><span class="annot"><span class="hs-identifier hs-type">BlockIssuer</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ouroboros.Consensus.Protocol.Praos.Common.html#PraosProtocolSupportsNodeCrypto"><span class="hs-identifier hs-type">PraosProtocolSupportsNodeCrypto</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679275974"><span class="hs-identifier hs-type">p</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><a href="../file:///usr/local/.ghcup/ghc/8.10.7/share/doc/ghc-8.10.7/html/libraries/base-4.14.3.0/src"><span class="hs-identifier hs-type">Word64</span></a></span></span><span>
+</span><span id="line-120"></span></pre></body></html>
